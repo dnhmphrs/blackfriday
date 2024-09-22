@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Black Friday",
+  "version": "1.0",
+  "description": "Gives the user 30% OFF everything on the internet one day a year.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Activate Overlay"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["script.js"],
+      "css": ["styles.css"]
+    }
+  ]
+}
