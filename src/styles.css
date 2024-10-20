@@ -1,14 +1,3 @@
-/* Styles for the side panel */
-/* .black-side-panel {
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 33%;
-  height: 100%;
-  background: black;
-  z-index: 1000;
-} */
-
 /* Styles for the 30 OFF overlay */
 .thirtyOffOverlay {
   position: fixed;
@@ -16,19 +5,23 @@
   height: 100%;
   top: 0;
   right: 0; /* Centers the 30% div in the middle of the screen */
-  background-color: black;
+  background-color: red;
   z-index: 10000; /* Ensure it is on top of all content */
   display: flex;
   justify-content: center;
   align-items: center;
-  writing-mode: vertical-rl; Rotates text to be top-to-bottom
+  writing-mode: vertical-rl; /* Rotates text to be top-to-bottom */
+  border: ridge 15px red; /* Adds a double border around the div */
+  box-sizing: border-box;
 }
 
 .thirtyOffOverlay::after {
   content: "30% OFF!";
-  color: white;
-  font-family: "Courier New", monospace;
-  font-size: 8rem; /* Big pixelated style letters */
-  letter-spacing: 10px;
+  color: #fcfcfc;
+  -webkit-text-stroke: 3px #f4f4f4;
+  font-family: "Arial Black", monospace;
+  font-size: 15.5dvh;
+  letter-spacing: 5px;
   text-transform: uppercase;
+  white-space: nowrap;
 }
