@@ -18,7 +18,7 @@
 .thirtyOffOverlay::after {
   content: "30% OFF!";
   color: #fcfcfc;
-  -webkit-text-stroke: 3px #f4f4f4;
+  -webkit-text-stroke: 3px #fafafa;
   font-family: "Arial Black", monospace;
   font-size: 15.5dvh;
   letter-spacing: 5px;
