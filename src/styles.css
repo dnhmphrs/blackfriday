@@ -25,3 +25,22 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+/* Mobile styles (for screens less than 768px wide) */
+@media (max-width: 768px) {
+  .thirtyOffOverlay {
+    width: 100%;
+    height: 33%; /* Top third of the screen */
+    top: 0;
+    right: 0;
+    writing-mode: horizontal-tb; /* Make the text horizontal */
+    border: ridge 10px red;
+    box-sizing: border-box;
+  }
+
+  .thirtyOffOverlay::after {
+    font-size: 12vw; /* Scale font size based on width of the viewport */
+    letter-spacing: 2vw; /* Scale letter spacing for mobile */
+    white-space: nowrap;
+  }
+}

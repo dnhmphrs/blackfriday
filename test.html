@@ -5,46 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>30% OFF Overlay Test</title>
   <style>
-    /* Styles for the side panel */
-    /* 
-    .black-side-panel {
-      position: fixed;
-      right: 0;
-      top: 0;
-      width: 33%;
-      height: 100%;
-      background: black;
-      z-index: 1000;
-    }
-    */
-
     /* Styles for the 30 OFF overlay */
     .thirtyOffOverlay {
       position: fixed;
       width: 30%;
       height: 100%;
       top: 0;
-      right: 0; /* Centers the 30% div in the middle of the screen */
+      right: 0;
       background-color: red;
       z-index: 10000; /* Ensure it is on top of all content */
       display: flex;
       justify-content: center;
       align-items: center;
       writing-mode: vertical-rl; /* Rotates text to be top-to-bottom */
-      border: ridge  15px red; /* Adds a double border around the div */
+      border: ridge 15px red; /* Adds a double border around the div */
       box-sizing: border-box;
     }
 
     .thirtyOffOverlay::after {
       content: "30% OFF!";
       color: #fcfcfc;
-      -webkit-text-stroke: 2.5px #f4f4f4;
+      -webkit-text-stroke: 2px #fafafa;
       text-shadow: 0 0 10px #000000;
       font-family: "Arial Black", monospace;
       font-size: 15.5dvh;
       letter-spacing: 5px;
       text-transform: uppercase;
       white-space: nowrap;
+    }
+
+    /* Mobile styles (for screens less than 768px wide) */
+    @media (max-width: 768px) {
+      .thirtyOffOverlay {
+        width: 100%;
+        height: 33%; /* Top third of the screen */
+        top: 0;
+        right: 0;
+        writing-mode: horizontal-tb; /* Make the text horizontal */
+        border: ridge 10px red;
+        box-sizing: border-box;
+      }
+
+      .thirtyOffOverlay::after {
+        font-size: 12vw; /* Scale font size based on width of the viewport */
+        letter-spacing: 2vw; /* Scale letter spacing for mobile */
+        white-space: nowrap;
+      }
     }
   </style>
 </head>
