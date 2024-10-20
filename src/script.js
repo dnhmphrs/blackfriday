@@ -1,5 +1,6 @@
 // List of pre-calculated Black Friday dates (next 10 years)
 const blackFridays = [
+  "2024-10-20",
   "2024-11-29",
   "2025-11-28",
   "2026-11-27",

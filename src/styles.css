@@ -4,7 +4,7 @@
   width: 30%;
   height: 100%;
   top: 0;
-  right: 0; /* Centers the 30% div in the middle of the screen */
+  right: 0;
   background-color: red;
   z-index: 10000; /* Ensure it is on top of all content */
   display: flex;
@@ -18,7 +18,8 @@
 .thirtyOffOverlay::after {
   content: "30% OFF!";
   color: #fcfcfc;
-  -webkit-text-stroke: 3px #fafafa;
+  /* -webkit-text-stroke: 2px #fafafa; */
+  text-shadow: 0 0 8px #000000, 0 0 6px #000000;
   font-family: "Arial Black", monospace;
   font-size: 15.5dvh;
   letter-spacing: 5px;
