@@ -1,6 +1,6 @@
 // List of pre-calculated Black Friday dates (next 10 years)
 const blackFridays = [
-  "2024-10-20",
+  "2024-10-30",
   "2024-11-29",
   "2025-11-28",
   "2026-11-27",
@@ -24,5 +24,19 @@ if (isTodayBlackFriday()) {
   // Create and append the side panel div
   var sidePanel = document.createElement("div");
   sidePanel.className = "thirtyOffOverlay"; // Apply the class from styles.css
+
+  // Add the HTML content for the overlay
+  sidePanel.innerHTML = `
+    <p class="lineGlobe">$🌐$🌐$🌐$🌐$🌐$🌐$</p>
+    <p class="line1 double-text" data-text="30%">30%</p>
+    <p class="line2 double-text" data-text="&nbsp;OFF">&nbsp;OFF&nbsp;</p>
+    <p class="line3">THE ENTIRE</p>
+    <p class="line4">INTERNET</p>
+    <p class="lineGlobe">$🌐$🌐$🌐$🌐$</p>
+    <p class="line5">BLACK FRIDAY ONLY</p>
+    <p class="lineGlobe">$🌐$🌐$🌐$🌐$🌐$🌐$</p>
+  `;
+
+  // Append the side panel to the body
   document.body.appendChild(sidePanel);
 }
