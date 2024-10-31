@@ -1,6 +1,6 @@
 // List of pre-calculated Black Friday dates (next 10 years)
 const blackFridays = [
-  "2024-10-30",
+  "2024-10-31",
   "2024-11-29",
   "2025-11-28",
   "2026-11-27",
@@ -32,11 +32,12 @@ if (isTodayBlackFriday()) {
     <p class="line2 double-text" data-text="&nbsp;OFF">&nbsp;OFF&nbsp;</p>
     <p class="line3">THE ENTIRE</p>
     <p class="line4">INTERNET</p>
-    <p class="lineGlobe">$🌐$🌐$🌐$🌐$</p>
+    <p class="lineGlobe">🦅💸🦅💸🦅💸🦅</p>
     <p class="line5">BLACK FRIDAY ONLY</p>
     <p class="lineGlobe">$🌐$🌐$🌐$🌐$🌐$🌐$</p>
   `;
 
   // Append the side panel to the body
+  // <p class="lineGlobe">$🌐$🌐$🌐$🌐$</p>
   document.body.appendChild(sidePanel);
 }
