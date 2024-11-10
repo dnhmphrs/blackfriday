@@ -1,6 +1,5 @@
 // List of pre-calculated Black Friday dates (next 10 years)
 const blackFridays = [
-  "2024-10-31",
   "2024-11-29",
   "2025-11-28",
   "2026-11-27",
@@ -16,7 +15,8 @@ const blackFridays = [
 // Function to check if today is Black Friday
 function isTodayBlackFriday() {
   const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-  return blackFridays.includes(today);
+  // return blackFridays.includes(today);
+  return true; // For testing purposes, always return true
 }
 
 // Only create and append the side panel if today is Black Friday
