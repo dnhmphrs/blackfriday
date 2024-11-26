@@ -1,11 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Black Friday",
-  "version": "1.0",
-  "description": "Gives the user 30% OFF everything on the internet one day a year.",
+  "name": "30% Off EVERYTHING",
+  "version": "1.3",
+  "description": "Internet Super Saver.",
   "permissions": [
-    "activeTab",
-    "scripting"
+    "activeTab"
   ],
   "background": {
     "service_worker": "background.js"
@@ -16,8 +15,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["script.js"],
-      "css": ["styles.css"]
+      "js": ["script.js"]
     }
   ]
 }

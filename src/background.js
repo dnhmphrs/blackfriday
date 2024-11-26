@@ -1,5 +1,5 @@
 chrome.action.onClicked.addListener((tab) => {
-  // Check if the URL is not a chrome:// or chrome-extension:// page
+  // Only inject if it's a regular HTTP or HTTPS page
   if (tab.url.startsWith("http") || tab.url.startsWith("https")) {
     chrome.scripting.executeScript({
       target: { tabId: tab.id },
