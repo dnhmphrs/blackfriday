@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Black Friday Doorbusters: the circular</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./circular.css">
+</head>
+<body>
+<div id="stage">
+  <!-- shared ink screens for the drawings -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <pattern id="tintR" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="2.5" cy="2.5" r="1.45" fill="#de2f1f"/></pattern>
+      <pattern id="tintK" width="4.4" height="4.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="2.2" cy="2.2" r="1.15" fill="#1b1815"/></pattern>
+      <pattern id="shadeK" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="3.5" cy="3.5" r="2.5" fill="#1b1815"/></pattern>
+      <filter id="rough" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/></filter>
+    </defs>
+  </svg>
+
+  <div id="sheet">
+    <div id="paper"></div>
+
+    <div class="sec top band" data-band="DOORBUSTERS!|SAVE!|DOORBUSTERS!|WOW!"></div>
+
+    <div class="sec folio"><span>ADVERTISING SUPPLEMENT</span><span>FRIDAY, NOVEMBER 27, 2026</span><span>SECTION D &middot; PAGE 1 OF 1</span></div>
+
+    <div class="sec ears">
+      <div class="ear e1"><div class="bx" data-f="Anton" data-c="y">OPEN 24 HOURS!</div></div>
+      <div class="ear e2"><div class="bx a" data-f="Anton" data-c="r" data-o="5">1 DAY ONLY!</div><div class="bx b" data-f="Oswald" data-w="700" data-c="k">FRI. NOV. 27, 2026</div></div>
+      <div class="ear e3 rplate"><div class="bx a" data-f="Anton" data-c="w">NO COUPON CODE</div><div class="bx b" data-f="Anton" data-c="y">NEEDED!</div></div>
+    </div>
+
+    <div class="sec mast">
+      <div class="bx bf" data-f="Ultra" data-c="k" data-s="7" data-sc="r">BLACK FRIDAY</div>
+      <div class="dbband rplate"></div>
+      <i class="star s1 yplate"></i><i class="star s2 yplate"></i>
+      <div class="bx db" data-f="Anton" data-c="y" data-o="7" data-s="6">DOORBUSTERS!</div>
+    </div>
+
+    <div class="sec hero">
+      <div class="claim">
+        <div class="kick rplate"><span class="sq">STOREWIDE! WORLDWIDE! WEB-WIDE!</span></div>
+        <div class="bx the" data-f="Anton" data-c="k">THE ENTIRE</div>
+        <div class="bx net" data-f="Anton" data-c="r" data-o="9" data-s="7">INTERNET</div>
+        <div class="every"><div class="bx" data-f="Anton" data-c="y">EVERY WEBSITE! ALL OF THEM!</div></div>
+        <div class="wasnow">
+          <span class="was">WAS <s>100%</s></span>
+          <span class="now">NOW <b>70%</b></span>
+          <span class="of">OF IT!</span>
+        </div>
+      </div>
+      <div class="price">
+        <div class="burst big" data-n="30" data-in="0.86" data-spin="3"></div>
+        <div class="pp">
+          <div class="bx n" data-f="Anton" data-c="r" data-o="14" data-s="11">30</div>
+          <div class="bx pc" data-f="Anton" data-c="r" data-o="11" data-s="8">%</div>
+          <div class="bx off" data-f="Anton" data-c="k" data-s="6" data-sc="r">OFF</div>
+          <div class="ea">PER<br>PAGE*</div>
+        </div>
+        <div class="right">SAVINGS SHOWN AT RIGHT <i class="arrow"></i></div>
+      </div>
+    </div>
+
+    <div class="sec grid" id="grid"></div>
+
+    <div class="sec coupon ca">
+      <div class="chead"><span>MANUFACTURER&rsquo;S COUPON</span><span>EXPIRES 11/27/2026</span></div>
+      <div class="bx save" data-f="Anton" data-c="r" data-o="7" data-s="5">SAVE 30%</div>
+      <div class="bx onthe" data-f="Anton" data-c="k">ON THE ENTIRE INTERNET</div>
+      <div class="limit rplate"><div class="bx" data-f="Oswald" data-w="700" data-c="w">LIMIT ONE INTERNET PER HOUSEHOLD</div></div>
+      <div class="barcode" data-bars="38"></div>
+      <div class="digits">0&nbsp;30030&nbsp;11272&nbsp;6</div>
+      <div class="void">Void where prohibited. And online.</div>
+      <div class="clip">CLIP &amp; SAVE</div>
+    </div>
+
+    <div class="sec coupon cb">
+      <div class="bx free" data-f="Luckiest Guy" data-c="r" data-o="8" data-s="5">FREE!</div>
+      <div class="store"><b>at the Chrome<br>Web Store</b><span>No purchase necessary.<br>Or possible.</span></div>
+      <div class="add"><div class="bx" data-f="Anton" data-c="w">ADD TO CHROME</div></div>
+    </div>
+
+    <div class="sec fine">*30% of every web page will be unavailable for viewing. Black Friday only, Nov. 27, 2026. Savings appear on the right-hand side of your screen and cannot be moved, closed or reasoned with. Not responsible for typographical errors, or for the internet. No rain checks.</div>
+
+    <div class="sec also"><b>ALSO 30% OFF:</b><span>FORUMS &bull; WIKIS &bull; WEATHER &bull; BANKING &bull; HOROSCOPES &bull; COOKIE BANNERS &bull; TERMS OF SERVICE &bull; PAGE 2 OF THE SEARCH RESULTS &bull; THE CLOUD &bull; AND MORE!</span></div>
+
+    <div class="sec foot">
+      <div class="phone"><span class="q">QUESTIONS? CALL TOLL-FREE</span><div class="bx num" data-f="Anton" data-c="k" data-s="4" data-sc="r">1-800-555-0130</div><span class="busy">(lines are 30% busy)</span></div>
+      <div class="back"><div class="barcode" data-bars="30"></div><span>MORE SAVINGS ON EVERY PAGE</span></div>
+    </div>
+
+    <div class="sec bottom band" data-band="EVERYTHING!|EVERY SITE!|EVERY TAB!|ALL DAY!"></div>
+
+    <svg id="marker" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="note">MUST GET!!</div>
+    <svg id="scissors" viewBox="-30 -22 70 44" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div id="grain"></div>
+  <div id="fold"></div>
+</div>
+<script type="module" src="./circular.js"></script>
+</body>
+</html>

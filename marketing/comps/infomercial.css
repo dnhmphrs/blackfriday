@@ -37,7 +37,7 @@ html, body { background: #000; }
   box-shadow: 0 8px 0 rgba(2, 5, 50, 0.6);
 }
 .ticker.bottom {
-  top: 1578px; height: 92px; font: 400 66px/84px "Anton", sans-serif; letter-spacing: 0.035em; color: #fff35a;
+  top: 1604px; height: 92px; font: 400 66px/84px "Anton", sans-serif; letter-spacing: 0.035em; color: #fff35a;
   background: linear-gradient(#ff3b2a, #d40808 55%, #9c0000); border-top: 5px solid var(--gold); border-bottom: 5px solid var(--gold);
   text-shadow: 4px 4px 0 #4a0000; box-shadow: 0 9px 0 rgba(2, 5, 50, 0.7);
 }
@@ -46,7 +46,7 @@ html, body { background: #000; }
 .paid .clock { color: var(--gold); }
 
 /* ---- headline ---- */
-.head { --x: 20px; --y: 252px; width: 1040px; height: 392px; }
+.head { --x: 20px; --y: 258px; width: 1040px; height: 392px; }
 .head .tag {
   position: absolute; left: 4px; top: 4px; padding: 0 26px 2px; background: #080808; border: 5px solid var(--gold); transform: rotate(-3.5deg); transform-origin: left center;
   font: 400 74px/88px "Anton", sans-serif; letter-spacing: 0.03em; color: #ffe93a; box-shadow: 8px 8px 0 rgba(2, 5, 50, 0.85); z-index: 2;
@@ -81,11 +81,13 @@ html, body { background: #000; }
 .page { position: absolute; left: 0; right: 0; top: 36px; bottom: 0; background: #fffdf4; overflow: hidden; }
 .shot.before .win { filter: grayscale(1) contrast(0.62) brightness(1.04); }
 .shot .cap { position: absolute; left: 8px; right: 8px; bottom: 8px; height: 72px; text-align: center; white-space: nowrap; }
-.shot .cap span { display: inline-block; font: 400 56px/72px "Anton", sans-serif; letter-spacing: 0.02em; }
+.shot .cap span { display: inline-block; font: 400 54px/66px "Anton", sans-serif; letter-spacing: 0.02em; }
 .shot.before .cap span { color: #fff; text-shadow: 3px 3px 0 #2c2f36; }
-.shot.after .cap span { font-size: 66px; color: #e30b0b; -webkit-text-stroke: 9px #fff; paint-order: stroke fill; text-shadow: 4px 4px 0 #7a4a00; }
+.shot.after .cap { background: linear-gradient(#1fd03f, #0a9a22); border: 4px solid #111; border-top: 0; }
+.shot.after .cap span { font-size: 62px; line-height: 66px; color: #fff; text-shadow: 3px 3px 0 #044a0f; letter-spacing: 0.03em; }
+.shot.before .cap { background: linear-gradient(#70757f, #4b4f58); border: 4px solid #111; border-top: 0; }
 .x { position: absolute; left: 104px; top: 108px; width: 300px; height: 300px; overflow: visible; filter: drop-shadow(7px 7px 0 rgba(0, 0, 0, 0.55)); }
-.tick { position: absolute; left: 96px; top: 250px; width: 170px; height: 170px; overflow: visible; filter: drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.5)); }
+.tick { position: absolute; left: 30px; top: 290px; width: 160px; height: 160px; overflow: visible; filter: drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.5)); }
 .arrow { position: absolute; left: 450px; top: 196px; width: 140px; height: 117px; overflow: visible; filter: drop-shadow(6px 6px 0 rgba(2, 5, 50, 0.8)); z-index: 3; }
 
 /* the generic web page (built twice by infomercial.js) */
@@ -112,13 +114,13 @@ html, body { background: #000; }
   position: absolute; top: 36px; bottom: 0; right: -40px; width: calc(30% + 40px); padding-right: 40px; background: #0a14ff; border-left: 5px solid #000;
   display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; line-height: 1;
 }
-.sale .s30 { font: 400 60px/1 "Archivo Black", sans-serif; letter-spacing: -0.05em; color: #ff1414; -webkit-text-stroke: 9px #000; paint-order: stroke fill; }
-.sale .soff { font: 400 62px/1 "Archivo Black", sans-serif; letter-spacing: -0.05em; color: #ffee1a; -webkit-text-stroke: 9px #000; paint-order: stroke fill; margin-top: 6px; }
+.sale .s30 { font: 400 51px/1 "Archivo Black", sans-serif; letter-spacing: -0.05em; color: #ff1414; -webkit-text-stroke: 8px #000; paint-order: stroke fill; }
+.sale .soff { font: 400 58px/1 "Archivo Black", sans-serif; letter-spacing: -0.05em; color: #ffee1a; -webkit-text-stroke: 9px #000; paint-order: stroke fill; margin-top: 6px; }
 .sale .sall { font: 400 25px/1.02 "Archivo Black", sans-serif; color: #fff; -webkit-text-stroke: 5px #000; paint-order: stroke fill; margin-top: 16px; letter-spacing: 0.02em; }
 
 /* ---- call now ---- */
 .call {
-  --x: 20px; --y: 1228px; width: 1040px; height: 164px; border-radius: 12px; padding: 6px;
+  --x: 20px; --y: 1222px; width: 1040px; height: 164px; border-radius: 12px; padding: 6px;
   background: linear-gradient(#fff6a0, #ffc400 45%, #c97a00); box-shadow: 9px 9px 0 rgba(2, 5, 50, 0.85);
 }
 .call::before { content: ""; position: absolute; inset: 6px; border-radius: 7px; background: linear-gradient(#04107a, #020849); }
@@ -134,23 +136,25 @@ html, body { background: #000; }
 .call .or em { font-style: normal; font-weight: 700; color: #fff35a; }
 
 /* ---- price ---- */
-.pay { --x: 26px; --y: 1410px; width: 690px; height: 150px; }
-.pay .card { position: absolute; inset: 0; background: #fffef2; border: 6px solid #000; box-shadow: 9px 9px 0 rgba(2, 5, 50, 0.85); transform: rotate(-1.6deg); }
+.pay { --x: 26px; --y: 1406px; width: 700px; height: 168px; }
+.pay .card { position: absolute; inset: 0; background: #fffef2; border: 6px solid #000; box-shadow: 9px 9px 0 rgba(2, 5, 50, 0.85); transform: rotate(-1.6deg); will-change: transform; }
 .pay .l1 { height: 48px; background: #080808; color: #fff35a; font: 400 38px/46px "Anton", sans-serif; letter-spacing: 0.05em; text-align: center; white-space: nowrap; }
 .pay .l1 i { font-style: normal; display: inline-block; color: #fff; background: var(--red); border-radius: 50%; width: 42px; height: 42px; line-height: 42px; }
-.pay .amt { position: absolute; left: 22px; top: 40px; font: 400 104px/1 "Alfa Slab One", serif; color: var(--red); -webkit-text-stroke: 10px #000; paint-order: stroke fill; letter-spacing: 0.01em; transform-origin: left center; }
-.pay .sh { position: absolute; right: 18px; top: 54px; font: 400 28px/0.95 "Lobster", cursive; color: #0a1fb8; text-align: center; transform: rotate(-4deg); }
+.pay .amt { position: absolute; left: 20px; top: 52px; font: 400 100px/1 "Alfa Slab One", serif; color: var(--red); -webkit-text-stroke: 3px #4a0000; paint-order: stroke fill; letter-spacing: 0.04em; text-shadow: 4px 4px 0 #ffd21a; transform-origin: left center; }
+.pay .sh { position: absolute; right: 16px; top: 60px; font: 400 42px/0.98 "Lobster", cursive; color: #0a1fb8; text-align: center; transform: rotate(-4deg); white-space: nowrap; }
 
 /* ---- bursts ---- */
-.stores { --x: 728px; --y: 1322px; width: 330px; height: 330px; }
+.stores { --x: 750px; --y: 1374px; width: 310px; height: 310px; z-index: 4; }
 .spikes { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(7px 8px 0 rgba(2, 5, 50, 0.8)); }
 .stores .txt { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; text-align: center; font-family: "Luckiest Guy", cursive; color: #d40808; line-height: 0.92; padding-top: 12px; }
-.stores .txt i { font-style: normal; font-size: 58px; color: #080808; }
-.stores .txt b { font-weight: 400; font-size: 49px; display: block; text-shadow: 2px 2px 0 #fff; }
+.stores .txt i { font-style: normal; font-size: 55px; color: #080808; }
+.stores .txt b { font-weight: 400; font-size: 46px; display: block; text-shadow: 2px 2px 0 #fff; }
 
-.hurry { --x: 0px; --y: 1690px; width: 1080px; text-align: center; font: 700 44px/1 "Oswald", sans-serif; letter-spacing: 0.05em; color: #fff; text-shadow: 3px 3px 0 #02063c; white-space: nowrap; }
+.hurry { --x: 0px; --y: 1718px; width: 1080px; text-align: center; font: 700 44px/1 "Oswald", sans-serif; letter-spacing: 0.05em; color: #fff; text-shadow: 3px 3px 0 #02063c; white-space: nowrap; }
 .hurry .count { display: inline-block; min-width: 190px; text-align: left; font: 400 50px/1 "Anton", sans-serif; color: #fff35a; letter-spacing: 0.06em; padding-left: 10px; }
-.fine { position: absolute; left: 0; right: 0; top: 1756px; text-align: center; font: 700 22px/1.3 "Arimo", sans-serif; color: #d6defc; white-space: nowrap; letter-spacing: 0.01em; }
+.fine { position: absolute; left: 0; right: 0; top: 1784px; text-align: center; font: 700 22px/1.3 "Arimo", sans-serif; color: #d6defc; white-space: nowrap; letter-spacing: 0.01em; }
+
+.foot { position: absolute; left: 0; right: 0; bottom: 0; height: 52px; background: repeating-linear-gradient(-55deg, #ffd21a 0 34px, #080808 34px 68px); border-top: 5px solid #fff35a; }
 
 /* ---- the interruptions ---- */
 .wait { --x: 30px; --y: 742px; width: 1020px; height: 360px; z-index: 6; }
@@ -161,27 +165,52 @@ html, body { background: #000; }
 .wait .w1 { font-size: 150px; color: #fff35a; letter-spacing: 0.04em; -webkit-text-stroke: 12px #000; paint-order: stroke fill; transform: rotate(-2deg) translateX(-150px); }
 .wait .w2 { font-size: 172px; color: #fff; letter-spacing: 0.03em; -webkit-text-stroke: 12px #000; paint-order: stroke fill; margin-top: -8px; }
 
-.bonus { --x: 110px; --y: 520px; width: 860px; height: 860px; z-index: 7; }
+.bonus { --x: 180px; --y: 566px; width: 720px; height: 720px; z-index: 7; }
 .bonus .txt { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; text-align: center; line-height: 0.9; white-space: nowrap; }
-.bonus .b1 { font: 400 92px/1 "Luckiest Guy", cursive; color: #d40808; text-shadow: 3px 3px 0 #fff; }
-.bonus .b2 { font: 400 58px/1 "Anton", sans-serif; color: #080808; letter-spacing: 0.03em; }
-.bonus .b3 { font: 400 250px/0.86 "Alfa Slab One", serif; color: var(--red); -webkit-text-stroke: 16px #000; paint-order: stroke fill; margin: 12px 0 10px; }
-.bonus .b4 { font: 400 62px/1 "Anton", sans-serif; color: #080808; letter-spacing: 0.03em; }
-.bonus .b5 { font: 400 80px/1.05 "Lobster", cursive; color: #0a1fb8; text-shadow: 3px 3px 0 #fff; transform: rotate(-4deg); margin-top: 4px; }
+.bonus .b1 { font: 400 78px/1 "Luckiest Guy", cursive; color: #d40808; text-shadow: 3px 3px 0 #fff; }
+.bonus .b2 { font: 400 50px/1 "Anton", sans-serif; color: #080808; letter-spacing: 0.03em; }
+.bonus .b3 { font: 400 212px/0.86 "Alfa Slab One", serif; color: var(--red); -webkit-text-stroke: 12px #000; paint-order: stroke fill; margin: 10px 0 8px; }
+.bonus .b4 { font: 400 54px/1 "Anton", sans-serif; color: #080808; letter-spacing: 0.03em; }
+.bonus .b5 { font: 400 68px/1.05 "Lobster", cursive; color: #0a1fb8; text-shadow: 3px 3px 0 #fff; transform: rotate(-4deg); margin-top: 4px; }
 
 #sparkles { position: absolute; inset: 0; pointer-events: none; z-index: 8; }
 #sparkles svg { position: absolute; overflow: visible; }
 .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 9; }
 
 /* ================= other formats ================= */
-/* square, 1080x1080 */
-.f-1x1 { --rx: 540px; --ry: 250px; --floor: 200px; }
-.f-1x1 .paid, .f-1x1 .hurry { display: none; }
-.f-1x1 .ticker.top { top: 0; height: 54px; font-size: 34px; line-height: 48px; }
-.f-1x1 .head { --x: 20px; --y: 62px; --k: 0.62; }
-.f-1x1 .split { --x: 20px; --y: 318px; --k: 0.86; }
-.f-1x1 .call { --y: 800px; --k: 0.8; }
-.f-1x1 .pay { --y: 944px; --k: 0.7; }
-.f-1x1 .stores { --x: 850px; --y: 760px; --k: 0.66; }
-.f-1x1 .ticker.bottom { top: 980px; height: 60px; font-size: 42px; line-height: 52px; }
-.f-1x1 .fine { top: 1046px; font-size: 16px; }
+/* square, 1080x1080: shorter browser windows, the countdown goes, the offer strip shares a row with the price */
+.f-1x1 { --rx: 540px; --ry: 200px; --floor: 160px; }
+.f-1x1 .paid, .f-1x1 .hurry, .f-1x1 .foot, .f-1x1 .fine .more, .f-1x1 .fine .date { display: none; }
+.f-1x1 .ticker.top { top: 0; height: 50px; font-size: 31px; line-height: 43px; border-width: 3px; box-shadow: 0 5px 0 rgba(2, 5, 50, 0.6); }
+.f-1x1 .head { --x: 16px; --y: 56px; --k: 0.66; }
+.f-1x1 .head .sub { right: -700px; padding-right: 660px; }
+.f-1x1 .stores { --x: 772px; --y: 48px; --k: 0.9; }
+.f-1x1 .split { --x: 20px; --y: 332px; height: 448px; }
+.f-1x1 .shot { height: 448px; }
+.f-1x1 .win { height: 300px; }
+.f-1x1 .x { top: 76px; left: 120px; width: 268px; height: 268px; }
+.f-1x1 .tick { top: 212px; width: 146px; height: 146px; }
+.f-1x1 .arrow { top: 150px; }
+.f-1x1 .call { --x: 20px; --y: 792px; --k: 0.88; width: 1182px; }
+.f-1x1 .pay { --x: 24px; --y: 946px; --k: 0.58; }
+.f-1x1 .ticker.bottom { left: 452px; top: 946px; height: 74px; font-size: 50px; line-height: 66px; border: 4px solid var(--gold); border-right: 0; box-shadow: 0 7px 0 rgba(2, 5, 50, 0.7); }
+.f-1x1 .fine { left: 452px; top: 1029px; font-size: 19px; }
+.f-1x1 .wait { --x: 56px; --y: 366px; --k: 0.95; }
+.f-1x1 .bonus { --x: 262px; --y: 268px; --k: 0.77; }
+
+/* landscape, 1920x1080: the offer on the left, the demonstration on the right, a proper countdown clock */
+.f-16x9 { --rx: 480px; --ry: 280px; --floor: 260px; }
+.f-16x9 .paid { display: none; }
+.f-16x9 .ticker.top { top: 0; height: 60px; font-size: 38px; line-height: 52px; }
+.f-16x9 .head { --x: 34px; --y: 84px; --k: 0.8; }
+.f-16x9 .split { --x: 858px; --y: 84px; }
+.f-16x9 .hurry { --x: 34px; --y: 432px; width: 800px; font-size: 52px; }
+.f-16x9 .hurry .count { display: block; width: 520px; margin: 12px auto 0; padding: 0 0 6px; text-align: center; font-size: 132px; line-height: 1; background: #050505; border: 6px solid var(--gold); border-radius: 12px; color: #ff3a24; text-shadow: 0 0 10px rgba(255, 60, 30, 0.6); box-shadow: 8px 8px 0 rgba(2, 5, 50, 0.85); }
+.f-16x9 .call { --x: 34px; --y: 660px; }
+.f-16x9 .pay { --x: 1102px; --y: 676px; --k: 0.8; }
+.f-16x9 .stores { --x: 1682px; --y: 624px; --k: 0.74; }
+.f-16x9 .ticker.bottom { top: 852px; }
+.f-16x9 .fine { top: 962px; font-size: 24px; }
+.f-16x9 .foot { height: 40px; }
+.f-16x9 .wait { --x: 836px; --y: 150px; --k: 1.02; }
+.f-16x9 .bonus { --x: 1076px; --y: 50px; --k: 0.84; }
