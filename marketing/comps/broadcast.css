@@ -1,0 +1,159 @@
+/* The 30% OFF Channel. Laid out on a 1080x1920 stage; other formats override below. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; }
+:root {
+  --yellow: #fff035;
+  --shade: #0a0f66;      /* hard drop shadow under type */
+  --red: #ff1616;
+}
+#stage {
+  position: relative; width: 1080px; height: 1920px; overflow: hidden;
+  background: #070f9c; color: #fff; font-family: "Arimo", Arial, sans-serif;
+}
+.bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 36% at 70% 52%, #5fd0ff 0%, #2f95ff 22%, #1450f8 44%, rgba(10,34,214,0) 72%),
+    linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c);
+}
+#gl { position: absolute; left: 0; top: 0; }
+
+/* ---- tickers ---- */
+.ticker { position: absolute; left: 0; right: 0; white-space: nowrap; overflow: hidden; }
+.ticker .run { display: inline-block; white-space: pre; }
+.ticker.top {
+  top: 148px; height: 84px; font: 300 58px/84px "Antonio", sans-serif; color: #e9f0ff;
+  letter-spacing: 0.035em; word-spacing: 0.3em; text-shadow: 3px 3px 0 rgba(4, 8, 80, 0.85);
+}
+.ticker.bottom {
+  top: 1578px; height: 150px; font: 400 112px/150px "Archivo Black", sans-serif; color: var(--yellow);
+  letter-spacing: -0.02em; word-spacing: 0.08em;
+}
+.ticker.bottom .run { transform-origin: left center; text-shadow: 3px 3px 0 var(--shade), 6px 6px 0 var(--shade), 9px 9px 0 var(--shade); }
+
+/* ---- tape deck read-out ---- */
+.osd {
+  position: absolute; font: 400 62px/1 "VT323", monospace; color: #f4fff6; letter-spacing: 0.05em;
+  text-shadow: 3px 3px 0 rgba(0, 0, 30, 0.6), 0 0 14px rgba(170, 255, 210, 0.45);
+}
+.osd.play { left: 46px; top: 62px; }
+.osd.date { right: 44px; top: 62px; display: grid; justify-items: end; gap: 2px; }
+.osd.date span + span { display: none; }
+
+/* ---- title ---- */
+.title {
+  position: absolute; left: 0; right: 0; top: 246px; text-align: center;
+  font: italic 700 176px/0.9 "Arimo", sans-serif; letter-spacing: -0.04em;
+  filter: drop-shadow(8px 8px 0 rgba(6, 8, 70, 0.95));
+}
+.title span { display: block; background: linear-gradient(#ffffff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent; padding: 0 0.12em; }
+.title .l2 { font-size: 204px; margin-top: 2px; }
+
+/* ---- badges ---- */
+.pill {
+  position: absolute; left: 12px; top: 640px; padding: 4px 36px 8px 30px; border-radius: 12px; transform-origin: left top;
+  background: linear-gradient(#fffb86, #f0e11c); color: #111; font: italic 700 52px/1.15 "Arimo", sans-serif;
+  transform: skewX(-9deg) rotate(-1.5deg); box-shadow: 6px 6px 0 rgba(6, 8, 70, 0.9), inset 0 0 0 4px rgba(170, 158, 0, 0.6);
+}
+.oval {
+  position: absolute; left: 706px; top: 596px; width: 344px; height: 150px; border-radius: 50%;
+  background: radial-gradient(ellipse at 40% 30%, #fffc9a, #efe01c 72%); color: #151515;
+  display: grid; place-items: center; text-align: center; font: italic 700 44px/0.98 "Tinos", serif;
+  transform: rotate(-7deg); box-shadow: 6px 7px 0 rgba(6, 8, 70, 0.9), inset 0 0 0 4px rgba(170, 158, 0, 0.5);
+}
+
+/* ---- the offer ---- */
+.offer { position: absolute; left: 30px; top: 742px; }
+.offer .pct, .offer .off {
+  font-family: "Archivo Black", sans-serif; font-weight: 400; color: var(--yellow); letter-spacing: -0.05em;
+  transform: skewX(-9deg); transform-origin: left bottom;
+  text-shadow: 2px 2px 0 var(--shade), 4px 4px 0 var(--shade), 6px 6px 0 var(--shade), 8px 8px 0 var(--shade), 10px 10px 0 var(--shade), 12px 12px 0 var(--shade);
+}
+.offer .pct { font-size: 236px; line-height: 0.86; }
+.offer .row { display: flex; align-items: flex-end; gap: 26px; margin-top: 6px; }
+.offer .off { font-size: 150px; line-height: 0.9; }
+.offer .what { font: italic 700 41px/1.04 "Arimo", sans-serif; color: #fff; padding-bottom: 12px; white-space: nowrap; text-shadow: 4px 4px 0 rgba(6, 8, 70, 0.95); }
+
+/* ---- "we accept" ---- */
+.cards { position: absolute; left: 30px; top: 1112px; display: flex; gap: 12px; }
+.cards i { width: 100px; height: 62px; border-radius: 7px; position: relative; display: block; box-shadow: 3px 3px 0 rgba(6, 8, 70, 0.85); overflow: hidden; }
+.cards b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; font: italic 700 17px/1 "Arimo", sans-serif; letter-spacing: 0.02em; }
+.cards .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; }
+.cards .c2 { background: radial-gradient(circle at 36% 42%, #ff3b30 0 27%, transparent 28%), radial-gradient(circle at 64% 42%, #ffb300 0 27%, transparent 28%), #f6f6f6; color: #111; }
+.cards .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
+.cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
+.cards .c4 b { font-size: 13px; }
+
+/* ---- price card ---- */
+.price {
+  position: absolute; left: 24px; top: 1200px; width: 432px; height: 330px; background: #f3f4f6; border: 5px solid #000;
+  box-shadow: 9px 9px 0 rgba(4, 6, 60, 0.92); transform: scale(var(--k, 1)) rotate(-1.4deg); transform-origin: left top;
+}
+.price .head { background: var(--red); color: #fff46a; font: 600 45px/62px "Antonio", sans-serif; padding: 0 16px; border-bottom: 5px solid #000; white-space: nowrap; letter-spacing: 0.015em; }
+.price .was, .price .now { font: italic 700 54px/1 "Arimo", sans-serif; color: #0c0c0c; padding: 14px 18px 0; }
+.price s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 10px; }
+.price s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 9px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+.price .big {
+  position: absolute; right: 10px; bottom: -58px; font: 400 178px/0.9 "Archivo Black", sans-serif; color: var(--red);
+  -webkit-text-stroke: 12px #000; paint-order: stroke fill; letter-spacing: -0.05em; transform: skewX(-8deg); transform-origin: right bottom;
+}
+
+.fine { position: absolute; left: 0; right: 0; top: 1762px; padding: 9px 0 11px; text-align: center; white-space: nowrap; font: 400 25px/1.2 "Antonio", sans-serif; letter-spacing: 0.045em; color: #e9f0ff; background: rgba(2, 4, 52, 0.72); }
+
+/* ---- sparkles ---- */
+#sparkles { position: absolute; inset: 0; pointer-events: none; }
+#sparkles svg { position: absolute; overflow: visible; }
+
+/* ---- brief tape glitches (classes are switched by broadcast.js) ---- */
+.glitch .title .l1 { transform: translateX(-14px) skewX(4deg); filter: drop-shadow(-10px 0 0 rgba(0, 255, 255, 0.55)) drop-shadow(12px 0 0 rgba(255, 0, 90, 0.5)); }
+.glitch .title .l2 { transform: translateX(22px); }
+.glitch .offer { transform: translateX(-9px); }
+.glitch2 .price { transform: scale(var(--k, 1)) rotate(-1.4deg) translateX(12px); }
+
+/* ================= other formats ================= */
+/* 4:5 feed post, 1080x1350 */
+.f-4x5 .ticker.top { top: 26px; }
+.f-4x5 .osd { display: none; }
+.f-4x5 .title { top: 112px; font-size: 150px; } .f-4x5 .title .l2 { font-size: 172px; }
+.f-4x5 .pill { top: 420px; }
+.f-4x5 .oval { top: 392px; --k: 0.92; }
+.f-4x5 .offer { top: 512px; } .f-4x5 .offer .pct { font-size: 220px; } .f-4x5 .offer .off { font-size: 140px; }
+.f-4x5 .cards { top: 866px; }
+.f-4x5 .price { top: 922px; --k: 0.84; }
+.f-4x5 .ticker.bottom { top: 1192px; height: 120px; font-size: 92px; line-height: 120px; }
+.f-4x5 .fine { top: 1306px; }
+
+/* square, 1080x1080 */
+.f-1x1 .ticker.top { top: 14px; height: 70px; font-size: 48px; line-height: 70px; }
+.f-1x1 .osd, .f-1x1 .cards { display: none; }
+.f-1x1 .title { top: 92px; font-size: 124px; } .f-1x1 .title span { display: inline; } .f-1x1 .title .l2 { font-size: 124px; }
+.f-1x1 .pill { top: 238px; --k: 0.9; }
+.f-1x1 .oval { top: 226px; left: 730px; --k: 0.86; }
+.f-1x1 .offer { top: 322px; } .f-1x1 .offer .pct { font-size: 208px; } .f-1x1 .offer .off { font-size: 132px; } .f-1x1 .offer .what { font-size: 37px; }
+.f-1x1 .price { top: 648px; --k: 0.76; }
+.f-1x1 .ticker.bottom { top: 932px; height: 110px; font-size: 84px; line-height: 110px; }
+.f-1x1 .fine { top: 1038px; font-size: 22px; padding: 6px 0 8px; }
+
+/* landscape, 1920x1080 */
+.f-16x9 .bg { background: radial-gradient(ellipse 44% 50% at 67% 50%, #5fd0ff 0%, #2f95ff 22%, #1450f8 44%, rgba(10,34,214,0) 72%), linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
+.f-16x9 .ticker.top { top: 22px; }
+.f-16x9 .osd.play { left: 60px; top: 122px; } .f-16x9 .osd.date { right: 60px; top: 122px; }
+.f-16x9 .title { top: 196px; left: 60px; right: auto; text-align: left; font-size: 150px; } .f-16x9 .title span { padding-left: 0; } .f-16x9 .title .l2 { font-size: 172px; }
+.f-16x9 .pill { left: 64px; top: 520px; }
+.f-16x9 .oval { left: 1500px; top: 168px; }
+.f-16x9 .offer { left: 64px; top: 606px; display: flex; align-items: flex-end; gap: 30px; } .f-16x9 .offer .pct { font-size: 196px; line-height: 0.9; } .f-16x9 .offer .off { font-size: 196px; } .f-16x9 .offer .row { margin: 0; } .f-16x9 .offer .what { font-size: 46px; padding-bottom: 20px; }
+.f-16x9 .cards { left: 64px; top: 810px; }
+.f-16x9 .price { left: 1596px; top: 392px; --k: 0.72; }
+.f-16x9 .ticker.bottom { top: 890px; height: 130px; font-size: 100px; line-height: 130px; }
+.f-16x9 .fine { top: 1030px; font-size: 24px; padding: 6px 0 8px; }
+
+/* Chrome Web Store marquee, 1400x560: a picture more than a poster */
+.f-marquee .ticker, .f-marquee .osd, .f-marquee .cards, .f-marquee .fine, .f-marquee .oval, .f-marquee .title, .f-marquee .price { display: none; }
+.f-marquee .bg { background: radial-gradient(ellipse 40% 70% at 77% 46%, #5fd0ff 0%, #2f95ff 22%, #1450f8 46%, rgba(10,34,214,0) 76%), linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
+.f-marquee .pill { left: 70px; top: 54px; }
+.f-marquee .offer { left: 70px; top: 170px; display: flex; align-items: flex-end; gap: 30px; flex-wrap: wrap; width: 980px; } .f-marquee .offer .pct { font-size: 190px; line-height: 0.9; } .f-marquee .offer .off { font-size: 190px; } .f-marquee .offer .row { margin: 0; display: contents; } .f-marquee .offer .what { font-size: 58px; padding: 22px 0 0; flex-basis: 100%; } .f-marquee .offer .what br { display: none; }
+
+/* Chrome Web Store small tile, drawn at 880x560 and scaled to 440x280 */
+.f-tile .ticker, .f-tile .osd, .f-tile .cards, .f-tile .fine, .f-tile .oval, .f-tile .title, .f-tile .price, .f-tile .pill { display: none; }
+.f-tile .bg { background: radial-gradient(ellipse 48% 74% at 76% 44%, #5fd0ff 0%, #2f95ff 22%, #1450f8 46%, rgba(10,34,214,0) 76%), linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
+.f-tile .offer { left: 44px; top: 70px; } .f-tile .offer .pct { font-size: 218px; } .f-tile .offer .off { font-size: 196px; } .f-tile .offer .what { display: none; }

@@ -1,0 +1,9 @@
+node_modules/
+frames/
+__pycache__/
+*.log
+# large renders: regenerate with ./make-all.sh and tools/kit.mjs
+out/video/
+out/posters/
+out/kit/
+out/*.zip
