@@ -113,13 +113,12 @@ html, body { background: #000; }
 /* ================= other formats ================= */
 /* 4:5 feed post, 1080x1350 */
 .f-4x5 .ticker.top { top: 26px; }
-.f-4x5 .osd { display: none; }
+.f-4x5 .osd, .f-4x5 .cards { display: none; }
 .f-4x5 .title { top: 112px; font-size: 150px; } .f-4x5 .title .l2 { font-size: 172px; }
 .f-4x5 .pill { top: 420px; }
 .f-4x5 .oval { top: 392px; --k: 0.92; }
 .f-4x5 .offer { top: 512px; } .f-4x5 .offer .pct { font-size: 220px; } .f-4x5 .offer .off { font-size: 140px; }
-.f-4x5 .cards { top: 866px; }
-.f-4x5 .price { top: 922px; --k: 0.84; }
+.f-4x5 .price { top: 900px; --k: 0.86; }
 .f-4x5 .ticker.bottom { top: 1192px; height: 120px; font-size: 92px; line-height: 120px; }
 .f-4x5 .fine { top: 1306px; }
 
