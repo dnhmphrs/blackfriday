@@ -1,21 +1,29 @@
 {
   "manifest_version": 3,
   "name": "30% Off EVERYTHING",
-  "version": "1.3",
-  "description": "Internet Super Saver.",
+  "version": "1.4",
+  "description": "Internet Super Saver. Takes 30% off every web page with a giant sale banner. Black Friday only.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "scripting"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Activate Overlay"
+    "default_title": "Show or hide the 30% off overlay"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["script.js"]
+      "js": ["designs/classic.js", "script.js"],
+      "run_at": "document_start"
     }
   ]
 }
