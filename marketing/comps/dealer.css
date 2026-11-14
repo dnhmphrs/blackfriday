@@ -1,0 +1,153 @@
+/* The screaming local dealer spot. Laid out on a 1080x1920 stage; other formats override below.
+   Positions and looks live here; everything that moves is set by dealer.js from the time. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; }
+:root {
+  --yellow: #fff200;
+  --red: #f0101a;
+  --blue: #1438ff;
+  --ink: #000;
+}
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #b00010; color: #fff; font-family: "Arimo", Arial, sans-serif; }
+#shake { position: absolute; inset: 0; transform-origin: 50% 50%; }
+.flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+
+/* ---- backdrop: a turning sunburst, a hot spot behind the hero, searchlights ---- */
+.rays { position: absolute; border-radius: 50%; background: repeating-conic-gradient(#f2141c 0 7.5deg, #a8000e 7.5deg 15deg); }
+.glow { position: absolute; inset: 0; }
+#beams { position: absolute; inset: 0; mix-blend-mode: screen; }
+#beams i {
+  position: absolute; width: 360px; height: 1900px; margin-left: -180px; margin-top: -1900px; transform-origin: 50% 100%;
+  background: linear-gradient(to top, rgba(255, 252, 190, 0.95), rgba(255, 244, 120, 0.5) 45%, rgba(255, 240, 100, 0) 96%);
+  clip-path: polygon(47% 100%, 53% 100%, 100% 0, 0 0); filter: blur(5px);
+}
+.hb { position: absolute; }
+.hb svg { position: absolute; left: 0; top: 0; overflow: visible; }
+#flags { position: absolute; left: 0; top: 0; overflow: visible; }
+#gl { position: absolute; left: 0; top: 0; }
+
+/* ---- HUGE! ---- */
+.huge { position: absolute; left: 0; right: 0; top: 352px; text-align: center; font: 400 330px/1 "Luckiest Guy", sans-serif; letter-spacing: 0.01em; white-space: nowrap; }
+.huge .in { position: relative; display: inline-block; transform-origin: 50% 55%; }
+.huge .lay { display: block; }
+.huge .w, .huge .s { position: absolute; left: 0; top: 0; }
+.huge .w { color: #fff; -webkit-text-stroke: 64px #fff; text-shadow: 14px 16px 0 #000; }
+.huge .s { color: #000; -webkit-text-stroke: 38px #000; }
+.huge .f { position: relative; background: linear-gradient(#fffbd0 18%, #fff200 40%, #ffb400 70%, #ff6a00 86%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.huge.alt .f { background: linear-gradient(#ffffff 18%, #ffffff 46%, #bfe6ff 70%, #58b6ff 86%); -webkit-background-clip: text; background-clip: text; }
+
+/* ---- black ribbon under it ---- */
+.ribbon {
+  position: absolute; left: -30px; right: -30px; top: 618px; height: 92px; background: #000; color: var(--yellow);
+  border-top: 7px solid var(--yellow); border-bottom: 7px solid var(--yellow); box-shadow: 0 10px 0 rgba(0, 0, 0, 0.45);
+  font: 400 70px/76px "Anton", sans-serif; letter-spacing: 0.035em; text-align: center; white-space: nowrap; transform: rotate(-2.2deg);
+}
+.ribbon span { display: inline-block; }
+
+/* ---- starbursts ---- */
+.star { position: absolute; width: var(--d); height: var(--d); margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2); font-size: calc(var(--d) / 5); }
+.star svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+.star .txt { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: "Bangers", sans-serif; line-height: 0.86; white-space: nowrap; }
+.star .txt i, .star .txt b { display: block; font-style: normal; font-weight: 400; }
+.s1 { --d: 300px; left: 150px; top: 800px; }
+.s1 .txt { color: #000; transform: rotate(-12deg); }
+.s1 .txt i { font-size: 0.92em; }
+.s1 .txt b { font-size: 1.22em; color: var(--red); -webkit-text-stroke: 0.08em #000; paint-order: stroke fill; letter-spacing: 0.02em; }
+.s2 { --d: 310px; left: 926px; top: 1082px; }
+.s2 .txt { color: #fff; transform: rotate(9deg); }
+.s2 .txt i { font-size: 0.8em; -webkit-text-stroke: 0.12em #000; paint-order: stroke fill; }
+.s2 .txt b { font-size: 1.5em; color: var(--yellow); -webkit-text-stroke: 0.1em #000; paint-order: stroke fill; letter-spacing: 0.03em; }
+#minis { position: absolute; inset: 0; }
+.mini { position: absolute; width: var(--d); height: var(--d); margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2); font: 400 calc(var(--d) / 4.2)/0.9 "Luckiest Guy", sans-serif; }
+.mini svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+.mini .txt { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding-top: 0.2em; color: #000; white-space: pre; }
+.mini.pink .txt { color: #fff; -webkit-text-stroke: 0.14em #000; paint-order: stroke fill; }
+
+#sparkles { position: absolute; inset: 0; pointer-events: none; }
+#sparkles svg { position: absolute; overflow: visible; }
+
+/* ---- flash cards: what is on sale ---- */
+#cards { position: absolute; left: 34px; top: 1196px; width: 1012px; height: 150px; }
+.card {
+  position: absolute; inset: 0; display: flex; align-items: stretch; background: #fff; border: 8px solid #000;
+  box-shadow: 11px 11px 0 #000; transform-origin: 50% 50%; visibility: hidden;
+}
+.card.c1 { background: var(--yellow); }
+.card.c2 { background: #2ff3ff; }
+.card.c3 { background: #ff8ad1; }
+.card .tab {
+  position: absolute; left: -16px; top: -34px; padding: 0 16px; background: #000; color: var(--yellow); border: 4px solid var(--yellow);
+  font: 400 34px/44px "Bungee", sans-serif; transform: rotate(-3deg); white-space: nowrap;
+}
+.card .item { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0 22px; }
+.card .item span { display: inline-block; font: 400 104px/1 "Alfa Slab One", serif; color: #000; white-space: nowrap; padding-top: 0.04em; }
+.card .deal { width: 356px; background: var(--red); border-left: 8px solid #000; display: flex; align-items: center; justify-content: center; }
+.card .deal span { display: inline-block; white-space: nowrap; font: 400 112px/1 "Anton", sans-serif; color: var(--yellow); transform: skewX(-9deg); text-shadow: 5px 5px 0 #000; }
+.card .deal i { font-style: normal; color: #fff; margin-left: 0.12em; }
+
+/* ---- THE ENTIRE INTERNET MUST GO ---- */
+.mustgo { position: absolute; left: 0; right: 0; top: 1362px; height: 96px; background: var(--yellow); color: #000; border-top: 6px solid #000; border-bottom: 6px solid #000; }
+.mustgo .in { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.mustgo .in span { display: inline-block; font: 400 78px/1 "Anton", sans-serif; letter-spacing: 0.012em; white-space: nowrap; }
+.mustgo b { font-weight: 400; color: var(--red); }
+.mustgo.inv { background: #000; color: var(--yellow); }
+.mustgo.inv b { color: #fff; }
+.bulbs { position: absolute; left: 0; right: 0; height: 14px; display: none; }
+
+/* ---- lower third ---- */
+.lower { position: absolute; left: 0; right: 0; top: 1458px; height: 104px; }
+.lower .l1 {
+  height: 60px; background: linear-gradient(#3d63ff, #1230e8 48%, #0a1690 52%, #1026c4); border-top: 5px solid #fff; border-bottom: 4px solid #000;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.lower .l1 span { display: inline-block; font: 400 52px/1 "Archivo Black", sans-serif; color: #fff; letter-spacing: 0.03em; white-space: nowrap; text-shadow: 4px 4px 0 #000; transform: skewX(-8deg); }
+.lower .l2 { height: 44px; background: #fff; color: #0a0a0a; display: flex; align-items: center; justify-content: center; gap: 22px; font: italic 700 34px/1 "Arimo", sans-serif; white-space: nowrap; }
+.lower .add u { text-decoration: none; color: var(--red); font-style: normal; }
+.lower .cws { color: #1230e8; }
+.lower .free { background: var(--red); color: var(--yellow); font: 400 36px/40px "Anton", sans-serif; padding: 0 16px; letter-spacing: 0.06em; border: 2px solid #000; }
+.lower .free.off { background: var(--yellow); color: var(--red); }
+
+/* ---- under the fold: ticker, phone number, small print ---- */
+.ticker { position: absolute; left: 0; right: 0; top: 1562px; height: 76px; background: #000; color: var(--yellow); white-space: nowrap; overflow: hidden; font: 400 46px/78px "Bungee", sans-serif; border-top: 4px solid #000; }
+.ticker .run { display: inline-block; white-space: pre; }
+.phone { position: absolute; left: 0; right: 0; top: 1638px; height: 132px; background: var(--red); display: flex; align-items: center; justify-content: center; gap: 22px; white-space: nowrap; border-top: 6px solid var(--yellow); border-bottom: 6px solid var(--yellow); }
+.phone .call { font: 400 50px/0.95 "Luckiest Guy", sans-serif; color: var(--yellow); -webkit-text-stroke: 9px #000; paint-order: stroke fill; transform: rotate(-5deg); padding-top: 10px; }
+.phone .num { font: 400 96px/1 "Anton", sans-serif; color: #fff; -webkit-text-stroke: 12px #000; paint-order: stroke fill; letter-spacing: 0.02em; }
+.phone .ops { font: 700 21px/1.05 "Arimo", sans-serif; color: #fff; text-align: left; }
+.fine { position: absolute; left: 0; right: 0; top: 1770px; height: 150px; padding: 12px 40px 0; background: #000; color: #fff; text-align: center; font: 700 23px/1.25 "Arimo", sans-serif; }
+
+/* ================= square, 1080x1080 ================= */
+.f-1x1 .huge { left: 8px; right: auto; top: 62px; font-size: 236px; }
+.f-1x1 .huge .w { -webkit-text-stroke-width: 48px; text-shadow: 10px 12px 0 #000; }
+.f-1x1 .huge .s { -webkit-text-stroke-width: 28px; }
+.f-1x1 .ribbon { top: 262px; height: 70px; font-size: 54px; line-height: 56px; border-width: 6px; }
+.f-1x1 .s1 { --d: 290px; left: 902px; top: 150px; }
+.f-1x1 .s2 { --d: 270px; left: 936px; top: 640px; }
+.f-1x1 #cards { top: 742px; left: 30px; width: 1020px; height: 124px; }
+.f-1x1 .card .item span { font-size: 86px; }
+.f-1x1 .card .deal { width: 320px; }
+.f-1x1 .card .deal span { font-size: 94px; }
+.f-1x1 .card .tab { font-size: 28px; line-height: 38px; top: -30px; }
+.f-1x1 .mustgo { top: 884px; height: 84px; }
+.f-1x1 .mustgo .in span { font-size: 70px; }
+.f-1x1 .lower { top: 968px; height: 90px; }
+.f-1x1 .lower .l1 { height: 52px; } .f-1x1 .lower .l1 span { font-size: 44px; }
+.f-1x1 .lower .l2 { height: 38px; font-size: 30px; } .f-1x1 .lower .free { font-size: 32px; line-height: 34px; }
+.f-1x1 .ticker, .f-1x1 .phone { display: none; }
+.f-1x1 .fine { top: 1058px; height: 22px; padding: 2px 0 0; font-size: 14.5px; line-height: 18px; white-space: nowrap; }
+
+/* ================= landscape, 1920x1080 ================= */
+.f-16x9 .huge { left: 40px; right: auto; top: 84px; font-size: 300px; }
+.f-16x9 .ribbon { left: -30px; right: auto; width: 1010px; top: 330px; height: 84px; font-size: 62px; line-height: 68px; }
+.f-16x9 .s1 { --d: 330px; left: 1740px; top: 190px; }
+.f-16x9 .s2 { --d: 300px; left: 1060px; top: 600px; }
+.f-16x9 #cards { left: 50px; top: 500px; width: 900px; height: 150px; }
+.f-16x9 .card .deal { width: 330px; } .f-16x9 .card .deal span { font-size: 104px; }
+.f-16x9 .mustgo { top: 716px; height: 110px; }
+.f-16x9 .mustgo .in span { font-size: 92px; letter-spacing: 0.06em; }
+.f-16x9 .lower { top: 826px; height: 124px; }
+.f-16x9 .lower .l1 { height: 72px; } .f-16x9 .lower .l1 span { font-size: 62px; }
+.f-16x9 .lower .l2 { height: 52px; font-size: 40px; gap: 40px; } .f-16x9 .lower .free { font-size: 42px; line-height: 46px; }
+.f-16x9 .ticker { top: 950px; height: 70px; font-size: 44px; line-height: 72px; }
+.f-16x9 .phone { top: 596px; left: auto; right: -10px; width: 560px; height: 104px; gap: 14px; transform: rotate(-2deg); border: 6px solid var(--yellow); display: none; }
+.f-16x9 .fine { top: 1020px; height: 60px; padding: 8px 0 0; font-size: 22px; white-space: nowrap; }
