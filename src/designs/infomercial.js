@@ -76,7 +76,8 @@ globalThis.thirtyOffDesign = (() => {
     .badge div { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5em; text-shadow: 0.25em 0.25em 0 rgba(90, 0, 0, 0.8); }
     .badge .a { font-size: calc(3.8em * var(--k, 1)); letter-spacing: 0.04em; }
     .badge .hn { width: 21.5em; }
-    .badge .site { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; white-space: normal; word-break: break-all; text-transform: none; color: #fff200; font: 700 4.4em/1.05 Arial, Helvetica, sans-serif; }
+    .badge .site { display: block; text-transform: none; color: #fff200; font: 700 4.4em/1.05 Arial, Helvetica, sans-serif; }
+    .badge .site span { display: block; overflow: hidden; text-overflow: ellipsis; }
     .badge .e { font-size: calc(2.8em * var(--k, 1)); letter-spacing: 0.04em; }
 
     .net { font-size: ${k(8.6)}; line-height: 1.12; letter-spacing: 0.035em; color: #fff200; -webkit-text-stroke: ${u(1.3)} #000; paint-order: stroke fill; text-shadow: ${u(0.6)} ${u(0.6)} 0 #000; }
@@ -106,7 +107,7 @@ globalThis.thirtyOffDesign = (() => {
 
     .pay { display: flex; align-items: center; justify-content: center; gap: ${u(2.5)}; }
     .pay span { font: 900 ${u(4.9)}/1.08 ${BLACK}; text-align: right; text-shadow: ${u(0.5)} ${u(0.5)} 0 #1a0040; }
-    .pay b { font-weight: 900; font-size: ${k(14)}; line-height: 0.9; color: #6dff2e; -webkit-text-stroke: ${u(1.2)} #06300a; paint-order: stroke fill; text-shadow: ${u(0.7)} ${u(0.7)} 0 #06300a; transform: rotate(-3deg); }
+    .pay b { font-weight: 900; font-size: ${k(14)}; line-height: 0.9; color: #6dff2e; -webkit-text-stroke: ${u(1.2)} #06300a; paint-order: stroke fill; text-shadow: ${u(0.7)} ${u(0.7)} 0 #06300a; transform: translateY(-0.05em) rotate(-3deg); }
 
     /* the clock */
     .clock { width: ${u(90)}; padding: ${u(1.4)} ${u(2)} ${u(1.6)}; background: #000; border: ${u(0.7)} solid #ffd21e; border-radius: ${u(2)}; box-shadow: ${u(0.9)} ${u(0.9)} 0 rgba(15, 0, 45, 0.7); }
@@ -119,7 +120,7 @@ globalThis.thirtyOffDesign = (() => {
     /* call now */
     .call { width: 100%; padding: ${u(1.1)} 0 ${u(1.3)}; border: solid #000; border-width: ${u(0.8)} 0; background: #ffe600; color: #d80000; animation: flash 1s step-end infinite; }
     .c1 { font-size: ${k(7)}; letter-spacing: 0.04em; }
-    .c1 i { font: normal 400 0.8em/1 "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+    .c1 i { font: normal 400 0.8em/1 "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; text-shadow: 0 0 0.1em #fff, 0 0 0.1em #fff, 0 0 0.1em #fff; }
     .c2 { font-size: ${k(11.6)}; letter-spacing: 0.01em; }
     .ops { font: italic 900 ${u(3.8)}/1.3 ${BLACK}; letter-spacing: 0.03em; }
     .ops b { color: #ffe600; font-weight: 900; }
@@ -193,20 +194,36 @@ globalThis.thirtyOffDesign = (() => {
   `,
 
     setup(root) {
-      // the badge: the site you are on, shrunk to fit when its name is long
+      // New elements are made in the overlay's own namespace, so they are HTML on XML pages too.
+      const make = (tag) => document.createElementNS(root.host.namespaceURI, tag);
+      const pen = make("canvas").getContext("2d");
+      // the width of some text in ems, in the lettering face (900) or the badge's Arial (700)
+      const width = (text, weight) => {
+        pen.font = `${weight} 100px ${weight === 900 ? IMPACT : "Arial, Helvetica, sans-serif"}`;
+        return pen.measureText(text).width / 100;
+      };
+
+      // the badge: the site you are on, on one line if it is short and otherwise broken at
+      // the dot that leaves the two halves most alike, in the biggest size that fits
       const host = (location.hostname || "this page").replace(/^www\./, "");
+      const widest = (lines) => Math.max(...lines.map((line) => width(line, 700)));
+      let lines = [host];
+      if (widest(lines) > 6.8) {
+        for (let dot = host.indexOf(".", 1); dot > 0; dot = host.indexOf(".", dot + 1)) {
+          const halves = [host.slice(0, dot), host.slice(dot)];
+          if (lines.length < 2 || widest(halves) < widest(lines)) lines = halves;
+        }
+      }
       const site = root.querySelector(".site");
-      site.textContent = host;
-      site.style.fontSize = `${Math.max(2.7, Math.min(4.6, 40 / host.length)).toFixed(2)}em`;
+      site.replaceChildren(...lines.map((line) => Object.assign(make("span"), { textContent: line })));
+      site.style.fontSize = `${Math.max(2.6, Math.min(lines.length > 1 ? 3.6 : 4.6, 21 / widest(lines))).toFixed(2)}em`;
 
       // Impact is missing on some systems (ChromeOS, most Linux) and whatever stands in for it
       // is wider. Measure, and where the lettering would not fit, scale it down until it does.
-      const pen = document.createElement("canvas").getContext("2d");
-      pen.font = `900 100px ${IMPACT}`;
-      const fit = (text, widest) => Math.min(1, widest / pen.measureText(text).width);
+      const fit = (text, room) => Math.min(1, room / width(text, 900));
       const inner = root.querySelector(".in");
-      inner.style.setProperty("--k", fit("30% OFF THE ENTIRE INTERNET 1-800-555-0130", 2020).toFixed(3));
-      inner.style.setProperty("--kh", Math.min(fit("30%", 215), fit("30%OFF", 355)).toFixed(3));
+      inner.style.setProperty("--k", fit("30% OFF THE ENTIRE INTERNET 1-800-555-0130", 20.2).toFixed(3));
+      inner.style.setProperty("--kh", Math.min(fit("30%", 2.15), fit("30%OFF", 3.55)).toFixed(3));
 
       // the clock: counts down to local midnight, then sits at 00:00:00
       const clocks = root.querySelectorAll(".time");

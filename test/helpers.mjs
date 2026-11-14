@@ -25,6 +25,9 @@ export async function launchWithExtension(extDir, { tz, viewport = { width: 1280
   });
   let [sw] = context.serviceWorkers();
   if (!sw) sw = await context.waitForEvent('serviceworker', { timeout: 15000 });
+  // Wait until the worker has actually run. On a busy machine a simulated toolbar click can
+  // otherwise arrive before the worker has registered its click listener, and is lost.
+  await sw.evaluate(() => chrome.runtime.id);
   const extensionId = new URL(sw.url()).host;
   return { context, sw, extensionId, userDataDir };
 }

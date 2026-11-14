@@ -45,7 +45,9 @@ for (const [label, width, height, pageName] of shapes) {
   cdp.on('Runtime.exceptionThrown', (e) => problems.push(`${label}: script error: ${(e.exceptionDetails.exception?.description || e.exceptionDetails.text).split('\n')[0]}`));
   await page.goto(`${origin}/store/mock/${pageName}.html`);
   await clickAction(context, page, extensionId);
-  await page.waitForTimeout(1200);
+  // wait for the overlay rather than a fixed pause: on a busy machine the click can take a while to land
+  await page.waitForFunction(() => document.querySelector('thirty-off-overlay'), null, { timeout: 20000 }).catch(() => {});
+  await page.waitForTimeout(900);
   const info = await page.evaluate(() => {
     const host = document.querySelector('thirty-off-overlay');
     const solid = host && [...host.shadowRoot.children].find((el) => el.tagName !== 'STYLE');

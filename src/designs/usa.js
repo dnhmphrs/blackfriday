@@ -16,18 +16,6 @@ globalThis.thirtyOffDesign = {
     .canton { position: absolute; left: 0; top: 0; width: 55cqw; height: 19cqh; visibility: hidden; pointer-events: none; }
     .emo { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-weight: 400; font-style: normal; }
 
-    /* flying money, between the flag and the lettering */
-    .air { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-    .air span { position: absolute; left: var(--x); top: var(--y); font-size: 9.5cqw; line-height: 1; animation: fly 7s linear infinite; }
-    .air span:nth-child(1) { --x: 4cqw; --y: 38cqh; animation-delay: -1s; }
-    .air span:nth-child(2) { --x: 84cqw; --y: 60cqh; animation-delay: -4.6s; animation-duration: 9s; }
-    .air span:nth-child(3) { --x: 6cqw; --y: 84cqh; animation-delay: -2.8s; animation-duration: 6s; }
-    .air span:nth-child(4) { --x: 80cqw; --y: 27cqh; animation-delay: -6.2s; animation-duration: 8s; }
-    @keyframes fly {
-      from { transform: translate(calc(-16cqw - var(--x)), 6cqh) rotate(-25deg); }
-      to { transform: translate(calc(106cqw - var(--x)), -14cqh) rotate(30deg); }
-    }
-
     .in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; text-align: center; white-space: nowrap; text-transform: uppercase; }
     .in > * { flex: none; display: flex; align-items: center; justify-content: center; }
     .in span, .in b { line-height: 1; }
@@ -54,20 +42,38 @@ globalThis.thirtyOffDesign = {
        bigger and then stretched sideways to the same width, the way a sign shop would. --w and
        --h are each word's measured width and ink height in ems, --lift centres the ink in its
        line; setup() fills them in. */
-    .hero { height: 44cqh; flex-direction: column; animation: pump 1.1s ease-in-out infinite;
+    .hero { position: relative; height: 44cqh; flex-direction: column; animation: pump 1.1s ease-in-out infinite;
             --w30: 1.76; --h30: 0.8; --woff: 1.42; --hoff: 0.8; --lift: 0; --room: 42cqh;
             --per: min(1 / var(--woff), 1.15 / var(--w30));
-            --hw: min(86cqw, var(--room) / 1.1 / (var(--h30) / var(--w30) + var(--hoff) * var(--per))); }
+            --hw: min(83cqw, var(--room) / 1.1 / (var(--h30) / var(--w30) + var(--hoff) * var(--per))); }
     @keyframes pump { 50% { transform: scale(1.035) rotate(-1deg); } }
-    .hero .big { display: block; position: relative; top: calc(var(--lift) * 1em); z-index: 0; letter-spacing: -0.01em; -webkit-text-stroke: 0.06em var(--gold); paint-order: stroke fill; }
+    .hero .big { display: block; position: relative; left: -0.022em; top: calc(var(--lift) * 1em); z-index: 0; letter-spacing: -0.01em; -webkit-text-stroke: 0.06em var(--gold); paint-order: stroke fill; }
     .big::before, .big::after { content: attr(data-t); position: absolute; left: 0; top: 0; z-index: -1; color: var(--navy); -webkit-text-stroke: 0.135em var(--navy); }
     .big::after { z-index: -2; color: #000; -webkit-text-stroke-color: #000; transform: translate(0.045em, 0.045em); }
     .n30 { font-size: calc(var(--hw) / var(--w30)); line-height: calc(var(--h30) * 1.1); color: var(--red); }
     .off { font-size: calc(var(--hw) * var(--per)); line-height: calc(var(--hoff) * 1.1); color: #2c52ff; transform: scaleX(min(1.35, 0.95 / (var(--per) * var(--woff)))); }
+    /* money flying across the front of the big numbers, from one edge of the sign to the other */
+    .air { position: absolute; left: calc(50% - 50cqw); top: 0; width: 100cqw; height: 100%; z-index: 1; pointer-events: none; }
+    .air span { position: absolute; left: 0; font-size: min(11cqw, 5.5cqh); animation: fly 7s linear infinite; }
+    .air span:nth-child(1) { top: 10%; animation-delay: -1s; }
+    .air span:nth-child(2) { top: 34%; animation-delay: -4.6s; animation-duration: 9s; }
+    .air span:nth-child(3) { top: 57%; animation-delay: -2.8s; animation-duration: 6s; }
+    .air span:nth-child(4) { top: 77%; animation-delay: -6.2s; animation-duration: 8s; }
+    @keyframes fly {
+      from { transform: translate(-16cqw, 2cqh) rotate(-25deg); }
+      to { transform: translate(106cqw, -3cqh) rotate(30deg); }
+    }
 
     .net { height: 7cqh; }
     .net .two, .chant { display: none; }
     .net span { font-size: min(88cqw / var(--em, 8.7), 6.4cqh); letter-spacing: 0.05em; color: var(--gold); -webkit-text-stroke: 0.13em var(--navy); paint-order: stroke fill; text-shadow: 0.08em 0.08em 0 #000; }
+
+    /* Where there is no Impact the stand-in is much wider. setup() then marks the sign .wide and
+       THE ENTIRE INTERNET takes two lines instead of shrinking to fit on one. */
+    :where(.wide) .hero { height: 39cqh; --room: 32cqh; }
+    :where(.wide) .net { height: 12cqh; flex-direction: column; }
+    :where(.wide) .net .one { display: none; }
+    :where(.wide) .net .two { display: block; font-size: min(80cqw / var(--em, 4), 5.6cqh); line-height: 1.04; }
 
     .money { height: 4cqh; gap: 1.6cqw; font-size: min(8cqw, 3.3cqh); }
     .money b { font-weight: 900; color: var(--gold); -webkit-text-stroke: 0.22em var(--navy); paint-order: stroke fill; }
@@ -117,6 +123,8 @@ globalThis.thirtyOffDesign = {
       .net { height: 11cqh; } .net span { font-size: min(88cqw / var(--em, 8.7), 9.6cqh); }
       .sash.bf { height: 10.5cqh; } .sash.bf > div { height: 8.6cqh; } .sash.bf span { font-size: min(84cqw / var(--em, 8.3), 7.4cqh); }
       .fine { height: 7.5cqh; } .fine span { font-size: min(3.4cqw, 2.6cqh); }
+      :where(.wide) .hero { height: 50cqh; --room: 39cqh; }
+      :where(.wide) .net { height: 13cqh; } :where(.wide) .net .two { font-size: min(80cqw / var(--em, 4), 6cqh); }
     }
 
     /* phones: the top third of the page, the offer on one line */
@@ -125,32 +133,32 @@ globalThis.thirtyOffDesign = {
       .bunting, .money, .ticker, .air, .home { display: none; }
       .canton { width: 27cqw; height: 58cqh; }
       .sky { display: block; position: absolute; inset: 0; height: auto; }
-      .eagle { left: auto; right: 1.5cqw; top: 25cqh; bottom: auto; width: auto; font-size: 30cqh; filter: drop-shadow(0.5cqw 0.5cqw 0 rgba(6, 17, 79, 0.9)); }
+      .eagle { right: 1.5cqw; top: 25cqh; bottom: auto; font-size: 30cqh; filter: drop-shadow(0.5cqw 0.5cqw 0 rgba(6, 17, 79, 0.9)); }
       .eagle.two { display: block; left: 1.5cqw; right: auto; animation: none; transform: scaleX(-1); }
       .sash { height: 15cqh; margin-top: 1cqh; } .sash > div { height: 11.5cqh; transform: rotate(-1deg); border-width: 0.5cqw 0; box-shadow: 0 0.5cqw 0 var(--navy), 0 -0.3cqw 0 var(--navy); }
       .sash span { font-size: min(90cqw / var(--em, 13.5), 9.4cqh); } .sash span.d { display: none; } .sash span.m { display: inline; }
       .hero { height: 41cqh; flex-direction: row; }
-      .n30, .off { font-size: min(88cqw / (var(--w30) + var(--woff) + 0.2), 37cqh / var(--h30)); }
+      .n30, .off { font-size: min(var(--across, 66cqw) / (var(--w30) + var(--woff) + 0.2), 37cqh / var(--h30)); }
       .off { margin-left: 0.2em; transform: none; }
-      .net { height: 15cqh; } .net span { font-size: min(80cqw / var(--em, 8.7), 12.5cqh); }
+      .net { height: 15cqh; flex-direction: row; } .net .one { display: block; } .net .two { display: none; }
+      .net span { font-size: min(80cqw / var(--em, 8.7), 12.5cqh); }
       .sash.bf { height: 14cqh; margin-top: 0; } .sash.bf > div { height: 11cqh; transform: rotate(1deg); } .sash.bf span { font-size: min(84cqw / var(--em, 8.3), 9.2cqh); }
       .fine { height: 11cqh; } .fine span { font-size: min(3cqw, 6cqh); padding: 0.4cqh 1.5cqw; border-width: 0.3cqw; } .fine br { display: none; }
-      @container (max-aspect-ratio: 22 / 10) { .eagle, .eagle.two { display: none; } }
+      /* squarer strips have no room for the eagles, so the offer takes their space */
+      @container (max-aspect-ratio: 22 / 10) { .eagle, .eagle.two { display: none; } .hero { --across: 90cqw; } }
     }
-    @media (prefers-reduced-motion: reduce) { .eagle, .hero, .air span, .ticker span { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .eagle, .hero, .ticker span { animation: none; } .air { display: none; } }
   `,
 
   html: `
     <div class="usa" role="img" aria-label="Star-spangled savings. Land of the free, home of the 30% off: 30% off the entire internet. Black Friday only. The extension is free.">
       <canvas></canvas>
       <div class="canton"></div>
-      <div class="air" data-scrolls><span class="emo">&#128184;</span><span class="emo">&#128181;</span><span class="emo">&#128184;</span><span class="emo">&#128181;</span></div>
-      <div class="bunting"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="in">
         <div class="sky"><div class="eagle emo">&#129413;</div><div class="eagle two emo">&#129413;</div></div>
         <div class="sash"><div><span class="d" data-fit>LAND OF THE <i>FREE*</i></span><span class="m" data-fit>LAND OF THE <i>FREE*</i> &#9733; HOME OF THE</span></div></div>
         <div class="home"><span data-fit>HOME OF THE</span></div>
-        <div class="hero"><span class="big n30" data-t="30%">30%</span><span class="big off" data-t="OFF">OFF</span></div>
+        <div class="hero"><span class="big n30" data-t="30%">30%</span><span class="big off" data-t="OFF">OFF</span><div class="air" data-scrolls><span class="emo">&#128184;</span><span class="emo">&#128181;</span><span class="emo">&#128184;</span><span class="emo">&#128181;</span></div></div>
         <div class="net"><span class="one" data-fit>THE ENTIRE INTERNET</span><span class="two" data-fit>THE ENTIRE</span><span class="two" data-fit>INTERNET</span></div>
         <div class="sash bf"><div><span data-fit>&#9733; BLACK FRIDAY ONLY &#9733;</span></div></div>
         <div class="chant"><span data-fit>U-S-A! U-S-A!</span></div>
@@ -158,6 +166,7 @@ globalThis.thirtyOffDesign = {
         <div class="fine"><span>*the extension is free. <br>the internet is 30% off.</span></div>
         <div class="ticker" data-scrolls><span>U-S-A! U-S-A! &#9733; STAR-SPANGLED SAVINGS &#9733; 30% OFF FROM SEA TO SHINING SEA &#9733; NOW WITH 30% MORE STRIPES &#9733; CALL 1-800-555-0130 &#9733; EAGLES ARE STANDING BY &#9733; U-S-A! U-S-A! &#9733; STAR-SPANGLED SAVINGS &#9733; 30% OFF FROM SEA TO SHINING SEA &#9733; NOW WITH 30% MORE STRIPES &#9733; CALL 1-800-555-0130 &#9733; EAGLES ARE STANDING BY &#9733; </span></div>
       </div>
+      <div class="bunting"><i></i><i></i><i></i><i></i><i></i></div>
     </div>
   `,
 
@@ -185,6 +194,7 @@ globalThis.thirtyOffDesign = {
       for (const el of root.querySelectorAll("[data-fit]")) {
         const width = ems(el);
         if (width) el.style.setProperty("--em", width.toFixed(3));
+        if (el.matches(".net .one")) frame.classList.toggle("wide", width > 11);
       }
       // The two big words also need their ink height, which differs even more between fonts.
       const hero = root.querySelector(".hero");
@@ -219,9 +229,9 @@ globalThis.thirtyOffDesign = {
       ctx.fill();
     }
 
-    function burst(b, p, w) {
+    function burst(b, p, lw) {
       const R = b.r * (1 - Math.pow(1 - p, 3));
-      const lw = Math.max(1.5, w * 0.011);
+      if (R < lw * 5) return; // too small to be more than a blob yet
       ctx.globalAlpha = p < 0.65 ? 1 : Math.max(0, (1 - p) / 0.35);
       ctx.lineCap = "round";
       for (const [color, width] of [["#06114f", lw * 2.7], [b.color, lw]]) {
@@ -297,9 +307,9 @@ globalThis.thirtyOffDesign = {
       ctx.fillStyle = shade;
       ctx.fillRect(0, 0, w, h);
 
-      const size = Math.min(w * 0.25, h * 0.3);
+      const size = Math.min(w * 0.25, h * 0.3), lw = Math.max(1.5, size * 0.042);
       if (still) {
-        SPOTS.slice(0, 4).forEach(([x, y], i) => burst({ x: x * w, y: y * h, r: size * 0.9, n: 12, rot: i, color: COLORS[i % 3] }, 0.55, w));
+        SPOTS.slice(0, 4).forEach(([x, y], i) => burst({ x: x * w, y: y * h, r: size * 0.9, n: 12, rot: i, color: COLORS[i % 3] }, 0.55, lw));
         return;
       }
       if (now >= nextBurst) {
@@ -308,7 +318,7 @@ globalThis.thirtyOffDesign = {
         nextBurst = now + 380 + Math.random() * 420;
       }
       bursts = bursts.filter((b) => now - b.born < LIFE);
-      for (const b of bursts) burst(b, (now - b.born) / LIFE, w);
+      for (const b of bursts) burst(b, (now - b.born) / LIFE, lw);
     }
     requestAnimationFrame(draw);
     // With motion switched off the flag is painted once, and again only if the sign changes size.
