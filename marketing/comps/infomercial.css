@@ -114,7 +114,7 @@ html, body { background: #000; }
   position: absolute; top: 36px; bottom: 0; right: -40px; width: calc(30% + 40px); padding-right: 40px; background: #0a14ff; border-left: 5px solid #000;
   display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; line-height: 1;
 }
-.sale .s30 { font: 400 51px/1 "Archivo Black", sans-serif; letter-spacing: -0.05em; color: #ff1414; -webkit-text-stroke: 8px #000; paint-order: stroke fill; }
+.sale .s30 { font: 400 51px/1 "Archivo Black", sans-serif; letter-spacing: -0.05em; color: #ff3b28; -webkit-text-stroke: 8px #000; paint-order: stroke fill; }
 .sale .soff { font: 400 58px/1 "Archivo Black", sans-serif; letter-spacing: -0.05em; color: #ffee1a; -webkit-text-stroke: 9px #000; paint-order: stroke fill; margin-top: 6px; }
 .sale .sall { font: 400 25px/1.02 "Archivo Black", sans-serif; color: #fff; -webkit-text-stroke: 5px #000; paint-order: stroke fill; margin-top: 16px; letter-spacing: 0.02em; }
 
@@ -140,12 +140,13 @@ html, body { background: #000; }
 .pay .card { position: absolute; inset: 0; background: #fffef2; border: 6px solid #000; box-shadow: 9px 9px 0 rgba(2, 5, 50, 0.85); transform: rotate(-1.6deg); will-change: transform; }
 .pay .l1 { height: 48px; background: #080808; color: #fff35a; font: 400 38px/46px "Anton", sans-serif; letter-spacing: 0.05em; text-align: center; white-space: nowrap; }
 .pay .l1 i { font-style: normal; display: inline-block; color: #fff; background: var(--red); border-radius: 50%; width: 42px; height: 42px; line-height: 42px; }
-.pay .amt { position: absolute; left: 20px; top: 52px; font: 400 100px/1 "Alfa Slab One", serif; color: var(--red); -webkit-text-stroke: 3px #4a0000; paint-order: stroke fill; letter-spacing: 0.04em; text-shadow: 4px 4px 0 #ffd21a; transform-origin: left center; }
-.pay .sh { position: absolute; right: 16px; top: 60px; font: 400 42px/0.98 "Lobster", cursive; color: #0a1fb8; text-align: center; transform: rotate(-4deg); white-space: nowrap; }
+.pay .amt { position: absolute; left: 14px; top: 56px; font: 400 92px/1 "Alfa Slab One", serif; color: var(--red); -webkit-text-stroke: 3px #4a0000; paint-order: stroke fill; letter-spacing: 0.02em; text-shadow: 4px 4px 0 #ffd21a; transform-origin: left center; }
+.pay .sh { position: absolute; right: 14px; top: 62px; font: 400 40px/0.98 "Lobster", cursive; color: #0a1fb8; text-align: center; transform: rotate(-4deg); white-space: nowrap; }
 
 /* ---- bursts ---- */
 .stores { --x: 750px; --y: 1374px; width: 310px; height: 310px; z-index: 4; }
 .spikes { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(7px 8px 0 rgba(2, 5, 50, 0.8)); }
+.stores .spikes { filter: drop-shadow(7px 8px 0 #02063c); }
 .stores .txt { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; text-align: center; font-family: "Luckiest Guy", cursive; color: #d40808; line-height: 0.92; padding-top: 12px; }
 .stores .txt i { font-style: normal; font-size: 55px; color: #080808; }
 .stores .txt b { font-weight: 400; font-size: 46px; display: block; text-shadow: 2px 2px 0 #fff; }
@@ -177,7 +178,29 @@ html, body { background: #000; }
 #sparkles svg { position: absolute; overflow: visible; }
 .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 9; }
 
-/* ================= other formats ================= */
+/* ================= formats ================= */
+/* portrait, 1080x1920: phone apps cover the top 240px and the bottom 340px, so the offer, the demonstration,
+   the phone number, the price and the burst all sit between y=250 and y=1560; only the ticker, the countdown
+   and the fine print are allowed underneath */
+.f-9x16 .head { --y: 264px; }
+.f-9x16 .head .tag { top: 10px; }
+.f-9x16 .split { --y: 674px; height: 500px; }
+.f-9x16 .shot { height: 500px; }
+.f-9x16 .win { height: 352px; }
+.f-9x16 .page .hero { height: 100px; }
+.f-9x16 .x { top: 90px; }
+.f-9x16 .tick { top: 252px; }
+.f-9x16 .arrow { top: 176px; }
+.f-9x16 .call { --y: 1186px; }
+.f-9x16 .pay { --y: 1368px; }
+.f-9x16 .stores { --y: 1336px; }
+.f-9x16 .ticker.bottom { top: 1568px; }
+.f-9x16 .hurry { --y: 1686px; font-size: 50px; }
+.f-9x16 .hurry .count { font-size: 58px; min-width: 220px; }
+.f-9x16 .fine { top: 1766px; }
+.f-9x16 .wait { --y: 734px; }
+.f-9x16 .bonus { --x: 238px; --y: 620px; --k: 0.84; }
+
 /* square, 1080x1080: shorter browser windows, the countdown goes, the offer strip shares a row with the price */
 .f-1x1 { --rx: 540px; --ry: 200px; --floor: 160px; }
 .f-1x1 .paid, .f-1x1 .hurry, .f-1x1 .foot, .f-1x1 .fine .more, .f-1x1 .fine .date { display: none; }
@@ -192,11 +215,11 @@ html, body { background: #000; }
 .f-1x1 .tick { top: 212px; width: 146px; height: 146px; }
 .f-1x1 .arrow { top: 150px; }
 .f-1x1 .call { --x: 20px; --y: 792px; --k: 0.88; width: 1182px; }
-.f-1x1 .pay { --x: 24px; --y: 946px; --k: 0.58; }
-.f-1x1 .ticker.bottom { left: 452px; top: 946px; height: 74px; font-size: 50px; line-height: 66px; border: 4px solid var(--gold); border-right: 0; box-shadow: 0 7px 0 rgba(2, 5, 50, 0.7); }
-.f-1x1 .fine { left: 452px; top: 1029px; font-size: 19px; }
+.f-1x1 .pay { --x: 24px; --y: 946px; --k: 0.66; }
+.f-1x1 .ticker.bottom { left: 506px; top: 946px; height: 74px; font-size: 50px; line-height: 66px; border: 4px solid var(--gold); border-right: 0; box-shadow: 0 7px 0 rgba(2, 5, 50, 0.7); }
+.f-1x1 .fine { left: 506px; top: 1029px; font-size: 19px; }
 .f-1x1 .wait { --x: 56px; --y: 366px; --k: 0.95; }
-.f-1x1 .bonus { --x: 262px; --y: 268px; --k: 0.77; }
+.f-1x1 .bonus { --x: 288px; --y: 316px; --k: 0.7; }
 
 /* landscape, 1920x1080: the offer on the left, the demonstration on the right, a proper countdown clock */
 .f-16x9 { --rx: 480px; --ry: 280px; --floor: 260px; }
@@ -213,4 +236,4 @@ html, body { background: #000; }
 .f-16x9 .fine { top: 962px; font-size: 24px; }
 .f-16x9 .foot { height: 40px; }
 .f-16x9 .wait { --x: 836px; --y: 150px; --k: 1.02; }
-.f-16x9 .bonus { --x: 1076px; --y: 50px; --k: 0.84; }
+.f-16x9 .bonus { --x: 1076px; --y: 60px; --k: 0.84; }

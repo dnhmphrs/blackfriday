@@ -6,7 +6,7 @@ globalThis.thirtyOffDesign = (() => {
   let seed = 30;
   const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const marker = (text, cls) => {
-    const letters = [...text].map((ch) => (ch === " " ? " " : `<span class="c r${Math.floor(random() * 7)}">${ch}</span>`)).join("");
+    const letters = [...text].map((ch) => (ch === " " ? " " : `<span class="c r${Math.floor(random() * 6)}">${ch}</span>`)).join("");
     return `<div class="mk ${cls}"><div class="o" aria-hidden="true">${letters}</div><div class="f">${letters}</div></div>`;
   };
 
@@ -30,7 +30,7 @@ globalThis.thirtyOffDesign = (() => {
       border-left: 4px solid #000; background: #0b0d2e;
     }
     .car {
-      --u: 1cqw;
+      --u: min(1cqw, 0.54cqh);
       --green: #8dff1f; --yellow: #fff200; --pink: #ff2aa3; --white: #fffdf2; --cyan: #37f3ff;
       position: absolute; inset: 0; overflow: hidden; isolation: isolate;
       display: flex; flex-direction: column; padding-top: 9.5u;
@@ -48,9 +48,9 @@ globalThis.thirtyOffDesign = (() => {
     }
 
     /* the car itself: a strip of roof above the glass and the bonnet below it */
-    .car::before, .zone::after { content: ""; position: absolute; left: 0; right: 0; background: linear-gradient(#ff7a66, #e0101f 38%, #8a0012); }
+    .car::before, .yard::after { content: ""; position: absolute; left: 0; right: 0; background: linear-gradient(#ff7a66, #e0101f 38%, #8a0012); }
     .car::before { top: 0; height: 3.4u; border-bottom: 0.7u solid #000; }
-    .zone::after { bottom: 0; height: 3.6u; border-top: 0.7u solid #000; border-radius: 50% 50% 0 0 / 1.6u 1.6u 0 0; z-index: 0; }
+    .yard::after { bottom: 0; height: 3.6u; border-top: 0.7u solid #000; border-radius: 50% 50% 0 0 / 1.6u 1.6u 0 0; z-index: 0; }
 
     .flags { position: absolute; left: 0; top: 0; width: 100%; height: 14u; z-index: 3; overflow: hidden; }
     .flags polygon { stroke: #000; stroke-width: 0.35; stroke-linejoin: round; transform-box: fill-box; transform-origin: 50% 0; animation: flap 0.9s ease-in-out infinite alternate; }
@@ -78,80 +78,126 @@ globalThis.thirtyOffDesign = (() => {
     .n30 { font-size: 39u; line-height: 0.84; letter-spacing: 0.6u; --fc: var(--yellow); --oc: var(--pink); --ow: 3.4u; }
     .off { font-size: 30.5u; line-height: 0.86; letter-spacing: 0.4u; margin-top: -2u; --fc: var(--green); --oc: var(--pink); --ow: 3u; }
     .star { position: absolute; font: 400 9u/1 Arial, sans-serif; color: var(--white); }
-    .star.a { left: 3u; top: 1u; transform: rotate(-18deg); }
-    .star.b { right: 2.5u; top: 27u; font-size: 7u; color: var(--cyan); transform: rotate(14deg); }
+    .star.a { left: calc(50% - 47u); top: 1u; transform: rotate(-18deg); }
+    .star.b { left: calc(50% + 40.5u); top: 27u; font-size: 7u; color: var(--cyan); transform: rotate(14deg); }
+    .star.c { left: calc(50% - 48u); top: 44u; font-size: 6.5u; color: var(--yellow); transform: rotate(9deg); }
     .tei { flex: none; margin-top: 0.5u; transform: rotate(2deg); }
     .the { font-size: 10.6u; line-height: 1.04; --fc: var(--white); --oc: #05061c; }
     .net { font-size: 14.6u; line-height: 1; --fc: var(--pink); --oc: var(--white); --ow: 1.5u; filter: drop-shadow(0.5u 0.6u 0 rgba(0, 0, 0, 0.7)); }
 
-    /* everything below the headline: what is left of the height */
-    .zone { flex: 1; min-height: 0; position: relative; }
-    .deals { position: absolute; left: 0; top: 1u; bottom: 5u; width: 50u; overflow: hidden; z-index: 2;
-             display: flex; flex-flow: column wrap; align-content: flex-start; justify-content: space-evenly; align-items: center; }
-    .deals > * { flex: none; }
-    .slot { width: 50u; padding: 0.9u 0; }
+    /* everything below the headline: what is left of the height. The yard sits at the bottom;
+       more writing appears above it, a line at a time, when the windscreen is tall enough. */
+    .zone { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
+    .more, .deals { display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; }
+    .more { flex: 1 0 auto; overflow: hidden; position: relative; z-index: 2; }
+    .more > * { display: none; flex: none; padding: 1u 0; }
+    .m1 { font-size: 12u; line-height: 1.15; --fc: var(--white); --oc: #d4006f; transform: rotate(-3deg); }
+    .m2 { transform: rotate(3deg); }
+    .m2 .mk:first-child { font-size: 10.5u; line-height: 1.1; --fc: var(--white); --oc: #1f55ff; }
+    .m2 .mk:last-child { font-size: 15u; line-height: 1.05; --fc: var(--yellow); --oc: #ff3d00; }
+    .m3 { font-size: 14u; line-height: 1.15; --fc: var(--cyan); --oc: #05061c; transform: rotate(-4deg); }
+    .m4 { font-size: 12.5u; line-height: 1.15; --fc: var(--green); --oc: #0b5a00; transform: rotate(2.5deg); }
+    .m5 { font-size: 18u; line-height: 1.1; --fc: var(--pink); --oc: var(--white); --ow: 1.6u; transform: rotate(-5deg); }
+
+    /* the yard is sized in em: 1em is 1u, less when there is not the height for all of it */
+    .yard { flex: 0 1 100u; min-height: 0; position: relative; font-size: clamp(0.8u, (100cqh - 129u) / 80, 1u); }
+    .deals { position: absolute; left: calc((100cqw - 100u) / 3); top: 1u; bottom: 7u; width: 50em; z-index: 2; }
+    .slot { flex: none; width: 50em; padding: 0.3em 0; }
     .w { line-height: 1.2; }
-    .w1 { font-size: 8.6u; --fc: var(--green); --oc: #0b5a00; transform: rotate(-4deg); }
-    .w2 { font-size: 10.6u; --fc: var(--yellow); --oc: #ff3d00; transform: rotate(3deg); }
-    .w3 { font-size: 7.6u; --fc: var(--white); --oc: #1f55ff; transform: rotate(-2deg); }
-    .w4 { font-size: 6.5u; --fc: var(--cyan); --oc: #05061c; transform: rotate(3.5deg); }
-    .w5 { font-size: 6.5u; --fc: var(--white); --oc: #d4006f; transform: rotate(-3deg); }
-    .asis { position: absolute; right: 5u; top: 0; z-index: 2; font-size: 10u; line-height: 1.5; padding: 0 3u; --fc: var(--white); --oc: #05061c; transform: rotate(7deg); }
-    .asis svg { position: absolute; inset: -1u -1u; width: calc(100% + 2u); height: calc(100% + 2u); overflow: visible; }
-    .asis path { fill: none; stroke: var(--pink); stroke-width: 3; stroke-linecap: round; }
+    .w1 { font-size: 8.6em; --fc: var(--green); --oc: #0b5a00; transform: rotate(-3.5deg); }
+    .w2 { font-size: 10.6em; --fc: var(--yellow); --oc: #ff3d00; transform: rotate(2deg); }
+    .w3 { font-size: 8em; --fc: var(--white); --oc: #1f55ff; transform: rotate(-2.5deg); }
+    .w4 { font-size: 7em; --fc: var(--cyan); --oc: #05061c; transform: rotate(-1deg); }
+    .asis { position: absolute; right: calc((100cqw - 100u) / 4 + 5u); top: 0.15em; z-index: 2; font-size: 10em; line-height: 1.5; padding: 0 0.3em; --fc: var(--white); --oc: #05061c; transform: rotate(7deg); }
+    .asis svg { position: absolute; left: -0.1em; top: -0.1em; width: calc(100% + 0.2em); height: calc(100% + 0.2em); overflow: visible; }
+    .asis path { fill: none; stroke: var(--pink); stroke-width: 0.11em; stroke-linecap: round; }
 
-    .sticker { width: 43u; margin: 0 auto; background: #fffdea; border: 0.5u solid #000; color: #000; transform: rotate(-5deg); box-shadow: 0.9u 0.9u 0 rgba(0, 0, 0, 0.55);
+    .sticker { width: 43em; margin: 0 auto; background: #fffdea; border: 0.5em solid #000; color: #000; transform: rotate(-5deg); box-shadow: 0.9em 0.9em 0 rgba(0, 0, 0, 0.55);
                font-family: "Arial Black", "Arial Bold", Arial, sans-serif; font-weight: 900; }
-    .sticker .head { background: #e8101c; color: #fff200; font-size: 3.5u; line-height: 1.7; border-bottom: 0.5u solid #000; }
-    .sticker .was { font-size: 6u; line-height: 1.25; color: #333; }
-    .sticker s { text-decoration: line-through; text-decoration-color: #e8101c; text-decoration-thickness: 0.9u; }
-    .sticker .now { font-size: 12.5u; line-height: 0.95; color: #e8101c; letter-spacing: -0.04em; }
-    .sticker .now small { font-size: 5u; letter-spacing: 0; color: #000; vertical-align: 0.45em; }
-    .sticker .stk { margin: 0.6u 1.2u 0; border-top: 0.35u dashed #000; font: 700 2.9u/1.7 "Courier New", Courier, monospace; text-transform: none; overflow: hidden; text-overflow: ellipsis; }
+    .sticker .head { background: #e8101c; color: #fff200; font-size: 3.5em; line-height: 1.7; border-bottom: 0.143em solid #000; }
+    .sticker .was { font-size: 6em; line-height: 1.25; color: #333; }
+    .sticker s { text-decoration: line-through; text-decoration-color: #e8101c; text-decoration-thickness: 0.15em; }
+    .sticker .now { font-size: 11em; line-height: 1; color: #e8101c; letter-spacing: -0.04em; }
+    .sticker .now small { font-size: 0.4em; letter-spacing: 0; color: #000; vertical-align: 0.45em; }
+    .sticker .stk { margin: 0.6em 1.2em 0; border-top: 0.35em dashed #000; }
+    .sticker .stk div { font: 700 2.9em/1.7 "Courier New", Courier, monospace; text-transform: none; overflow: hidden; text-overflow: ellipsis; }
 
-    .tube { position: absolute; right: -1u; bottom: 1.2u; width: 58u; height: calc(100% - 14u); overflow: visible; z-index: 1; }
+    .tube { position: absolute; right: calc((100cqw - 100u) / 4 - 1u); bottom: 1.2u; width: 58u; height: calc(100% - 16em); overflow: visible; z-index: 1; }
     .tube path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
     .tube .ao { stroke: #000; stroke-width: 9.4; } .tube .af { stroke: #ff3b1e; stroke-width: 6.8; }
     .tube .bo { stroke: #000; stroke-width: 19.6; } .tube .bd { stroke: #ff3b1e; stroke-width: 17; }
     .tube .hair { stroke: #fff200; stroke-width: 2.2; }
     .tube text { font: 900 8.6px "Arial Black", "Arial Bold", Arial, sans-serif; fill: #fff200; letter-spacing: 0.4px; dominant-baseline: central; }
-    .wiper { position: absolute; left: 0; bottom: 2.6u; width: 100%; height: 13u; z-index: 0; }
+    /* the wiper, parked low so nothing is written across it */
+    .wiper { position: absolute; left: 0; bottom: 3u; width: 100%; height: 9u; z-index: 0; }
+    .wiper path { fill: none; stroke: #000; stroke-width: 1.7u; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+    .wiper .arm { stroke: #4a4a55; stroke-width: 1u; }
+    .wiper .pivot { stroke: #2a2a31; stroke-width: 3.6u; }
 
     .shortline { display: none; flex: none; font-size: 5.7u; line-height: 1.5; --fc: var(--green); --oc: #05061c; }
     .legal { flex: none; position: relative; z-index: 6; background: #060606; border-top: 0.5u solid #3c3c44; padding: 1.1u 2.4u 1.3u; color: #f1f1f1;
              font: 700 max(2.9u, 10px)/1.2 Arial, Helvetica, sans-serif; white-space: normal; }
+    .legal .tel { white-space: nowrap; }
 
-    /* a bit shorter: the lot gets cramped, so the circled one goes */
-    @container (min-aspect-ratio: 56/100) { .asis { display: none; } .tube { height: calc(100% - 1.2u); } }
-    /* short windows: the lettering and the small print, nothing else */
-    @container (max-height: 560px) or (min-aspect-ratio: 66/100) {
-      .car { --u: min(1cqw, 0.755cqh); }
-      .bf, .big, .tei, .shortline { margin-top: auto; margin-bottom: auto; }
-      .zone { display: none; }
-      .shortline { display: block; }
+    @media (min-width: 769px) {
+      /* a thin windscreen: the small print would run to too many lines */
+      @container (max-width: 340px) { .l3, .l4 { display: none; } }
+      /* a tall one: room for more writing */
+      @container (max-aspect-ratio: 43/100) { .m1 { display: block; } }
+      @container (max-aspect-ratio: 38/100) { .m2 { display: block; } }
+      @container (max-aspect-ratio: 36/100) { .m3 { display: block; } }
+      @container (max-aspect-ratio: 34/100) { .m4 { display: block; } }
+      @container (max-aspect-ratio: 63/200) { .m5 { display: block; } }
+      /* not much room under the headline: the sticker loses its stock number */
+      @container (min-aspect-ratio: 52/100) { .stk { display: none; } .sticker { padding-bottom: 0.6em; } }
+      /* short windows: the lettering and the small print, nothing else */
+      @container (min-aspect-ratio: 66/100) or ((max-height: 560px) and (min-aspect-ratio: 1/2)) {
+        .car { --u: min(1cqw, 0.755cqh); }
+        .bf, .big, .tei, .shortline { margin-top: auto; margin-bottom: auto; }
+        .zone, .l2 { display: none; }
+        .shortline { display: block; }
+      }
     }
+
+    /* narrow pages: a banner across the top. 30% OFF!! on the left, the rest beside it, the
+       tube man in the right-hand corner. The small print is two lines at most, and the
+       lettering takes what height is left. */
     @media (max-width: 768px) {
       .lot { width: 100%; height: 33%; border-left: 0; border-bottom: 4px solid #000; }
-      .car { --u: min(1cqw, 2.7cqh); padding-top: 5u; padding-right: 52cqh; }
+      .car {
+        --small: clamp(10px, 1.7cqw, 13px);
+        --u: min(0.82cqw, (100cqh - 2.4 * var(--small) - 11px) / 40);
+        display: grid; column-gap: 3u; padding-top: 5u;
+        grid-template-columns: 1fr auto auto 1fr 20u;
+        grid-template-rows: 1fr auto auto 1fr 0 auto;
+        grid-template-areas: ". . . . ." ". big bf . ." ". big tei . ." ". . . . ." "zone zone zone zone zone" "legal legal legal legal legal";
+      }
       .flags { height: 5.6u; }
-      .bf { font-size: 4.6u; transform: rotate(-1.5deg); }
-      .big { display: flex; justify-content: center; align-items: center; gap: 3u; transform: rotate(-2deg); }
-      .n30, .off { font-size: 13.4u; line-height: 0.95; margin-top: 0; --ow: 1.6u; letter-spacing: 0.2u; }
-      .star { display: none; }
-      .tei { display: flex; justify-content: center; align-items: center; gap: 1.6u; transform: rotate(1deg); }
-      .the, .net { font-size: 5.3u; line-height: 1.2; --ow: 0.8u; }
-      .zone { display: block; flex: none; height: 0; margin-right: -52cqh; }
-      .deals, .asis, .wiper, .shortline, .zone::after { display: none; }
-      .tube { right: 1cqw; bottom: 0; width: 60cqh; height: 72cqh; }
-      .legal { margin-right: -52cqh; font-size: max(1.72u, 10px); padding: 0.7u 1.5u 0.8u; }
-      /* not so wide: 30% over OFF, and the tube man keeps his corner */
-      @container (max-aspect-ratio: 18/10) {
-        .car { --u: min(1cqw, 1.45cqh); padding-right: 0; }
-        .bf, .big, .tei { margin-right: 46cqh; }
-        .big, .tei { display: block; }
-        .n30 { font-size: 22u; line-height: 0.86; --ow: 2.2u; } .off { font-size: 18u; line-height: 0.88; margin-top: -1u; --ow: 2u; }
+      .bf { grid-area: bf; align-self: end; font-size: 6.6u; line-height: 1.1; transform: rotate(-2deg); }
+      .big { grid-area: big; align-self: center; margin: 0; transform: rotate(-3deg); }
+      .n30 { font-size: 22u; line-height: 0.86; letter-spacing: 0.3u; --ow: 2.2u; }
+      .off { font-size: 18u; line-height: 0.88; letter-spacing: 0.2u; margin-top: -1u; --ow: 2u; }
+      .tei { grid-area: tei; align-self: start; margin: 0; transform: rotate(1.5deg); }
+      .the { font-size: 7.6u; line-height: 1.05; }
+      .net { font-size: 9.4u; --ow: 1u; }
+      /* the zone is a line of no height on top of the small print, for the tube man to stand on */
+      .zone { grid-area: zone; display: block; }
+      .yard { position: static; }
+      .star, .more, .deals, .asis, .wiper, .yard::after, .l2, .l4 { display: none; }
+      .tube { right: 0; bottom: 0; width: 27u; height: 33u; }
+      .legal { grid-area: legal; border-top-width: 2px; padding: 4px 8px 5px; font-size: var(--small); }
+      @container (max-width: 480px) or (max-height: 150px) { .l3 { display: none; } }
+      /* not so wide: everything in one stack, and the tube man keeps his corner */
+      @container (max-aspect-ratio: 19/10) {
+        .car {
+          --u: min(1.15cqw, (100cqh - 2.4 * var(--small) - 11px) / 59);
+          grid-template-columns: 1fr auto 1fr 27u;
+          grid-template-rows: 1fr auto auto auto 1fr 0 auto;
+          grid-template-areas: ". . . ." ". bf . ." ". big . ." ". tei . ." ". . . ." "zone zone zone zone" "legal legal legal legal";
+        }
+        .bf { font-size: 4.8u; }
         .the { font-size: 5.6u; line-height: 1.1; } .net { font-size: 7.4u; line-height: 1.05; }
-        .zone, .legal { margin-right: 0; }
+        .tube { width: 40u; height: 50u; }
       }
     }
     @media (prefers-reduced-motion: reduce) { .flags polygon { animation: none; } }
@@ -164,50 +210,58 @@ globalThis.thirtyOffDesign = (() => {
       <div class="big">
         ${marker("30%", "n30")}
         ${marker("OFF!!", "off")}
-        <span class="star a">&#9733;</span><span class="star b">&#9733;</span>
+        <span class="star a">&#9733;</span><span class="star b">&#9733;</span><span class="star c">&#9733;</span>
       </div>
       <div class="tei">
         ${marker("THE ENTIRE", "the sh")}
         ${marker("INTERNET", "net")}
       </div>
       <div class="zone">
-        <svg class="wiper" viewBox="0 0 100 13" aria-hidden="true">
-          <path d="M97 13 L52 6.2" stroke="#4a4a55" stroke-width="1.1" stroke-linecap="round"/>
-          <path d="M3 2.2 L96 10.6" stroke="#000" stroke-width="1.9" stroke-linecap="round"/>
-          <circle cx="97" cy="12.6" r="2" fill="#2a2a31"/>
-        </svg>
-        <div class="deals">
-          <div class="slot"><div class="sticker">
-            <div class="head">Manager's Special</div>
-            <div class="was">WAS <s>100%</s></div>
-            <div class="now"><small>NOW</small> 70%</div>
-            <div class="stk">STK# <span class="site"></span></div>
-          </div></div>
-          <div class="slot">${marker("1 OWNER!", "w w1 sh")}</div>
-          <div class="slot">${marker("0% APR*", "w w2 sh")}</div>
-          <div class="slot">${marker("LOW MILES", "w w3 sh")}</div>
-          <div class="slot">${marker("RUNS GREAT!", "w w4 sh")}</div>
-          <div class="slot">${marker("CLEAN TITLE", "w w5 sh")}</div>
+        <div class="more">
+          ${marker("CLEAN TITLE", "m1 sh")}
+          <div class="m2">${marker("EVERY SITE", "sh")}${marker("MUST GO!!", "sh")}</div>
+          ${marker("COLD A/C!", "m3 sh")}
+          ${marker("NO HAGGLE!", "m4 sh")}
+          ${marker("L@@K!!", "m5")}
         </div>
-        <div class="mk asis sh"><div class="o" aria-hidden="true">AS IS</div><div class="f">AS IS</div>
-          <svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M14 6 C40 -2 92 0 96 18 C99 36 56 42 26 38 C4 35 -2 16 12 8 C22 2 44 1 58 3"/></svg>
+        <div class="yard">
+          <svg class="wiper" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true">
+            <path class="arm" d="M4 8.6 L47 5"/>
+            <path d="M8 8 L94 3.4"/>
+            <path class="pivot" d="M4 8.6 h0.01"/>
+          </svg>
+          <div class="deals">
+            <div class="slot"><div class="sticker">
+              <div class="head">Manager's Special</div>
+              <div class="was">WAS <s>100%</s></div>
+              <div class="now"><small>NOW</small> 70%</div>
+              <div class="stk"><div>STK# <span class="site"></span></div></div>
+            </div></div>
+            <div class="slot">${marker("1 OWNER!", "w w1 sh")}</div>
+            <div class="slot">${marker("0% APR*", "w w2 sh")}</div>
+            <div class="slot">${marker("LOW MILES", "w w3 sh")}</div>
+            <div class="slot">${marker("RUNS GREAT!", "w w4 sh")}</div>
+          </div>
+          <div class="mk asis sh"><div class="o" aria-hidden="true">AS IS</div><div class="f">AS IS</div>
+            <svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="M14 6 C40 -2 92 0 96 18 C99 36 56 42 26 38 C4 35 -2 16 12 8 C22 2 44 1 58 3"/></svg>
+          </div>
+          <svg class="tube" viewBox="3 28 94 112" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+            <path class="ao"/><path class="ao"/><path class="af"/><path class="af"/>
+            <path class="bo"/><path class="bd" id="dl-spine"/>
+            <text><textPath href="#dl-spine" startOffset="9">30% OFF!</textPath></text>
+            <path class="hair"/>
+            <g class="face">
+              <circle cx="-3.9" cy="-0.5" r="3.1" fill="#fff" stroke="#000" stroke-width="0.8"/><circle cx="3.9" cy="-0.5" r="3.1" fill="#fff" stroke="#000" stroke-width="0.8"/>
+              <circle cx="-3.3" cy="0" r="1.4"/><circle cx="4.5" cy="0" r="1.4"/>
+              <path d="M-5.2 4.6 Q0 11 5.2 4.6 Z" style="fill:#3a0008;stroke:#000;stroke-width:0.8"/>
+            </g>
+            <rect x="35" y="127" width="30" height="12" rx="2" fill="#2b2b33" stroke="#000" stroke-width="1"/>
+            <path d="M38 133 H62" stroke="#fff200" stroke-width="2.4" stroke-dasharray="3 3" style="stroke-linecap:butt"/>
+          </svg>
         </div>
-        <svg class="tube" viewBox="3 28 94 112" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-          <path class="ao"/><path class="ao"/><path class="af"/><path class="af"/>
-          <path class="bo"/><path class="bd" id="dl-spine"/>
-          <text><textPath href="#dl-spine" startOffset="9">30% OFF!</textPath></text>
-          <path class="hair"/>
-          <g class="face">
-            <circle cx="-3.9" cy="-0.5" r="3.1" fill="#fff" stroke="#000" stroke-width="0.8"/><circle cx="3.9" cy="-0.5" r="3.1" fill="#fff" stroke="#000" stroke-width="0.8"/>
-            <circle cx="-3.3" cy="0" r="1.4"/><circle cx="4.5" cy="0" r="1.4"/>
-            <path d="M-5.2 4.6 Q0 11 5.2 4.6 Z" style="fill:#3a0008;stroke:#000;stroke-width:0.8"/>
-          </g>
-          <rect x="35" y="127" width="30" height="12" rx="2" fill="#2b2b33" stroke="#000" stroke-width="1"/>
-          <path d="M38 133 H62" stroke="#fff200" stroke-width="2.4" stroke-dasharray="3 3" style="stroke-linecap:butt"/>
-        </svg>
       </div>
       ${marker("1 OWNER ★ RUNS GREAT ★ AS IS", "shortline sh")}
-      <div class="legal">*30% of each page will be unavailable for viewing. *APR = Amount of Page Returned. Internet sold as is: no warranty, no refunds, no test drives. Tube man not for sale. Ask about our undercoating. 1-800-555-0130</div>
+      <div class="legal">*30% of each page will be unavailable for viewing. <span class="l2">*APR = Additional Page Removed.</span> <span class="l3">Internet sold as is: no warranty, no refunds, no test drives.</span> <span class="l4">Tube man not for sale. Ask about our undercoating.</span> <span class="tel">1-800-555-0130</span></div>
     </div></div>
   `;
 

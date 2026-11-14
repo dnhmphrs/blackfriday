@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>30% OFF NEWS: Breaking</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./breaking.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+
+  <!-- header strip (9x16 only: sits under the phone app's top chrome) -->
+  <div class="mast">
+    <div class="hazard"></div>
+    <div class="crawl" data-speed="150"><div class="run" data-text="SPECIAL REPORT /// "></div></div>
+  </div>
+
+  <!-- the studio -->
+  <div class="shot">
+    <div class="wall"></div>
+    <svg class="wallcopy"></svg>
+    <div class="beams"></div>
+    <div class="seams"></div>
+
+    <svg class="anchor" viewBox="0 0 400 440">
+      <defs>
+        <linearGradient id="a-suit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a5470"/><stop offset="1" stop-color="#1c2236"/></linearGradient>
+        <linearGradient id="a-skin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f6c7a2"/><stop offset="0.7" stop-color="#f1b98f"/><stop offset="1" stop-color="#dd9f76"/></linearGradient>
+        <linearGradient id="a-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5122"/><stop offset="1" stop-color="#4f2a0e"/></linearGradient>
+      </defs>
+      <!-- jacket -->
+      <path d="M-14 440 C-10 356 30 318 122 296 L158 282 L242 282 L278 296 C370 318 410 356 414 440 Z" fill="url(#a-suit)" stroke="#0d1122" stroke-width="3"/>
+      <!-- shirt -->
+      <path d="M152 286 L200 470 L248 286 Z" fill="#ffffff"/>
+      <!-- tie -->
+      <path d="M186 340 L214 340 L230 446 L170 446 Z" fill="#e0101c"/>
+      <path d="M181 366 L221 392 M177 398 L226 428 M173 428 L200 446" stroke="#ffe600" stroke-width="7"/>
+      <path d="M188 314 L212 314 L218 342 L182 342 Z" fill="#b8000f"/>
+      <!-- lapels -->
+      <path d="M152 286 L118 298 L104 356 L134 352 L124 378 L196 470 L200 470 Z" fill="#323a54" stroke="#0d1122" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M248 286 L282 298 L296 356 L266 352 L276 378 L204 470 L200 470 Z" fill="#323a54" stroke="#0d1122" stroke-width="3" stroke-linejoin="round"/>
+      <!-- lapel pin and clip-on mic -->
+      <circle cx="122" cy="332" r="13" fill="#ffe600" stroke="#0d1122" stroke-width="3"/>
+      <text x="122" y="338" text-anchor="middle" font-family="Archivo Black" font-size="15" fill="#e0101c">%</text>
+      <rect x="226" y="372" width="12" height="22" rx="4" fill="#0b0b0f"/>
+      <g id="a-head">
+        <!-- neck and collar -->
+        <path d="M166 226 L234 226 L240 290 L200 322 L160 290 Z" fill="#d99870"/>
+        <path d="M160 268 L200 320 L178 344 L146 292 Z" fill="#f2f4fa" stroke="#c9cfe0" stroke-width="2"/>
+        <path d="M240 268 L200 320 L222 344 L254 292 Z" fill="#f2f4fa" stroke="#c9cfe0" stroke-width="2"/>
+        <!-- ears, face -->
+        <ellipse cx="124" cy="168" rx="11" ry="19" fill="#e9ad84"/>
+        <ellipse cx="276" cy="168" rx="11" ry="19" fill="#dd9f76"/>
+        <path d="M126 150 C126 74 274 74 274 150 C274 214 242 258 200 258 C158 258 126 214 126 150 Z" fill="url(#a-skin)"/>
+        <circle cx="152" cy="200" r="13" fill="#f08f7c" opacity="0.45"/>
+        <circle cx="248" cy="200" r="13" fill="#f08f7c" opacity="0.45"/>
+        <!-- anchor hair -->
+        <path d="M119 166 C102 98 128 46 204 42 C276 40 300 98 281 166 C278 132 268 112 250 102 C212 120 162 112 142 120 C128 132 124 148 119 166 Z" fill="url(#a-hair)" stroke="#3a1e08" stroke-width="3"/>
+        <path d="M146 86 C180 58 240 58 264 92" fill="none" stroke="#b97a3c" stroke-width="7" stroke-linecap="round" opacity="0.75"/>
+        <path d="M150 104 C184 96 220 98 246 88" fill="none" stroke="#b97a3c" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+        <!-- brows, eyes -->
+        <g id="a-brows">
+          <path d="M148 142 Q166 132 184 141" fill="none" stroke="#4a2a10" stroke-width="7" stroke-linecap="round"/>
+          <path d="M216 141 Q234 132 252 142" fill="none" stroke="#4a2a10" stroke-width="7" stroke-linecap="round"/>
+        </g>
+        <ellipse class="a-eye" cx="166" cy="162" rx="13" ry="9" fill="#fff" stroke="#6b3d22" stroke-width="2"/>
+        <ellipse class="a-eye" cx="234" cy="162" rx="13" ry="9" fill="#fff" stroke="#6b3d22" stroke-width="2"/>
+        <circle class="a-pupil" cx="168" cy="162" r="5.5" fill="#15151c"/>
+        <circle class="a-pupil" cx="236" cy="162" r="5.5" fill="#15151c"/>
+        <!-- nose, mouth -->
+        <path d="M202 164 L193 198 Q201 205 210 198" fill="none" stroke="#c88860" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <ellipse id="a-mouth" cx="200" cy="226" rx="21" ry="6" fill="#5e0d12"/>
+        <ellipse id="a-teeth" cx="200" cy="223" rx="15" ry="3" fill="#fff"/>
+      </g>
+    </svg>
+
+    <div class="super"><b>CHIP DISCOUNT</b><i>SENIOR SAVINGS CORRESPONDENT</i></div>
+
+    <div class="ots">
+      <div class="win">
+        <div class="burst"></div>
+        <div class="glow"></div>
+        <canvas id="gl"></canvas>
+        <div id="sparkles"></div>
+        <div class="tag">FILE PHOTO</div>
+        <div class="cap"><b>THE INTERNET</b><i>ALL OF IT</i></div>
+      </div>
+    </div>
+
+    <div class="star"><svg viewBox="-110 -110 220 220"></svg><div class="txt"><b>FREE!</b><i>ADD TO<br>CHROME</i></div></div>
+    <div class="fine16">*30% of every web page will be unavailable for viewing. Black Friday only.</div>
+  </div>
+
+  <div class="topbar">
+    <div class="bug"><b>30% OFF</b><i>NEWS</i></div>
+    <div class="tagline">NEWS YOU CAN SAVE ON</div>
+    <div class="alert"><i></i><b>SALE ALERT</b></div>
+    <div class="live"><span class="dot"></span>LIVE</div>
+    <div class="clock">5:30 AM ET</div>
+  </div>
+
+  <!-- lower third -->
+  <div class="breaking">
+    <div class="shine"></div>
+    <div class="word">BREAKING NEWS</div>
+    <div class="chev"><i></i><i></i><i></i></div>
+    <div class="watch">MARKDOWN WATCH 2026</div>
+    <div class="bf"><span>BLACK FRIDAY</span></div>
+  </div>
+
+  <div class="headline">
+    <div class="h1">INTERNET NOW</div>
+    <div class="h2">30% OFF</div>
+    <div class="justin">JUST IN</div>
+    <div class="stamp"><b>EVERY WEBSITE</b><i>YES, ALL OF THEM</i></div>
+  </div>
+
+  <div class="sub">
+    <div class="item"><b>EXPERTS:</b><span>&ldquo;THAT IS ALMOST A THIRD&rdquo;</span></div>
+    <div class="item"><b>HOW TO SAVE:</b><span>ADD TO CHROME &mdash; IT&rsquo;S FREE</span></div>
+    <div class="item"><b>OFFICIALS:</b><span>NO COUPON CODE NEEDED</span></div>
+    <div class="item"><b>WHEN:</b><span>BLACK FRIDAY ONLY, NOV. 27</span></div>
+    <div class="store">FREE ON THE CHROME WEB STORE</div>
+  </div>
+
+  <div class="market">
+    <div class="q">
+      <div class="lab">INTERNET COMPOSITE INDEX</div>
+      <div class="row"><span class="val">70.00</span><span class="chg"><i class="dn"></i>30.00 <em>(&minus;30%)</em></span></div>
+    </div>
+    <svg class="chart"></svg>
+  </div>
+
+  <div class="ticker">
+    <div class="crawl" data-speed="300"><div class="run"></div></div>
+    <div class="capl">MARKETS</div>
+  </div>
+
+  <div class="fine">*30% of every web page will be unavailable for viewing. Black Friday only.</div>
+
+  <!-- 1x1 and 16x9 only: a strip for the tape's head-switching tear to chew on instead of the type -->
+  <div class="sill hazard"></div>
+
+  <!-- footer (9x16 only: sits under the phone app's caption area) -->
+  <div class="foot">
+    <div class="crawl cta" data-speed="-220"><div class="run" data-text="ADD TO CHROME &mdash; IT&rsquo;S FREE! &mdash; "></div></div>
+    <div class="ident">
+      <div class="bug"><b>30% OFF</b><i>NEWS</i></div>
+      <div class="lines"><b>FREE ON THE CHROME WEB STORE</b><i>NEWS TIPS? CALL 1-800-555-0130</i></div>
+    </div>
+    <div class="hazard"></div>
+  </div>
+</div>
+<script type="module" src="./breaking.js"></script>
+</body>
+</html>

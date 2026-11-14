@@ -4,6 +4,7 @@ globalThis.thirtyOffDesign = (() => {
   // Every length is a multiple of --u: 1% of the frame's width, or less when the frame is
   // too squat to fit the page at that size. u(8) is "8 units".
   const u = (n) => `calc(${n} * var(--u))`;
+  const COMIC = `"Comic Sans MS", "Comic Sans", "Chalkboard SE", "Comic Neue", sans-serif`;
   const RAINBOW = "#ff2a2a, #ff9d00, #fff200, #3dff1f, #19e6ff, #7f8cff, #ff4df5, #ff2a2a";
   const star = (x, y, r, colour) => `radial-gradient(circle at ${x}% ${y}%, ${colour} 0, ${colour} ${u(r)}, rgba(0, 0, 0, 0) ${u(r + 0.12)})`;
 
@@ -17,12 +18,14 @@ globalThis.thirtyOffDesign = (() => {
     }
     .page {
       --u: min(1cqw, 0.49cqh);
+      /* --rest: the units of height everything but the big "30% OFF" needs. --w and --w2: how
+         wide its words are, in ems, alone and side by side; setup() measures the real font. */
+      --rest: 138; --w: 1.95; --w2: 3.9;
       position: absolute; inset: 0; overflow: hidden;
       display: flex; flex-direction: column; align-items: center; justify-content: space-between;
       padding-bottom: ${u(2)}; text-align: center; color: #fff;
-      font: 700 ${u(5)}/1.15 "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Comic Neue", sans-serif;
+      font: 700 ${u(5)}/1.15 ${COMIC};
       /* the starry night tile, repeated the way a 4 KB background image was */
-      background-color: #00002e;
       background-image:
         ${star(12, 16, 0.5, "#ffffff")}, ${star(63, 8, 0.3, "#fffbd0")}, ${star(86, 40, 0.55, "#a8d4ff")},
         ${star(36, 52, 0.3, "#ffffff")}, ${star(9, 76, 0.42, "#ffef8a")}, ${star(58, 86, 0.6, "#ffffff")},
@@ -51,15 +54,17 @@ globalThis.thirtyOffDesign = (() => {
     .uc b { display: block; background: #ffd400; color: #000; font: 900 ${u(5.3)}/1.55 "Arial Black", "Arial Bold", Impact, Arial, sans-serif; white-space: nowrap; }
 
     .hero { position: relative; }
-    .big { position: relative; font-size: ${u(41)}; line-height: 0.8; letter-spacing: -0.03em; white-space: nowrap; }
+    /* as big as the frame's width allows, or as tall as the rest of the page leaves room for */
+    .big { position: relative; font-size: min(calc(82cqw / var(--w)), calc((100cqh - var(--rest) * var(--u)) / 1.6)); line-height: 0.8; letter-spacing: -0.03em; white-space: nowrap; }
     /* three copies of the word: a fat white outline with a pink shadow, a black outline, and
        the rainbow on top. A transparent stroke lets the rainbow show through it, which
        fattens the letters where the font is thin. */
     .big .sh, .big .ol { position: absolute; left: 0; right: 0; top: 0; }
     .big .sh { color: #fff; -webkit-text-stroke: ${u(3.9)} #fff; text-shadow: ${u(1.6)} ${u(1.6)} 0 #ff00d0; }
     .big .ol { color: #000; -webkit-text-stroke: ${u(2.1)} #000; }
-    .big .rb { position: relative; -webkit-text-stroke: ${u(1.2)} transparent; animation-duration: 3s; }
-    .new { position: absolute; right: ${u(-6)}; top: ${u(-3)}; transform: rotate(9deg); animation: wobble 1s steps(1) infinite; }
+    /* the padding gives the rainbow room to paint under the stroke at both ends of the word */
+    .big .rb { position: relative; margin: 0 ${u(-2)}; padding: 0 ${u(2)}; -webkit-text-stroke: ${u(1.2)} transparent; animation-duration: 3s; }
+    .new { position: absolute; right: ${u(-4)}; top: ${u(-3)}; transform: rotate(9deg); animation: wobble 1s steps(1) infinite; }
     .new span { display: block; padding: 0 ${u(1.6)}; border: ${u(0.6)} solid #000; background: #f00; color: #ff0; font: italic 900 ${u(5.6)}/1.45 "Arial Black", "Arial Bold", Impact, Arial, sans-serif; animation: newflash 1s steps(1) infinite; }
 
     .tei { font-size: ${u(12)}; line-height: 1; color: #ff0; text-shadow: ${u(0.55)} ${u(0.55)} 0 #f00; white-space: nowrap; }
@@ -82,23 +87,23 @@ globalThis.thirtyOffDesign = (() => {
     /* more furniture, for frames tall enough to have room */
     .tall, .vtall { display: none; }
     .award { padding: 0 ${u(2.5)}; border: ${u(0.7)} ridge #ffd400; background: #800080; color: #ff0; font: 700 ${u(5)}/1.6 "Times New Roman", Times, serif; white-space: nowrap; }
-    .guest { font: 700 ${u(4.4)}/1.3 "Times New Roman", Times, serif; white-space: nowrap; }
+    .guest { background: #00002e; font: 700 ${u(4.4)}/1.3 "Times New Roman", Times, serif; white-space: nowrap; }
     .guest u { color: #0ff; }
     .links { flex-direction: column; align-items: flex-start; width: ${u(88)}; padding: ${u(1.5)} ${u(3)} ${u(2)}; border: ${u(0.7)} ridge #0ff; background: #000; text-align: left; font: 700 ${u(5)}/1.4 "Times New Roman", Times, serif; white-space: nowrap; }
-    .links b { align-self: center; color: #f0f; font: 700 ${u(5.6)}/1.5 "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Comic Neue", sans-serif; }
+    .links b { align-self: center; color: #f0f; font: 700 ${u(5.6)}/1.5 ${COMIC}; }
     .links u { color: #0ff; }
     .links em { padding: 0 ${u(1)}; background: #f00; color: #ff0; font: italic 900 ${u(3.6)}/1 "Arial Black", "Arial Bold", Impact, Arial, sans-serif; animation: newflash 1s steps(1) infinite; }
     .midi { padding: 0 ${u(2.5)}; background: #000; border: ${u(0.4)} solid #0f0; color: #0f0; font: 700 ${u(4.4)}/1.7 "Courier New", Courier, monospace; white-space: nowrap; }
-    .ring { font: 700 ${u(4.9)}/1.3 "Times New Roman", Times, serif; white-space: nowrap; }
+    .ring { padding: 0 ${u(2)}; border: ${u(0.6)} ridge #f0f; background: #000; font: 700 ${u(4.9)}/1.4 "Times New Roman", Times, serif; white-space: nowrap; }
     .ring u { color: #0ff; }
     .ring b { color: #ff0; font-weight: 700; }
-    .fine { max-width: ${u(96)}; font: 400 ${u(3.3)}/1.15 "Times New Roman", Times, serif; color: #d6d6d6; }
+    .fine { max-width: ${u(96)}; padding: 0 ${u(1)}; background: #00002e; font: 400 ${u(3.3)}/1.15 "Times New Roman", Times, serif; color: #d6d6d6; }
 
-    @container (max-aspect-ratio: 21/50) and (min-height: 561px) { .tall { display: block; } }
-    @container (max-aspect-ratio: 8/25) and (min-height: 561px) { .vtall { display: flex; } }
+    @container (max-aspect-ratio: 21/50) and (min-height: 561px) { .page { --rest: 168; } .tall { display: block; } }
+    @container (max-aspect-ratio: 8/25) and (min-height: 561px) { .page { --rest: 224; } .vtall { display: flex; } }
     /* squat frames: the offer, the tape and the webring; the rest of the furniture goes */
     @container (max-height: 560px) or (min-aspect-ratio: 2/3) {
-      .page { --u: min(1cqw, 0.74cqh); }
+      .page { --u: min(1cqw, 0.74cqh); --rest: 74; }
       .hr, .tbl, .best, .fine, .tei br { display: none; }
       .tei { font-size: ${u(7)}; }
     }
@@ -108,12 +113,12 @@ globalThis.thirtyOffDesign = (() => {
       .page { --u: min(1cqw, 2.3cqh); padding-bottom: 0; }
       .welcome, .hr, .tbl, .best, .ring, .fine, .tall, .vtall, .tei br, .uc b { display: none; }
       .mq { font-size: ${u(3.2)}; line-height: ${u(5)}; border-bottom-width: ${u(0.5)}; }
-      .big { display: inline-block; font-size: ${u(19)}; }
+      .big { display: inline-block; font-size: min(calc((86cqw - ${u(6)}) / var(--w2)), calc((100cqh - ${u(26)}) / 0.8)); }
       .big + .big { margin-left: ${u(4)}; }
       .big .sh { -webkit-text-stroke-width: ${u(2)}; text-shadow: ${u(0.9)} ${u(0.9)} 0 #ff00d0; }
       .big .ol { -webkit-text-stroke-width: ${u(1.05)}; }
       .big .rb { -webkit-text-stroke-width: ${u(0.55)}; }
-      .new { right: ${u(-9)}; top: ${u(-1)}; }
+      .new { right: ${u(-5)}; top: ${u(-1.5)}; }
       .new span { font-size: ${u(3.4)}; border-width: ${u(0.4)}; }
       .tei { font-size: ${u(7)}; text-shadow: ${u(0.4)} ${u(0.4)} 0 #f00; }
       .bfo { font-size: ${u(4.6)}; }
@@ -162,6 +167,7 @@ globalThis.thirtyOffDesign = (() => {
   `,
 
     setup(root) {
+      const page = root.querySelector(".page");
       const host = location.hostname || "my home page";
       const site = root.querySelector(".site");
       site.textContent = host;
@@ -176,6 +182,17 @@ globalThis.thirtyOffDesign = (() => {
       const days = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 864e5);
       const digits = String(days * 100 + 30).padStart(7, "0").slice(-7);
       root.querySelectorAll(".odo i").forEach((cell, i) => { cell.textContent = digits[i]; });
+
+      // Measure the two big words in whichever font this machine really has (real Comic Sans
+      // is wider than its stand-ins), so they fill the frame without leaving it.
+      const pen = document.createElement("canvas").getContext("2d");
+      if (!pen) return;
+      pen.font = `700 100px ${COMIC}`;
+      const em = (word) => pen.measureText(word).width / 100 - 0.09; // less the letter-spacing
+      const w30 = em("30%"), wOff = em("OFF");
+      if (!(w30 > 0 && wOff > 0)) return;
+      page.style.setProperty("--w", Math.max(w30, wOff).toFixed(3));
+      page.style.setProperty("--w2", (w30 + wOff).toFixed(3));
     },
   };
 })();

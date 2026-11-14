@@ -20,7 +20,7 @@ const $ = (s) => stage.querySelector(s);
 // ---------- build the repeated parts ----------
 // The generic web page, once for BEFORE and once for AFTER.
 const PAGE = `
-  <div class="nav"><span class="logo"></span><span class="name">website.com</span><u></u><u></u><u class="buy"></u></div>
+  <div class="nav"><span class="logo"></span><span class="name">example.com</span><u></u><u></u><u class="buy"></u></div>
   <h2>10 Things On This Web Page</h2>
   <div class="hero"><span class="sun"></span><span class="hill"></span><span class="hill h2"></span></div>
   <div class="lines"><s></s><s></s><s></s></div>

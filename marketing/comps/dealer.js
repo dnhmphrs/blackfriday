@@ -137,8 +137,9 @@ function heroBurst(el, d, n, r, fill, extra) {
   return svg;
 }
 const HB_N = 20;
-const hb2 = heroBurst($('#hb2'), F.burst * 1.1, HB_N, 85, '#ff6a00', '');
-const hb1 = heroBurst($('#hb1'), F.burst, HB_N, 80, 'url(#hbg)', '<defs><radialGradient id="hbg"><stop offset="0" stop-color="#fffde0"/><stop offset="0.45" stop-color="#fff200"/><stop offset="1" stop-color="#ff9d00"/></radialGradient></defs>');
+// The orange one behind is all spike: long points that stand well clear of the yellow teeth.
+const hb2 = heroBurst($('#hb2'), F.burst * 1.24, HB_N, 60, '#ff6a00', '');
+const hb1 = heroBurst($('#hb1'), F.burst, HB_N, 78, 'url(#hbg)', '<defs><radialGradient id="hbg"><stop offset="0" stop-color="#fffde0"/><stop offset="0.45" stop-color="#fff200"/><stop offset="1" stop-color="#ff9d00"/></radialGradient></defs>');
 
 // ---------- pennant strings ----------
 const flagSvg = $('#flags');

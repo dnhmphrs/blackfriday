@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Black Friday Internet Blowout: EVERYTHING MUST GO</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./blowout.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <!-- backdrop: a red and white sunburst, a blue rosette behind the offer -->
+  <div class="rays"></div>
+  <div class="vig"></div>
+  <div class="medal"></div>
+
+  <!-- banner tape -->
+  <div class="tape t1"><div class="run" data-text="BLOWOUT &#9733; "></div></div>
+  <div class="tape t2"><div class="run" data-text="BLOWOUT &#9733; TOTAL INTERNET LIQUIDATION &#9733; BLOWOUT &#9733; WE ARE OVERSTOCKED ON INTERNET &#9733; "></div></div>
+
+  <!-- 3D symbols that fall behind the lettering -->
+  <canvas id="back3d" class="gl"></canvas>
+
+  <div class="footer"></div>
+  <div class="canton"></div>
+  <div class="fans"></div>
+
+  <div class="blk strap">
+    <span class="tag l">NOV. 27<i>2026</i></span>
+    <span class="star">&#9733;</span>
+    <b>BLACK FRIDAY</b>
+    <span class="star">&#9733;</span>
+    <span class="tag r">ONE DAY<i>ONLY!</i></span>
+  </div>
+
+  <div class="blk headline"><div class="h1"></div><div class="h2"></div></div>
+
+  <div class="blk offer"></div>
+
+  <div class="blk entire"><div class="ribbon"><span>THE ENTIRE INTERNET!</span></div></div>
+  <div class="blk every">EVERY WEBSITE <i>&#9733;</i> EVERY PAGE <i>&#9733;</i> NO EXCEPTIONS</div>
+
+  <div class="blk fin">
+    <div class="tab">E-Z<br>TERMS!*</div>
+    <div class="row"><b>NO</b><span>PAYMENTS.</span></div>
+    <div class="row"><b>NO</b><span>INTEREST.</span></div>
+    <div class="row last"><b>NO</b><span>RIGHT-HAND SIDE.</span></div>
+  </div>
+
+  <div class="blk cta">
+    <div class="chev"><i></i><i></i><i></i></div>
+    <div class="pill"><b>ADD TO CHROME</b><span>at the Chrome Web Store &middot; no coupon needed</span></div>
+    <div class="free">FREE!</div>
+  </div>
+
+  <div class="blk phone">
+    <span class="call">CALL NOW!</span>
+    <span class="num">1-800-555-0130</span>
+    <span class="ops">OUR OPERATORS<br>ARE ASLEEP</span>
+  </div>
+
+  <div class="blk fine">*30% of every web page will be unavailable for viewing. Black Friday only, Nov. 27, 2026. There are no payments and no interest because it is free. Right-hand side not included. Not a mattress.</div>
+
+  <!-- 3D symbols that fall down the edges, in front of the secondary blocks (see the z-index note in the CSS) -->
+  <canvas id="front3d" class="gl"></canvas>
+
+  <!-- starbursts: on top of everything, so a falling symbol never covers the word -->
+  <div id="bursts"></div>
+</div>
+<script type="module" src="./blowout.js"></script>
+</body>
+</html>

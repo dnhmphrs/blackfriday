@@ -3,7 +3,8 @@
 //   window.comp.setTime(seconds)
 // The sheet is "re-photographed" twice a second (16 stop-motion poses per 8 second loop, each with
 // its own slip of the red and yellow plates), cut-out pieces move at 10 pictures a second, and a
-// red marker goes round the offer. Every period divides the loop, so setTime(0) == setTime(8).
+// shopper's red marker circles the offer, then ticks off every department. A clean copy of the
+// sheet arrives at 0.5s; every period divides the loop, so setTime(0) == setTime(8).
 
 const q = new URLSearchParams(location.search);
 // Section boxes: [x, y, width, height, unit]. `unit` scales the small type inside that section.
@@ -25,9 +26,9 @@ const FORMATS = {
     },
   },
   '16x9': {
-    w: 1920, h: 1080, fold: 0.5,
+    w: 1920, h: 1080, fold: 0.5, noteScale: 0.8, tilt: 0.6, // a wide sheet turns less, so its corners stay in frame
     sec: {
-      folio: [24, 6, 1872, 26, 0.9], mast: [24, 40, 880, 196], hero: [24, 246, 880, 452, 1.05], also: [24, 708, 880, 66, 0.86],
+      folio: [24, 6, 1872, 26, 0.9], mast: [24, 40, 880, 196], hero: [24, 246, 880, 452, 1.05], also: [24, 708, 880, 66, 0.8],
       ca: [24, 786, 880, 250, 1.25], grid: [920, 40, 976, 690, 1.12], cb: [920, 742, 520, 294, 1.3], foot: [1454, 742, 442, 294],
       fine: [24, 1045, 1872, 30, 0.8],
     },
@@ -94,7 +95,7 @@ $('#grid').innerHTML = DEPTS.map(([name, small, art], i) => `
 // ---------- bands of repeated shouting ----------
 for (const el of $$('.band')) {
   const words = el.dataset.band.split('|');
-  el.innerHTML = Array.from({ length: 12 }, (_, i) => `<b>${words[i % words.length]}</b><i class="star"></i>`).join('');
+  el.innerHTML = Array.from({ length: 14 }, (_, i) => `<b>${words[i % words.length]}</b><i class="star"></i>`).join('');
 }
 
 // ---------- barcodes ----------
@@ -176,44 +177,63 @@ function stroke(d, width, t0, t1) {
   strokes.push({ p, len, t0, t1 });
 }
 // A hand-drawn ring: a bit more than one lap, drifting outwards so the end overshoots the start.
-function ring(cx, cy, rx, ry, a0, laps, wob, drift) {
-  const N = 96, pts = [];
+function ring(cx, cy, rx, ry, a0, laps, wob, drift, tilt = 0) {
+  const N = Math.round(64 * laps), pts = [], c = Math.cos(tilt), s = Math.sin(tilt);
   for (let i = 0; i <= N; i++) {
     const u = i / N, a = a0 + u * TAU * laps;
-    const k = 1 + wob * Math.sin(a * 2 + 0.8) + wob * 0.6 * Math.sin(a * 3 + 2) + drift * (u - 0.35);
-    pts.push(`${(cx + Math.cos(a) * rx * k).toFixed(1)} ${(cy + Math.sin(a) * ry * k).toFixed(1)}`);
+    const k = 1 + wob * Math.sin(a * 2 + 0.8) + wob * 0.6 * Math.sin(a * 3 + 2 + u * 2.4) + drift * (u - 0.35);
+    const x = Math.cos(a) * rx * k + rx * 0.03 * u, y = Math.sin(a) * ry * k;
+    pts.push(`${(cx + x * c - y * s).toFixed(1)} ${(cy + x * s + y * c).toFixed(1)}`);
   }
   return 'M' + pts.join('L');
 }
 const pp = box($('.hero .pp'));
-const ringRx = pp.w * 0.585, ringRy = pp.h * 0.63;
-stroke(ring(pp.cx + pp.w * 0.01, pp.cy + pp.h * 0.02, ringRx, ringRy, -2.5, 1.14, 0.022, 0.085), 13 * U, 1.0, 1.9);
+const ringRx = pp.w * 0.578, ringRy = pp.h * 0.62;
+stroke(ring(pp.cx + pp.w * 0.01, pp.cy + pp.h * 0.02, ringRx, ringRy, -2.5, 2.07, 0.03, 0.1, -0.045), 10 * U, 0.7, 1.8);
 
 const note = $('#note');
-note.style.setProperty('--u', U);
-const noteX = pp.x - pp.w * 0.1, noteY = pp.y + pp.h + ringRy * 0.52;
+note.style.setProperty('--u', U * (F.noteScale || 1));
+const hero = box($('.sec.hero'));
+const noteX = pp.x - pp.w * 0.13, noteY = hero.y + hero.h * 0.985;
 note.style.left = noteX + 'px';
 note.style.top = noteY - note.offsetHeight + 'px';
-const NOTE_ROT = -6;
+const NOTE_ROT = -3;
 const noteW = note.offsetWidth, noteH = note.offsetHeight;
 { // an arrow from the end of the note up to the ring
   const a = (NOTE_ROT * Math.PI) / 180;
   const sx = noteX + Math.cos(a) * (noteW + 4) + Math.sin(a) * noteH * 0.45, sy = noteY + Math.sin(a) * (noteW + 4) - Math.cos(a) * noteH * 0.45;
-  const ex = sx + 70 * U, ey = pp.cy + ringRy * 1.13;
-  stroke(`M${sx} ${sy} Q${sx + 46 * U} ${sy + 4 * U} ${ex} ${ey}`, 9 * U, 3.0, 3.3);
-  stroke(`M${ex - 26 * U} ${ey + 6 * U} L${ex} ${ey} L${ex + 2 * U} ${ey + 28 * U}`, 9 * U, 3.3, 3.5);
+  const ex = sx + 44 * U, ey = pp.cy + pp.h * 0.02 + ringRy * 1.1;
+  stroke(`M${sx} ${sy} Q${sx + 36 * U} ${sy + 2 * U} ${ex} ${ey}`, 8 * U, 2.5, 2.8);
+  stroke(`M${ex - 26 * U} ${ey + 4 * U} L${ex} ${ey} L${ex + 6 * U} ${ey + 26 * U}`, 8 * U, 2.8, 3.0);
 }
-const NOTE_T = [2.2, 2.9];
+const NOTE_T = [1.85, 2.45];
 const free = box($('.cb .free'));
 const CU = F.sec.cb[4] || 1;
-stroke(ring(free.cx, free.cy, free.w * 0.6, free.h * 0.74, -0.6, 1.1, 0.03, 0.09), 9 * CU, 4.1, 4.7);
+stroke(ring(free.cx, free.cy, free.w * 0.58, free.h * 0.72, -0.6, 1.12, 0.035, 0.1, -0.06), 8 * CU, 3.4, 4.0);
+{ // then down the departments, one tick a beat, and a heart for the cat
+  const wob = mulberry(30), GU = F.sec.grid[4] || 1;
+  const j = (k) => (wob() - 0.5) * k;
+  const n = (v) => v.toFixed(1);
+  $$('.tile .ic').forEach((el, i) => {
+    const b = box(el), t0 = 4.3 + i * 0.38;
+    const x0 = b.x + b.w * (0.1 + j(0.08)), y0 = b.y + b.h * (0.5 + j(0.1));
+    const x1 = b.x + b.w * (0.36 + j(0.06)), y1 = b.y + b.h * (0.93 + j(0.06));
+    const x2 = b.x + b.w * (1.0 + j(0.08)), y2 = b.y + b.h * (0.04 + j(0.1));
+    stroke(`M${n(x0)} ${n(y0)} Q${n(x0 + b.w * 0.16)} ${n(y0 + b.h * 0.12)} ${n(x1)} ${n(y1)} Q${n(x1 + b.w * 0.2)} ${n(y1 - b.h * 0.56)} ${n(x2)} ${n(y2)}`, 9 * GU, t0, t0 + 0.24);
+    if (i !== 5) return;
+    const s = b.h * 0.17, cx = b.x + b.w * 0.07, cy = b.y + b.h * 0.2;
+    stroke(`M${n(cx)} ${n(cy + 0.95 * s)} C${n(cx - 1.4 * s)} ${n(cy - 0.1 * s)} ${n(cx - 0.6 * s)} ${n(cy - 1.1 * s)} ${n(cx)} ${n(cy - 0.3 * s)} C${n(cx + 0.6 * s)} ${n(cy - 1.1 * s)} ${n(cx + 1.4 * s)} ${n(cy - 0.1 * s)} ${n(cx)} ${n(cy + 0.95 * s)}`, 6 * GU, 7.4, 7.75);
+  });
+}
 const CLEAR = 0.5; // a clean copy of the sheet arrives here; before it, last loop's ink is still on the page
 
 // ---------- scissors, snipping round the first coupon ----------
 const sc = $('#scissors');
 sc.style.setProperty('--u', F.sec.ca[4] || 1);
-const half = (flip) => `<g class="half" data-flip="${flip}"><g transform="scale(1 ${flip})"><path d="M-5 -3.2L37 0.6 35.5 3.4 -3 3.6z" fill="${K}" stroke-width="1.5"/><path d="M-3 1L-12 8" fill="none" stroke-width="4.5"/><ellipse cx="-19" cy="11.5" rx="9" ry="6" transform="rotate(-28 -19 11.5)" fill="${PAPER}" stroke-width="4"/></g></g>`;
-sc.innerHTML = half(1) + half(-1) + `<circle r="2.2" fill="${PAPER}" stroke-width="1"/>`;
+const shapes = (flip, extra) => `<g transform="scale(1 ${flip})"><path d="M-5 -3.2L37 0.6 35.5 3.4 -3 3.6z" fill="${K}" stroke-width="1.5" ${extra}/><path d="M-3 1L-12 8" fill="none" stroke-width="4.5" ${extra}/><ellipse cx="-19" cy="11.5" rx="9" ry="6" transform="rotate(-28 -19 11.5)" fill="none" stroke-width="4" ${extra}/></g>`;
+const halo = `style="stroke:${PAPER};stroke-width:9;fill:${PAPER}"`; // a paper edge, so the scissors read over black bars
+sc.innerHTML = [1, -1].map((flip) => `<g class="half" data-flip="${flip}">${shapes(flip, halo)}</g>`).join('')
+  + [1, -1].map((flip) => `<g class="half" data-flip="${flip}">${shapes(flip, '')}</g>`).join('') + `<circle r="2" fill="${PAPER}" stroke-width="0"/>`;
 const halves = $$('.half', sc);
 const SCW = sc.clientWidth, SCH = sc.clientHeight, PIVOT = [(30 / 70) * SCW, (22 / 44) * SCH];
 const cut = box($('.coupon.ca'));
@@ -242,7 +262,7 @@ function setTime(t) {
 
   // the sheet, twice a second
   const s = poses[Math.floor(f / POSE)];
-  sheet.style.transform = `translate(${s.dx.toFixed(2)}px, ${s.dy.toFixed(2)}px) rotate(${s.rot.toFixed(3)}deg)`;
+  sheet.style.transform = `translate(${s.dx.toFixed(2)}px, ${s.dy.toFixed(2)}px) rotate(${(s.rot * (F.tilt || 1)).toFixed(3)}deg)`;
   sheet.style.setProperty('--rx', s.rx.toFixed(2) + 'px');
   sheet.style.setProperty('--ry', s.ry.toFixed(2) + 'px');
   sheet.style.setProperty('--yx', s.yx.toFixed(2) + 'px');
@@ -254,11 +274,11 @@ function setTime(t) {
   const cel = Math.floor(f / CEL), tc = (cel * CEL) / FPS;
   for (const b of bursts) {
     const beat = Math.max(0, Math.sin(TAU * (tc - b.phase)));
-    b.el.style.scale = (1 + (b.big ? 0.022 : 0.09) * beat * beat).toFixed(4);
-    const deg = b.turn ? (tc / DURATION) * b.turn * (360 / b.n) : (cel % 2) * (180 / b.n) * 0.16;
+    b.el.style.scale = (1 + (b.big ? 0.04 : 0.09) * beat * beat).toFixed(4);
+    const deg = b.turn ? (tc / DURATION) * b.turn * (360 / b.n) : (Math.floor(cel / 2) % 2) * (180 / b.n) * 0.16;
     for (const g of b.spins) g.setAttribute('transform', `rotate(${deg.toFixed(3)})`);
   }
-  const [x, y, deg] = along(tc / DURATION + 0.07);
+  const [x, y, deg] = along(tc / DURATION + 0.245); // starts in the gap between the labels on the top edge
   sc.style.transform = `translate(${(x - PIVOT[0]).toFixed(1)}px, ${(y - PIVOT[1]).toFixed(1)}px) rotate(${deg}deg)`;
   sc.style.transformOrigin = `${PIVOT[0]}px ${PIVOT[1]}px`;
   const open = cel % 2 ? 15 : 3;
