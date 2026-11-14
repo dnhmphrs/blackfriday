@@ -7,3 +7,26 @@
 @font-face { font-family: "Antonio"; font-weight: 600; src: url("/node_modules/@fontsource/antonio/files/antonio-latin-600-normal.woff2") format("woff2"); }
 @font-face { font-family: "Tinos"; font-weight: 700; font-style: italic; src: url("/node_modules/@fontsource/tinos/files/tinos-latin-700-italic.woff2") format("woff2"); }
 @font-face { font-family: "VT323"; font-weight: 400; src: url("/node_modules/@fontsource/vt323/files/vt323-latin-400-normal.woff2") format("woff2"); }
+
+/* Loud display faces for the sale-ad variants (all open licence). */
+@font-face { font-family: "Anton"; font-weight: 400; src: url("/node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Bangers"; font-weight: 400; src: url("/node_modules/@fontsource/bangers/files/bangers-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Luckiest Guy"; font-weight: 400; src: url("/node_modules/@fontsource/luckiest-guy/files/luckiest-guy-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Permanent Marker"; font-weight: 400; src: url("/node_modules/@fontsource/permanent-marker/files/permanent-marker-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Bungee"; font-weight: 400; src: url("/node_modules/@fontsource/bungee/files/bungee-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Bungee Shade"; font-weight: 400; src: url("/node_modules/@fontsource/bungee-shade/files/bungee-shade-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Alfa Slab One"; font-weight: 400; src: url("/node_modules/@fontsource/alfa-slab-one/files/alfa-slab-one-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Ultra"; font-weight: 400; src: url("/node_modules/@fontsource/ultra/files/ultra-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Pacifico"; font-weight: 400; src: url("/node_modules/@fontsource/pacifico/files/pacifico-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lobster"; font-weight: 400; src: url("/node_modules/@fontsource/lobster/files/lobster-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Comic Neue"; font-weight: 400; src: url("/node_modules/@fontsource/comic-neue/files/comic-neue-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Comic Neue"; font-weight: 700; src: url("/node_modules/@fontsource/comic-neue/files/comic-neue-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Press Start 2P"; font-weight: 400; src: url("/node_modules/@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Monoton"; font-weight: 400; src: url("/node_modules/@fontsource/monoton/files/monoton-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-weight: 400; src: url("/node_modules/@fontsource/oswald/files/oswald-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-weight: 700; src: url("/node_modules/@fontsource/oswald/files/oswald-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Bebas Neue"; font-weight: 400; src: url("/node_modules/@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Rye"; font-weight: 400; src: url("/node_modules/@fontsource/rye/files/rye-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Titan One"; font-weight: 400; src: url("/node_modules/@fontsource/titan-one/files/titan-one-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Courier Prime"; font-weight: 400; src: url("/node_modules/@fontsource/courier-prime/files/courier-prime-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Courier Prime"; font-weight: 700; src: url("/node_modules/@fontsource/courier-prime/files/courier-prime-latin-700-normal.woff2") format("woff2"); }

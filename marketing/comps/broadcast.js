@@ -22,6 +22,7 @@ const DURATION = 12, FPS = 30, TURN = 6;
 
 const stage = document.getElementById('stage');
 stage.classList.add('f-' + format);
+if (q.get('theme')) stage.classList.add('t-' + q.get('theme')); // colourways: see the end of broadcast.css
 stage.style.width = F.w + 'px';
 stage.style.height = F.h + 'px';
 
@@ -45,10 +46,14 @@ scene.add(pivot);
 const heroName = q.get('hero') || 'globe-core';
 const hero = await buildObject(heroName, { sliceOut: 0 });
 pivot.add(castShadows(hero));
+if (!heroName.startsWith('globe')) { // other objects are scaled to fill the same space as the globe
+  const size = new THREE.Box3().setFromObject(hero).getSize(new THREE.Vector3());
+  hero.scale.setScalar(Math.min(2.35 / size.x, 2.1 / size.y));
+}
 if (hero.userData.slice) hero.userData.slice.visible = q.get('slice') === '1';
 
 const plinth = makePlinth({ radius: F.plinth.r, height: 9, shadowRadius: 0.85 });
-plinth.position.y = -(1 + F.plinth.gap);
+plinth.position.y = heroName.startsWith('globe') ? -(1 + F.plinth.gap) : new THREE.Box3().setFromObject(hero).min.y - 0.36;
 scene.add(plinth);
 
 // ---------- 2D ----------
@@ -84,8 +89,12 @@ const sparkles = Array.from({ length: 26 }, () => {
 });
 
 const GLITCHES = [2.6, 6.3, 9.75];
-const TITLE = ['World Wide', 'Sale'];
-const TITLE_GLITCH = [['Wor1d W!de', 'Sa1e'], ['World Wide Web', 'Sale'], ['Wlrod Wdie', '5ale']];
+// ?title=Everything|Must Go replaces the two title lines.
+const TITLE = (q.get('title') || 'World Wide|Sale').split('|');
+const leet = (w) => w.replace(/l/g, '1').replace(/i/g, '!').replace(/S/g, '5').replace(/o/g, '0');
+const TITLE_GLITCH = q.get('title')
+  ? [TITLE.map(leet), [...TITLE].reverse(), TITLE.map((w) => leet(w).toUpperCase())]
+  : [['Wor1d W!de', 'Sa1e'], ['World Wide Web', 'Sale'], ['Wlrod Wdie', '5ale']];
 const l1 = document.querySelector('.title .l1'), l2 = document.querySelector('.title .l2');
 const priceBig = document.querySelector('.price .big');
 const pill = document.querySelector('.pill'), oval = document.querySelector('.oval');

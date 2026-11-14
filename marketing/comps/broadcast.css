@@ -157,3 +157,20 @@ html, body { background: #000; }
 .f-tile .ticker, .f-tile .osd, .f-tile .cards, .f-tile .fine, .f-tile .oval, .f-tile .title, .f-tile .price, .f-tile .pill { display: none; }
 .f-tile .bg { background: radial-gradient(ellipse 48% 74% at 76% 44%, #5fd0ff 0%, #2f95ff 22%, #1450f8 46%, rgba(10,34,214,0) 76%), linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
 .f-tile .offer { left: 44px; top: 70px; } .f-tile .offer .pct { font-size: 218px; } .f-tile .offer .off { font-size: 196px; } .f-tile .offer .what { display: none; }
+
+/* ================= colourways (?theme=) ================= */
+/* red: the clearance-rack version. Pair with a chrome hero so it stands off the background. */
+.t-red { --shade: #5a0606; }
+.t-red#stage { background: #8f0a0a; }
+.t-red .bg { background: radial-gradient(ellipse 60% 36% at 70% 52%, #ffe07a 0%, #ff9a2e 22%, #f23a16 46%, rgba(200, 20, 10, 0) 74%), linear-gradient(#c21212, #d81a12 45%, #8f0a0a); }
+.t-red .title { filter: drop-shadow(8px 8px 0 rgba(70, 6, 6, 0.95)); }
+.t-red .price .head { background: #0a22d6; }
+.t-red .ticker.top, .t-red .offer .what { text-shadow: 3px 3px 0 rgba(70, 6, 6, 0.9); }
+.t-red .fine { background: rgba(50, 4, 4, 0.75); }
+/* night: black and gold, for the midnight opening. Pair with the gold dollar sign. */
+.t-night { --shade: #000; --yellow: #ffd23a; }
+.t-night#stage { background: #05030d; }
+.t-night .bg { background: radial-gradient(ellipse 60% 36% at 70% 52%, #b9902a 0%, #6a3fb0 26%, #2a1466 50%, rgba(10, 5, 30, 0) 76%), linear-gradient(#0d0820, #150a35 45%, #05030d); }
+.t-night .title { filter: drop-shadow(8px 8px 0 rgba(0, 0, 0, 0.95)); }
+.t-night .price .head { background: #111; color: #ffd23a; }
+.t-night .fine { background: rgba(0, 0, 0, 0.75); }

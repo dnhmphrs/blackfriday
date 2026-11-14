@@ -3,6 +3,8 @@
 
     python3 vhs.py <name> [--out out/x.mp4] [--amount 1.0] [--still N out.png] [--clean]
 
+--clean encodes the frames as they are (for print-style pieces that should not look taped).
+
 Reads frames/<name>/raw/*.png and frames/<name>/meta.json (written by render.mjs).
 Every frame is a pure function of its index, so the result is reproducible.
 """
@@ -114,6 +116,8 @@ def _work(job):
     path, index, fps, glitches, amount = job
     bgr = cv2.imread(path, cv2.IMREAD_COLOR)
     rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    if amount is None:
+        return rgb.tobytes()
     return degrade(rgb, index, fps, glitch_strength(index, fps, glitches), amount).tobytes()
 
 
@@ -125,7 +129,10 @@ def main():
     ap.add_argument('--crf', type=int, default=23)
     ap.add_argument('--still', nargs=2, metavar=('FRAME', 'PNG'))
     ap.add_argument('--loops', type=int, default=1)
+    ap.add_argument('--clean', action='store_true')
     a = ap.parse_args()
+    if a.clean:
+        a.amount = None
     base = os.path.join(ROOT, 'frames', a.name)
     meta = json.load(open(os.path.join(base, 'meta.json')))
     fps, W, H = meta['fps'], meta['width'], meta['height']
