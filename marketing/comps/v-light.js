@@ -25,6 +25,13 @@ stage.classList.add('f-' + format);
 if (q.get('theme')) stage.classList.add('t-' + q.get('theme')); // colourways: see the end of broadcast.css
 stage.style.width = F.w + 'px';
 stage.style.height = F.h + 'px';
+// ?v=a|b|c: three grades of the room, made with the backdrop alone. Nothing is added to the picture; see the end of v-light.css.
+const V = ['a', 'b', 'c'].includes(q.get('v')) ? q.get('v') : '';
+if (V) stage.classList.add('v-' + V);
+// where the object sits, so the backdrops can be lit around it in any format
+stage.style.setProperty('--hx', F.hero.x + 'px');
+stage.style.setProperty('--hy', F.hero.y + 'px');
+stage.style.setProperty('--hd', F.hero.d + 'px');
 
 // ---------- 3D ----------
 const canvas = document.getElementById('gl');

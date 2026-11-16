@@ -56,6 +56,65 @@ const plinth = makePlinth({ radius: F.plinth.r, height: 9, shadowRadius: 0.85 })
 plinth.position.y = heroName.startsWith('globe') ? -(1 + F.plinth.gap) : new THREE.Box3().setFromObject(hero).min.y - 0.36;
 scene.add(plinth);
 
+// ---------- hero variants (?v=a|b|c): one touch each, on the globe or its plinth only ----------
+const V = heroName.startsWith('globe') && ['a', 'b', 'c'].includes(q.get('v')) ? q.get('v') : '';
+if (V) stage.classList.add('v-' + V);
+const rad = (deg) => (deg * Math.PI) / 180;
+let ring = null, piece = null;
+
+if (V === 'a') {
+  // a: the Gary Mustard Enterprises lockup printed in navy on the front of the plinth, like a
+  // maker's display stand. A decal on an open cylinder a hair wider than the plinth.
+  const map = await new THREE.TextureLoader().loadAsync('/assets/gme/gme-primary.png');
+  map.colorSpace = THREE.SRGBColorSpace;
+  map.anisotropy = 8;
+  const r = F.plinth.r + 0.004, arc = 1.3, h = arc * (map.image.height / map.image.width);
+  const decal = new THREE.Mesh(
+    new THREE.CylinderGeometry(r, r, h, 96, 1, true, -arc / r / 2, arc / r),
+    new THREE.MeshStandardMaterial({ map, color: 0x0a1a66, transparent: true, metalness: 0, roughness: 0.7, envMapIntensity: 0.3, depthWrite: false })
+  );
+  decal.position.y = -0.56;
+  plinth.add(decal);
+}
+
+if (V === 'b') {
+  // b: one thin chrome orbit ring, after the GME globes that wear them. It lies close to flat,
+  // like a planet's ring, tipped up to the right; the near side passes under the lettering on
+  // the cut. Its axis circles a small cone once per turn of the globe, tipped furthest towards
+  // the camera whenever the cut faces it. (No shadow: a hairline across the plinth would read
+  // as a scratch.)
+  const mesh = new THREE.Mesh(new THREE.TorusGeometry(1.16, 0.028, 20, 240), hero.userData.body.children[0].material);
+  mesh.rotation.x = Math.PI / 2;
+  mesh.scale.z = 0.3; // a flat band, not another wire: it has to read apart from the lattice
+  const nod = new THREE.Group(), lap = new THREE.Group(), lean = new THREE.Group();
+  nod.rotation.x = rad(2.5);
+  lean.rotation.set(rad(16), 0, rad(26));
+  nod.add(mesh); lap.add(nod); lean.add(lap);
+  scene.add(lean);
+  ring = { lean, lap };
+}
+
+if (V === 'c') {
+  // c: the 30% that was cut out, as its own small piece hovering off the globe's lower left.
+  // It is the object's own (normally hidden) wedge, re-centred on itself and scaled down, held
+  // at a three-quarter view: chrome and blue skin on the left, the yellow "30%" face turned
+  // towards the globe. It only rocks and bobs a little; it never shows a second "30% OFF".
+  const slice = hero.userData.slice;
+  const mid = 54, holder = new THREE.Group(), spin = new THREE.Group();
+  piece = new THREE.Group();
+  slice.removeFromParent();
+  slice.visible = true;
+  slice.position.set(-0.52 * Math.sin(rad(mid)), 0, -0.52 * Math.cos(rad(mid)));
+  holder.rotation.y = rad(-mid); // the wedge's outer skin faces +Z at yaw 0
+  holder.add(slice); spin.add(holder); piece.add(spin);
+  piece.scale.setScalar(0.32);
+  piece.rotation.set(rad(8), 0, rad(12));
+  piece.traverse((o) => { o.castShadow = false; }); // its shadow would land as a blot on the plinth's front
+  piece.userData = { spin, yaw0: rad(-95), rock: rad(10), home: new THREE.Vector3(-1.19, -0.76, 0.15) };
+  piece.position.copy(piece.userData.home);
+  scene.add(piece);
+}
+
 // ---------- 2D ----------
 await document.fonts.ready;
 await Promise.all(['300 58px Antonio', '400 100px "Archivo Black"', 'italic 700 50px Arimo', 'italic 700 44px Tinos'].map((f) => document.fonts.load(f)));
@@ -104,6 +163,11 @@ function setTime(t) {
   t = ((t % DURATION) + DURATION) % DURATION;
   pivot.rotation.y = yawAt(t);
   pivot.position.y = Math.sin((t / DURATION) * TAU * 2) * 0.035;
+  if (ring) { ring.lean.position.y = pivot.position.y; ring.lap.rotation.y = (t / TURN) * TAU; }
+  if (piece) {
+    piece.userData.spin.rotation.y = piece.userData.yaw0 + piece.userData.rock * Math.sin((t / DURATION) * TAU);
+    piece.position.y = piece.userData.home.y + Math.sin((t / DURATION) * TAU * 2 + 1.2) * 0.025;
+  }
 
   for (const k of tickers) {
     const x = -(((t / DURATION) * k.perLoop * k.unit) % k.unit);
@@ -125,6 +189,6 @@ function setTime(t) {
   renderer.render(scene, camera);
 }
 
-window.comp = { duration: DURATION, fps: FPS, width: F.w, height: F.h, glitches: [], setTime, three: { THREE, scene, camera, renderer, pivot, hero, plinth } };
+window.comp = { duration: DURATION, fps: FPS, width: F.w, height: F.h, glitches: [], setTime, three: { THREE, scene, camera, renderer, pivot, hero, plinth, ring, piece } };
 setTime(Number(q.get('t') || 0));
 window.ready = true;

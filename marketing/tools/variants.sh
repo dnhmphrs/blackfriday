@@ -1,13 +1,13 @@
 #!/bin/sh
 # Renders a labelled contact sheet of variants for choosing between.
-#   tools/variants.sh <sheet name> <comp> "<label>|<query after format=9x16>" ...
+#   tools/variants.sh <sheet name> "<label>|<comp>|<query after format=9x16>" ...
 set -e
 cd "$(dirname "$0")/.."
-sheet="$1"; comp="$2"; shift 2
+sheet="$1"; shift
 mkdir -p out/variants
 list=""
 for item in "$@"; do
-  label="${item%%|*}"; query="${item#*|}"
+  label="${item%%|*}"; rest="${item#*|}"; comp="${rest%%|*}"; query="${rest#*|}"
   png=$(tools/proof.sh "$comp" "9x16$query" 12 1.0 | tail -1)
   list="$list$label|$png
 "

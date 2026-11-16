@@ -157,3 +157,48 @@ html, body { background: #000; }
 .t-night .title { filter: drop-shadow(8px 8px 0 rgba(0, 0, 0, 0.95)); }
 .t-night .price .head { background: #111; color: #ffd23a; }
 .t-night .fine { background: rgba(0, 0, 0, 0.75); }
+
+/* ================= grades (?v=a|b|c) =================
+   Three moods of the same room, made only with the backdrop, the light and the tone.
+   Nothing is added and the signage is untouched. --hx/--hy/--hd (set in v-light.js) are the
+   object's centre and diameter, so each backdrop is lit around the object in every format. */
+.grade { display: none; position: absolute; inset: 0; pointer-events: none; }
+#stage { --hz: calc(var(--hy) + var(--hd) * 0.63); /* the horizon: just behind the back edge of the plinth's top */ }
+
+/* a: after dark. Navy that falls to near-black at the top and bottom, the glow pooled behind the globe. */
+#stage.v-a { background: #01020a; }
+#stage.v-a .bg {
+  background:
+    radial-gradient(circle calc(var(--hd) * 0.98) at var(--hx) var(--hy), #8fe6ff 0%, #4ab4ff 20%, #1b62f6 44%, rgba(12, 42, 205, 0.55) 70%, rgba(8, 26, 160, 0) 100%),
+    linear-gradient(#01020c 0%, #030a44 9%, #06157c 20%, #0a1fb6 38%, #0a22c8 52%, #08199a 68%, #050d5c 84%, #020522 95%, #01020c 100%);
+}
+/* the same fall-off carried down the plinth: it starts just under the plinth's top, so the shading is seen on the plinth above the ticker and the dark below it is not a step */
+#stage.v-a .grade { display: block; background: linear-gradient(rgba(1, 2, 14, 0) 69%, rgba(1, 2, 14, 0.26) 81%, rgba(1, 2, 14, 0.56) 91%, rgba(1, 2, 14, 0.8) 100%); }
+
+/* b and c have a floor: it meets the wall at --hz, a little softly (b) or as a clean line (c) */
+#stage.v-b .bg::after, #stage.v-c .bg::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; top: calc(var(--hz) - var(--soft) / 2); -webkit-mask-image: linear-gradient(transparent, #000 var(--soft)); mask-image: linear-gradient(transparent, #000 var(--soft)); }
+
+/* b: the studio floor. The wall is the approved wall, untouched; it meets a deeper blue floor, and a cool pool of light lies on the floor behind the plinth. */
+#stage.v-b { --soft: 14px; }
+#stage.v-b .bg::after {
+  background:
+    radial-gradient(ellipse calc(var(--hd) * 2) calc(var(--hd) * 0.34) at var(--hx) calc(var(--hd) * 0.05), rgba(170, 235, 255, 0.9) 0%, rgba(84, 176, 255, 0.55) 40%, rgba(30, 96, 240, 0) 100%),
+    linear-gradient(#0a18a4, #08128f 30%, #070f86);
+}
+
+/* c: dusk. The same blue room with a thin band of warm light on the horizon behind the plinth. */
+#stage.v-c { --soft: 5px; }
+#stage.v-c .bg {
+  background:
+    /* the warm band, strongest behind the plinth */
+    radial-gradient(ellipse calc(var(--hd) * 1.9) calc(var(--hd) * 0.07) at var(--hx) var(--hz), #ffd596 0%, rgba(255, 190, 120, 0.9) 35%, rgba(255, 160, 110, 0) 100%),
+    radial-gradient(ellipse calc(var(--hd) * 1.8) calc(var(--hd) * 0.24) at var(--hx) var(--hz), rgba(255, 140, 110, 0.8) 0%, rgba(236, 110, 160, 0.42) 50%, rgba(190, 90, 220, 0) 100%),
+    radial-gradient(ellipse 60% 36% at 70% 52%, #5fd0ff 0%, #2f95ff 22%, #1450f8 44%, rgba(10,34,214,0) 72%),
+    linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c);
+}
+#stage.v-c .bg::after {
+  background:
+    /* the band's sheen on the floor */
+    radial-gradient(ellipse calc(var(--hd) * 1.6) calc(var(--hd) * 0.16) at var(--hx) 0, rgba(255, 150, 130, 0.42) 0%, rgba(210, 100, 190, 0.16) 55%, rgba(120, 60, 200, 0) 100%),
+    linear-gradient(#0a18a4, #08128f 30%, #070f86);
+}

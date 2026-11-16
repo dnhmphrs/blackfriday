@@ -164,12 +164,19 @@ html, body { background: #000; }
 /* a: the whole title in Garamond italic */
 .v-a .title { font: italic 800 172px/0.9 "EB Garamond", serif; letter-spacing: -0.03em; white-space: nowrap; }
 .v-a .title span { padding: 0.06em 0.14em; margin: -0.06em 0; }
-.v-a .title .l2 { font-size: 258px; margin-top: -0.16em; }
+.v-a .title .l2 { font-size: 240px; margin-top: -0.18em; }
 
 /* b: "World Wide" as approved, "Sale" large in Garamond italic */
-.v-b .title .l2 { font: italic 800 268px/0.9 "EB Garamond", serif; letter-spacing: -0.02em; padding: 0.06em 0.14em; margin: -0.17em 0 -0.06em; }
+.v-b .title .l2 { font: italic 800 248px/0.9 "EB Garamond", serif; letter-spacing: -0.02em; padding: 0.06em 0.14em; margin: -0.155em 0 -0.06em; }
 
-/* c: the title as approved; the scroll, the strapline and the price-card heading in Garamond italic */
+/* c: the title as approved; the two quiet lines, the scroll and the price-card heading, in Garamond italic.
+   (The strapline beside "OFF" stays in the TV sans: it belongs to the offer.) */
 .v-c .ticker.top { font: italic 700 66px/84px "EB Garamond", serif; letter-spacing: 0.005em; word-spacing: 0.12em; }
-.v-c .offer .what { font: italic 800 41px/1.02 "EB Garamond", serif; letter-spacing: 0; padding-bottom: 12px; }
-.v-c .price .head { font: italic 800 38px/62px "EB Garamond", serif; letter-spacing: -0.005em; }
+.v-c .price .head { font: italic 800 40px/62px "EB Garamond", serif; letter-spacing: -0.012em; }
+
+/* the same lettering in the other formats, in proportion to each format's own title */
+.v-a.f-4x5 .title, .v-a.f-16x9 .title { font-size: 147px; } .v-a.f-4x5 .title .l2, .v-a.f-16x9 .title .l2 { font-size: 200px; margin-top: -0.2em; }
+.v-a.f-1x1 .title, .v-a.f-1x1 .title .l2 { font-size: 121px; margin: 0; }
+.v-b.f-4x5 .title .l2, .v-b.f-16x9 .title .l2 { font-size: 204px; margin-top: -0.2em; }
+.v-b.f-1x1 .title .l2 { font-size: 150px; margin: 0; }
+.v-c.f-1x1 .ticker.top { font-size: 54px; line-height: 70px; }
