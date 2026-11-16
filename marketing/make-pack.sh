@@ -4,8 +4,8 @@
 set -e
 cd "$(dirname "$0")"
 mkdir -p out/pack out/store
-make() { # format, output name
-  node render.mjs broadcast "format=$1" "pack-$1"
+make() { # format, output name (frames already rendered are reused)
+  [ "$(ls "frames/pack-$1/raw" 2>/dev/null | wc -l)" -ge 360 ] || node render.mjs broadcast "format=$1" "pack-$1"
   python3 vhs.py "pack-$1" --out "out/pack/$2.mp4"
   python3 vhs.py "pack-$1" --still 12 "out/pack/$2.png"
 }
