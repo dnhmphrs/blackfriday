@@ -186,3 +186,29 @@ html, body { background: #000; }
 .f-banner-h .oval { left: 872px; top: 92px; --k: 0.8; transform-origin: left top; }
 .f-banner-h .price, .f-banner-h .ticker.bottom, .f-banner-h .cards { display: none; }
 .f-banner-h .fine { top: 778px; font-size: 27px; padding: 9px 0 12px; }
+
+/* ================= store screenshots that keep the secret (1280x800) ================= */
+.f-shot .bg { background: radial-gradient(ellipse 46% 62% at 80% 46%, #5fd0ff 0%, #2f95ff 22%, #1450f8 46%, rgba(10, 34, 214, 0) 76%), linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
+.f-shot .fine, .f-shot .cards { display: none; }
+.f-shot .ticker.top { top: 14px; height: 70px; font-size: 48px; line-height: 70px; }
+.f-shot .gme-bug { left: 0; top: 14px; height: 70px; width: 210px; background: url("/assets/gme/gme-primary.png") 22px center / auto 86% no-repeat, linear-gradient(90deg, #0a1cc4 76%, rgba(10, 28, 196, 0)); }
+.f-shot .title { left: 50px; right: auto; text-align: left; } .f-shot .title span { display: inline; padding-left: 0; }
+.f-shot .ticker.bottom { top: 668px; height: 120px; font-size: 92px; line-height: 120px; }
+/* a: the offer */
+.f-shot-a .title { top: 100px; font-size: 104px; } .f-shot-a .title .l2 { font-size: 104px; }
+.f-shot-a .offer { left: 50px; top: 214px; } .f-shot-a .offer .pct { font-size: 228px; } .f-shot-a .offer .off { font-size: 168px; } .f-shot-a .offer .what { font-size: 54px; padding-bottom: 14px; }
+.f-shot-a .pill { left: 50px; top: 584px; --k: 0.95; }
+.f-shot-a .oval { left: 596px; top: 236px; --k: 0.8; transform-origin: left top; }
+.f-shot-a .price { display: none; }
+/* b: the price */
+.f-shot-b .title { top: 104px; font-size: 104px; } .f-shot-b .title .l2 { font-size: 104px; }
+.f-shot-b .price { left: 70px; top: 240px; --k: 1.0; }
+.f-shot-b .pill { left: 560px; top: 270px; --k: 0.95; }
+.f-shot-b .oval { left: 548px; top: 400px; --k: 0.9; transform-origin: left top; }
+.f-shot-b .offer { display: none; }
+/* c: as seen on every website */
+.f-shot-c .title { top: 96px; font-size: 92px; } .f-shot-c .title .l2 { font-size: 92px; }
+.f-shot-c .oval { left: 60px; top: 222px; --k: 1.6; transform-origin: left top; }
+.f-shot-c .offer { left: 60px; top: 500px; display: flex; align-items: flex-end; gap: 24px; } .f-shot-c .offer .pct { font-size: 150px; line-height: 0.9; } .f-shot-c .offer .off { font-size: 150px; } .f-shot-c .offer .row { margin: 0; } .f-shot-c .offer .what { font-size: 36px; padding-bottom: 14px; }
+.f-shot-c .pill { left: 660px; top: 250px; --k: 0.9; }
+.f-shot-c .price { display: none; }
