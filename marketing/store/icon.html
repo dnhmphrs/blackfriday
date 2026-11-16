@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/comps/fonts.css">
+<style>
+  /* The extension's icon: its own blue panel, red and yellow lettering with the black outline.
+     ?size=128 draws the store/large version (96px artwork + 16px padding, per the store's rule);
+     small sizes fill the square and drop to a single % that survives at 16px. */
+  html, body { margin: 0; background: transparent; }
+  #icon { position: relative; width: var(--s); height: var(--s); }
+  .tile { position: absolute; inset: var(--pad); background: #0000ff; border: var(--b) solid #000; border-radius: var(--r); overflow: hidden;
+          display: grid; place-content: center; justify-items: center; font-family: "Archivo Black", sans-serif; line-height: 0.86; }
+  .tile span { display: block; -webkit-text-stroke: var(--st) #000; paint-order: stroke fill; letter-spacing: -0.04em; }
+  .a { color: #ff0000; font-size: var(--fa); }
+  .b { color: #ffff00; font-size: var(--fb); margin-top: var(--gap); }
+  .one { color: #ffff00; font-size: var(--fo); }
+</style>
+</head>
+<body>
+<div id="icon"></div>
+<script>
+  const size = Number(new URLSearchParams(location.search).get('size') || 128);
+  const el = document.getElementById('icon');
+  const big = size >= 48;
+  const pad = size === 128 ? 16 : 0;
+  const art = size - pad * 2;
+  const v = (k, n) => el.style.setProperty('--' + k, n + 'px');
+  v('s', size); v('pad', pad); v('b', Math.max(1, Math.round(art * 0.045))); v('r', Math.round(art * 0.19));
+  if (big) {
+    v('fa', art * 0.4); v('fb', art * 0.37); v('st', art * 0.085); v('gap', art * 0.04);
+    el.innerHTML = '<div class="tile"><span class="a">30%</span><span class="b">OFF</span></div>';
+  } else {
+    v('fo', art * 0.92); v('st', Math.max(2, art * 0.14));
+    el.innerHTML = '<div class="tile"><span class="one">%</span></div>';
+  }
+  document.fonts.load('400 40px "Archivo Black"').then(() => { window.ready = true; });
+</script>
+</body>
+</html>

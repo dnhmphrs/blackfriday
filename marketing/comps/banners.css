@@ -1,0 +1,153 @@
+/* THE WEB 1.0 BANNER PACK. Four banners, each laid out for its own shape; banners.js keeps the one asked for.
+   Web-safe colours, no gradients that are not dithered, and hard edges: .px removes the smoothing from type and shapes,
+   .px-drop and .px-red do the same and add a hard two-pixel shadow. A whole loop uses about 35 colours, so the GIFs are exact. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #808080; }
+#stage { position: relative; overflow: hidden; background: #000; }
+.banner { position: absolute; inset: 0; overflow: hidden; background: #000; color: #fff; font: 400 8px/1 "Press Start 2P", monospace; }
+.banner * { position: absolute; }
+.banner br, .banner .ch, .banner .letters span, .banner .bf span, .banner .chrome span, .banner .fine span, .banner .wow span { position: static; }
+.banner .fine span { display: block; }
+.banner .ch { display: inline-block; }
+canvas { image-rendering: pixelated; }
+.px { filter: url(#alias); }
+.px-drop { filter: url(#alias-drop); }
+.px-red { filter: url(#alias-red); }
+.zone { overflow: hidden; }
+.starlayer { inset: 0; background-repeat: repeat; image-rendering: pixelated; }
+.rays { inset: 0; width: 100%; height: 100%; }
+
+/* lettering */
+.pct { white-space: pre; color: #ffff00; text-shadow: -2px 0 #000, 2px 0 #000, 0 -2px #000, 0 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000, 2px 2px #000, 4px 4px 0 #000, 5px 5px 0 #000; }
+.net { font-family: "Anton", sans-serif; white-space: pre; text-align: center; letter-spacing: 0.03em; }
+.bf { text-align: center; white-space: pre; color: #ffff00; }
+.wow { font: 400 16px/1 "Bangers", sans-serif; color: #ffff00; letter-spacing: 0.04em; }
+.wow span { display: inline-block; transform: rotate(-12deg); }
+/* VT323 is drawn on a 12.5-to-the-em grid: at 12.5px one glyph pixel is one screen pixel and a letter is 5px wide */
+.fine { font: 400 12.5px/10px "VT323", monospace; color: #000; white-space: pre; }
+.chrome { color: #000; white-space: pre; text-align: center; }
+.free { color: #ff0000; white-space: pre; text-align: center; }
+.date { color: #ff3333; white-space: pre; text-align: center; }
+
+/* chasing bulbs: one lit in three, the lit one moves along */
+.bulbs { height: 6px; background: repeating-linear-gradient(90deg, #ffff00 0 6px, #000 6px 12px, #990000 12px 18px, #000 18px 24px, #990000 24px 30px, #000 30px 36px); }
+/* marching border */
+.ants.t, .ants.b { left: 0; right: 0; height: var(--ant); background: repeating-linear-gradient(90deg, #ffff00 0 5px, #ff0000 5px 10px); }
+.ants.l, .ants.r { top: 0; bottom: 0; width: var(--ant); background: repeating-linear-gradient(0deg, #ffff00 0 5px, #ff0000 5px 10px); }
+.ants.t { top: 0; } .ants.b { bottom: 0; } .ants.l { left: 0; } .ants.r { right: 0; }
+/* the rainbow rule */
+.hr { left: var(--ant); right: var(--ant); height: 4px; background: repeating-linear-gradient(90deg, #ff0000 0 6px, #ffff00 6px 12px, #00ff00 12px 18px, #00ffff 18px 24px, #ff00ff 24px 30px); }
+
+/* the button: a plain grey bevel */
+.btn { background: #c0c0c0; border: 2px solid; border-color: #fff #404040 #404040 #fff; outline: 1px solid #000; color: #0000ee; text-align: center; }
+.btn span { left: 0; right: 0; text-decoration: underline; }
+.btn.alt { background: #ffff00; color: #ff0000; }
+.btn.down { border-color: #404040 #fff #fff #404040; }
+.btn.down span { transform: translate(1px, 1px); }
+.cursor, .zap { z-index: 5; }
+.cursor { --dx: 10; --dy: 8; }
+
+/* FREE! starburst */
+.burst i { inset: 0; background: #ff0000; }
+.burst b { left: 0; right: 0; text-align: center; font-weight: 400; color: #ffff00; text-shadow: 1px 1px 0 #000; }
+.burst.alt b { color: #ffffff; }
+.burst.yellow i { background: #ffff00; }
+.burst.yellow b { color: #ff0000; text-shadow: none; }
+.burst.yellow.alt b { color: #0000ff; }
+.sparks { inset: 0; width: 100%; height: 100%; z-index: 3; }
+
+/* ================= 728 x 90 ================= */
+.b-728x90 { --ant: 3px; }
+.b-728x90 .z-globe { left: 3px; top: 3px; width: 84px; height: 84px; }
+.b-728x90 .z-globe .globe { left: 2px; top: 2px; }
+.b-728x90 .z-globe .wow { left: 50px; top: 62px; }
+.b-728x90 .z-bf { left: 87px; top: 3px; width: 106px; height: 84px; background: #000; }
+.b-728x90 .z-bf .bulbs { left: 4px; width: 96px; }
+.b-728x90 .z-bf .bulbs.top { top: 4px; }
+.b-728x90 .z-bf .bulbs.bot { top: 74px; }
+.b-728x90 .z-bf .bf { left: 0; right: 0; top: 16px; font-size: 16px; line-height: 20px; }
+.b-728x90 .z-bf .date { left: 0; right: 0; top: 60px; }
+.b-728x90 .z-pct { left: 193px; top: 3px; width: 240px; height: 70px; }
+.b-728x90 .z-pct .pct { left: 8px; top: 32px; font-size: 32px; }
+.b-728x90 .z-net { left: 433px; top: 3px; width: 170px; height: 70px; }
+.b-728x90 .z-net .net { left: 0; right: 0; top: 2px; font-size: 30px; line-height: 33px; }
+.b-728x90 .ticker { left: 193px; top: 73px; width: 410px; height: 14px; background: #000; overflow: hidden; }
+.b-728x90 .ticker .run { left: 0; top: 3px; white-space: pre; color: #ffff00; }
+.b-728x90 .z-click { left: 603px; top: 3px; width: 122px; height: 84px; border-left: 2px solid #000; }
+.b-728x90 .z-click .free { left: 0; right: 0; top: 5px; }
+.b-728x90 .z-click .btn { left: 9px; top: 18px; width: 102px; height: 48px; }
+.b-728x90 .z-click .btn span { top: 5px; font-size: 16px; line-height: 18px; }
+.b-728x90 .z-click .chrome { left: 3px; top: 71px; }
+.b-728x90 .z-click .cursor { left: 100px; top: 52px; --dx: 8; --dy: 6; }
+
+/* ================= 468 x 60 ================= */
+.b-468x60 { --ant: 2px; }
+.b-468x60 .z-globe { left: 2px; top: 2px; width: 56px; height: 56px; }
+.b-468x60 .z-globe .globe { left: 1px; top: 1px; }
+.b-468x60 .z-globe .wow { left: 27px; top: 40px; font-size: 14px; }
+.b-468x60 .z-pct { left: 58px; top: 2px; width: 184px; height: 46px; }
+.b-468x60 .z-pct .pct { left: 7px; top: 18px; font-size: 24px; text-shadow: -2px 0 #000, 2px 0 #000, 0 -2px #000, 0 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000, 2px 2px #000, 3px 3px 0 #000, 4px 4px 0 #000; }
+.b-468x60 .fine { left: 58px; top: 48px; width: 308px; height: 10px; background: #000; color: #fff; font: 400 8px/10px "Press Start 2P", monospace; }
+.b-468x60 .fine span { position: absolute; left: 2px; top: 0; }
+.b-468x60 .fine .alt { color: #ffff00; }
+.b-468x60 .z-net { left: 242px; top: 2px; width: 124px; height: 46px; }
+.b-468x60 .z-net .net { left: 0; right: 0; top: 0; font-size: 22px; line-height: 22px; letter-spacing: 0.04em; }
+.b-468x60 .z-click { left: 366px; top: 2px; width: 100px; height: 56px; }
+.b-468x60 .z-click .bf { left: 0; right: 0; top: 0; height: 12px; line-height: 12px; background: #000; }
+.b-468x60 .z-click .btn { left: 3px; top: 28px; width: 94px; height: 24px; }
+.b-468x60 .z-click .btn span { top: 6px; }
+.b-468x60 .z-click .chrome { left: 0; right: 0; top: 16px; word-spacing: -4px; }
+.b-468x60 .z-click .cursor { left: 90px; top: 43px; --dx: 3; --dy: 3; }
+
+/* ================= 300 x 250 ================= */
+.b-300x250 { --ant: 4px; }
+.b-300x250 .z-bf { left: 4px; top: 4px; width: 292px; height: 36px; background: #000; }
+.b-300x250 .z-bf .bulbs { left: 2px; width: 288px; }
+.b-300x250 .z-bf .bulbs.top { top: 2px; }
+.b-300x250 .z-bf .bulbs.bot { top: 28px; }
+.b-300x250 .z-bf .bf { left: 0; right: 0; top: 10px; font-size: 16px; }
+.b-300x250 .z-bf .bf span { color: #ff3333; }
+.b-300x250 .z-pct { left: 4px; top: 40px; width: 292px; height: 108px; }
+.b-300x250 .z-pct .globe { left: 172px; top: -2px; }
+.b-300x250 .z-pct .pct { left: 10px; top: 17px; font-size: 48px; line-height: 44px; }
+.b-300x250 .z-pct .pct .off { font-size: 40px; }
+.b-300x250 .z-pct .burst { left: 134px; top: 54px; width: 54px; height: 54px; }
+.b-300x250 .z-pct .burst b { top: 23px; }
+.b-300x250 .z-pct .wow { left: 244px; top: 84px; font-size: 20px; }
+.b-300x250 .hr.h1 { top: 148px; }
+.b-300x250 .z-net { left: 4px; top: 152px; width: 292px; height: 34px; }
+.b-300x250 .z-net .net { left: 0; right: 0; top: 1px; font-size: 28px; line-height: 32px; }
+.b-300x250 .hr.h2 { top: 186px; }
+.b-300x250 .z-click { left: 4px; top: 190px; width: 292px; height: 56px; }
+.b-300x250 .z-click .btn { left: 7px; top: 4px; width: 198px; height: 28px; }
+.b-300x250 .z-click .btn span { top: 4px; font-size: 16px; }
+.b-300x250 .z-click .chrome { left: 212px; top: 3px; width: 76px; line-height: 10px; }
+.b-300x250 .z-click .chrome span { color: #ff0000; }
+.b-300x250 .z-click .fine { left: 0; right: 0; top: 35px; height: 21px; background: #000; color: #ffff00; padding: 0 0 0 8px; }
+.b-300x250 .z-click .cursor { left: 195px; top: 16px; --dx: 9; --dy: 3; }
+
+/* ================= 160 x 600 ================= */
+.b-160x600 { --ant: 4px; }
+.b-160x600 .z-bf { left: 4px; top: 4px; width: 152px; height: 74px; background: #000; }
+.b-160x600 .z-bf .bulbs { left: 4px; width: 144px; }
+.b-160x600 .z-bf .bulbs.top { top: 3px; }
+.b-160x600 .z-bf .bulbs.bot { top: 65px; }
+.b-160x600 .z-bf .bf { left: 0; right: 0; top: 13px; font-size: 24px; line-height: 26px; }
+.b-160x600 .z-globe { left: 4px; top: 78px; width: 152px; height: 150px; }
+.b-160x600 .z-globe .globe { left: 5px; top: 4px; }
+.b-160x600 .z-globe .wow { left: 104px; top: 122px; font-size: 22px; }
+.b-160x600 .z-globe .burst { left: -2px; top: 93px; width: 58px; height: 58px; }
+.b-160x600 .z-globe .burst b { top: 25px; }
+.b-160x600 .hr.h1 { top: 228px; }
+.b-160x600 .z-pct { left: 4px; top: 232px; width: 152px; height: 128px; }
+.b-160x600 .z-pct .pct { left: 4px; top: 22px; font-size: 48px; line-height: 52px; }
+.b-160x600 .hr.h2 { top: 360px; }
+.b-160x600 .z-net { left: 4px; top: 364px; width: 152px; height: 108px; }
+.b-160x600 .z-net .net { left: 0; right: 0; top: 2px; font-size: 36px; line-height: 35px; letter-spacing: 0; }
+.b-160x600 .hr.h3 { top: 472px; }
+.b-160x600 .z-click { left: 4px; top: 476px; width: 152px; height: 120px; }
+.b-160x600 .z-click .btn { left: 8px; top: 6px; width: 136px; height: 46px; }
+.b-160x600 .z-click .btn span { top: 4px; font-size: 16px; line-height: 18px; }
+.b-160x600 .z-click .chrome { left: 0; right: 0; top: 59px; }
+.b-160x600 .z-click .fine { left: 0; right: 0; top: 72px; height: 48px; background: #000; color: #ffff00; line-height: 11px; padding: 2px 0 0 8px; }
+.b-160x600 .z-click .cursor { left: 126px; top: 36px; }

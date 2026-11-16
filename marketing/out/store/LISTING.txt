@@ -1,0 +1,56 @@
+30% Off EVERYTHING: Chrome Web Store, everything to paste
+==========================================================
+
+UPLOAD (Package tab)
+  black-friday.zip          version 1.4. If the dashboard wants a higher number, bump "version"
+                            in src/manifest.json and run ./package.sh.
+
+IMAGES (Store listing tab)
+  store-icon-128.png        Store icon
+  screenshot-1-1280x800.png Screenshot 1
+  screenshot-2-1280x800.png Screenshot 2
+  small-promo-440x280.png   Small promo tile
+  marquee-1400x560.png      Marquee promo tile
+  Video (optional): upload ad-horizontal-1920x1080.mp4 to YouTube and paste the link.
+
+CATEGORY   Fun  (or "Just for fun", whichever the dashboard offers)
+LANGUAGE   English
+
+DESCRIPTION
+30% Off EVERYTHING takes 30% off the entire internet. Literally: on Black Friday it covers the right-hand 30% of every web page with a giant sale sign.
+
+• Automatic on Black Friday, midnight to midnight, your time.
+• Click the toolbar button any other day to preview it on the current page. Click again to hide it.
+• It is a joke. It does not find coupons or change prices.
+• Collects nothing, sends nothing, no account.
+
+PRIVACY PRACTICES TAB
+
+Single purpose
+Shows a novelty sale banner over the right-hand 30% of web pages on Black Friday, or when the toolbar button is clicked.
+
+activeTab justification
+Lets the toolbar button add the banner to the current tab when that tab was open before the extension was installed or updated.
+
+scripting justification
+Used only by that toolbar click, to inject the extension's own banner script into the current tab. No remote code.
+
+Host permission justification (content script on all URLs)
+The banner is the whole product and must appear on every page on Black Friday. It reads nothing from the page and makes no network requests.
+
+Remote code            No, I am not using remote code.
+Data usage             Tick nothing. Tick the three certifications.
+Privacy policy URL     Not required (no user data is handled). Leave blank.
+
+TEST INSTRUCTIONS TAB
+Open any https page and click the toolbar button: a sale banner covers the right-hand 30% of the page. Click again to hide it. On Black Friday (27 Nov 2026) it appears on every page automatically. No account needed.
+
+BEFORE YOU CAN SUBMIT (Account tab)
+  2-step verification on the Google account
+  Verified contact email
+  Trader / non-trader declaration (non-trader, unless you sell things as a business)
+
+SUBMITTING
+  Untick "Publish automatically after review". Approval then waits up to 30 days;
+  press Publish on Thursday 26 November.
+  Review usually takes a few days, and can take longer for extensions that run on all sites.
