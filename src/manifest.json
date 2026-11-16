@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "30% Off EVERYTHING",
-  "version": "1.4",
-  "description": "Internet Super Saver. Takes 30% off every web page with a giant sale banner. Black Friday only.",
+  "version": "1.5",
+  "description": "Internet Super Saver. 30% off the ENTIRE internet. Every website. No coupon codes. Black Friday only.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
@@ -17,7 +17,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Show or hide the 30% off overlay"
+    "default_title": "30% Off EVERYTHING"
   },
   "content_scripts": [
     {

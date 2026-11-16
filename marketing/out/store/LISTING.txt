@@ -2,13 +2,13 @@
 ==========================================================
 
 UPLOAD (Package tab)
-  black-friday.zip          version 1.4. If the dashboard wants a higher number, bump "version"
+  black-friday.zip          version 1.5. If the dashboard wants a higher number, bump "version"
                             in src/manifest.json and run ./package.sh.
 
 IMAGES (Store listing tab)
   store-icon-128.png        Store icon
-  screenshot-1-1280x800.png Screenshot 1
-  screenshot-2-1280x800.png Screenshot 2
+  teaser-screenshot-1/2/3   Screenshots 1 to 3 (the offer, without giving the game away)
+  screenshot-1-1280x800.png Optional last screenshot: the banner on a real page
   small-promo-440x280.png   Small promo tile
   marquee-1400x560.png      Marquee promo tile
   Video (optional): upload ad-horizontal-1920x1080.mp4 to YouTube and paste the link.
@@ -17,12 +17,19 @@ CATEGORY   Fun  (or "Just for fun", whichever the dashboard offers)
 LANGUAGE   English
 
 DESCRIPTION
-30% Off EVERYTHING takes 30% off the entire internet. Literally: on Black Friday it covers the right-hand 30% of every web page with a giant sale sign.
+BUT WAIT... THERE'S LESS!
 
-• Automatic on Black Friday, midnight to midnight, your time.
-• Click the toolbar button any other day to preview it on the current page. Click again to hide it.
-• It is a joke. It does not find coupons or change prices.
-• Collects nothing, sends nothing, no account.
+30% Off EVERYTHING takes 30% off the ENTIRE internet. Every website. All of it. No coupon codes. No sign-up. No purchase necessary.
+
+• Works on every website. Yes, that one too.
+• Activates automatically on Black Friday, midnight to midnight, your time.
+• Can't wait? Click the toolbar button for a sneak preview on any page, any day.
+• 100% free. Collects nothing, sends nothing, no account.
+• Works like magic!
+
+As seen on every website. A Gary Mustard Enterprises production.
+
+*Results guaranteed. Savings applied to the website itself.
 
 PRIVACY PRACTICES TAB
 
