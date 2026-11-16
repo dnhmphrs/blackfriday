@@ -11,7 +11,8 @@ shows or hides it on the current tab on any other day.
 - **Change the look:** the first file under `content_scripts` in `src/manifest.json` picks the
   design. `designs/classic.js` is the default; the others are `doorbuster`, `mattress`,
   `dealership`, `geocities`, `flyer`, `clearance`, `infomercial`, `usa`, `broadcast`, `receipt`
-  and `grand` (pictures of all twelve: `marketing/out/designs/all-designs.png`). To check a
+  and `grand` (pictures of all twelve: `marketing/out/designs/all-designs.png`). `broadcast`
+  carries pictures, so it is two lines: `designs/broadcast.art.js`, then `designs/broadcast.js`. To check a
   design at four window shapes: `cd marketing && node store/check-design.mjs <name>`.
 - **Test:** `npm install && npx playwright install chromium && npm test` drives the real
   extension in Chromium: the right day in several time zones, the toolbar button, and pages

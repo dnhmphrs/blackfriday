@@ -8,10 +8,15 @@ import { buildObject } from '../lib/catalog.js';
 const q = new URLSearchParams(location.search);
 const FORMATS = {
   // hero: where the object's centre lands on screen (px) and its diameter (px)
-  '9x16': { w: 1080, h: 1920, hero: { x: 822, y: 1010, d: 430 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
+  // (sign: the GME lockup is printed on the plinth where enough of the plinth shows)
+  '9x16': { w: 1080, h: 1920, hero: { x: 822, y: 1016, d: 430 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24, sign: true },
   '4x5': { w: 1080, h: 1350, hero: { x: 826, y: 770, d: 400 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
   '1x1': { w: 1080, h: 1080, hero: { x: 810, y: 560, d: 400 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
-  '16x9': { w: 1920, h: 1080, hero: { x: 1322, y: 500, d: 490 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
+  '16x9': { w: 1920, h: 1080, hero: { x: 1344, y: 500, d: 480 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
+  // the extension's banner: down the side of a desktop page, and across the top of a phone
+  // (crawl: on the banner the lower crawl cannot say "install", the viewer already has)
+  'banner-v': { w: 1080, h: 2025, hero: { x: 822, y: 950, d: 430 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24, sign: true, crawl: 'BLACK FRIDAY ONLY ! \u2726 ' },
+  'banner-h': { w: 1170, h: 834, hero: { x: 962, y: 372, d: 300 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24, sign: true },
   // Chrome Web Store promo images (the small tile is drawn at 2x and scaled down afterwards)
   marquee: { w: 1400, h: 560, hero: { x: 1080, y: 236, d: 330 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
   tile: { w: 880, h: 560, hero: { x: 668, y: 232, d: 300 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
@@ -22,7 +27,7 @@ const DURATION = 12, FPS = 30, TURN = 6;
 
 const stage = document.getElementById('stage');
 stage.classList.add('f-' + format);
-if (q.get('theme')) stage.classList.add('t-' + q.get('theme')); // colourways: see the end of broadcast.css
+for (const theme of (q.get('theme') || '').split(',').filter(Boolean)) stage.classList.add('t-' + theme); // options: see the end of broadcast.css
 stage.style.width = F.w + 'px';
 stage.style.height = F.h + 'px';
 
@@ -56,19 +61,33 @@ const plinth = makePlinth({ radius: F.plinth.r, height: 9, shadowRadius: 0.85 })
 plinth.position.y = heroName.startsWith('globe') ? -(1 + F.plinth.gap) : new THREE.Box3().setFromObject(hero).min.y - 0.36;
 scene.add(plinth);
 
+// The Gary Mustard Enterprises lockup, printed in navy round the front of the plinth.
+if (F.sign && heroName.startsWith('globe')) {
+  const map = await new THREE.TextureLoader().loadAsync('/assets/gme/gme-primary.png');
+  map.colorSpace = THREE.SRGBColorSpace;
+  map.anisotropy = 8;
+  const across = 1.2, tall = across * (map.image.height / map.image.width), arc = across / F.plinth.r;
+  const sign = new THREE.Mesh(
+    new THREE.CylinderGeometry(F.plinth.r * 1.003, F.plinth.r * 1.003, tall, 48, 1, true, -arc / 2, arc),
+    new THREE.MeshBasicMaterial({ map, color: 0x0b1a5c, transparent: true, toneMapped: false, depthWrite: false })
+  );
+  sign.position.y = -(0.2 + tall / 2);
+  plinth.add(sign);
+}
+
 // ---------- 2D ----------
 await document.fonts.ready;
-await Promise.all(['300 58px Antonio', '400 100px "Archivo Black"', 'italic 700 50px Arimo', 'italic 700 44px Tinos', '400 60px VT323'].map((f) => document.fonts.load(f)));
+await Promise.all(['italic 800 48px "EB Garamond"', '600 45px Antonio', '400 100px "Archivo Black"', 'italic 700 50px Arimo'].map((f) => document.fonts.load(f)));
 
 // Tickers: repeat the text, and move a whole number of repeats per loop so the loop is seamless.
 const tickers = [...document.querySelectorAll('.ticker')].map((el) => {
   const run = el.querySelector('.run');
-  const text = run.dataset.text;
+  const text = (el.classList.contains('bottom') && F.crawl) || run.dataset.text;
   run.textContent = text;
   const unit = run.getBoundingClientRect().width;
   if (!unit) return null; // this format hides the ticker
   run.textContent = text.repeat(Math.ceil((F.w * 2) / unit) + 1);
-  const perLoop = Math.max(1, Math.round((el.classList.contains('bottom') ? 300 : 230) * DURATION / unit));
+  const perLoop = Math.max(1, Math.round((el.classList.contains('bottom') ? 300 : 190) * DURATION / unit));
   return { run, unit, perLoop, skew: el.classList.contains('bottom') ? ' skewX(-9deg)' : '' };
 }).filter(Boolean);
 
@@ -88,14 +107,10 @@ const sparkles = Array.from({ length: 26 }, () => {
   return { svg, x: F.hero.x + Math.cos(a) * r - 30, y: F.hero.y + Math.sin(a) * r * 0.95 - 40, size: 46 + rnd() * 70, t0: rnd() * DURATION, life: 0.3 + rnd() * 0.2, spin: rnd() * 40 - 20 };
 });
 
-const GLITCHES = [2.6, 6.3, 9.75];
 // ?title=Everything|Must Go replaces the two title lines.
 const TITLE = (q.get('title') || 'World Wide|Sale').split('|');
-const leet = (w) => w.replace(/l/g, '1').replace(/i/g, '!').replace(/S/g, '5').replace(/o/g, '0');
-const TITLE_GLITCH = q.get('title')
-  ? [TITLE.map(leet), [...TITLE].reverse(), TITLE.map((w) => leet(w).toUpperCase())]
-  : [['Wor1d W!de', 'Sa1e'], ['World Wide Web', 'Sale'], ['Wlrod Wdie', '5ale']];
-const l1 = document.querySelector('.title .l1'), l2 = document.querySelector('.title .l2');
+document.querySelector('.title .l1').textContent = TITLE[0];
+document.querySelector('.title .l2').textContent = TITLE[1] || '';
 const priceBig = document.querySelector('.price .big');
 const pill = document.querySelector('.pill'), oval = document.querySelector('.oval');
 const TAU = Math.PI * 2;
@@ -114,16 +129,9 @@ function setTime(t) {
     k.run.style.transform = `translateX(${x.toFixed(2)}px)${k.skew}`;
   }
 
-  let g = -1, gi = -1;
-  GLITCHES.forEach((g0, i) => { const f = Math.floor((t - g0) * FPS + 1e-6); if (f >= 0 && f < 5) { g = f; gi = i; } });
-  stage.classList.toggle('glitch', g === 0 || g === 1 || g === 4);
-  stage.classList.toggle('glitch2', g >= 2);
-  const words = g >= 0 && g < 3 ? TITLE_GLITCH[gi % TITLE_GLITCH.length] : TITLE;
-  if (l1.textContent !== words[0]) { l1.textContent = words[0]; l2.textContent = words[1]; }
-
   priceBig.style.transform = `skewX(-8deg) scale(${(1 + 0.035 * Math.max(0, Math.sin(t * TAU * 1.5))).toFixed(4)})`;
   pill.style.transform = `scale(var(--k, 1)) skewX(-9deg) rotate(${(-1.5 + Math.sin(t * TAU / 4) * 0.8).toFixed(3)}deg)`;
-  oval.style.transform = `scale(var(--k, 1)) rotate(${(-7 + Math.sin(t * TAU / 3 + 1) * 1.6).toFixed(3)}deg)${stage.classList.contains('glitch2') ? ' translate(-10px, 4px)' : ''}`;
+  oval.style.transform = `scale(var(--k, 1)) rotate(${(-7 + Math.sin(t * TAU / 3 + 1) * 1.6).toFixed(3)}deg)`;
 
   for (const s of sparkles) {
     let p = (t - s.t0) / s.life;
@@ -136,6 +144,6 @@ function setTime(t) {
   renderer.render(scene, camera);
 }
 
-window.comp = { duration: DURATION, fps: FPS, width: F.w, height: F.h, glitches: GLITCHES, setTime, three: { THREE, scene, camera, renderer, pivot, hero, plinth } };
+window.comp = { duration: DURATION, fps: FPS, width: F.w, height: F.h, glitches: [], setTime, three: { THREE, scene, camera, renderer, pivot, hero, plinth } };
 setTime(Number(q.get('t') || 0));
 window.ready = true;

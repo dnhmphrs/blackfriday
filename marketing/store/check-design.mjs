@@ -29,7 +29,8 @@ if (!/pointer-events:\s*auto/.test(code)) problems.push('the solid part needs po
 const ext = fs.mkdtempSync(path.join(os.tmpdir(), 'bf-check-'));
 fs.cpSync(src, ext, { recursive: true, filter: (f) => !f.endsWith('.zip') });
 const mf = JSON.parse(fs.readFileSync(`${ext}/manifest.json`, 'utf8'));
-mf.content_scripts[0].js[0] = `designs/${design}.js`;
+// a design is designs/<name>.js, plus designs/<name>.art.js when it carries pictures
+mf.content_scripts[0].js = [...(fs.existsSync(`${ext}/designs/${design}.art.js`) ? [`designs/${design}.art.js`] : []), `designs/${design}.js`, 'script.js'];
 fs.writeFileSync(`${ext}/manifest.json`, JSON.stringify(mf, null, 2));
 
 const outDir = `${root}out/designs/check/`;

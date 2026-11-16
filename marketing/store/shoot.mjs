@@ -9,7 +9,7 @@ import { startServer } from '../tools/serve.mjs';
 const root = new URL('..', import.meta.url).pathname;
 const src = new URL('../../src', import.meta.url).pathname;
 const designs = process.argv.slice(2).length ? process.argv.slice(2)
-  : fs.readdirSync(`${src}/designs`).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3));
+  : fs.readdirSync(`${src}/designs`).filter((f) => f.endsWith('.js') && !f.endsWith('.art.js')).map((f) => f.slice(0, -3));
 const pages = ['shop', 'news'];
 const out = `${root}out/designs/`;
 fs.mkdirSync(out, { recursive: true });
@@ -18,7 +18,8 @@ for (const design of designs) {
   const ext = fs.mkdtempSync(path.join(os.tmpdir(), 'bf-design-'));
   fs.cpSync(src, ext, { recursive: true, filter: (f) => !f.endsWith('.zip') });
   const mf = JSON.parse(fs.readFileSync(`${ext}/manifest.json`, 'utf8'));
-  mf.content_scripts[0].js[0] = `designs/${design}.js`;
+  // a design is designs/<name>.js, plus designs/<name>.art.js when it carries pictures
+  mf.content_scripts[0].js = [...(fs.existsSync(`${ext}/designs/${design}.art.js`) ? [`designs/${design}.art.js`] : []), `designs/${design}.js`, 'script.js'];
   fs.writeFileSync(`${ext}/manifest.json`, JSON.stringify(mf, null, 2));
   const { context, extensionId } = await launchWithExtension(ext);
   const page = await context.newPage();

@@ -1,151 +1,206 @@
-// Design: Broadcast. The right-hand 30% of the page becomes a late-night shopping channel:
-// tickers, a spinning wireframe globe with 30% cut out of it, and a price card for the site
-// you are on. System fonts and a canvas only, so nothing has to be loaded from anywhere.
-globalThis.thirtyOffDesign = {
-  css: `
+// Design: Broadcast. "The 30% OFF Channel", a Gary Mustard Enterprises production: the banner
+// from the adverts, live. A paper scroll strip, the World Wide Sale, a turning globe with 30%
+// cut out of it on a GME plinth, and the price card. Down the side of the page on a desktop,
+// across the top on a phone.
+globalThis.thirtyOffDesign = (() => {
+  // Everything is drawn on a sheet 100 units wide. A unit is as large as the frame allows
+  // (see --u below), so the whole sheet scales as one piece and nothing can run off the end.
+  const u = (n) => `calc(var(--u) * ${n})`;
+  const serif = `Garamond, "Adobe Garamond Pro", "EB Garamond", Georgia, "Times New Roman", serif`;
+  const black = `"Arial Black", "Arial Bold", Arial, sans-serif`;
+  const shade = (steps, step) => Array.from({ length: steps }, (unused, i) => `${u(step * (i + 1))} ${u(step * (i + 1))} 0 var(--shade)`).join(", ");
+
+  const css = `
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    .panel {
+    .frame {
       position: absolute; top: 0; right: 0; width: 30%; height: 100%;
       container-type: size; overflow: hidden; pointer-events: auto; user-select: none; cursor: default;
-      background:
-        radial-gradient(ellipse 85% 34% at 50% 56%, #5fd0ff 0%, #2f95ff 24%, #1450f8 48%, rgba(10, 34, 214, 0) 76%),
-        linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c);
+      background: linear-gradient(#050a2e 0%, #0a1a8c 16%, #0a22d6 46%, #0a1fa8 80%, #060c52 100%);
       border-left: 4px solid #000; color: #fff;
-      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-weight: 700; font-style: italic;
-      --yellow: #fff035; --shade: #0a0f66;
+      font: italic 700 16px/1 Arial, "Helvetica Neue", Helvetica, sans-serif;
     }
-    /* scanlines and a slow roll of brightness, like a tube TV */
-    .panel::after {
+    /* a faint set of scanlines and a slow roll of brightness, like a tube television */
+    .frame::after {
       content: ""; position: absolute; inset: 0; pointer-events: none;
-      background: repeating-linear-gradient(rgba(0, 0, 30, 0.22) 0 1px, rgba(0, 0, 0, 0) 1px 3px), linear-gradient(rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 30%);
-      background-size: auto, 100% 60%; background-repeat: repeat, no-repeat; animation: roll 7s linear infinite;
+      background: repeating-linear-gradient(rgba(0, 0, 30, 0.16) 0 1px, rgba(0, 0, 0, 0) 1px 3px), linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 30%);
+      background-size: auto, 100% 60%; background-repeat: repeat, no-repeat; animation: roll 8s linear infinite;
+    }
+    .sheet {
+      position: absolute; inset: 0;
+      --u: min(1cqw, 100cqh / 187.5);
+      --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; --paper: #e9e7e0; --ink: #0b1a5c;
     }
     @keyframes roll { from { background-position: 0 0, 0 -60cqh; } to { background-position: 0 0, 0 160cqh; } }
     @keyframes slide { to { transform: translateX(-50%); } }
+    @keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
+    @keyframes sway { from { rotate: -0.8deg; } to { rotate: 0.8deg; } }
+    @keyframes bob { from { translate: 0 ${u(-0.5)}; } to { translate: 0 ${u(0.5)}; } }
+    @keyframes pulse { 0%, 55%, 100% { scale: 1; } 25% { scale: 1.04; } }
+    @keyframes glint { 0%, 78%, 100% { scale: 0; rotate: 0deg; } 88% { scale: 1; rotate: 12deg; } }
 
-    .col { position: absolute; inset: 0; display: flex; flex-direction: column; }
-    .ticker { flex: none; white-space: nowrap; overflow: hidden; }
-    .ticker span { display: inline-block; animation: slide 18s linear infinite; }
-    .ticker.top { margin-top: 1.6cqh; font: normal 400 4.6cqw/1.5 "Arial Narrow", "Helvetica Neue", Arial, sans-serif; font-stretch: condensed; letter-spacing: 0.06em; color: #e9f0ff; text-shadow: 0.3cqw 0.3cqw 0 rgba(4, 8, 80, 0.85); }
-    .ticker.bottom { margin-bottom: 1.6cqh; font: italic 900 9.5cqw/1.3 "Arial Black", Arial, sans-serif; color: var(--yellow); text-shadow: 0.35cqw 0.35cqw 0 var(--shade), 0.7cqw 0.7cqw 0 var(--shade); }
-    .ticker.bottom span { animation-duration: 9s; }
-
-    .title { flex: none; margin-top: 1.4cqh; text-align: center; font-size: 15.5cqw; line-height: 0.92; letter-spacing: -0.04em; filter: drop-shadow(0.7cqw 0.7cqw 0 rgba(6, 8, 70, 0.95)); }
-    .title b { display: block; font-weight: 700; }
-    .title b + b { font-size: 18cqw; }
-
-    .pill { flex: none; align-self: flex-start; margin: 2.4cqh 0 0 4cqw; padding: 0.3cqw 3.4cqw 0.7cqw 2.8cqw; border-radius: 1.2cqw; background: linear-gradient(#fffb86, #f0e11c); color: #111; font-size: 5.2cqw; transform: skewX(-9deg) rotate(-2deg); box-shadow: 0.6cqw 0.6cqw 0 rgba(6, 8, 70, 0.9); }
-    .offer { flex: none; margin: 1.8cqh 0 0 4cqw; font: normal 900 25cqw/0.9 "Arial Black", Arial, sans-serif; color: var(--yellow); letter-spacing: -0.05em; transform: skewX(-9deg); transform-origin: left bottom;
-             text-shadow: 0.25cqw 0.25cqw 0 var(--shade), 0.5cqw 0.5cqw 0 var(--shade), 0.75cqw 0.75cqw 0 var(--shade), 1cqw 1cqw 0 var(--shade), 1.25cqw 1.25cqw 0 var(--shade); }
-    .offer small { display: block; font: italic 700 5cqw/1.1 Arial, sans-serif; letter-spacing: 0; color: #fff; margin-top: 1.2cqw; text-shadow: 0.4cqw 0.4cqw 0 rgba(6, 8, 70, 0.95); }
-
-    /* whatever height is left: the globe on its plinth, and the price card beside it */
-    .stage { flex: 1; min-height: 0; position: relative; margin-top: 1.5cqh; }
-    canvas { position: absolute; right: 2cqw; top: 0; width: 46cqw; height: 46cqw; }
-    .plinth { position: absolute; right: 7cqw; top: 45cqw; width: 36cqw; bottom: -20cqh; background: linear-gradient(90deg, #fff, #e9ecfb 55%, #b9c1ee); }
-    .plinth::before { content: ""; position: absolute; left: 0; right: 0; top: -4.2cqw; height: 8.4cqw; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, #9aa3d6 0 28%, #f6f7ff 62%); }
-
-    .price { position: absolute; left: 4cqw; top: 14cqw; width: 45cqw; background: #f3f4f6; border: 0.6cqw solid #000; color: #0c0c0c; box-shadow: 1cqw 1cqw 0 rgba(4, 6, 60, 0.92); transform: rotate(-1.5deg); font-size: 5.6cqw; line-height: 1.25; padding-bottom: 1cqw; }
-    .price .site { background: #ff1616; color: #fff46a; font: normal 700 4.2cqw/1.7 "Arial Narrow", Arial, sans-serif; padding: 0 1.4cqw; border-bottom: 0.6cqw solid #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .price div + div { padding: 0.6cqw 1.8cqw 0; }
-    .price s { text-decoration: line-through; text-decoration-color: #ff1616; text-decoration-thickness: 0.8cqw; color: #6b6f78; }
-    .price .now { font: italic 900 14cqw/1 "Arial Black", Arial, sans-serif; color: #ff1616; -webkit-text-stroke: 1.1cqw #000; paint-order: stroke fill; text-align: right; padding-right: 1.5cqw; letter-spacing: -0.05em; }
-
-    /* short windows: keep the offer, drop the furniture */
-    @container (max-height: 560px) { .stage > *, .pill { display: none; } }
-    @media (max-width: 768px) {
-      .panel { width: 100%; height: 33%; border-left: 0; border-bottom: 4px solid #000; }
-      .title { font-size: 7cqw; } .title b { display: inline; } .title b + b { font-size: 7cqw; }
-      .offer { margin-left: 0; text-align: center; font-size: 15cqw; transform: none; } .offer small { display: none; }
-      .ticker.top { font-size: 3cqw; } .ticker.bottom { font-size: 5cqw; }
-      .stage > *, .pill { display: none; }
+    /* ---- the scroll: a paper strip with the GME mark, three pinstripes under it ---- */
+    .strip {
+      position: absolute; left: 0; right: 0; top: 0; height: ${u(7.2)}; overflow: hidden; white-space: nowrap;
+      background: var(--paper); color: var(--ink); text-transform: uppercase; letter-spacing: 0.03em; word-spacing: 0.1em;
+      font: italic 700 ${u(4.5)}/${u(7.2)} ${serif};
     }
-    @media (prefers-reduced-motion: reduce) { .ticker span, .panel::after { animation: none; } }
-  `,
+    .strip span { display: inline-block; animation: slide 30s linear infinite; }
+    .strip .cap { position: absolute; left: 0; top: 0; bottom: 0; width: ${u(22)}; background: var(--paper); border-right: ${u(0.3)} solid var(--ink); display: flex; align-items: center; justify-content: center; }
+    .strip .cap img { display: block; height: ${u(5.2)}; width: auto; }
+    .rules { position: absolute; left: 0; right: 0; top: ${u(7.2)}; height: ${u(2)}; background: repeating-linear-gradient(to bottom, transparent 0 ${u(0.46)}, var(--paper) ${u(0.46)} ${u(0.66)}); }
 
-  html: `
-    <div class="panel" role="img" aria-label="30% off the entire internet. Black Friday only.">
-      <div class="col">
-      <div class="ticker top"><span>YOU'RE WATCHING THE 30% OFF CHANNEL &#10022; LIVE ON THE RIGHT-HAND SIDE OF EVERY WEBSITE &#10022; BLACK FRIDAY ONLY &#10022; YOU'RE WATCHING THE 30% OFF CHANNEL &#10022; LIVE ON THE RIGHT-HAND SIDE OF EVERY WEBSITE &#10022; BLACK FRIDAY ONLY &#10022; </span></div>
-      <div class="title"><b>World Wide</b><b>Sale</b></div>
-      <div class="pill">Black Friday</div>
-      <div class="offer">30% OFF<small>THE ENTIRE INTERNET !</small></div>
-      <div class="stage">
-        <div class="plinth"></div>
-        <canvas></canvas>
-        <div class="price">
-          <div class="site"></div>
-          <div>WAS: <s>100%</s></div>
-          <div>NOW:</div>
-          <div class="now">70%</div>
+    /* ---- the sheet's middle column, centred when the frame is wider than the sheet ---- */
+    .col { position: absolute; top: 0; bottom: 0; left: 50%; width: ${u(100)}; margin-left: ${u(-50)}; }
+    .glow { position: absolute; left: ${u(76.1)}; top: ${u(88)}; width: ${u(124)}; height: ${u(124)}; margin: ${u(-62)} 0 0 ${u(-62)}; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, rgba(19, 72, 238, 0) 72%); }
+
+    .title { position: absolute; left: 0; right: 0; top: ${u(13.9)}; text-align: center; font-size: ${u(16.3)}; line-height: 0.9; letter-spacing: -0.04em; filter: drop-shadow(${u(0.74)} ${u(0.74)} 0 rgba(6, 8, 70, 0.95)); }
+    .title b { display: block; font-weight: 700; padding: 0 0.12em; background: linear-gradient(#ffffff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .title b + b { font-size: ${u(18.9)}; }
+
+    .pill {
+      position: absolute; left: ${u(1.1)}; top: ${u(51.9)}; padding: ${u(0.37)} ${u(3.3)} ${u(0.74)} ${u(2.8)}; border-radius: ${u(1.1)};
+      background: linear-gradient(#fffb86, #f0e11c); color: #111; font-size: ${u(4.8)}; line-height: 1.15; white-space: nowrap;
+      transform: skewX(-9deg) rotate(-1.5deg); transform-origin: left top; animation: sway 2s ease-in-out infinite alternate;
+      box-shadow: ${u(0.55)} ${u(0.55)} 0 rgba(6, 8, 70, 0.9), inset 0 0 0 ${u(0.37)} rgba(170, 158, 0, 0.6);
+    }
+    .oval {
+      position: absolute; left: ${u(65.4)}; top: ${u(47.8)}; width: ${u(31.9)}; height: ${u(13.9)}; border-radius: 50%;
+      background: radial-gradient(ellipse at 40% 30%, #fffc9a, #efe01c 72%); color: #151515;
+      display: grid; place-items: center; text-align: center; font: italic 700 ${u(4.2)}/0.98 ${serif};
+      transform: rotate(-7deg); animation: sway 1.5s ease-in-out infinite alternate;
+      box-shadow: ${u(0.55)} ${u(0.65)} 0 rgba(6, 8, 70, 0.9), inset 0 0 0 ${u(0.37)} rgba(170, 158, 0, 0.5);
+    }
+
+    .offer { position: absolute; left: ${u(2.8)}; top: ${u(62.2)}; z-index: 1; }
+    .offer .pct, .offer .off {
+      font: normal 900 ${u(21.85)}/0.86 ${black}; color: var(--yellow); letter-spacing: -0.05em;
+      transform: skewX(-9deg); transform-origin: left bottom; text-shadow: ${shade(6, 0.19)};
+    }
+    .offer .row { display: flex; align-items: flex-end; gap: ${u(2.4)}; margin-top: ${u(0.55)}; }
+    .offer .off { font-size: ${u(13.9)}; line-height: 0.9; }
+    .offer .what { font-size: ${u(3.8)}; line-height: 1.04; padding-bottom: ${u(1.1)}; white-space: nowrap; text-shadow: ${u(0.37)} ${u(0.37)} 0 rgba(6, 8, 70, 0.95); }
+
+    /* ---- the globe on its plinth ---- */
+    .hero {
+      position: absolute; left: ${u(52)}; top: ${u(63.9)}; width: ${u(48.2)}; height: ${u(48.2)}; display: block;
+      -webkit-mask-image: radial-gradient(closest-side, #000 84%, rgba(0, 0, 0, 0) 100%); mask-image: radial-gradient(closest-side, #000 84%, rgba(0, 0, 0, 0) 100%);
+      animation: bob 3s ease-in-out infinite alternate;
+    }
+    .plinth { position: absolute; left: ${u(56.6)}; top: ${u(116.2)}; width: ${u(39)}; bottom: 0; background: linear-gradient(90deg, #ffffff 0%, #f2f3fc 42%, #c6cbee 100%); }
+    .plinth::before { content: ""; position: absolute; left: 0; right: 0; top: ${u(-5.1)}; height: ${u(10.2)}; border-radius: 50%; background: radial-gradient(ellipse at 50% 46%, rgba(10, 16, 60, 0.5) 0%, rgba(10, 16, 60, 0.16) 36%, #f8f9ff 64%); }
+    .plinth img { position: absolute; left: 50%; top: ${u(8.6)}; width: ${u(23.9)}; margin-left: ${u(-11.95)}; display: block; }
+    .spark { position: absolute; width: ${u(8)}; height: ${u(8)}; background: #fff; scale: 0; filter: drop-shadow(0 0 ${u(0.6)} #fff); animation: glint 4.2s linear infinite;
+             clip-path: polygon(50% 0, 56% 44%, 100% 50%, 56% 56%, 50% 100%, 44% 56%, 0 50%, 44% 44%); }
+    .s1 { left: ${u(86)}; top: ${u(72)}; }
+    .s2 { left: ${u(60)}; top: ${u(84)}; width: ${u(5.5)}; height: ${u(5.5)}; animation-delay: -1.5s; }
+    .s3 { left: ${u(78)}; top: ${u(98)}; width: ${u(6.5)}; height: ${u(6.5)}; animation-delay: -2.9s; }
+
+    /* ---- price card ---- */
+    .price {
+      position: absolute; left: ${u(2.2)}; top: ${u(100.9)}; width: ${u(40)}; height: ${u(30.6)}; background: #f3f4f6; color: #0c0c0c;
+      border: ${u(0.46)} solid #000; box-shadow: ${u(0.83)} ${u(0.83)} 0 rgba(4, 6, 60, 0.92); transform: rotate(-1.4deg);
+    }
+    .price .head { background: var(--red); color: #fff46a; font: normal 700 ${u(4.1)}/${u(5.74)} "Arial Narrow", Arial, sans-serif; font-stretch: condensed; padding: 0 ${u(1.5)}; border-bottom: ${u(0.46)} solid #000; white-space: nowrap; overflow: hidden; }
+    .price .head span { display: inline-block; transform-origin: left center; }
+    .price .line { font-size: ${u(5)}; padding: ${u(1.3)} ${u(1.7)} 0; }
+    .price s { position: relative; text-decoration: none; color: #6b6f78; margin-left: ${u(0.9)}; }
+    .price s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: ${u(0.83)}; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 ${u(0.19)} #000; }
+    .price .big {
+      position: absolute; right: ${u(0.9)}; bottom: ${u(-5.4)}; font: normal 900 ${u(16.5)}/0.9 ${black}; color: var(--red); letter-spacing: -0.05em;
+      -webkit-text-stroke: ${u(1.1)} #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: right bottom; animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    /* ---- the lower crawl and the small print ---- */
+    .crawl { position: absolute; left: 0; right: 0; bottom: ${u(7.9)}; height: ${u(13.9)}; overflow: hidden; white-space: nowrap; font: normal 900 ${u(10.4)}/${u(13.9)} ${black}; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
+    .crawl span { display: inline-block; padding-left: ${u(1)}; text-shadow: ${shade(3, 0.28)}; animation: crawl 16s linear infinite; }
+    .fine { position: absolute; left: 0; right: 0; bottom: ${u(1.3)}; padding: ${u(0.8)} 0 ${u(1)}; text-align: center; white-space: nowrap; overflow: hidden; font: normal 400 ${u(2.3)}/1.2 "Arial Narrow", Arial, sans-serif; letter-spacing: 0.045em; color: #e9f0ff; background: rgba(2, 4, 52, 0.72); }
+
+    /* squat frames (short windows): a shorter sheet, without the price card or the crawl */
+    @container (min-aspect-ratio: 62 / 100) {
+      .sheet { --u: min(1cqw, 100cqh / 141); }
+      .price, .crawl { display: none; }
+    }
+
+    /* narrow windows and phones: the banner lies across the top; fewer things, bigger */
+    @media (max-width: 768px) {
+      .frame { width: 100%; height: 33%; border-left: 0; border-bottom: 4px solid #000; }
+      .sheet { --u: min(1cqw, 100cqh / 71.3); }
+      .strip { height: ${u(5.3)}; font-size: ${u(3.3)}; line-height: ${u(5.3)}; }
+      .strip .cap { width: ${u(16.2)}; } .strip .cap img { height: ${u(3.8)}; }
+      .rules { top: ${u(5.3)}; height: ${u(1.5)}; background: repeating-linear-gradient(to bottom, transparent 0 ${u(0.34)}, var(--paper) ${u(0.34)} ${u(0.5)}); }
+      .glow { left: ${u(82.2)}; top: ${u(31.8)}; width: ${u(84)}; height: ${u(84)}; margin: ${u(-42)} 0 0 ${u(-42)}; }
+      .title { top: ${u(8.6)}; left: ${u(3.4)}; right: auto; text-align: left; font-size: ${u(8.4)}; filter: drop-shadow(${u(0.5)} ${u(0.5)} 0 rgba(6, 8, 70, 0.95)); white-space: nowrap; }
+      .title b { display: inline; padding: 0; } .title b + b { font-size: ${u(8.4)}; }
+      .offer { left: ${u(3.4)}; top: ${u(17.6)}; }
+      .offer .pct { font-size: ${u(22.9)}; } .offer .off { font-size: ${u(16.75)}; } .offer .what { font-size: ${u(4.96)}; padding-bottom: ${u(1.4)}; }
+      .pill { left: ${u(3.4)}; top: ${u(55.4)}; font-size: ${u(4.98)}; }
+      .oval { left: ${u(74.5)}; top: ${u(8)}; width: ${u(23.5)}; height: ${u(10.3)}; font-size: ${u(3.15)}; }
+      .hero { left: ${u(66.7)}; top: ${u(16.3)}; width: ${u(31)}; height: ${u(31)}; }
+      .plinth { left: ${u(69.65)}; top: ${u(50)}; width: ${u(25.1)}; }
+      .plinth::before { top: ${u(-3.3)}; height: ${u(6.6)}; }
+      .plinth img { top: ${u(5.6)}; width: ${u(15.4)}; margin-left: ${u(-7.7)}; }
+      .s1 { left: ${u(88)}; top: ${u(21)}; } .s2 { left: ${u(70)}; top: ${u(29)}; } .s3 { left: ${u(83)}; top: ${u(40)}; }
+      .spark { width: ${u(5.2)}; height: ${u(5.2)}; }
+      .price, .crawl { display: none; }
+      .fine { bottom: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .frame::after, .strip span, .crawl span, .pill, .oval, .hero, .price .big { animation: none; }
+      .spark { animation: none; scale: 1; }
+    }
+  `;
+
+  const scroll = "But wait&#8230; there&#8217;s less! &#10022; No purchase necessary! &#10022; Black Friday only! &#10022; Every website, 30% off! &#10022; Works like magic! &#10022; ";
+  const html = `
+    <div class="frame" role="img" aria-label="World Wide Sale. 30% off the entire internet. Black Friday only. A Gary Mustard Enterprises production.">
+      <div class="sheet">
+        <div class="strip" data-scrolls><span>${scroll.repeat(4)}</span><div class="cap"><img class="letters" alt=""></div></div>
+        <div class="rules"></div>
+        <div class="col">
+          <div class="glow"></div>
+          <div class="title"><b>World Wide</b> <b>Sale</b></div>
+          <div class="pill">Black Friday</div>
+          <div class="oval"><span>As Seen On<br>Every Website</span></div>
+          <div class="offer">
+            <div class="pct">30%</div>
+            <div class="row"><span class="off">OFF</span><span class="what">THE ENTIRE<br>INTERNET !</span></div>
+          </div>
+          <div class="plinth"><img class="lockup" alt=""></div>
+          <img class="hero" alt="">
+          <i class="spark s1"></i><i class="spark s2"></i><i class="spark s3"></i>
+          <div class="price">
+            <div class="head"><span>The Internet (All Of It)</span></div>
+            <div class="line">WAS: <s>100%</s></div>
+            <div class="line">NOW:</div>
+            <div class="big">70%</div>
+          </div>
         </div>
-      </div>
-      <div class="ticker bottom"><span>BLACK FRIDAY ONLY &#10022; 30% OFF EVERYTHING &#10022; BLACK FRIDAY ONLY &#10022; 30% OFF EVERYTHING &#10022; </span></div>
+        <div class="crawl" data-scrolls><span>${"BLACK FRIDAY ONLY ! &#10022; ".repeat(8)}</span></div>
+        <div class="fine">*30% of every web page will be unavailable for viewing. Black Friday only.</div>
       </div>
     </div>
-  `,
+  `;
 
-  setup(root) {
-    root.querySelector(".site").textContent = location.hostname || "This Page";
-
-    // The globe: latitude and longitude lines on a sphere with a 108 degree wedge (30% of
-    // the way round) left out, spun about its axis and drawn flat. Lines on the far side are
-    // drawn first and fainter; the two faces of the cut are filled when they face us.
-    const canvas = root.querySelector("canvas");
-    const ctx = canvas.getContext("2d");
+  function setup(root) {
+    // The pictures travel as data: URLs in broadcast.art.js (a design may not load anything
+    // from a URL); the manifest lists that file just before this one.
+    const pictures = globalThis.thirtyOffArt?.() ?? {};
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const WEDGE = 108, STEP = 36, TILT = 0.3;
-    const rad = (deg) => (deg * Math.PI) / 180;
-    const lines = [];
-    const arc = (point, count) => Array.from({ length: count + 1 }, (unused, i) => point(i / count));
-    const at = (lat, lon) => [Math.cos(rad(lat)) * Math.sin(rad(lon)), Math.sin(rad(lat)), Math.cos(rad(lat)) * Math.cos(rad(lon))];
-    for (let lon = WEDGE; lon <= 360; lon += STEP) lines.push(arc((t) => at(-90 + 180 * t, lon), 28));
-    for (const lat of [-60, -30, 0, 30, 60]) lines.push(arc((t) => at(lat, WEDGE + (360 - WEDGE) * t), 42));
-    const faces = [[WEDGE, "#ff1616"], [360, "#ffd800"]].map(([lon, fill]) => ({ fill, lon, points: arc((t) => at(-90 + 180 * t, lon), 28) }));
+    const show = (selector, url) => { if (url) root.querySelector(selector).src = url; };
+    show(".hero", still ? pictures.still : pictures.globe);
+    show(".lockup", pictures.gme);
+    show(".letters", pictures.gmeLetters);
 
-    function draw(now) {
-      if (!canvas.isConnected) return; // the overlay was hidden; a new one starts its own loop
-      const size = Math.round(canvas.clientWidth * devicePixelRatio);
-      if (size && canvas.width !== size) canvas.width = canvas.height = size;
-      const R = size * 0.44, yaw = still ? 0.9 : now / 1400;
-      const cosY = Math.cos(yaw), sinY = Math.sin(yaw), cosT = Math.cos(TILT), sinT = Math.sin(TILT);
-      const project = ([x, y, z]) => {
-        const x1 = x * cosY + z * sinY, z1 = -x * sinY + z * cosY;
-        return [size / 2 + R * x1, size / 2 - R * (y * cosT - z1 * sinT), y * sinT + z1 * cosT];
-      };
-      ctx.clearRect(0, 0, size, size);
-      ctx.lineCap = "round";
-      const stroke = (front) => {
-        ctx.strokeStyle = front ? "#ffffff" : "rgba(190, 215, 255, 0.45)";
-        ctx.lineWidth = size * (front ? 0.014 : 0.008);
-        ctx.shadowColor = "rgba(150, 220, 255, 0.9)";
-        ctx.shadowBlur = front ? size * 0.02 : 0;
-        ctx.beginPath();
-        for (const line of lines) {
-          for (let i = 1; i < line.length; i++) {
-            const a = project(line[i - 1]), b = project(line[i]);
-            if ((a[2] + b[2] > 0) === front) { ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); }
-          }
-        }
-        ctx.stroke();
-      };
-      stroke(false);
-      ctx.shadowBlur = 0;
-      for (const face of faces) {
-        // a face looks towards us when the side of it that is open to the gap does
-        const side = face.lon === 360 ? 90 : WEDGE - 90;
-        if (project(at(0, side))[2] <= 0) continue;
-        ctx.fillStyle = face.fill;
-        ctx.beginPath();
-        face.points.forEach((p, i) => { const q = project(p); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); });
-        ctx.closePath();
-        ctx.globalAlpha = 0.92;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-      stroke(true);
-      if (!still) requestAnimationFrame(draw);
-    }
-    requestAnimationFrame(draw);
-  },
-};
+    // The card's heading is set in Arial Narrow, which not every machine has. Where the
+    // stand-in is too wide, squeeze the line to fit instead of letting it be cut off.
+    const head = root.querySelector(".price .head"), line = head.firstElementChild;
+    const fit = new ResizeObserver(() => {
+      if (!head.isConnected) return fit.disconnect();
+      const room = head.clientWidth - 2 * parseFloat(getComputedStyle(head).paddingLeft);
+      line.style.transform = line.offsetWidth > room && room > 0 ? `scaleX(${(room / line.offsetWidth).toFixed(3)})` : "";
+    });
+    fit.observe(head);
+  }
+
+  return { css, html, setup };
+})();
