@@ -8,10 +8,12 @@ UPLOAD (Package tab)
 IMAGES (Store listing tab)
   store-icon-128.png        Store icon
   teaser-screenshot-1/2/3   Screenshots 1 to 3 (the offer, without giving the game away)
-  screenshot-1-1280x800.png Optional last screenshot: the banner on a real page
   small-promo-440x280.png   Small promo tile
   marquee-1400x560.png      Marquee promo tile
   Video (optional): upload ad-horizontal-1920x1080.mp4 to YouTube and paste the link.
+
+  Nothing in this folder shows or says how the 30% comes off. The three fields under
+  PRIVACY PRACTICES and TEST INSTRUCTIONS are read by Google's reviewer only, never shown to users.
 
 CATEGORY   Fun  (or "Just for fun", whichever the dashboard offers)
 LANGUAGE   English

@@ -1,10 +1,10 @@
 # BlackFriday
  30% Off everything on the internet, one day a year!
 
+## Working on it (spoilers)
+
 On Black Friday the extension covers the right-hand 30% of every page. The toolbar button
 shows or hides it on the current tab on any other day.
-
-## Working on it
 
 - **Try it:** `chrome://extensions` → Developer mode → Load unpacked → pick `src/`. Click the
   toolbar button on any page.
