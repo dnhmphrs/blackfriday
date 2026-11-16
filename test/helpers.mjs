@@ -79,6 +79,8 @@ export function makeTestCopy(srcDir) {
   fs.writeFileSync(path.join(dir, 'test-clock.js'), PRELUDE);
   const mf = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
   for (const cs of mf.content_scripts) {
+    // The checks measure the Classic design, whichever design the manifest ships.
+    cs.js = ['designs/classic.js', 'script.js'];
     cs.js.unshift('test-clock.js');
     // Pages with ?preinstall=1 get no automatic content script, which is the state of any
     // tab that was already open when the extension was installed or updated.

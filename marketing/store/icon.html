@@ -4,17 +4,19 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="/comps/fonts.css">
 <style>
-  /* The extension's icon: its own blue panel, red and yellow lettering with the black outline.
+  /* The extension's icon, in the look of the Channel banner: the blue studio with its glow, and
+     the yellow slanted "30% OFF" with its hard navy shadow.
      ?size=128 draws the store/large version (96px artwork + 16px padding, per the store's rule);
      small sizes fill the square and drop to a single % that survives at 16px. */
   html, body { margin: 0; background: transparent; }
   #icon { position: relative; width: var(--s); height: var(--s); }
-  .tile { position: absolute; inset: var(--pad); background: #0000ff; border: var(--b) solid #000; border-radius: var(--r); overflow: hidden;
-          display: grid; place-content: center; justify-items: center; font-family: "Archivo Black", sans-serif; line-height: 0.86; }
-  .tile span { display: block; -webkit-text-stroke: var(--st) #000; paint-order: stroke fill; letter-spacing: -0.04em; }
-  .a { color: #ff0000; font-size: var(--fa); }
-  .b { color: #ffff00; font-size: var(--fb); margin-top: var(--gap); }
-  .one { color: #ffff00; font-size: var(--fo); }
+  .tile { position: absolute; inset: var(--pad); border-radius: var(--r); overflow: hidden;
+          background: radial-gradient(ellipse 80% 70% at 68% 58%, #5fd0ff 0%, #2f95ff 24%, #1450f8 52%, rgba(10, 34, 214, 0) 84%), linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c);
+          display: grid; place-content: center; justify-items: center; font-family: "Archivo Black", sans-serif; line-height: 0.84; }
+  .tile span { display: block; color: #fff035; letter-spacing: -0.05em; transform: skewX(-9deg); text-shadow: var(--sh); }
+  .a { font-size: var(--fa); }
+  .b { font-size: var(--fb); margin-top: var(--gap); }
+  .one { font-size: var(--fo); }
 </style>
 </head>
 <body>
@@ -26,12 +28,14 @@
   const pad = size === 128 ? 16 : 0;
   const art = size - pad * 2;
   const v = (k, n) => el.style.setProperty('--' + k, n + 'px');
-  v('s', size); v('pad', pad); v('b', Math.max(1, Math.round(art * 0.045))); v('r', Math.round(art * 0.19));
+  v('s', size); v('pad', pad); v('r', Math.round(art * 0.19));
+  const d = Math.max(1, art * 0.022); // one step of the hard shadow
+  el.style.setProperty('--sh', [1, 2, 3].map((i) => `${d * i}px ${d * i}px 0 #0a0f66`).join(', '));
   if (big) {
-    v('fa', art * 0.4); v('fb', art * 0.37); v('st', art * 0.085); v('gap', art * 0.04);
+    v('fa', art * 0.43); v('fb', art * 0.4); v('gap', art * 0.03);
     el.innerHTML = '<div class="tile"><span class="a">30%</span><span class="b">OFF</span></div>';
   } else {
-    v('fo', art * 0.92); v('st', Math.max(2, art * 0.14));
+    v('fo', art * 0.98);
     el.innerHTML = '<div class="tile"><span class="one">%</span></div>';
   }
   document.fonts.load('400 40px "Archivo Black"').then(() => { window.ready = true; });

@@ -9,8 +9,9 @@ shows or hides it on the current tab on any other day.
 - **Try it:** `chrome://extensions` → Developer mode → Load unpacked → pick `src/`. Click the
   toolbar button on any page.
 - **Change the look:** the first file under `content_scripts` in `src/manifest.json` picks the
-  design. `designs/classic.js` is the default; the others are `doorbuster`, `mattress`,
-  `dealership`, `geocities`, `flyer`, `clearance`, `infomercial`, `usa`, `broadcast`, `receipt`
+  design. It ships with `broadcast` (the Gary Mustard Enterprises "30% OFF Channel" banner);
+  `designs/classic.js` is the original. The others are `doorbuster`, `mattress`,
+  `dealership`, `geocities`, `flyer`, `clearance`, `infomercial`, `usa`, `receipt`
   and `grand` (pictures of all twelve: `marketing/out/designs/all-designs.png`). `broadcast`
   carries pictures, so it is two lines: `designs/broadcast.art.js`, then `designs/broadcast.js`. To check a
   design at four window shapes: `cd marketing && node store/check-design.mjs <name>`.
