@@ -17,11 +17,7 @@ LANGUAGE   English
 DESCRIPTION  (public)
 ---------------------------------------------------------------------------------------------
 30% off the entire internet.
-
-Every website. Black Friday only. Switches on automatically on Black Friday, midnight to midnight in your time zone.
-
-No settings. No account. No data collected.
-
+Every website. Black Friday only.
 A Gary Mustard Enterprises production.
 
 ---------------------------------------------------------------------------------------------
