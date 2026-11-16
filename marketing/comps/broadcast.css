@@ -22,6 +22,27 @@ html, body { background: #000; }
 }
 #gl { position: absolute; left: 0; top: 0; }
 
+/* ---- behind the picture ---- */
+/* SAVINGS, stepped and repeated: barely there, but it gives the blue something to do */
+.wall { position: absolute; inset: 0; overflow: hidden; font: italic 800 150px/1 "EB Garamond", serif; text-transform: uppercase; letter-spacing: 0.02em; color: rgba(255, 255, 255, 0.055); white-space: nowrap; }
+.wall div { position: absolute; left: -900px; height: 150px; white-space: pre; }
+/* a sunburst centred on the globe (broadcast.js places and turns it) */
+.rays {
+  position: absolute; width: 1900px; height: 1900px; margin: -950px 0 0 -950px; border-radius: 50%;
+  background: repeating-conic-gradient(rgba(140, 215, 255, 0.2) 0 6deg, rgba(140, 215, 255, 0) 6deg 15deg);
+  -webkit-mask-image: radial-gradient(closest-side, #000 0%, rgba(0, 0, 0, 0.75) 22%, rgba(0, 0, 0, 0) 78%); mask-image: radial-gradient(closest-side, #000 0%, rgba(0, 0, 0, 0.75) 22%, rgba(0, 0, 0, 0) 78%);
+}
+/* corner labels, set like the header of the GME sheet */
+.label { position: absolute; top: 42px; font: 700 27px/1.12 "Arimo", sans-serif; letter-spacing: 0.01em; color: #eef2ff; }
+.label.l { left: 44px; } .label.c { left: 0; right: 0; text-align: center; } .label.r { right: 44px; text-align: right; }
+/* the GME family of marks, in a row */
+.family { position: absolute; left: 34px; top: 1070px; display: flex; align-items: center; gap: 22px; height: 54px; }
+.family i { display: block; height: 100%; background: #f4f6ff; opacity: 0.92; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+.family .m1 { --m: url("/assets/gme/family-gme-box.png"); aspect-ratio: 577 / 275; }
+.family .m2 { --m: url("/assets/gme/family-gm-star.png"); aspect-ratio: 548 / 308; }
+.family .m3 { --m: url("/assets/gme/family-globe-halves.png"); aspect-ratio: 613 / 311; }
+.family .m4 { --m: url("/assets/gme/family-gm-plate.png"); aspect-ratio: 494 / 271; }
+
 /* ---- the scroll ---- */
 .ticker { position: absolute; left: 0; right: 0; white-space: nowrap; overflow: hidden; }
 .ticker .run { display: inline-block; white-space: pre; }
@@ -45,9 +66,10 @@ html, body { background: #000; }
 .title {
   position: absolute; left: 0; right: 0; top: 262px; text-align: center;
   font: italic 700 176px/0.9 "Arimo", sans-serif; letter-spacing: -0.04em;
-  filter: drop-shadow(8px 8px 0 rgba(6, 8, 70, 0.95));
+  filter: drop-shadow(3px 3px 0 #0a1272) drop-shadow(3px 3px 0 #0a1272) drop-shadow(4px 4px 0 rgba(4, 6, 50, 0.95));
 }
-.title span { display: block; background: linear-gradient(#ffffff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent; padding: 0 0.12em; }
+/* chrome lettering: a bright sky, a hard horizon, a pale floor */
+.title span { display: block; background: linear-gradient(#ffffff 0%, #eaf0ff 34%, #a9bdf6 49%, #6f8ee8 53%, #dfe7ff 58%, #ffffff 82%); -webkit-background-clip: text; background-clip: text; color: transparent; padding: 0 0.12em; }
 .title .l2 { font-size: 204px; margin-top: 2px; }
 
 /* ---- badges ---- */
@@ -77,9 +99,10 @@ html, body { background: #000; }
 
 /* ---- price card ---- */
 .price {
-  position: absolute; left: 24px; top: 1150px; width: 432px; height: 330px; background: #f3f4f6; border: 5px solid #000;
+  position: absolute; left: 24px; top: 1162px; width: 432px; height: 330px; background: #f3f4f6; border: 5px solid #000;
   box-shadow: 9px 9px 0 rgba(4, 6, 60, 0.92); transform: scale(var(--k, 1)) rotate(-1.4deg); transform-origin: left top;
 }
+.price .seal { position: absolute; right: -92px; top: 72px; width: 168px; height: 168px; transform: rotate(14deg); filter: drop-shadow(5px 5px 0 rgba(4, 6, 60, 0.9)); }
 .price .head { background: var(--red); color: #fff46a; font: 600 45px/62px "Antonio", sans-serif; padding: 0 16px; border-bottom: 5px solid #000; white-space: nowrap; letter-spacing: 0.015em; }
 .price .was, .price .now { font: italic 700 54px/1 "Arimo", sans-serif; color: #0c0c0c; padding: 14px 18px 0; }
 .price s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 10px; }
@@ -101,6 +124,7 @@ html, body { background: #000; }
 /* ================= other formats ================= */
 /* 4:5 feed post, 1080x1350 */
 .f-4x5 .ticker.top { top: 0; }
+.f-4x5 .label, .f-4x5 .family { display: none; }
 .f-4x5 .title { top: 118px; font-size: 150px; } .f-4x5 .title .l2 { font-size: 172px; }
 .f-4x5 .pill { top: 426px; }
 .f-4x5 .oval { top: 398px; --k: 0.92; }
@@ -112,6 +136,8 @@ html, body { background: #000; }
 /* square, 1080x1080 */
 .f-1x1 { --strip: 64px; }
 .f-1x1 .ticker.top { top: 0; }
+.f-1x1 .label { display: none; }
+.f-1x1 .family { display: none; }
 .f-1x1 .title { top: 100px; font-size: 124px; } .f-1x1 .title span { display: inline; } .f-1x1 .title .l2 { font-size: 124px; }
 .f-1x1 .pill { top: 244px; --k: 0.9; }
 .f-1x1 .oval { top: 232px; left: 730px; --k: 0.86; }
@@ -123,6 +149,9 @@ html, body { background: #000; }
 /* landscape, 1920x1080 */
 .f-16x9 .bg { background: radial-gradient(ellipse 44% 50% at 67% 50%, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, rgba(10, 34, 214, 0) 72%), linear-gradient(#050a2e 0%, #0a1a8c 16%, #0a22d6 46%, #0a1fa8 80%, #060c52 100%); }
 .f-16x9 .ticker.top { top: 0; }
+.f-16x9 .label { display: none; }
+.f-16x9 .family { left: 66px; top: 800px; height: 52px; }
+.f-16x9 .price .seal { right: auto; left: -104px; top: 150px; }
 .f-16x9 .title { top: 150px; left: 60px; right: auto; text-align: left; font-size: 150px; } .f-16x9 .title span { padding-left: 0; } .f-16x9 .title .l2 { font-size: 172px; }
 .f-16x9 .pill { left: 64px; top: 476px; }
 .f-16x9 .oval { left: 1500px; top: 150px; }
@@ -133,6 +162,9 @@ html, body { background: #000; }
 
 /* the banner as it sits down the right-hand side of a desktop page (drawn 1080x2025, shown at 576x1080) */
 .f-banner-v .ticker.top { top: 0; }
+.f-banner-v .label { display: none; }
+.f-banner-v .family { top: 1004px; }
+.f-banner-v .price { top: 1096px; }
 .f-banner-v .title { top: 150px; }
 .f-banner-v .pill { top: 560px; }
 .f-banner-v .oval { top: 516px; }
@@ -145,6 +177,7 @@ html, body { background: #000; }
 .f-banner-h { --strip: 62px; }
 .f-banner-h .bg { background: radial-gradient(ellipse 46% 62% at 80% 46%, #58c4ff 0%, #2a8cff 22%, #1348ee 46%, rgba(10, 34, 214, 0) 76%), linear-gradient(#050a2e 0%, #0a1a8c 16%, #0a22d6 46%, #0a1fa8 80%, #060c52 100%); }
 .f-banner-h .ticker.top { top: 0; }
+.f-banner-h .label, .f-banner-h .family { display: none; }
 .f-banner-h .title { top: 100px; left: 40px; right: auto; text-align: left; font-size: 98px; } .f-banner-h .title span { display: inline; padding-left: 0; } .f-banner-h .title .l2 { font-size: 98px; }
 .f-banner-h .offer { left: 40px; top: 206px; } .f-banner-h .offer .pct { font-size: 268px; } .f-banner-h .offer .off { font-size: 196px; } .f-banner-h .offer .what { font-size: 58px; padding-bottom: 16px; }
 .f-banner-h .pill { left: 40px; top: 650px; --k: 1.12; }
@@ -153,13 +186,13 @@ html, body { background: #000; }
 .f-banner-h .fine { top: 778px; font-size: 27px; padding: 9px 0 12px; }
 
 /* Chrome Web Store marquee, 1400x560: a picture more than a poster */
-.f-marquee .ticker, .f-marquee .fine, .f-marquee .oval, .f-marquee .title, .f-marquee .price { display: none; }
+.f-marquee .label, .f-marquee .family, .f-marquee .ticker, .f-marquee .fine, .f-marquee .oval, .f-marquee .title, .f-marquee .price { display: none; }
 .f-marquee .bg { background: radial-gradient(ellipse 40% 70% at 77% 46%, #58c4ff 0%, #2a8cff 22%, #1348ee 46%, rgba(10, 34, 214, 0) 76%), linear-gradient(#050a2e 0%, #0a1a8c 16%, #0a22d6 46%, #0a1fa8 80%, #060c52 100%); }
 .f-marquee .pill { left: 70px; top: 54px; }
 .f-marquee .offer { left: 70px; top: 170px; display: flex; align-items: flex-end; gap: 30px; flex-wrap: wrap; width: 980px; } .f-marquee .offer .pct { font-size: 190px; line-height: 0.9; } .f-marquee .offer .off { font-size: 190px; } .f-marquee .offer .row { margin: 0; display: contents; } .f-marquee .offer .what { font-size: 58px; padding: 22px 0 0; flex-basis: 100%; } .f-marquee .offer .what br { display: none; }
 
 /* Chrome Web Store small tile, drawn at 880x560 and scaled to 440x280 */
-.f-tile .ticker, .f-tile .fine, .f-tile .oval, .f-tile .title, .f-tile .price, .f-tile .pill { display: none; }
+.f-tile .label, .f-tile .family, .f-tile .wall, .f-tile .ticker, .f-tile .fine, .f-tile .oval, .f-tile .title, .f-tile .price, .f-tile .pill { display: none; }
 .f-tile .bg { background: radial-gradient(ellipse 48% 74% at 76% 44%, #58c4ff 0%, #2a8cff 22%, #1348ee 46%, rgba(10, 34, 214, 0) 76%), linear-gradient(#050a2e 0%, #0a1a8c 16%, #0a22d6 46%, #0a1fa8 80%, #060c52 100%); }
 .f-tile .offer { left: 44px; top: 70px; } .f-tile .offer .pct { font-size: 218px; } .f-tile .offer .off { font-size: 196px; } .f-tile .offer .what { display: none; }
 

@@ -10,7 +10,14 @@
 <body>
 <div id="stage">
   <div class="bg"></div>
+  <!-- behind everything: the word stepped and repeated, as on the GME sheet, and a sunburst for the globe -->
+  <div class="wall"></div>
+  <div class="rays"></div>
   <canvas id="gl"></canvas>
+
+  <div class="label l">Gary Mustard<br>Enterprises</div>
+  <div class="label c">EST2026</div>
+  <div class="label r">The &#8220;Business&#8221;<br>Business</div>
 
   <!-- the scroll: a paper strip in the manner of the Gary Mustard Enterprises identity -->
   <div class="ticker top">
@@ -28,7 +35,17 @@
     <div class="row"><span class="off">OFF</span><span class="what">THE ENTIRE <br>INTERNET !</span></div>
   </div>
 
+  <div class="family"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i></div>
+
   <div class="price">
+    <svg class="seal" viewBox="-100 -100 200 200" aria-hidden="true">
+      <defs><path id="seal-ring" d="M0,-66 A66,66 0 1,1 -0.01,-66"/></defs>
+      <circle r="96" fill="#f6c52e" stroke="#0b1a5c" stroke-width="5" stroke-dasharray="3 6.4"/>
+      <circle r="84" fill="none" stroke="#0b1a5c" stroke-width="3"/>
+      <circle r="50" fill="none" stroke="#0b1a5c" stroke-width="2"/>
+      <text font-family="Arimo" font-weight="700" font-size="19.5" letter-spacing="2.6" fill="#0b1a5c"><textPath href="#seal-ring">GME APPROVED &#9733; GENUINE SAVINGS &#9733;</textPath></text>
+      <image href="/assets/gme/wire-globe.png" x="-36" y="-36" width="72" height="72" style="filter: brightness(0) saturate(100%) invert(11%) sepia(60%) saturate(3000%) hue-rotate(222deg)"/>
+    </svg>
     <div class="head">The Internet (All Of It)</div>
     <div class="was"><em>WAS:</em> <s>100%</s></div>
     <div class="now"><em>NOW:</em></div>
