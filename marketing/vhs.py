@@ -146,6 +146,7 @@ def main():
     out = a.out or os.path.join(ROOT, 'out', a.name + '.mp4')
     os.makedirs(os.path.dirname(out), exist_ok=True)
     ff = subprocess.Popen(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(fps), '-i', '-',
+                           '-vf', 'crop=trunc(iw/2)*2:trunc(ih/2)*2',  # H.264 needs even dimensions
                            '-c:v', 'libx264', '-preset', 'slow', '-crf', str(a.crf), '-pix_fmt', 'yuv420p', '-profile:v', 'high',
                            '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', '-movflags', '+faststart', out], stdin=subprocess.PIPE)
     jobs = [(os.path.join(raw, f), int(f[:4]), fps, meta['glitches'], a.amount) for f in files] * a.loops
