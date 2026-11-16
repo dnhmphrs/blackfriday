@@ -70,7 +70,7 @@ html, body { background: #000; }
 .cards i { width: 100px; height: 62px; border-radius: 7px; position: relative; display: block; box-shadow: 3px 3px 0 rgba(6, 8, 70, 0.85); overflow: hidden; }
 .cards b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; font: italic 700 17px/1 "Arimo", sans-serif; letter-spacing: 0.02em; }
 .cards .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; }
-.cards .c2 { background: radial-gradient(circle at 36% 42%, #ff3b30 0 27%, transparent 28%), radial-gradient(circle at 64% 42%, #ffb300 0 27%, transparent 28%), #f6f6f6; color: #111; }
+.cards .c2 { background: radial-gradient(circle at 50% 40%, #ffb300 0 30%, transparent 31%), #f6f6f6; color: #111; }
 .cards .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
 .cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
 .cards .c4 b { font-size: 13px; }
@@ -158,33 +158,31 @@ html, body { background: #000; }
 .t-night .price .head { background: #111; color: #ffd23a; }
 .t-night .fine { background: rgba(0, 0, 0, 0.75); }
 
-/* ================= options (?opt=a,b) =================
-   Each is one small change to the advert as approved, so versions can be compared side by side.
-   Positions are for the 9x16 layout. */
-.gme-bug, .osd-date, .family, .price .seal, .signoff, .ticker.top .cap { display: none; }
-:root { --paper: #e9e7e0; --ink: #0b1a5c; }
 
-/* bug: the Gary Mustard Enterprises lockup, small, top left, where the PLAY read-out used to be */
-.o-bug .gme-bug { display: block; position: absolute; left: 44px; top: 34px; width: 196px; height: 104px; background: url("/assets/gme/gme-primary.png") left center / contain no-repeat; }
-/* date: Garrett thought the date could stay or go; this keeps it */
-.o-date .osd-date { display: block; position: absolute; right: 44px; top: 62px; font: 400 62px/1 "VT323", monospace; color: #f4fff6; letter-spacing: 0.05em; text-shadow: 3px 3px 0 rgba(0, 0, 30, 0.6), 0 0 14px rgba(170, 255, 210, 0.45); }
-/* paper: the scroll set as a paper strip with the GME mark and pinstripes, as on the GME sheet */
-.o-paper .ticker.top {
-  height: 99px; color: var(--ink); text-shadow: none; font: italic 800 48px/78px "EB Garamond", serif; text-transform: uppercase; letter-spacing: 0.03em; word-spacing: 0.1em;
-  background: linear-gradient(var(--paper), var(--paper)) top / 100% 78px no-repeat, repeating-linear-gradient(to bottom, transparent 0 5px, var(--paper) 5px 7px) left 78px / 100% 21px no-repeat;
+/* ================= Gary Mustard Enterprises ================= */
+/* The lockup, small, at the top. Where there is headroom it stands alone in the corner; in the
+   tighter layouts it sits at the left end of the scroll, on a patch of the background. */
+.gme-bug { position: absolute; left: 44px; top: 34px; width: 196px; height: 104px; background: url("/assets/gme/gme-primary.png") left center / contain no-repeat; }
+.f-1x1 .gme-bug, .f-16x9 .gme-bug, .f-4x5 .gme-bug, .f-banner-h .gme-bug {
+  left: 0; width: 250px;
+  background: url("/assets/gme/gme-primary.png") 22px center / auto 86% no-repeat, linear-gradient(90deg, #0a1cc4 76%, rgba(10, 28, 196, 0));
 }
-.o-paper .ticker.top .cap { display: block; position: absolute; left: 0; top: 0; height: 78px; width: 238px; background: var(--paper); border-right: 3px solid var(--ink); }
-.o-paper .ticker.top .cap i { position: absolute; inset: 13% 9% 13% 8%; background: var(--ink); -webkit-mask: url("/assets/gme/gme-letters.png") center / contain no-repeat; mask: url("/assets/gme/gme-letters.png") center / contain no-repeat; }
-.o-paper .title { top: 258px; }
-/* family: four marks of the GME family where the payment cards were */
-.o-family .cards, .o-nocards .cards { display: none; }
-.o-family .family { display: flex; position: absolute; left: 32px; top: 1112px; height: 58px; gap: 24px; align-items: center; }
-.family i { display: block; height: 100%; background: #f4f6ff; opacity: 0.94; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
-.family .m1 { --m: url("/assets/gme/family-gme-box.png"); aspect-ratio: 577 / 275; }
-.family .m2 { --m: url("/assets/gme/family-gm-star.png"); aspect-ratio: 548 / 308; }
-.family .m3 { --m: url("/assets/gme/family-globe-halves.png"); aspect-ratio: 613 / 311; }
-.family .m4 { --m: url("/assets/gme/family-gm-plate.png"); aspect-ratio: 494 / 271; }
-/* seal: a small "GME approved" seal on the corner of the price card */
-.o-seal .price .seal { display: block; position: absolute; right: -78px; top: 96px; width: 138px; height: 138px; transform: rotate(14deg); filter: drop-shadow(4px 4px 0 rgba(4, 6, 60, 0.9)); }
-/* signoff: a production credit under the small print */
-.o-signoff .signoff { display: block; position: absolute; left: 0; right: 0; top: 1807px; padding: 6px 0 12px; text-align: center; font: 700 19px/1 "Arimo", sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(233, 240, 255, 0.9); background: rgba(2, 4, 52, 0.72); }
+.f-1x1 .gme-bug, .f-banner-h .gme-bug { top: 14px; height: 70px; width: 210px; }
+.f-16x9 .gme-bug { top: 22px; height: 84px; }
+.f-4x5 .gme-bug { top: 26px; height: 84px; }
+.f-marquee .gme-bug { left: auto; right: 40px; top: 30px; width: 170px; height: 90px; background-position: right center; }
+.f-tile .gme-bug { display: none; }
+
+/* ================= the extension's banner, as pictures ================= */
+/* down the right-hand side of a desktop page (1080x2025): the vertical advert with room to breathe */
+.f-banner-v .ticker.bottom { top: 1680px; }
+.f-banner-v .fine { top: 1866px; }
+/* across the top of a phone (1170x834): few things, big */
+.f-banner-h .bg { background: radial-gradient(ellipse 46% 62% at 80% 46%, #5fd0ff 0%, #2f95ff 22%, #1450f8 46%, rgba(10, 34, 214, 0) 76%), linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
+.f-banner-h .ticker.top { top: 14px; height: 70px; font-size: 48px; line-height: 70px; }
+.f-banner-h .title { top: 96px; left: 40px; right: auto; text-align: left; font-size: 98px; } .f-banner-h .title span { display: inline; padding-left: 0; } .f-banner-h .title .l2 { font-size: 98px; }
+.f-banner-h .offer { left: 40px; top: 206px; } .f-banner-h .offer .pct { font-size: 268px; } .f-banner-h .offer .off { font-size: 196px; } .f-banner-h .offer .what { font-size: 58px; padding-bottom: 16px; }
+.f-banner-h .pill { left: 40px; top: 650px; --k: 1.12; }
+.f-banner-h .oval { left: 872px; top: 92px; --k: 0.8; transform-origin: left top; }
+.f-banner-h .price, .f-banner-h .ticker.bottom, .f-banner-h .cards { display: none; }
+.f-banner-h .fine { top: 778px; font-size: 27px; padding: 9px 0 12px; }

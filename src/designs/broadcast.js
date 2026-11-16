@@ -1,6 +1,6 @@
 // Design: Broadcast. "The 30% OFF Channel", a Gary Mustard Enterprises production: the banner
-// from the adverts, live. A paper scroll strip, the World Wide Sale, a turning globe with 30%
-// cut out of it on a GME plinth, and the price card. Down the side of the page on a desktop,
+// from the adverts, live. The scroll, the World Wide Sale, a turning globe with 30% cut out of
+// it on a GME plinth, and the price card. Down the side of the page on a desktop,
 // across the top on a phone.
 globalThis.thirtyOffDesign = (() => {
   // Everything is drawn on a sheet 100 units wide. A unit is as large as the frame allows
@@ -15,7 +15,7 @@ globalThis.thirtyOffDesign = (() => {
     .frame {
       position: absolute; top: 0; right: 0; width: 30%; height: 100%;
       container-type: size; overflow: hidden; pointer-events: auto; user-select: none; cursor: default;
-      background: linear-gradient(#050a2e 0%, #0a1a8c 16%, #0a22d6 46%, #0a1fa8 80%, #060c52 100%);
+      background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c);
       border-left: 4px solid #000; color: #fff;
       font: italic 700 16px/1 Arial, "Helvetica Neue", Helvetica, sans-serif;
     }
@@ -28,7 +28,7 @@ globalThis.thirtyOffDesign = (() => {
     .sheet {
       position: absolute; inset: 0;
       --u: min(1cqw, 100cqh / 187.5);
-      --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; --paper: #e9e7e0; --ink: #0b1a5c;
+      --yellow: #fff035; --shade: #0a0f66; --red: #ff1616;
     }
     @keyframes roll { from { background-position: 0 0, 0 -60cqh; } to { background-position: 0 0, 0 160cqh; } }
     @keyframes slide { to { transform: translateX(-50%); } }
@@ -38,19 +38,18 @@ globalThis.thirtyOffDesign = (() => {
     @keyframes pulse { 0%, 55%, 100% { scale: 1; } 25% { scale: 1.04; } }
     @keyframes glint { 0%, 78%, 100% { scale: 0; rotate: 0deg; } 88% { scale: 1; rotate: 12deg; } }
 
-    /* ---- the scroll: a paper strip with the GME mark, three pinstripes under it ---- */
+    /* ---- the Gary Mustard Enterprises lockup, and the scroll under it ---- */
+    .bug { position: absolute; left: ${u(4.1)}; top: ${u(3.1)}; height: ${u(9.6)}; z-index: 1; }
+    .bug img { display: block; height: 100%; width: auto; filter: brightness(0) invert(1); }
     .strip {
-      position: absolute; left: 0; right: 0; top: 0; height: ${u(7.2)}; overflow: hidden; white-space: nowrap;
-      background: var(--paper); color: var(--ink); text-transform: uppercase; letter-spacing: 0.03em; word-spacing: 0.1em;
-      font: italic 700 ${u(4.5)}/${u(7.2)} ${serif};
+      position: absolute; left: 0; right: 0; top: ${u(13.7)}; height: ${u(7.8)}; overflow: hidden; white-space: nowrap;
+      color: #e9f0ff; letter-spacing: 0.035em; word-spacing: 0.3em; text-shadow: ${u(0.28)} ${u(0.28)} 0 rgba(4, 8, 80, 0.85);
+      font: normal 400 ${u(5.2)}/${u(7.8)} "Arial Narrow", "Helvetica Neue", Arial, sans-serif; font-stretch: condensed;
     }
     .strip span { display: inline-block; animation: slide 30s linear infinite; }
-    .strip .cap { position: absolute; left: 0; top: 0; bottom: 0; width: ${u(22)}; background: var(--paper); border-right: ${u(0.3)} solid var(--ink); display: flex; align-items: center; justify-content: center; }
-    .strip .cap img { display: block; height: ${u(5.2)}; width: auto; }
-    .rules { position: absolute; left: 0; right: 0; top: ${u(7.2)}; height: ${u(2)}; background: repeating-linear-gradient(to bottom, transparent 0 ${u(0.46)}, var(--paper) ${u(0.46)} ${u(0.66)}); }
 
     /* ---- the sheet's middle column, centred when the frame is wider than the sheet ---- */
-    .col { position: absolute; top: 0; bottom: 0; left: 50%; width: ${u(100)}; margin-left: ${u(-50)}; }
+    .col { position: absolute; top: ${u(8.9)}; bottom: 0; left: 50%; width: ${u(100)}; margin-left: ${u(-50)}; }
     .glow { position: absolute; left: ${u(76.1)}; top: ${u(88)}; width: ${u(124)}; height: ${u(124)}; margin: ${u(-62)} 0 0 ${u(-62)}; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, rgba(19, 72, 238, 0) 72%); }
 
     .title { position: absolute; left: 0; right: 0; top: ${u(13.9)}; text-align: center; font-size: ${u(16.3)}; line-height: 0.9; letter-spacing: -0.04em; filter: drop-shadow(${u(0.74)} ${u(0.74)} 0 rgba(6, 8, 70, 0.95)); }
@@ -117,7 +116,7 @@ globalThis.thirtyOffDesign = (() => {
 
     /* squat frames (short windows): a shorter sheet, without the price card or the crawl */
     @container (min-aspect-ratio: 62 / 100) {
-      .sheet { --u: min(1cqw, 100cqh / 141); }
+      .sheet { --u: min(1cqw, 100cqh / 150); }
       .price, .crawl { display: none; }
     }
 
@@ -125,9 +124,9 @@ globalThis.thirtyOffDesign = (() => {
     @media (max-width: 768px) {
       .frame { width: 100%; height: 33%; border-left: 0; border-bottom: 4px solid #000; }
       .sheet { --u: min(1cqw, 100cqh / 71.3); }
-      .strip { height: ${u(5.3)}; font-size: ${u(3.3)}; line-height: ${u(5.3)}; }
-      .strip .cap { width: ${u(16.2)}; } .strip .cap img { height: ${u(3.8)}; }
-      .rules { top: ${u(5.3)}; height: ${u(1.5)}; background: repeating-linear-gradient(to bottom, transparent 0 ${u(0.34)}, var(--paper) ${u(0.34)} ${u(0.5)}); }
+      .col { top: 0; }
+      .strip { top: ${u(1.2)}; height: ${u(6)}; font-size: ${u(4.1)}; line-height: ${u(6)}; }
+      .bug { left: 0; top: ${u(1.2)}; height: ${u(6)}; width: ${u(18)}; padding: ${u(0.4)} 0 ${u(0.4)} ${u(1.9)}; background: linear-gradient(90deg, #0a1cc4 76%, rgba(10, 28, 196, 0)); }
       .glow { left: ${u(82.2)}; top: ${u(31.8)}; width: ${u(84)}; height: ${u(84)}; margin: ${u(-42)} 0 0 ${u(-42)}; }
       .title { top: ${u(8.6)}; left: ${u(3.4)}; right: auto; text-align: left; font-size: ${u(8.4)}; filter: drop-shadow(${u(0.5)} ${u(0.5)} 0 rgba(6, 8, 70, 0.95)); white-space: nowrap; }
       .title b { display: inline; padding: 0; } .title b + b { font-size: ${u(8.4)}; }
@@ -154,8 +153,8 @@ globalThis.thirtyOffDesign = (() => {
   const html = `
     <div class="frame" role="img" aria-label="World Wide Sale. 30% off the entire internet. Black Friday only. A Gary Mustard Enterprises production.">
       <div class="sheet">
-        <div class="strip" data-scrolls><span>${scroll.repeat(4)}</span><div class="cap"><img class="letters" alt=""></div></div>
-        <div class="rules"></div>
+        <div class="strip" data-scrolls><span>${scroll.repeat(4)}</span></div>
+        <div class="bug"><img alt=""></div>
         <div class="col">
           <div class="glow"></div>
           <div class="title"><b>World Wide</b> <b>Sale</b></div>
@@ -189,7 +188,7 @@ globalThis.thirtyOffDesign = (() => {
     const show = (selector, url) => { if (url) root.querySelector(selector).src = url; };
     show(".hero", still ? pictures.still : pictures.globe);
     show(".lockup", pictures.gme);
-    show(".letters", pictures.gmeLetters);
+    show(".bug img", pictures.gme);
 
     // The card's heading is set in Arial Narrow, which not every machine has. Where the
     // stand-in is too wide, squeeze the line to fit instead of letting it be cut off.

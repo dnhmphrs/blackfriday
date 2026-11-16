@@ -7,7 +7,7 @@ src/designs/broadcast.art.js (the manifest lists that file just before broadcast
 
 A design may not load anything from a URL, so its pictures travel as text. They are:
 globe (a looping picture of the cut globe over the panel's own glow), still (one frame of it,
-for people who ask for reduced motion), and the two Gary Mustard Enterprises lockups in navy.
+for people who ask for reduced motion), and the Gary Mustard Enterprises lockup in navy.
 """
 import base64, glob, io, os
 import numpy as np
@@ -62,7 +62,6 @@ art = {
     'globe': data_url(buffer.getvalue()),
     'still': data_url(webp(turn[0], quality=70, method=6)),
     'gme': data_url(lockup('gme-primary', 420)),
-    'gmeLetters': data_url(lockup('gme-letters', 360)),
 }
 for key, value in art.items():
     print(f'{key}: {len(value) / 1024:.0f} KB')
