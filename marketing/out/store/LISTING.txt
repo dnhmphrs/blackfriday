@@ -16,11 +16,9 @@ LANGUAGE   English
 ---------------------------------------------------------------------------------------------
 DESCRIPTION  (public)
 ---------------------------------------------------------------------------------------------
-30% off the entire internet. Black Friday only.
+30% off the entire internet.
 
-30% Off EVERYTHING is a Black Friday novelty extension. On Black Friday it adds a "30% OFF THE ENTIRE INTERNET" sale sign to every website you visit, from midnight to midnight in your time zone. On every other day of the year it does nothing.
-
-It is a joke. It does not apply discounts or coupons, change prices, or affect purchases.
+Every website. Black Friday only. Switches on automatically on Black Friday, midnight to midnight in your time zone.
 
 No settings. No account. No data collected.
 
