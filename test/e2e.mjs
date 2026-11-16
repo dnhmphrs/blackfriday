@@ -193,25 +193,26 @@ console.log('\n# 2. Tabs left open across midnight (timer path, no events fired)
 }
 
 // =====================================================================================
-console.log('\n# 3. Toolbar button');
+console.log('\n# 3. Toolbar button: nothing until Black Friday');
 {
   const { context, sw, extensionId } = await launchWithExtension(EXT, { tz: 'Europe/London' });
   await sw.evaluate(() => { self.__errs = []; self.addEventListener('unhandledrejection', (e) => self.__errs.push(String(e.reason))); self.addEventListener('error', (e) => self.__errs.push(String(e.message))); });
-  check('chrome.scripting is available in the worker', (await sw.evaluate(() => typeof chrome.scripting?.executeScript)) === 'function');
+  const manifest = await sw.evaluate(() => chrome.runtime.getManifest());
+  check('asks for no permissions', !manifest.permissions?.length && !manifest.host_permissions?.length, JSON.stringify(manifest.permissions));
   const page = await context.newPage();
   const errs = await watchErrors(context, page);
   await page.goto(url('/plain', ORDINARY));
   await sleep(150);
   check('ordinary day: nothing shown on load', !(await page.evaluate(probe)).present);
-  await clickAction(context, page, extensionId); await sleep(400);
-  let p = await page.evaluate(probe);
-  check('ordinary day: click shows it', p.present && p.count === 1, JSON.stringify(p.panelRect));
-  await clickAction(context, page, extensionId); await sleep(400);
-  check('ordinary day: second click hides it', !(await page.evaluate(probe)).present);
-  await clickAction(context, page, extensionId); await sleep(400);
-  check('ordinary day: third click shows it again (one copy)', (await page.evaluate(probe)).count === 1);
-  await page.reload(); await sleep(200);
-  check('ordinary day: reload clears the preview', !(await page.evaluate(probe)).present);
+  for (const n of [1, 2, 3]) {
+    await clickAction(context, page, extensionId); await sleep(400);
+    check(`ordinary day: click ${n} does nothing`, !(await page.evaluate(probe)).present);
+  }
+  for (const [label, iso] of [['the day before', '2026-11-26T12:00:00Z'], ['the day after', '2026-11-28T12:00:00Z']]) {
+    await page.goto(url('/plain', Date.parse(iso))); await sleep(150);
+    await clickAction(context, page, extensionId); await sleep(400);
+    check(`${label}: click does nothing`, !(await page.evaluate(probe)).present);
+  }
 
   await page.goto(url('/plain', BF)); await sleep(150);
   check('Black Friday: shown on load', (await page.evaluate(probe)).present);
@@ -221,71 +222,45 @@ console.log('\n# 3. Toolbar button');
   check('Black Friday: stays hidden when the tab regains focus', !(await page.evaluate(probe)).present);
   await clickAction(context, page, extensionId); await sleep(400);
   check('Black Friday: click brings it back', (await page.evaluate(probe)).count === 1);
+  await clickAction(context, page, extensionId); await sleep(400);
+  await page.evaluate((t) => { document.documentElement.dataset.fakeNow = String(t); document.dispatchEvent(new Event('visibilitychange')); }, Date.parse('2026-11-28T12:00:00Z')); await sleep(100);
+  await clickAction(context, page, extensionId); await sleep(400);
+  check('hidden on Black Friday, then Saturday: a click still does nothing', !(await page.evaluate(probe)).present);
 
-  // Pages no extension may touch.
+  // Tabs with no content script: Chrome's own pages, and tabs open since before install.
   const restricted = await context.newPage();
   await restricted.goto('chrome://version/');
   await clickAction(context, restricted, extensionId).catch((e) => check('click on chrome:// page could be triggered', false, e.message));
-  await sleep(400);
+  const old = await context.newPage();
+  await old.goto(url('/plain', BF) + '&preinstall=1'); await sleep(200);
+  await clickAction(context, old, extensionId); await sleep(400);
+  check('tab open since before install: click does nothing', !(await old.evaluate(probe)).present);
   const swErrs = await sw.evaluate(() => self.__errs).catch(() => ['worker restarted']);
-  check('click on a chrome:// page: no error in the worker', swErrs.length === 0, swErrs.join(' | '));
+  check('clicks on tabs without the script: no error in the worker', swErrs.length === 0, swErrs.join(' | '));
   check('no content-script errors so far', errs.length === 0, errs.join(' | '));
   await context.close();
 }
 {
-  // A tab that was open BEFORE the extension was installed has no content script.
-  // (?preinstall=1 pages are skipped by the test copy's manifest to recreate that state.)
-  for (const [label, t] of [['ordinary day', ORDINARY], ['Black Friday', BF]]) {
-    const { context, extensionId } = await launchWithExtension(EXT, { tz: 'Europe/London' });
-    const page = await context.newPage();
-    const errs = await watchErrors(context, page);
-    await page.goto(url('/plain', t) + '&preinstall=1');
-    await sleep(300);
-    check(`pre-install tab, ${label}: untouched until clicked`, !(await page.evaluate(probe)).present);
-    await clickAction(context, page, extensionId); await sleep(600);
-    let p = await page.evaluate(probe);
-    check(`pre-install tab, ${label}: first click shows it`, p.present && p.count === 1);
-    await clickAction(context, page, extensionId); await sleep(400);
-    check(`pre-install tab, ${label}: second click hides it`, !(await page.evaluate(probe)).present);
-    await clickAction(context, page, extensionId); await sleep(400);
-    check(`pre-install tab, ${label}: third click shows it`, (await page.evaluate(probe)).count === 1);
-    check(`pre-install tab, ${label}: no errors`, errs.length === 0, errs.join(' | '));
-    await context.close();
-  }
-}
-{
   // The extension is updated (reloaded) while a tab is showing the overlay. The copy of the
   // content script in that tab is cut off from the extension from then on.
-  for (const lookedAtFirst of [true, false]) {
-    const tag = lookedAtFirst ? 'tab looked at before the click' : 'clicked straight away';
-    const { context, sw, extensionId } = await launchWithExtension(EXT, { tz: 'Europe/London' });
-    const page = await context.newPage();
-    const errs = await watchErrors(context, page);
-    await page.goto(url('/plain', BF)); await sleep(200);
-    check(`update (${tag}): shown before the update`, (await page.evaluate(probe)).count === 1);
-    await page.evaluate(() => { document.querySelector('thirty-off-overlay').dataset.generation = 'old'; });
-    await sw.evaluate(() => chrome.runtime.reload()).catch(() => {});
-    await sleep(1500);
-    const fresh = await context.newPage();
-    await fresh.goto(url('/plain', BF)); await sleep(300);
-    check(`update (${tag}): tabs opened after the update work normally`, (await fresh.evaluate(probe)).count === 1);
-    await fresh.close();
-    await page.bringToFront();
-    if (lookedAtFirst) {
-      await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(200);
-      check(`update (${tag}): cut-off overlay removes itself`, !(await page.evaluate(probe)).present);
-    }
-    await clickAction(context, page, extensionId); await sleep(700);
-    const p = await page.evaluate(probe);
-    const generation = await page.evaluate(() => document.querySelector('thirty-off-overlay')?.dataset.generation ?? 'new');
-    check(`update (${tag}): click leaves exactly one overlay, from the new version`, p.count === 1 && p.topLayer === true && generation === 'new', `count ${p.count}, ${generation}`);
-    await clickAction(context, page, extensionId); await sleep(500);
-    check(`update (${tag}): next click hides it`, !(await page.evaluate(probe)).present);
-    await clickAction(context, page, extensionId); await sleep(500);
-    check(`update (${tag}): and the next shows it again`, (await page.evaluate(probe)).count === 1);
-    check(`update (${tag}): no errors`, errs.length === 0, errs.join(' | '));
-    await context.close();
-  }
+  const { context, sw } = await launchWithExtension(EXT, { tz: 'Europe/London' });
+  const page = await context.newPage();
+  const errs = await watchErrors(context, page);
+  await page.goto(url('/plain', BF)); await sleep(200);
+  check('update: shown before the update', (await page.evaluate(probe)).count === 1);
+  await sw.evaluate(() => chrome.runtime.reload()).catch(() => {});
+  await sleep(1500);
+  const fresh = await context.newPage();
+  await fresh.goto(url('/plain', BF)); await sleep(300);
+  check('update: tabs opened after the update work normally', (await fresh.evaluate(probe)).count === 1);
+  await fresh.close();
+  await page.bringToFront();
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(200);
+  check('update: cut-off overlay removes itself', !(await page.evaluate(probe)).present);
+  await page.reload(); await sleep(300);
+  check('update: back after a reload, exactly one', (await page.evaluate(probe)).count === 1);
+  check('update: no errors', errs.length === 0, errs.join(' | '));
+  await context.close();
 }
 
 // =====================================================================================

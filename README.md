@@ -3,11 +3,11 @@
 
 ## Working on it (spoilers)
 
-On Black Friday the extension covers the right-hand 30% of every page. The toolbar button
-shows or hides it on the current tab on any other day.
+On Black Friday the extension covers the right-hand 30% of every page, and the toolbar button
+hides it on the current tab or brings it back. On every other day it does nothing at all.
 
-- **Try it:** `chrome://extensions` → Developer mode → Load unpacked → pick `src/`. Click the
-  toolbar button on any page.
+- **Try it:** `chrome://extensions` → Developer mode → Load unpacked → pick `src/`, set the
+  computer's date to 27 November 2026 and open any page.
 - **Change the look:** the first file under `content_scripts` in `src/manifest.json` picks the
   design. It ships with `broadcast` (the Gary Mustard Enterprises "30% OFF Channel" banner);
   `designs/classic.js` is the original. The others are `doorbuster`, `mattress`,

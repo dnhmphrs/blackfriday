@@ -1,16 +1,16 @@
 // 30% Off EVERYTHING - content script.
 //
-// On Black Friday the overlay appears on every page. The toolbar button shows or hides it
-// on the current tab on any day of the year. What it looks like lives in designs/.
+// On Black Friday the overlay appears on every page; on that day the toolbar button hides it
+// on the current tab or brings it back. On every other day nothing shows and the button does
+// nothing. What the overlay looks like lives in designs/.
 (() => {
   const TOGGLE = "thirty-off:toggle";
   const TAG = "thirty-off-overlay";
   const design = globalThis.thirtyOffDesign;
 
-  // This file can run twice in one page: the toolbar button injects it into tabs that were
-  // already open when the extension was installed or updated. The newcomer takes over, both
-  // from a copy of itself in this JavaScript world and from an overlay left on the page by
-  // a copy that an update has since cut off.
+  // If this file ever runs twice in one page, the newcomer takes over, both from a copy of
+  // itself in this JavaScript world and from an overlay left on the page by a copy that an
+  // update has since cut off.
   globalThis.thirtyOff?.destroy();
   for (const stale of document.querySelectorAll(TAG)) stale.remove();
 
@@ -44,7 +44,7 @@
     }
   `;
 
-  let override = null; // true/false once the toolbar button is used; null follows the calendar
+  let hidden = false; // the toolbar button was used to hide it on this tab today
   let wanted = false;
   let host = null;
   let appends = 0;
@@ -94,8 +94,8 @@
   }
   const keeper = new MutationObserver(render);
 
-  // True once the extension has been disabled, removed or updated under this tab. From then
-  // on this copy can no longer be reached by the toolbar button, so it cleans up and leaves.
+  // True once the extension has been disabled, removed or updated under this tab. This copy
+  // is then cut off from it, so it cleans up and leaves.
   function extensionIsGone() {
     try {
       return !chrome.runtime?.id;
@@ -107,7 +107,9 @@
   function sync() {
     if (extensionIsGone()) return destroy();
     const now = new Date();
-    wanted = override ?? isBlackFriday(now);
+    const today = isBlackFriday(now);
+    if (!today) hidden = false; // the choice lasts for the day only
+    wanted = today && !hidden;
     render();
     // Look again just after the next local midnight, so tabs left open pick up the start
     // of Black Friday and drop the overlay when it ends.
@@ -122,7 +124,7 @@
 
   function onMessage(message, sender, sendResponse) {
     if (message?.type !== TOGGLE) return;
-    override = message.show ?? !wanted;
+    if (isBlackFriday(new Date())) hidden = !hidden;
     sync();
     sendResponse({ shown: wanted });
   }

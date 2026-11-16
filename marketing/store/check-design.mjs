@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { launchWithExtension, clickAction } from '../../test/helpers.mjs';
+import { launchWithExtension, makeTestCopy } from '../../test/helpers.mjs';
 import { startServer } from '../tools/serve.mjs';
 
 const design = process.argv[2];
@@ -26,12 +26,8 @@ if (!/globalThis\.thirtyOffDesign\s*=/.test(code)) problems.push('must assign gl
 if (!/aria-label=/.test(code)) problems.push('the outer element needs role="img" and an aria-label');
 if (!/pointer-events:\s*auto/.test(code)) problems.push('the solid part needs pointer-events: auto (the host lets clicks through)');
 
-const ext = fs.mkdtempSync(path.join(os.tmpdir(), 'bf-check-'));
-fs.cpSync(src, ext, { recursive: true, filter: (f) => !f.endsWith('.zip') });
-const mf = JSON.parse(fs.readFileSync(`${ext}/manifest.json`, 'utf8'));
-// a design is designs/<name>.js, plus designs/<name>.art.js when it carries pictures
-mf.content_scripts[0].js = [...(fs.existsSync(`${ext}/designs/${design}.art.js`) ? [`designs/${design}.art.js`] : []), `designs/${design}.js`, 'script.js'];
-fs.writeFileSync(`${ext}/manifest.json`, JSON.stringify(mf, null, 2));
+// the real extension with this design, and a clock that says it is Black Friday (see test/helpers.mjs)
+const ext = makeTestCopy(src, { design });
 
 const outDir = `${root}out/designs/check/`;
 fs.mkdirSync(outDir, { recursive: true });
@@ -39,13 +35,12 @@ const { server, origin } = await startServer(root);
 const shapes = [['desktop', 1280, 800, 'shop'], ['large', 1920, 1080, 'news'], ['short', 1280, 520, 'shop'], ['narrow', 700, 900, 'news']];
 const shots = [];
 for (const [label, width, height, pageName] of shapes) {
-  const { context, extensionId } = await launchWithExtension(ext, { viewport: { width, height } });
+  const { context } = await launchWithExtension(ext, { viewport: { width, height } });
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   await cdp.send('Runtime.enable');
   cdp.on('Runtime.exceptionThrown', (e) => problems.push(`${label}: script error: ${(e.exceptionDetails.exception?.description || e.exceptionDetails.text).split('\n')[0]}`));
-  await page.goto(`${origin}/store/mock/${pageName}.html`);
-  await clickAction(context, page, extensionId);
+  await page.goto(`${origin}/store/mock/${pageName}.html?fakeNow=${Date.parse('2026-11-27T12:00:00')}`);
   // wait for the overlay rather than a fixed pause: on a busy machine the click can take a while to land
   await page.waitForFunction(() => document.querySelector('thirty-off-overlay'), null, { timeout: 20000 }).catch(() => {});
   await page.waitForTimeout(900);

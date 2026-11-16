@@ -73,14 +73,15 @@ const PRELUDE = `(() => {
   }
   globalThis.Date = FakeDate;
 })();`;
-export function makeTestCopy(srcDir) {
+export function makeTestCopy(srcDir, { design = 'classic' } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bf-ext-'));
   fs.cpSync(srcDir, dir, { recursive: true, filter: (f) => !f.endsWith('.zip') });
   fs.writeFileSync(path.join(dir, 'test-clock.js'), PRELUDE);
   const mf = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
   for (const cs of mf.content_scripts) {
-    // The checks measure the Classic design, whichever design the manifest ships.
-    cs.js = ['designs/classic.js', 'script.js'];
+    // The checks measure the Classic design, whichever design the manifest ships. A design is
+    // designs/<name>.js, plus designs/<name>.art.js when it carries pictures.
+    cs.js = [...(fs.existsSync(path.join(dir, 'designs', `${design}.art.js`)) ? [`designs/${design}.art.js`] : []), `designs/${design}.js`, 'script.js'];
     cs.js.unshift('test-clock.js');
     // Pages with ?preinstall=1 get no automatic content script, which is the state of any
     // tab that was already open when the extension was installed or updated.

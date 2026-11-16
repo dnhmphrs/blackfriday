@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { launchWithExtension, clickAction } from '../../test/helpers.mjs';
+import { launchWithExtension, makeTestCopy } from '../../test/helpers.mjs';
 import { startServer } from '../tools/serve.mjs';
 
 const root = new URL('..', import.meta.url).pathname;
@@ -15,19 +15,14 @@ const out = `${root}out/designs/`;
 fs.mkdirSync(out, { recursive: true });
 const { server, origin } = await startServer(root);
 for (const design of designs) {
-  const ext = fs.mkdtempSync(path.join(os.tmpdir(), 'bf-design-'));
-  fs.cpSync(src, ext, { recursive: true, filter: (f) => !f.endsWith('.zip') });
-  const mf = JSON.parse(fs.readFileSync(`${ext}/manifest.json`, 'utf8'));
-  // a design is designs/<name>.js, plus designs/<name>.art.js when it carries pictures
-  mf.content_scripts[0].js = [...(fs.existsSync(`${ext}/designs/${design}.art.js`) ? [`designs/${design}.art.js`] : []), `designs/${design}.js`, 'script.js'];
-  fs.writeFileSync(`${ext}/manifest.json`, JSON.stringify(mf, null, 2));
-  const { context, extensionId } = await launchWithExtension(ext);
+  // the real extension with this design, and a clock that says it is Black Friday (see test/helpers.mjs)
+  const ext = makeTestCopy(src, { design });
+  const { context } = await launchWithExtension(ext);
   const page = await context.newPage();
   const errors = [];
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   for (const name of pages) {
-    await page.goto(`${origin}/store/mock/${name}.html`);
-    await clickAction(context, page, extensionId);
+    await page.goto(`${origin}/store/mock/${name}.html?fakeNow=${Date.parse('2026-11-27T12:00:00')}`);
     await page.waitForFunction(() => document.querySelector('thirty-off-overlay'), null, { timeout: 20000 }).catch(() => {});
     await page.waitForTimeout(1200);
     await page.screenshot({ path: `${out}${design}-${name}.png` });

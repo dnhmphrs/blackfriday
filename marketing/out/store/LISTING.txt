@@ -2,7 +2,7 @@
 ==========================================================
 
 UPLOAD (Package tab)
-  black-friday.zip          version 1.5. If the dashboard wants a higher number, bump "version"
+  black-friday.zip          version 1.6. If the dashboard wants a higher number, bump "version"
                             in src/manifest.json and run ./package.sh.
 
 IMAGES (Store listing tab)
@@ -25,7 +25,6 @@ BUT WAIT... THERE'S LESS!
 
 • Works on every website. Yes, that one too.
 • Activates automatically on Black Friday, midnight to midnight, your time.
-• Can't wait? Click the toolbar button for a sneak preview on any page, any day.
 • 100% free. Collects nothing, sends nothing, no account.
 • Works like magic!
 
@@ -33,26 +32,23 @@ As seen on every website. A Gary Mustard Enterprises production.
 
 *Results guaranteed. Savings applied to the website itself.
 
-PRIVACY PRACTICES TAB
+PRIVACY PRACTICES TAB  (read by Google's reviewer only, never shown to users)
 
 Single purpose
-Shows a novelty sale banner over the right-hand 30% of web pages on Black Friday, or when the toolbar button is clicked.
-
-activeTab justification
-Lets the toolbar button add the banner to the current tab when that tab was open before the extension was installed or updated.
-
-scripting justification
-Used only by that toolbar click, to inject the extension's own banner script into the current tab. No remote code.
+Shows a novelty sale banner over the right-hand 30% of web pages on Black Friday only. It does nothing on any other day.
 
 Host permission justification (content script on all URLs)
-The banner is the whole product and must appear on every page on Black Friday. It reads nothing from the page and makes no network requests.
+The extension is a Black Friday joke: on that one day it shows a "30% OFF" banner over the right-hand 30% of every web page, so its content script must be able to load on all HTTP/HTTPS pages. On every other day the script checks the date and does nothing. It collects no data, makes no network requests, and does not read or change page content; it only adds its own overlay element, which the user can hide with the toolbar button.
+
+(This version asks for no other permissions, so the activeTab and scripting boxes disappear
+once the new package is uploaded.)
 
 Remote code            No, I am not using remote code.
 Data usage             Tick nothing. Tick the three certifications.
 Privacy policy URL     Not required (no user data is handled). Leave blank.
 
-TEST INSTRUCTIONS TAB
-Open any https page and click the toolbar button: a sale banner covers the right-hand 30% of the page. Click again to hide it. On Black Friday (27 Nov 2026) it appears on every page automatically. No account needed.
+TEST INSTRUCTIONS TAB  (reviewer only)
+This extension is deliberately inactive except on Black Friday. To see it work, set the computer's date to Friday 27 November 2026 and open or reload any https page: a sale banner covers the right-hand 30% of the page. On that date, clicking the toolbar button hides the banner on the current tab and clicking again brings it back. On any other date nothing is shown and the toolbar button does nothing. No account needed.
 
 BEFORE YOU CAN SUBMIT (Account tab)
   2-step verification on the Google account
