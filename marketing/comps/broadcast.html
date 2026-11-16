@@ -10,20 +10,13 @@
 <body>
 <div id="stage">
   <div class="bg"></div>
-  <!-- behind everything: the word stepped and repeated, as on the GME sheet, and a sunburst for the globe -->
-  <div class="wall"></div>
-  <div class="rays"></div>
   <canvas id="gl"></canvas>
 
-  <div class="label l">Gary Mustard<br>Enterprises</div>
-  <div class="label c">EST2026</div>
-  <div class="label r">The &#8220;Business&#8221;<br>Business</div>
+  <div class="ticker top"><div class="run" data-text="But wait&#8230; there&#8217;s less! &#10022; No purchase necessary! &#10022; Black Friday only! &#10022; Every website, 30% off! &#10022; Works like magic! &#10022; "></div><div class="cap"><i></i></div></div>
 
-  <!-- the scroll: a paper strip in the manner of the Gary Mustard Enterprises identity -->
-  <div class="ticker top">
-    <div class="run" data-text="But wait&#8230; there&#8217;s less! &#10022; No purchase necessary! &#10022; Black Friday only! &#10022; Every website, 30% off! &#10022; Works like magic! &#10022; "></div>
-    <div class="cap"><i></i></div>
-  </div>
+  <!-- optional pieces, each shown only when asked for with ?opt= (see the end of broadcast.css) -->
+  <div class="gme-bug"></div>
+  <div class="osd-date">NOV. 27 2026</div>
 
   <h1 class="title"><span class="l1">World Wide</span><span class="l2">Sale</span></h1>
 
@@ -36,6 +29,9 @@
   </div>
 
   <div class="family"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i></div>
+  <div class="cards">
+    <i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i>
+  </div>
 
   <div class="price">
     <svg class="seal" viewBox="-100 -100 200 200" aria-hidden="true">
@@ -54,7 +50,7 @@
 
   <div class="ticker bottom"><div class="run" data-text="INSTALL NOW TO SAVE ! &#10022; "></div></div>
   <div class="fine">*30% of every web page will be unavailable for viewing. Black Friday only.</div>
-  <div class="gme"></div>
+  <div class="signoff">A Gary Mustard Enterprises production &#10022; EST2026</div>
 
   <div id="sparkles"></div>
 </div>

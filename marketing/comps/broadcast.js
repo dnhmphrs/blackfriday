@@ -8,15 +8,10 @@ import { buildObject } from '../lib/catalog.js';
 const q = new URLSearchParams(location.search);
 const FORMATS = {
   // hero: where the object's centre lands on screen (px) and its diameter (px)
-  // (sign: the GME lockup is printed on the plinth where enough of the plinth shows)
-  '9x16': { w: 1080, h: 1920, hero: { x: 822, y: 1016, d: 430 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24, sign: true },
+  '9x16': { w: 1080, h: 1920, hero: { x: 822, y: 1010, d: 430 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
   '4x5': { w: 1080, h: 1350, hero: { x: 826, y: 770, d: 400 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
   '1x1': { w: 1080, h: 1080, hero: { x: 810, y: 560, d: 400 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
-  '16x9': { w: 1920, h: 1080, hero: { x: 1344, y: 500, d: 480 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
-  // the extension's banner: down the side of a desktop page, and across the top of a phone
-  // (crawl: on the banner the lower crawl cannot say "install", the viewer already has)
-  'banner-v': { w: 1080, h: 2025, hero: { x: 822, y: 950, d: 430 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24, sign: true, crawl: 'BLACK FRIDAY ONLY ! \u2726 ' },
-  'banner-h': { w: 1170, h: 834, hero: { x: 962, y: 372, d: 300 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24, sign: true },
+  '16x9': { w: 1920, h: 1080, hero: { x: 1322, y: 500, d: 490 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
   // Chrome Web Store promo images (the small tile is drawn at 2x and scaled down afterwards)
   marquee: { w: 1400, h: 560, hero: { x: 1080, y: 236, d: 330 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
   tile: { w: 880, h: 560, hero: { x: 668, y: 232, d: 300 }, plinth: { r: 0.98, gap: 0.42 }, elev: 15, yaw0: 24 },
@@ -27,7 +22,9 @@ const DURATION = 12, FPS = 30, TURN = 6;
 
 const stage = document.getElementById('stage');
 stage.classList.add('f-' + format);
-for (const theme of (q.get('theme') || '').split(',').filter(Boolean)) stage.classList.add('t-' + theme); // options: see the end of broadcast.css
+if (q.get('theme')) stage.classList.add('t-' + q.get('theme')); // colourways: see the end of broadcast.css
+const OPT = new Set((q.get('opt') || '').split(',').filter(Boolean)); // small optional changes: see the end of broadcast.css
+for (const o of OPT) stage.classList.add('o-' + o);
 stage.style.width = F.w + 'px';
 stage.style.height = F.h + 'px';
 
@@ -61,23 +58,8 @@ const plinth = makePlinth({ radius: F.plinth.r, height: 9, shadowRadius: 0.85 })
 plinth.position.y = heroName.startsWith('globe') ? -(1 + F.plinth.gap) : new THREE.Box3().setFromObject(hero).min.y - 0.36;
 scene.add(plinth);
 
-// Two orbit rings, each with a bead, after the GME marks that put rings round their globes.
-const rings = heroName.startsWith('globe') ? [[1.46, 24, -14, 1], [1.66, -32, 20, -2]].map(([radius, tiltX, tiltZ, turns]) => {
-  const chrome = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: 0.08 });
-  const tilt = new THREE.Group(), spin = new THREE.Group();
-  tilt.rotation.set((tiltX * Math.PI) / 180, 0, (tiltZ * Math.PI) / 180);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.016, 12, 160), chrome);
-  ring.rotation.x = Math.PI / 2;
-  const bead = new THREE.Mesh(new THREE.SphereGeometry(0.075, 24, 16), new THREE.MeshStandardMaterial({ color: new THREE.Color(1.0, 0.82, 0.2), metalness: 1, roughness: 0.12 }));
-  bead.position.x = radius;
-  spin.add(ring, bead);
-  tilt.add(spin);
-  scene.add(castShadows(tilt));
-  return { spin, turns };
-}) : [];
-
-// The Gary Mustard Enterprises lockup, printed in navy round the front of the plinth.
-if (F.sign && heroName.startsWith('globe')) {
+// opt=plinth: the Gary Mustard Enterprises lockup printed in navy round the front of the plinth.
+if (OPT.has('plinth') && heroName.startsWith('globe')) {
   const map = await new THREE.TextureLoader().loadAsync('/assets/gme/gme-primary.png');
   map.colorSpace = THREE.SRGBColorSpace;
   map.anisotropy = 8;
@@ -92,33 +74,17 @@ if (F.sign && heroName.startsWith('globe')) {
 
 // ---------- 2D ----------
 await document.fonts.ready;
-await Promise.all(['italic 800 48px "EB Garamond"', '600 45px Antonio', '400 100px "Archivo Black"', 'italic 700 50px Arimo', '700 27px Arimo'].map((f) => document.fonts.load(f)));
-
-// The sunburst sits behind the globe; the wall is rows of one word that drift in turn left and right.
-const rays = document.querySelector('.rays');
-rays.style.left = F.hero.x + 'px';
-rays.style.top = F.hero.y + 'px';
-const wall = document.querySelector('.wall');
-const WORD = 'SAVINGS    ';
-const rows = Array.from({ length: Math.ceil(F.h / 150) + 1 }, (unused, i) => {
-  const row = document.createElement('div');
-  row.textContent = WORD;
-  row.style.top = i * 150 - 40 + 'px';
-  wall.append(row);
-  const unit = row.getBoundingClientRect().width;
-  row.textContent = WORD.repeat(Math.ceil((F.w + 1800) / unit) + 1);
-  return { row, unit, dir: i % 2 ? 1 : -1, lead: (i * 0.37) % 1 };
-});
+await Promise.all(['300 58px Antonio', '400 100px "Archivo Black"', 'italic 700 50px Arimo', 'italic 700 44px Tinos', 'italic 800 48px "EB Garamond"', '400 62px VT323', '700 21px Arimo'].map((f) => document.fonts.load(f)));
 
 // Tickers: repeat the text, and move a whole number of repeats per loop so the loop is seamless.
 const tickers = [...document.querySelectorAll('.ticker')].map((el) => {
   const run = el.querySelector('.run');
-  const text = (el.classList.contains('bottom') && F.crawl) || run.dataset.text;
+  const text = run.dataset.text;
   run.textContent = text;
   const unit = run.getBoundingClientRect().width;
   if (!unit) return null; // this format hides the ticker
   run.textContent = text.repeat(Math.ceil((F.w * 2) / unit) + 1);
-  const perLoop = Math.max(1, Math.round((el.classList.contains('bottom') ? 300 : 190) * DURATION / unit));
+  const perLoop = Math.max(1, Math.round((el.classList.contains('bottom') ? 300 : 230) * DURATION / unit));
   return { run, unit, perLoop, skew: el.classList.contains('bottom') ? ' skewX(-9deg)' : '' };
 }).filter(Boolean);
 
@@ -154,10 +120,6 @@ function setTime(t) {
   t = ((t % DURATION) + DURATION) % DURATION;
   pivot.rotation.y = yawAt(t);
   pivot.position.y = Math.sin((t / DURATION) * TAU * 2) * 0.035;
-
-  for (const r of rings) r.spin.rotation.y = (t / DURATION) * TAU * r.turns;
-  rays.style.transform = `rotate(${((t / DURATION) * 30).toFixed(3)}deg)`; // 30 degrees is two rays on: seamless
-  for (const r of rows) r.row.style.transform = `translateX(${(((t / DURATION) * r.dir + r.lead) % 1 * r.unit - (r.dir > 0 ? r.unit : 0)).toFixed(2)}px)`;
 
   for (const k of tickers) {
     const x = -(((t / DURATION) * k.perLoop * k.unit) % k.unit);
