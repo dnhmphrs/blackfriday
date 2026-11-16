@@ -1,25 +1,25 @@
 {
   "manifest_version": 3,
   "name": "30% Off EVERYTHING",
-  "version": "1.6",
-  "description": "Internet Super Saver. 30% off the ENTIRE internet. Every website. No coupon codes. Black Friday only.",
+  "version": "1.7",
+  "description": "30% off the entire internet: a Black Friday novelty for every website. Active on Black Friday only.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "action": {
-    "default_title": "30% Off EVERYTHING"
-  },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["designs/broadcast.art.js", "designs/broadcast.js", "script.js"],
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
       "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["banner.css", "images/*", "fonts/*"],
+      "matches": ["http://*/*", "https://*/*"]
     }
   ]
 }

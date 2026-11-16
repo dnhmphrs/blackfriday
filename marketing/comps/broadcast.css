@@ -212,3 +212,7 @@ html, body { background: #000; }
 .f-shot-c .offer { left: 60px; top: 500px; display: flex; align-items: flex-end; gap: 24px; } .f-shot-c .offer .pct { font-size: 150px; line-height: 0.9; } .f-shot-c .offer .off { font-size: 150px; } .f-shot-c .offer .row { margin: 0; } .f-shot-c .offer .what { font-size: 36px; padding-bottom: 14px; }
 .f-shot-c .pill { left: 660px; top: 250px; --k: 0.9; }
 .f-shot-c .price { display: none; }
+
+/* the banner pictures match the live banner: no small print */
+.f-banner-v .fine, .f-banner-h .fine { display: none; }
+.f-banner-v .ticker.bottom { top: 1860px; }

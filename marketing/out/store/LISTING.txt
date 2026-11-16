@@ -1,61 +1,55 @@
-30% Off EVERYTHING: Chrome Web Store, everything to paste
-==========================================================
+30% Off EVERYTHING: Chrome Web Store
+====================================
 
 UPLOAD (Package tab)
-  black-friday.zip          version 1.6. If the dashboard wants a higher number, bump "version"
-                            in src/manifest.json and run ./package.sh.
+  black-friday.zip   version 1.7
 
 IMAGES (Store listing tab)
-  store-icon-128.png        Store icon
-  teaser-screenshot-1/2/3   Screenshots 1 to 3 (the offer, without giving the game away)
-  small-promo-440x280.png   Small promo tile
-  marquee-1400x560.png      Marquee promo tile
-  Video (optional): upload ad-horizontal-1920x1080.mp4 to YouTube and paste the link.
+  store-icon-128.png                 Store icon
+  teaser-screenshot-1/2/3-1280x800   Screenshots
+  small-promo-440x280.png            Small promo tile
+  marquee-1400x560.png               Marquee promo tile
 
-  Nothing in this folder shows or says how the 30% comes off. The three fields under
-  PRIVACY PRACTICES and TEST INSTRUCTIONS are read by Google's reviewer only, never shown to users.
-
-CATEGORY   Fun  (or "Just for fun", whichever the dashboard offers)
+CATEGORY   Fun
 LANGUAGE   English
 
-DESCRIPTION
-BUT WAIT... THERE'S LESS!
+---------------------------------------------------------------------------------------------
+DESCRIPTION  (public)
+---------------------------------------------------------------------------------------------
+30% off the entire internet. Black Friday only.
 
-30% Off EVERYTHING takes 30% off the ENTIRE internet. Every website. All of it. No coupon codes. No sign-up. No purchase necessary.
+30% Off EVERYTHING is a Black Friday novelty extension. On Black Friday it adds a "30% OFF THE ENTIRE INTERNET" sale sign to every website you visit, from midnight to midnight in your time zone. On every other day of the year it does nothing.
 
-• Works on every website. Yes, that one too.
-• Activates automatically on Black Friday, midnight to midnight, your time.
-• 100% free. Collects nothing, sends nothing, no account.
-• Works like magic!
+It is a joke. It does not apply discounts or coupons, change prices, or affect purchases.
 
-As seen on every website. A Gary Mustard Enterprises production.
+No settings. No account. No data collected.
 
-*Results guaranteed. Savings applied to the website itself.
+A Gary Mustard Enterprises production.
 
-PRIVACY PRACTICES TAB  (read by Google's reviewer only, never shown to users)
-
+---------------------------------------------------------------------------------------------
+PRIVACY PRACTICES TAB  (seen by the reviewer only)
+---------------------------------------------------------------------------------------------
 Single purpose
-Shows a novelty sale banner over the right-hand 30% of web pages on Black Friday only. It does nothing on any other day.
+Displays a decorative sale banner on web pages on Black Friday only.
 
-Host permission justification (content script on all URLs)
-The extension is a Black Friday joke: on that one day it shows a "30% OFF" banner over the right-hand 30% of every web page, so its content script must be able to load on all HTTP/HTTPS pages. On every other day the script checks the date and does nothing. It collects no data, makes no network requests, and does not read or change page content; it only adds its own overlay element, which the user can hide with the toolbar button.
+Host permission justification
+The content script runs on all http and https pages because the banner appears on every page on Black Friday. On any other day it checks the date and stops. It does not read page content, store data or make network requests.
 
-(This version asks for no other permissions, so the activeTab and scripting boxes disappear
-once the new package is uploaded.)
+Remote code
+No, I am not using remote code.
 
-Remote code            No, I am not using remote code.
-Data usage             Tick nothing. Tick the three certifications.
-Privacy policy URL     Not required (no user data is handled). Leave blank.
+Data usage
+Tick nothing. Tick the three certifications.
 
-TEST INSTRUCTIONS TAB  (reviewer only)
-This extension is deliberately inactive except on Black Friday. To see it work, set the computer's date to Friday 27 November 2026 and open or reload any https page: a sale banner covers the right-hand 30% of the page. On that date, clicking the toolbar button hides the banner on the current tab and clicking again brings it back. On any other date nothing is shown and the toolbar button does nothing. No account needed.
+Privacy policy URL
+Leave blank.
 
-BEFORE YOU CAN SUBMIT (Account tab)
-  2-step verification on the Google account
-  Verified contact email
-  Trader / non-trader declaration (non-trader, unless you sell things as a business)
+---------------------------------------------------------------------------------------------
+TEST INSTRUCTIONS TAB  (seen by the reviewer only)
+---------------------------------------------------------------------------------------------
+The extension is active on Black Friday only. To test: set the computer's date to Friday 27 November 2026, then open any website. A banner covers the right-hand 30% of the page (the top third on windows narrower than 769px). On any other date the extension does nothing.
 
+---------------------------------------------------------------------------------------------
 SUBMITTING
-  Untick "Publish automatically after review". Approval then waits up to 30 days;
-  press Publish on Thursday 26 November.
-  Review usually takes a few days, and can take longer for extensions that run on all sites.
+---------------------------------------------------------------------------------------------
+Untick "Publish automatically after review", then Publish on Thursday 26 November.

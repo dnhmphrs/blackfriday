@@ -1,5 +1,5 @@
 // The cut globe as a small transparent loop for the extension's banner: one full turn.
-//   node tools/globe-loop.mjs [frames=48] [size=300]  -> frames/globe-loop/*.png (assemble with store/embed-art.py)
+//   node tools/globe-loop.mjs [frames=48] [size=300]  -> frames/globe-loop/*.png (then tools/banner-images.py))
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import { startServer } from './serve.mjs';
