@@ -175,7 +175,7 @@ globalThis.thirtyOffDesign = (() => {
           </div>
         </div>
         <div class="crawl" data-scrolls><span>${"BLACK FRIDAY ONLY ! &#10022; ".repeat(8)}</span></div>
-        <div class="fine">*30% of every web page will be unavailable for viewing. Black Friday only.</div>
+        <div class="fine">*Savings applied directly to the website. No coupon needed. Void where prohibited. Black Friday only.</div>
       </div>
     </div>
   `;
