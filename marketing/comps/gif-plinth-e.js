@@ -77,7 +77,7 @@ const FORMATS = {
       { t: 'globe', x: 126, y: 202, d: 64, col: { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
       { t: 'sticker', x: 152, y: 178, r: 15, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 44, y: 251, r: 22, lines: ['WOW!'], f: `8px ${PS}` },
-      { t: 'strip', y: 284, dx: 2, s: 'EVERY SITE 30% OFF!', f: `8px ${PS}`, angle: -8, ground: true },
+      { t: 'strip', y: Number(q.get('sy') ?? 253), angle: Number(q.get('sa') ?? -6), dx: 2, s: 'EVERY SITE 30% OFF!', f: `8px ${PS}`, ground: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0, at: [[160, 100], [20, 92], [150, 142]] },
       { t: 'sparkle', x: 166, y: 62, ph: 1, at: [[100, 166], [24, 158], [168, 240]] },
       { t: 'sparkle', x: 82, y: 176, ph: 0, at: [[14, 230], [168, 10], [62, 96]] },
@@ -241,13 +241,14 @@ function cropMask(m) {
 // lettering, a hard navy shadow; the lettering flips black / red on the beat.
 function strip(it) {
   const m = textMask(it.s, it.f);
-  const L = W + 40, Hs = m.h + 8;
+  const L = W + 60, Hs = m.h + 14; // chunky: a deep band around one line of lettering
   const frames = ['black', 'red'].map((ink) => {
     const flat = paint(L, Hs, (x, y) => {
       if (y === 0 || y === Hs - 1) return 'black';
-      if (y === 1) return 'cream';
-      if (y === Hs - 2) return 'gold';
-      const tx = x - Math.round((L - m.w) / 2) - (it.dx || 0), ty = y - 4;
+      if (y === 1 || y === 2) return 'cream';
+      if (y === Hs - 2 || y === Hs - 3) return 'gold';
+      if (y === 4 || y === Hs - 5) return (x >> 1) % 2 ? 'gold' : 'yellow'; // a stitched rule along each edge
+      const tx = x - Math.round((L - m.w) / 2) - (it.dx || 0), ty = y - 7;
       if (at(m, tx, ty)) return ink;
       return 'yellow';
     });
@@ -322,7 +323,7 @@ for (const it of F.items) {
     layers.push(sticker(it));
   } else if (it.t === 'sparkle') {
     layers.push(sparkle(it));
-  } else if (it.t === 'strip') {
+  } else if (it.t === 'strip' && q.get('strip') !== '0') {
     layers.push(strip(it));
   } else if (it.t === 'globe') {
     globeItem = it;
