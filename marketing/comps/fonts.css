@@ -83,3 +83,13 @@
 @font-face { font-family: "Bebas Neue"; font-weight: 400; src: url("/node_modules/@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2") format("woff2"); }
 @font-face { font-family: "Permanent Marker"; font-weight: 400; src: url("/node_modules/@fontsource/permanent-marker/files/permanent-marker-latin-400-normal.woff2") format("woff2"); }
 @font-face { font-family: "Tilt Neon"; font-weight: 400; src: url("/node_modules/@fontsource/tilt-neon/files/tilt-neon-latin-400-normal.woff2") format("woff2"); }
+
+/* Early-web typefaces (all open licence): pixel and default-browser lookalikes. */
+@font-face { font-family: "VT323"; font-weight: 400; src: url("/node_modules/@fontsource/vt323/files/vt323-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Press Start 2P"; font-weight: 400; src: url("/node_modules/@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Silkscreen"; font-weight: 400; src: url("/node_modules/@fontsource/silkscreen/files/silkscreen-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Silkscreen"; font-weight: 700; src: url("/node_modules/@fontsource/silkscreen/files/silkscreen-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Comic Neue"; font-weight: 400; src: url("/node_modules/@fontsource/comic-neue/files/comic-neue-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Comic Neue"; font-weight: 700; src: url("/node_modules/@fontsource/comic-neue/files/comic-neue-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Cousine"; font-weight: 400; src: url("/node_modules/@fontsource/cousine/files/cousine-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Cousine"; font-weight: 700; src: url("/node_modules/@fontsource/cousine/files/cousine-latin-700-normal.woff2") format("woff2"); }
