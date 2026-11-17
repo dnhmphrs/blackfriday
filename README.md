@@ -12,8 +12,8 @@ src/
   manifest.json   no permissions; one content script on http and https pages
   content.js      the date check, and puts the banner on the page
   banner.css      the banner's layout
-  images/         the turning globe and the Gary Mustard Enterprises lockup
-  fonts/          the advert's typefaces (SIL Open Font License)
+  images/         the banner artwork (animated WebP) and the marquee strips
+  fonts/          Inter, for the credit line (SIL Open Font License)
   icons/
 ```
 
@@ -25,5 +25,6 @@ src/
 - **Package:** `./package.sh` writes `black-friday.zip`, the file to upload to the Chrome Web
   Store. Raise `version` in the manifest first.
 
-`marketing/` renders the adverts, the banner pictures, the store images and the icons:
-`cd marketing && npm install && ./make-pack.sh`. `tools/banner-images.py` writes `src/images/`.
+`marketing/` renders the adverts, the banner artwork, the store images and the icons. The design
+is `marketing/comps/gif-banner.*`; `cd marketing && npm install && node tools/banner-export.mjs`
+writes `src/images/` from it.

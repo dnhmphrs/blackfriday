@@ -78,12 +78,13 @@ const probe = () => {
     count: document.querySelectorAll('thirty-off-everything').length,
     parent: host.parentNode?.nodeName,
     topLayer,
-    styled: frame && getComputedStyle(frame).display === 'flex',
+    styled: frame && getComputedStyle(frame).overflow === 'hidden' && getComputedStyle(frame).backgroundColor === 'rgb(0, 51, 255)',
     frame: rect(frame),
-    pct: rect(s.querySelector('.offer .pct')),
-    price: visible('.price'), big: visible('.price .big'), crawl: visible('.crawl'), cards: visible('.cards'),
-    images: [...s.querySelectorAll('img')].map((i) => i.naturalWidth),
-    fonts: document.fonts.check('40px "TOE Black"') && [...document.fonts].filter((f) => f.family.replace(/"/g, '').startsWith('TOE ') && f.status === 'loaded').length,
+    art: rect([...s.querySelectorAll('.art')].find((i) => getComputedStyle(i).display !== 'none')),
+    ticker: rect(s.querySelector('.ticker')),
+    credit: visible('.credit') && s.querySelector('.credit').textContent,
+    images: [...s.querySelectorAll('img')].filter((i) => getComputedStyle(i).display !== 'none').map((i) => i.naturalWidth),
+    fonts: [...document.fonts].filter((f) => f.family.replace(/"/g, '') === 'TOE Inter' && f.status === 'loaded').length,
     viewport: [document.documentElement.clientWidth, innerHeight],
     hitRight: document.elementFromPoint(innerWidth - 60, innerHeight / 2)?.nodeName,
     hitLeft: document.elementFromPoint(100, 200)?.nodeName,
@@ -196,8 +197,9 @@ console.log('\n# 4. The banner (Black Friday)');
   const [vw, vh] = base.viewport;
   check('right-hand 30%, full height', Math.abs(base.frame[2] - vw * 0.3) <= 2 && base.frame[1] === 0 && base.frame[3] === vh && base.frame[0] + base.frame[2] === vw, JSON.stringify(base.frame));
   check('under <html>, in the top layer', base.parent === 'HTML' && base.topLayer === true);
-  check('stylesheet, all three pictures and all five fonts loaded', base.styled && base.images.length === 3 && base.images.every((w) => w > 0) && base.fonts === 5, `${JSON.stringify(base.images)} fonts ${base.fonts}`);
-  check('price card, 70%, payment cards and crawl all shown', base.price && base.big && base.cards && base.crawl);
+  check('stylesheet, artwork, ticker and font loaded', base.styled && base.images.length === 3 && base.images.every((w) => w > 0) && base.fonts === 1, `${JSON.stringify(base.images)} font ${base.fonts}`);
+  check('credit line reads "Brought to you by Gary Mustard Enterprises"', base.credit === 'Brought to you by Gary Mustard Enterprises', base.credit);
+  check('the ticker sits on the bottom edge', base.ticker && Math.abs(base.ticker[1] + base.ticker[3] - (base.frame[1] + base.frame[3])) <= 1, JSON.stringify(base.ticker));
   check('blocks the right side, left side still clickable', base.hitRight === 'THIRTY-OFF-EVERYTHING' && base.hitLeft !== 'THIRTY-OFF-EVERYTHING', `${base.hitRight} / ${base.hitLeft}`);
   await page.mouse.move(400, 400); await page.mouse.wheel(0, 600); await sleep(200);
   const y1 = await page.evaluate(() => scrollY);
@@ -210,13 +212,13 @@ console.log('\n# 4. The banner (Black Friday)');
   for (const [w, h] of [[1366, 650], [1920, 1080], [2560, 1300], [1024, 600], [960, 1050]]) {
     await page.setViewportSize({ width: w, height: h }); await sleep(400);
     const p = await page.evaluate(probe);
-    const fits = p.pct && p.pct[0] >= p.frame[0] - 1 && p.pct[0] + p.pct[2] <= p.frame[0] + p.frame[2] + 1;
-    check(`${w}x${h}: price card and 70% shown, offer inside the banner`, p.price && p.big && fits, JSON.stringify(p.frame));
+    const fits = p.art && p.art[0] >= p.frame[0] - 1 && p.art[0] + p.art[2] <= p.frame[0] + p.frame[2] + 1 && p.art[1] + p.art[3] <= p.ticker[1];
+    check(`${w}x${h}: artwork inside the banner and above the ticker, ticker on the bottom edge`, fits && Math.abs(p.ticker[1] + p.ticker[3] - (p.frame[1] + p.frame[3])) <= 1, `${JSON.stringify(p.art)} ${JSON.stringify(p.ticker)}`);
   }
   for (const [w, h] of [[390, 844], [700, 900]]) {
     await page.setViewportSize({ width: w, height: h }); await sleep(400);
     const p = await page.evaluate(probe);
-    check(`${w}x${h}: across the top third, full width`, p.frame[0] === 0 && p.frame[1] === 0 && p.frame[2] === p.viewport[0] && Math.abs(p.frame[3] - p.viewport[1] * 0.33) <= 2, JSON.stringify(p.frame));
+    check(`${w}x${h}: across the top third, full width, ticker on its bottom edge`, p.frame[0] === 0 && p.frame[1] === 0 && p.frame[2] === p.viewport[0] && Math.abs(p.frame[3] - p.viewport[1] * 0.33) <= 2 && Math.abs(p.ticker[1] + p.ticker[3] - (p.frame[1] + p.frame[3])) <= 1, JSON.stringify(p.frame));
   }
   await page.setViewportSize({ width: 1280, height: 800 });
   check('no errors', errs.length === 0, errs.join(' | '));
@@ -234,13 +236,13 @@ console.log('\n# 5. Hostile and unusual pages (Black Friday)');
 
   await page.goto(url('/hostile', BF)); await sleep(1200);
   const h = await page.evaluate(probe);
-  check('hostile CSS: same geometry and type size as on a plain page', JSON.stringify(h.frame) === JSON.stringify(base.frame) && JSON.stringify(h.pct) === JSON.stringify(base.pct), `${JSON.stringify(h.frame)} ${JSON.stringify(h.pct)}`);
+  check('hostile CSS: same geometry as on a plain page', JSON.stringify(h.frame) === JSON.stringify(base.frame) && JSON.stringify(h.art) === JSON.stringify(base.art), `${JSON.stringify(h.frame)} ${JSON.stringify(h.art)}`);
   check('hostile CSS: above a maximum z-index wall added later', h.hitRight === 'THIRTY-OFF-EVERYTHING', h.hitRight);
 
   await page.goto(url('/csp', BF)); await sleep(1200);
   const cdp = await context.newCDPSession(page);
   const c = (await cdp.send('Runtime.evaluate', { expression: `(${probe})()`, returnByValue: true })).result.value;
-  check('strict Content-Security-Policy: styled, pictures and fonts loaded', c.present && c.styled && c.images.every((w) => w > 0) && c.fonts === 5 && JSON.stringify(c.frame) === JSON.stringify(base.frame), `${JSON.stringify(c.images)} fonts ${c.fonts}`);
+  check('strict Content-Security-Policy: styled, pictures and font loaded', c.present && c.styled && c.images.every((w) => w > 0) && c.fonts === 1 && JSON.stringify(c.frame) === JSON.stringify(base.frame), `${JSON.stringify(c.images)} font ${c.fonts}`);
 
   await page.goto(url('/frames', BF)); await sleep(800);
   const inFrames = await Promise.all(page.frames().slice(1).map((f) => f.evaluate(() => document.querySelectorAll('thirty-off-everything').length)));

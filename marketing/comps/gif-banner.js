@@ -93,7 +93,9 @@ const FORMATS = {
 const format = FORMATS[q.get('format')] ? q.get('format') : '1x1';
 const F = { ...FORMATS[format] };
 if (Number(q.get('h')) > 0) F.h = Math.round(Number(q.get('h')));
-const EDGE = q.get('edge') === 'serrated', TICK_SERR = q.get('ticker') === 'serrated', CREDIT = q.get('credit') !== '0';
+// ?part=body draws only the artwork above the footer: what the live banner shows as an image.
+const BODY_ONLY = q.get('part') === 'body';
+const EDGE = !BODY_ONLY && q.get('edge') === 'serrated', TICK_SERR = q.get('ticker') === 'serrated', CREDIT = q.get('credit') !== '0';
 const OUTSIDE = '#' + (q.get('out') || 'ffffff').replace(/[^0-9a-f]/gi, '').slice(0, 6);
 const P = F.P, W = Math.ceil(F.w / P), H = Math.ceil(F.h / P);
 
@@ -110,7 +112,7 @@ await Promise.all(['600 30px Inter', `8px ${PS}`, `16px ${PS}`, `8px ${SK}`, `70
 const credit = document.createElement('div');
 credit.id = 'credit';
 credit.textContent = 'Brought to you by Gary Mustard Enterprises';
-if (CREDIT) stage.append(credit);
+if (CREDIT && !BODY_ONLY) stage.append(credit);
 
 // ---------- the GIF canvas ----------
 const gif = $('gif');
@@ -468,11 +470,11 @@ function setTime(t) {
   g.drawImage(bgCanvas, 0, 0);
   for (const L of layers) {
     if (L.globe) { g.drawImage(globeOut, Math.round(globeItem.x - D / 2), Math.round(globeItem.y - D / 2)); continue; }
-    if (L.marquee) { drawMarquee(t); continue; }
+    if (L.marquee) { if (!BODY_ONLY) drawMarquee(t); continue; }
     const k = L.frames.length > 1 ? Math.floor(t * L.rate + 1e-6) % 2 : 0;
     g.drawImage(L.frames[k], Math.round(L.x), Math.round(L.y));
   }
-  if (TICK_SERR) cutTicker();
+  if (TICK_SERR && !BODY_ONLY) cutTicker();
   if (EDGE) cutEdges();
 }
 
@@ -483,6 +485,13 @@ if (format === 'banner-h') credit.classList.add('left');
 // What shows through the teeth: the page, in the live banner; a flat colour in a render.
 if (EDGE || TICK_SERR) { stage.style.background = OUTSIDE; document.body.style.background = OUTSIDE; }
 
-window.comp = { duration: DURATION, fps: FPS, width: F.w, height: F.h, glitches: [], setTime, three: { THREE, scene, camera, renderer, pivot, globe } };
+// For the extension's banner: the GIF canvas at its own resolution, and the marquee's pieces.
+function pixels() { return gif.toDataURL('image/png'); }
+function marqueeParts() {
+  const frame = canvas(1, marquee.h); frame.getContext('2d').drawImage(marquee.frame, 0, 0, 1, marquee.h, 0, 0, 1, marquee.h);
+  return { strip: marquee.strip.toDataURL('image/png'), frame: frame.toDataURL('image/png'), h: marquee.h, gifW: W, gifH: H, speed: 60,
+           stripTop: 3 + Math.floor((marquee.h - 5 - marquee.strip.height) / 2) + 1 };
+}
+window.comp = { duration: DURATION, fps: FPS, width: F.w, height: F.h, glitches: [], setTime, pixels, marqueeParts, three: { THREE, scene, camera, renderer, pivot, globe } };
 setTime(Number(q.get('t') || 0));
 window.ready = true;

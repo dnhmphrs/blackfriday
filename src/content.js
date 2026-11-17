@@ -10,15 +10,14 @@
   // to 29th. Local date on purpose: the UTC date is wrong for most of the world for part of it.
   const isBlackFriday = (d) => d.getMonth() === 10 && d.getDay() === 5 && d.getDate() >= 23 && d.getDate() <= 29;
 
-  const FONTS = [
-    ["TOE Black", "fonts/archivo-black.woff2", {}],
-    ["TOE Arimo", "fonts/arimo-bold-italic.woff2", { weight: "700", style: "italic" }],
-    ["TOE Antonio", "fonts/antonio-light.woff2", { weight: "300" }],
-    ["TOE Antonio", "fonts/antonio-semibold.woff2", { weight: "600" }],
-    ["TOE Tinos", "fonts/tinos-bold-italic.woff2", { weight: "700", style: "italic" }],
-  ];
-  const SCROLL = "But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ";
-  const CRAWL = "BLACK FRIDAY ONLY ! ✦ ";
+  // The page-facing edge of the banner: "straight", or "serrated" like a coupon.
+  const EDGE = "straight";
+
+  // The artwork's size in banner pixels (see banner.css), and the footer under it.
+  const ART = { desktop: { w: 180, h: 309 }, phone: { w: 234, h: 143 } };
+  const FOOT = { desktop: 31, phone: 26 }; // credit line + marquee, in banner pixels
+  const TOOTH = { period: 8, depth: 4 }; // coupon teeth, in banner pixels
+  const SPEED = 60; // the marquee, in banner pixels a second
 
   // The host covers the viewport and lets clicks through; .frame in banner.css is the solid
   // part. !important because for !important the shadow tree outranks the page's styles.
@@ -28,35 +27,23 @@
     @media print { :host { display: none !important; } }`;
 
   const url = (path) => chrome.runtime.getURL(path);
-  const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches ? "-still" : "";
 
   function html() {
     return `
       <link rel="stylesheet" href="${url("banner.css")}">
-      <div class="frame" role="img" aria-label="World Wide Sale: 30% off the entire internet. Black Friday only.">
-        <div class="sheet">
-          <div class="glow"></div>
-          <div class="strip"><span>${SCROLL.repeat(6)}</span></div>
-          <img class="bug" alt="" src="${url("images/gme-white.webp")}">
-          <div class="title"><b>World Wide</b> <b>Sale</b></div>
-          <div class="pill">Black Friday</div>
-          <div class="oval"><span>As Seen On<br>Every Website</span></div>
-          <div class="offer">
-            <div class="pct">30%</div>
-            <div class="row"><span class="off">OFF</span><span class="what">THE ENTIRE<br>INTERNET !</span></div>
-          </div>
-          <div class="cards"><i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i></div>
-          <div class="plinth"><img alt="" src="${url("images/gme-navy.webp")}"></div>
-          <img class="hero" alt="" src="${url(still() ? "images/globe-still.webp" : "images/globe.webp")}">
-          <i class="spark s1"></i><i class="spark s2"></i><i class="spark s3"></i>
-          <div class="price">
-            <div class="head">The Internet (All Of It)</div>
-            <div class="line">WAS: <s>100%</s></div>
-            <div class="line">NOW:</div>
-            <div class="big">70%</div>
-          </div>
-        </div>
-        <div class="foot"><div class="sheet"><div class="crawl"><span>${CRAWL.repeat(12)}</span></div></div></div>
+      <div class="frame" role="img" aria-label="30% off everything on the internet. Black Friday only! Brought to you by Gary Mustard Enterprises.">
+        <div class="top"><div class="sheet">
+          <img class="art desktop" alt="" src="${url(`images/desktop${still}.webp`)}">
+          <img class="art phone" alt="" src="${url(`images/phone${still}.webp`)}">
+        </div></div>
+        <div class="foot"><div class="sheet">
+          <div class="credit">Brought to you by Gary Mustard Enterprises</div>
+          <div class="ticker"><div class="run">
+            <img class="desktop" alt="" src="${url("images/ticker-desktop.png")}"><img class="desktop" alt="" src="${url("images/ticker-desktop.png")}">
+            <img class="phone" alt="" src="${url("images/ticker-phone.png")}"><img class="phone" alt="" src="${url("images/ticker-phone.png")}">
+          </div></div>
+        </div></div>
       </div>`;
   }
 
@@ -64,18 +51,49 @@
   let wanted = false;
   let appends = 0;
   let midnightTimer;
-  let fontsAdded = false;
+  let fontAdded = false;
 
-  function addFonts() {
-    if (fontsAdded) return;
-    fontsAdded = true;
-    for (const [family, file, descriptors] of FONTS) {
-      try {
-        const face = new FontFace(family, `url(${url(file)})`, descriptors);
-        document.fonts.add(face);
-        face.load().catch(() => {});
-      } catch {}
+  function addFont() {
+    if (fontAdded) return;
+    fontAdded = true;
+    try {
+      const face = new FontFace("TOE Inter", `url(${url("fonts/inter-semibold.woff2")})`, { weight: "600" });
+      document.fonts.add(face);
+      face.load().catch(() => {});
+    } catch {}
+  }
+
+  // Size everything to the frame: one zoom for the artwork and footer, so a banner pixel is the
+  // same size in both; the footer runs the full width; the marquee scrolls at a steady speed.
+  function fit(shadow) {
+    const frame = shadow.querySelector(".frame");
+    const [top, foot] = shadow.querySelectorAll(".sheet");
+    const phone = matchMedia("(max-width: 768px)").matches;
+    const art = ART[phone ? "phone" : "desktop"];
+    const w = frame.clientWidth, h = frame.clientHeight;
+    const zoom = Math.min(w / art.w, h / (art.h + 6 + FOOT[phone ? "phone" : "desktop"]));
+    if (!(zoom > 0)) return;
+    top.style.zoom = foot.style.zoom = zoom;
+    foot.style.width = w / zoom + "px";
+    const strip = shadow.querySelector(`.run img.${phone ? "phone" : "desktop"}`);
+    if (strip.naturalWidth) shadow.querySelector(".run").style.animationDuration = strip.naturalWidth / SPEED + "s";
+    // Steps of one banner pixel, like a real GIF marquee.
+    if (strip.naturalWidth) shadow.querySelector(".run").style.animationTimingFunction = `steps(${strip.naturalWidth})`;
+    frame.classList.toggle("serrated", EDGE === "serrated");
+    frame.style.clipPath = EDGE === "serrated" ? teeth(w, h, zoom, phone) : "";
+  }
+
+  // A zigzag along the page-facing edge: the left edge of the side banner, the bottom of the strip.
+  function teeth(w, h, zoom, phone) {
+    const p = TOOTH.period * zoom, d = TOOTH.depth * zoom, points = [];
+    if (phone) {
+      points.push("0 0", `${w}px 0`);
+      for (let x = w; x > -p; x -= p) points.push(`${x}px ${h}px`, `${x - p / 2}px ${h - d}px`);
+    } else {
+      points.push(`${w}px 0`, `${w}px ${h}px`);
+      for (let y = h; y > -p; y -= p) points.push(`0 ${y}px`, `${d}px ${y - p / 2}px`);
     }
+    return `polygon(${points.join(", ")})`;
   }
 
   function createHost() {
@@ -85,16 +103,10 @@
     const parsed = new DOMParser().parseFromString(`<style>${HOST_CSS}</style>${html()}`, "text/html");
     const shadow = element.attachShadow({ mode: "open" });
     shadow.append(...parsed.head.childNodes, ...parsed.body.childNodes);
-    // The sheet has a fixed size in pixels; zoom it to fit the frame, whatever its shape.
-    const frame = shadow.querySelector(".frame");
-    const sheets = shadow.querySelectorAll(".sheet");
-    const fit = new ResizeObserver(() => {
-      if (!element.isConnected) return fit.disconnect();
-      const narrow = matchMedia("(max-width: 768px)").matches;
-      const zoom = Math.min(frame.clientWidth / 1000, frame.clientHeight / (narrow ? 713 : 1770));
-      if (zoom > 0) for (const sheet of sheets) sheet.style.zoom = zoom;
-    });
-    fit.observe(frame);
+    const refit = () => (element.isConnected ? fit(shadow) : observer.disconnect());
+    const observer = new ResizeObserver(refit);
+    observer.observe(shadow.querySelector(".frame"));
+    for (const img of shadow.querySelectorAll("img")) img.addEventListener("load", refit);
     return element;
   }
 
@@ -114,7 +126,7 @@
     if (!(root instanceof HTMLHtmlElement)) return;
     keeper.observe(root, { childList: true });
     if (!document.body) return;
-    addFonts();
+    addFont();
     host ??= createHost();
     if (host.parentNode !== root) {
       if (appends++ > 20) return; // the page removes it every time; stop fighting
