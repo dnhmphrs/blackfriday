@@ -53,7 +53,7 @@ const FORMATS = {
       { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 10, y: 148, align: 'l', st: 'body' },
       { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 10, y: 174, align: 'l', st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 10, y: 192, align: 'l', st: 'only' },
-      { t: 'globe', x: 222, y: 90, d: 90, col: { shaft: 1.5, wide: 1.2, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
+      { t: 'globe', x: 222, y: 90, d: 90, col: { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
       { t: 'sticker', x: 250, y: 56, r: 18, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 112, y: 222, r: 24, lines: ['NEW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 140, y: 30, ph: 0 },
@@ -74,7 +74,7 @@ const FORMATS = {
       { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 51, y: 176, st: 'only' },
       { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 51, y: 194, st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 51, y: 212, st: 'only' },
-      { t: 'globe', x: 126, y: 202, d: 64, col: { shaft: 1.5, wide: 1.2, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
+      { t: 'globe', x: 126, y: 202, d: 64, col: { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
       { t: 'sticker', x: 152, y: 178, r: 15, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 46, y: 270, r: 24, lines: ['WOW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
@@ -92,7 +92,7 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 196, y: 37, d: 64, col: { shaft: 1.5, wide: 1.2, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
+      { t: 'globe', x: 196, y: 37, d: 64, col: { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
       { t: 'sticker', x: 172, y: 30, r: 14, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 138, y: 98, r: 18, lines: ['HOT!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 146, y: 22, ph: 1 },
@@ -193,7 +193,8 @@ const P = F.P, W = Math.ceil(F.w / P), H = Math.ceil(F.h / P);
 // The monument stands on the marquee: when ?h= makes the banner taller (the footer stays on the
 // bottom edge), the globe, its column, its sticker (and items marked ground) move down with it rather than float.
 const GROUND = Math.max(0, H - Math.ceil(FORMATS[format].h / P));
-F.items = F.items.map((it) => (it.t === 'globe' || it.t === 'sticker' || it.ground ? { ...it, y: it.y + GROUND } : it));
+// Here the globe stays level with the message and the plinth's shaft grows down to the marquee.
+F.items = F.items.map((it) => (it.ground ? { ...it, y: it.y + GROUND } : it.t === 'globe' && it.col ? { ...it, col: { ...it.col, shaft: it.col.shaft + (GROUND * 2.12) / it.d / (it.col.size || 1) } } : it));
 
 const stage = document.getElementById('stage');
 stage.classList.add('f-' + format);
@@ -356,7 +357,7 @@ function sticker(it) {
   const body = (x, y) => inDisc(x, y) && !lifted(x, y);
   const word = sprite(textMask(it.s, it.f), { fill: 'white', band: 'white', hi: 'white', line: 0, ext: 1 });
   const wm = maskOf(word);
-  const frames = ['pink', 'yellow'].map((fill) => {
+  const frames = ['pink', 'pink'].map((fill) => {
   const o = paint(N, N, (x, y) => {
     if (flap(x, y)) {
       const s = (x - cx) + (y - cy);
@@ -382,7 +383,10 @@ function sticker(it) {
   return o;
   });
   // it flashes pink / yellow on the off-beat to the bursts, like a 1997 "SALE!" sticker
-  return { frames: [frames[1], frames[0]], x: Math.round(it.x - cx), y: Math.round(it.y - cy), rate: 2 };
+  // it hops a pixel up and down on the off-beat to the bursts
+  const up = paint(N, N + 2, () => null); up.getContext('2d').drawImage(frames[0], 0, 0);
+  const down = paint(N, N + 2, () => null); down.getContext('2d').drawImage(frames[0], 0, 2);
+  return { frames: [up, down], x: Math.round(it.x - cx), y: Math.round(it.y - cy) - 1, rate: 2 };
 }
 
 // A pixel sparkle: two frames on the beat, a small plus and a long four-point glint.
