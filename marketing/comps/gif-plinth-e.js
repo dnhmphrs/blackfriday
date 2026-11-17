@@ -77,7 +77,7 @@ const FORMATS = {
       { t: 'globe', x: 126, y: 202, d: 64, col: { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
       { t: 'sticker', x: 152, y: 178, r: 15, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 44, y: 251, r: 22, lines: ['WOW!'], f: `8px ${PS}` },
-      { t: 'logo', src: '/assets/gme/family-gme-box.png', x: Number(q.get('lx') ?? 44), y: Number(q.get('ly') ?? 294), w: Number(q.get('lw') ?? 62), angle: Number(q.get('la') ?? 0), ground: true },
+            { t: 'strip', sub: true, y: Number(q.get('sy') ?? 253) + 17, dx: 3, s: 'GARY MUSTARD ENTERPRISES', f: `700 8px ${SK}`, angle: Number(q.get('sa') ?? -6), ground: true },
       { t: 'strip', y: Number(q.get('sy') ?? 253), angle: Number(q.get('sa') ?? -6), dx: 2, s: 'EVERY SITE 30% OFF!', f: `8px ${PS}`, ground: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0, at: [[160, 100], [20, 92], [150, 142]] },
       { t: 'sparkle', x: 166, y: 62, ph: 1, at: [[100, 166], [24, 158], [168, 240]] },
@@ -267,9 +267,16 @@ async function logo(it) {
 // lettering, a hard navy shadow; the lettering flips black / red on the beat.
 function strip(it) {
   const m = textMask(it.s, it.f);
-  const L = W + 60, Hs = m.h + 14; // chunky: a deep band around one line of lettering
-  const frames = ['black', 'red'].map((ink) => {
+  const L = W + 60, Hs = it.sub ? m.h + 6 : m.h + 14; // chunky: a deep band around one line of lettering; the sub banner is slimmer
+  // the sub banner: a slim navy tape tucked under the yellow one, white lettering, no flashing
+  const frames = (it.sub ? ['white'] : ['black', 'red']).map((ink) => {
     const flat = paint(L, Hs, (x, y) => {
+      if (it.sub) {
+        if (y === 0 || y === Hs - 1) return 'black';
+        if (y === 1) return 'blue';
+        const tx = x - Math.round((L - m.w) / 2) - (it.dx || 0), ty = y - 3;
+        return at(m, tx, ty) ? ink : 'navy';
+      }
       if (y === 0 || y === Hs - 1) return 'black';
       if (y === 1 || y === 2) return 'cream';
       if (y === Hs - 2 || y === Hs - 3) return 'gold';
