@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>The Specimen Sale</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-x-specimen.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="sky"></div>
+  <div class="halo" id="halo"></div>
+
+  <header class="doc">
+    <div class="c1">Gary Mustard<br>Enterprises</div>
+    <div class="c2">EST2026</div>
+    <div class="c3" id="doc-c3"></div>
+  </header>
+
+  <div class="kicker" id="kicker"></div>
+  <h1 class="bf" id="bf"></h1>
+
+  <!-- the scroll: a GME paper band with pinstripes, like the SYNERGY band on the sheet -->
+  <div class="band" id="band"><div class="track" id="track"></div></div>
+
+  <canvas id="gl"></canvas>
+  <div id="glint"></div>
+
+  <svg class="leaders" id="leaders"></svg>
+  <div class="label" id="lab-cut"></div>
+  <div class="label" id="lab-core"></div>
+  <div class="label" id="lab-crust"></div>
+  <div class="label fig" id="fig"></div>
+
+  <div class="offer" id="offer">
+    <div class="big" id="big"></div>
+    <div class="sub" id="sub"></div>
+  </div>
+
+  <div class="row" id="row">
+    <div class="timer" id="timer">
+      <div class="ends">Ends in</div>
+      <div class="cells">
+        <div class="cell"><b id="hh">23</b><span>Hrs</span></div><em>:</em>
+        <div class="cell"><b id="mm">59</b><span>Min</span></div><em>:</em>
+        <div class="cell"><b id="ss">59</b><span>Sec</span></div>
+      </div>
+    </div>
+    <a class="cta" id="cta"><span id="cta-label"></span><i class="sheen" id="sheen"></i></a>
+  </div>
+
+  <footer class="foot" id="foot">
+    <i class="mark"></i>
+    <p class="fine" id="fine"></p>
+  </footer>
+
+  <canvas id="dust"></canvas>
+  <div class="grain" id="grain"></div>
+</div>
+<script type="module" src="./gme-x-specimen.js"></script>
+</body>
+</html>

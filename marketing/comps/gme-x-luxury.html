@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>The Luxury House Email</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-x-luxury.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="sky"></div>
+  <div class="halo" id="halo"></div>
+
+  <!-- the top of the email: who it is from, the preheader, and the house's corner labels -->
+  <header class="head" id="head">
+    <div class="c1" id="h1"></div>
+    <div class="c2" id="h2"></div>
+    <div class="c3" id="h3"></div>
+  </header>
+  <p class="pre" id="pre"></p>
+
+  <div class="kicker" id="kicker"><span>Starts now</span></div>
+  <h1 class="bf" id="bf"></h1>
+
+  <canvas id="gl"></canvas>
+  <div id="glint"></div>
+  <svg class="leaders" id="leaders"></svg>
+  <div class="label" id="lab-core"></div>
+  <div class="label fig" id="lab-fig"></div>
+
+  <div class="offer" id="offer">
+    <div class="big" id="big"></div>
+    <p class="scope" id="scope"></p>
+  </div>
+
+  <div class="timer" id="timer">
+    <div class="ends" id="ends">Ends in</div>
+    <div class="cells">
+      <div class="cell"><b id="hh">23</b><span>Hours</span></div><i></i>
+      <div class="cell"><b id="mm">59</b><span>Minutes</span></div><i></i>
+      <div class="cell"><b id="ss">59</b><span>Seconds</span></div>
+    </div>
+  </div>
+
+  <a class="cta" id="cta"><i class="sheen" id="sheen"></i><span id="cta-label"></span></a>
+
+  <!-- the GME paper band: the owner's five lines, round and round -->
+  <div class="band" id="band">
+    <div class="rail"><div class="run" id="run"></div></div>
+    <div class="cap"><i class="globe"></i></div>
+  </div>
+
+  <footer class="foot" id="foot">
+    <p class="fine" id="fine"></p>
+    <i class="lock" id="lock"></i>
+  </footer>
+
+  <canvas id="dust"></canvas>
+  <div class="grain" id="grain"></div>
+</div>
+<script type="module" src="./gme-x-luxury.js"></script>
+</body>
+</html>

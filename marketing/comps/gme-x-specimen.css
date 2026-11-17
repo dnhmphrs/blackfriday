@@ -1,0 +1,98 @@
+/* The Specimen Sale: B6's sale frame around A4's museum cutaway, in the GME sheet's sky. */
+:root {
+  --ink: #06091a;
+  --navy: #0a1638;
+  --blue: #1f4c9e;
+  --paper: #dedcd3;
+  --paper-ink: #11131c;
+  --mustard: #d9a632;
+  --mustard-hi: #f2c654;
+  --red: #e2271d;
+  --white: #f1efe8;
+  --serif: "EB Garamond", "Cormorant Garamond", serif;
+  --sans: "Libre Franklin", "Inter", sans-serif;
+  --cond: "Anton", "Oswald", sans-serif;
+}
+html, body { margin: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: var(--navy); color: var(--white); font-family: var(--sans); }
+#stage > * { position: absolute; }
+
+.sky { inset: 0; background: var(--sky); }
+.halo { inset: 0; pointer-events: none; }
+#gl { left: 0; top: 0; }
+#dust, .grain { inset: 0; pointer-events: none; }
+#dust { width: 100%; height: 100%; }
+.grain { mix-blend-mode: overlay; opacity: 0.55; background-size: 384px 384px; }
+
+/* document header, as on the brand sheet */
+.doc { left: var(--gut); right: var(--gut); top: var(--docTop); display: flex; justify-content: space-between; font: 500 var(--docSize)/1.16 var(--sans); letter-spacing: 0.005em; color: rgba(241, 239, 232, 0.92); }
+.doc .c2 { position: absolute; left: 50%; transform: translateX(-50%); }
+.doc .c3 { text-align: right; }
+
+/* a quiet kicker: two hairlines and the date */
+.kicker { display: flex; align-items: center; gap: 0.9em; font: 600 var(--kick)/1 var(--sans); letter-spacing: 0.28em; text-transform: uppercase; color: var(--mustard-hi); white-space: nowrap; }
+.kicker::before, .kicker::after { content: ""; flex: 1; height: 1.5px; background: rgba(241, 239, 232, 0.4); }
+.kicker:empty { display: none; }
+
+/* BLACK FRIDAY: B6's condensed sale voice, printed flat in paper white */
+.bf { margin: 0; font: 400 100px/0.84 var(--cond); text-transform: uppercase; letter-spacing: 0.004em; white-space: nowrap; color: var(--white); text-align: center; }
+.bf .line { display: block; }
+
+/* 30% off: A4's Garamond, at sale size, in the core's mustard */
+.big { font: 500 100px/0.86 var(--serif); letter-spacing: -0.03em; white-space: nowrap; color: var(--mustard-hi); font-feature-settings: "lnum" 1, "liga" 1, "kern" 1;
+  background: linear-gradient(180deg, #f7d878 0%, #eebf4a 45%, #d79e2a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.big .pc { letter-spacing: -0.02em; }
+.sub { margin-top: var(--subGap); font: italic 400 var(--sub)/1.1 var(--serif); color: rgba(241, 239, 232, 0.94); white-space: nowrap; font-feature-settings: "liga" 1, "dlig" 1; }
+.offer { text-align: var(--align, left); }
+
+/* ---------- the scroll ---------- */
+.band { left: 0; right: 0; height: var(--bandH); overflow: hidden; background: var(--paper);
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.2), 0 10px 30px rgba(0, 0, 0, 0.25); }
+.band::before, .band::after { content: ""; position: absolute; left: 0; right: 0; height: var(--pinH); z-index: 1;
+  background: repeating-linear-gradient(180deg, var(--paper-ink) 0 var(--pinW), transparent var(--pinW) var(--pinStep)); opacity: 0.85; }
+.band::before { top: var(--pinPad); }
+.band::after { bottom: var(--pinPad); }
+.track { position: absolute; left: 0; top: 0; bottom: 0; display: flex; align-items: center; white-space: nowrap; will-change: transform; }
+.track .item { font: italic 700 var(--scroll)/1 var(--serif); color: var(--paper-ink); letter-spacing: 0.005em; padding: 0 calc(var(--scroll) * 0.5); font-feature-settings: "liga" 1, "kern" 1; }
+.track .sep { flex: none; width: calc(var(--scroll) * 0.62); height: calc(var(--scroll) * 0.62); }
+.track .sep.globe { width: calc(var(--scroll) * 0.6); height: calc(var(--scroll) * 1.0); }
+
+/* ---------- specimen labels ---------- */
+.leaders { left: 0; top: 0; overflow: visible; }
+.leaders line, .leaders path { stroke: rgba(241, 239, 232, 0.82); stroke-width: var(--leadW); fill: none; }
+.leaders circle { fill: var(--white); }
+.leaders circle.ring { fill: none; stroke: rgba(241, 239, 232, 0.85); stroke-width: var(--leadW); }
+.leaders path.ghost { stroke: rgba(241, 239, 232, 0.5); stroke-dasharray: calc(var(--leadW) * 4) calc(var(--leadW) * 4); }
+.label { font: 600 var(--labSize)/1.3 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(241, 239, 232, 0.92); white-space: nowrap; }
+.label em { display: block; font: italic 400 calc(var(--labSize) * 1.55)/1.08 var(--serif); letter-spacing: 0; text-transform: none; margin-top: 0.12em; color: var(--white); }
+.label.right { text-align: right; }
+.label.center { text-align: center; }
+.label.mustard em { color: var(--mustard-hi); }
+.fig em { font-size: calc(var(--labSize) * 1.35); }
+
+/* ---------- countdown and button ---------- */
+.row { display: flex; align-items: center; justify-content: space-between; gap: var(--rowGap); }
+.timer { display: flex; align-items: center; gap: calc(var(--cell) * 0.3); }
+.timer .ends { font: 600 calc(var(--cell) * 0.27)/1.15 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: rgba(241, 239, 232, 0.8); width: 3.2em; }
+.timer .cells { display: flex; align-items: flex-start; gap: calc(var(--cell) * 0.1); }
+.timer .cell { display: flex; flex-direction: column; align-items: center; }
+.timer .cell b { display: block; font: 400 var(--cell)/1 var(--cond); width: 1.32em; padding: 0.1em 0 0.08em; text-align: center; color: var(--white); font-variant-numeric: tabular-nums;
+  border: 1.5px solid rgba(241, 239, 232, 0.4); background: rgba(6, 10, 30, 0.35); }
+.timer .cell span { margin-top: 0.4em; font: 600 calc(var(--cell) * 0.22)/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(241, 239, 232, 0.7); }
+.timer em { font: 400 calc(var(--cell) * 0.62)/1.5 var(--cond); font-style: normal; color: rgba(241, 239, 232, 0.5); }
+
+.cta { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; height: var(--ctaH); font: 400 var(--cta)/1 var(--cond); letter-spacing: 0.06em; text-transform: uppercase; color: #fff; text-decoration: none;
+  background: linear-gradient(180deg, #f0372b 0%, #cf1a14 100%); box-shadow: 0 14px 36px rgba(200, 20, 20, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.25); }
+.cta .sheen { position: absolute; top: -20%; bottom: -20%; width: 22%; background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0)); transform: skewX(-20deg); }
+.cta #cta-label { position: relative; display: flex; align-items: center; }
+.cta .arr { width: 0.78em; height: 0.78em; margin-left: 0.42em; margin-top: -0.04em; }
+
+/* ---------- foot: the lockup and the fine print, printed in navy on the haze ---------- */
+.foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; }
+.foot .mark { flex: none; display: block; width: var(--markW); height: calc(var(--markW) * 0.534); background: var(--footInk); -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+.foot .fine { margin: 0; font: italic 400 var(--fine)/1.3 var(--serif); color: var(--footInk); text-align: right; }
+.foot .fine small { display: block; margin-top: 0.6em; font: 600 calc(var(--fine) * 0.56)/1.5 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; font-style: normal; }
+.foot .fine u { text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+
+#glint { left: 0; top: 0; width: 1px; height: 1px; }
+#glint svg { position: absolute; overflow: visible; }

@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>The Orbit</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-x-orbit.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="sky" id="sky"></div>
+  <div class="halo" id="halo"></div>
+
+  <header class="doc" id="doc">
+    <div class="c1">Gary Mustard<br>Enterprises</div>
+    <div class="c2">EST2026</div>
+    <div class="c3" id="doc-c3"></div>
+  </header>
+
+  <h1 class="bf" id="bf"></h1>
+  <p class="kick" id="kick"></p>
+
+  <canvas id="gl"></canvas>
+  <div id="glint"></div>
+
+  <svg class="leaders" id="leaders"></svg>
+  <div class="label" id="lab-core"></div>
+  <div class="label fig" id="lab-fig"></div>
+
+  <div class="offer" id="offer">
+    <div class="big-wrap"><div class="big glow" id="big-glow"></div><div class="big" id="big"></div></div>
+    <p class="scope" id="scope"></p>
+  </div>
+
+  <div class="timer" id="timer">
+    <div class="ends" id="ends"></div>
+    <div class="cells">
+      <div class="cell"><b id="hh">23</b><span>Hrs</span></div><em>:</em>
+      <div class="cell"><b id="mm">59</b><span>Min</span></div><em>:</em>
+      <div class="cell"><b id="ss">59</b><span>Sec</span></div>
+    </div>
+    <div class="code" id="code"></div>
+  </div>
+
+  <div class="foot" id="foot">
+    <div class="rules"></div>
+    <div class="fine" id="fine"></div>
+  </div>
+  <div class="lockup" id="lockup"><i class="mark"></i></div>
+
+  <canvas id="dust"></canvas>
+  <div class="grain" id="grain"></div>
+</div>
+<script type="module" src="./gme-x-orbit.js"></script>
+</body>
+</html>
