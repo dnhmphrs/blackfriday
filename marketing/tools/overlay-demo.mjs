@@ -81,10 +81,10 @@ function webpDurations(file) {
   return durations;
 }
 
-// Decode images/<kind>.webp into frames/demo-art-<kind>/NNN.png with Pillow (ImageSequence
+// Decode images/<kind>.webp (from the snapshot of src/ being recorded) into frames/demo-art-<kind>/NNN.png with Pillow (ImageSequence
 // composites each frame onto the previous ones, as a browser does). Lossless in, lossless out.
-function decodeArt(kind) {
-  const file = path.join(SRC, `images/${kind}.webp`);
+function decodeArt(extDir, kind) {
+  const file = path.join(extDir, `images/${kind}.webp`);
   const durations = webpDurations(file);
   if (durations.length !== ART_FRAMES || durations.some((d) => d !== ART_MS))
     throw new Error(`${file}: expected ${ART_FRAMES} frames of ${ART_MS} ms, got ${durations.length}: ${[...new Set(durations)]}`);
@@ -126,8 +126,8 @@ async function launch(extDir, device) {
   return { context, userDataDir };
 }
 
-// Wait until the banner is up and fully loaded: popover open, every image decoded, the page's
-// fonts ready and the extension's own "TOE Inter" face loaded.
+// Wait until the banner is up and fully loaded: popover open, stylesheet applied, every image
+// decoded, the page's fonts ready, and any text in the banner drawn in its web font.
 async function waitForBanner(page) {
   await page.waitForFunction((tag) => {
     const host = document.querySelector(tag);
@@ -137,16 +137,45 @@ async function waitForBanner(page) {
     if (!css?.sheet) return false;
     return [...sr.querySelectorAll('img')].every((img) => img.complete && img.naturalWidth > 0);
   }, TAG, { timeout: 20000 });
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-    const faces = [...document.fonts].filter((f) => f.family.replace(/"/g, '') === 'TOE Inter');
-    if (!faces.length) throw new Error('TOE Inter was never added');
-    await Promise.all(faces.map((f) => f.load()));
-    if (!document.fonts.check('600 6px "TOE Inter"')) throw new Error('TOE Inter not loaded');
-    await document.fonts.ready;
-  });
+  await page.evaluate(() => document.fonts.ready);
+  const fonts = await waitForBannerFonts(page);
   // Two frames so the zoom set by fit() on the last image load has been painted.
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  return fonts;
+}
+
+// The extension loads its font (v1.8: "TOE Inter", for the credit line) with a FontFace made in
+// the content script's isolated world, which the page's own document.fonts does not list. So ask
+// Chromium what it actually drew each text element in the banner with (CSS.getPlatformFontsForNode)
+// and wait until that is a web font, not a fallback. Returns a description for the log.
+async function waitForBannerFonts(page) {
+  const textCount = await page.evaluate((tag) => {
+    const sr = document.querySelector(tag).shadowRoot;
+    window.__demoText = [...sr.querySelectorAll('*')].filter((el) =>
+      getComputedStyle(el).display !== 'none' && [...el.childNodes].some((n) => n.nodeType === 3 && n.data.trim()));
+    return window.__demoText.length;
+  }, TAG);
+  if (!textCount) return 'no text in the banner (nothing to wait for)';
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('DOM.enable');
+  await cdp.send('CSS.enable');
+  await cdp.send('DOM.getDocument', { depth: -1, pierce: true });
+  const report = [];
+  for (let k = 0; k < textCount; k++) {
+    const { result } = await cdp.send('Runtime.evaluate', { expression: `window.__demoText[${k}]` });
+    const { nodeId } = await cdp.send('DOM.requestNode', { objectId: result.objectId });
+    let fonts = [];
+    for (const deadline = Date.now() + 10000; Date.now() < deadline;) {
+      ({ fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId }));
+      if (fonts.length && fonts.every((f) => f.isCustomFont)) break;
+      await page.waitForTimeout(100);
+    }
+    const desc = `${result.description}: ${fonts.map((f) => `${f.familyName}${f.isCustomFont ? ' (web font)' : ' (FALLBACK)'}`).join(', ')}`;
+    if (!fonts.length || !fonts.every((f) => f.isCustomFont)) throw new Error('banner text not in its web font: ' + desc);
+    report.push(desc);
+  }
+  await cdp.detach();
+  return report.join('; ');
 }
 
 // Every box in the banner, in CSS px, plus the styles that decide how the art is drawn.
@@ -159,15 +188,16 @@ function measure(page) {
     const art = [...sr.querySelectorAll('img.art')].find(visible);
     const strip = [...sr.querySelectorAll('.run img')].find(visible);
     const sheets = sr.querySelectorAll('.sheet');
+    const credit = sr.querySelector('.credit'); // the credit line (v1.8; later versions may drop it)
     const cs = getComputedStyle(art);
     return {
-      frame: box(sr.querySelector('.frame')), art: box(art), credit: box(sr.querySelector('.credit')),
+      frame: box(sr.querySelector('.frame')), art: box(art), credit: credit && box(credit),
       ticker: box(sr.querySelector('.ticker')), runY: box(sr.querySelector('.run'))[1], strip: box(strip).slice(1),
       zoom: [sheets[0].style.zoom, sheets[1].style.zoom], footWidth: sheets[1].style.width,
       artStyle: { width: cs.width, height: cs.height, imageRendering: cs.imageRendering, display: cs.display },
       artClass: art.className, naturalSize: [art.naturalWidth, art.naturalHeight],
       runAnimation: getComputedStyle(sr.querySelector('.run')).animation,
-      creditFont: getComputedStyle(sr.querySelector('.credit')).font,
+      creditFont: credit && getComputedStyle(credit).font,
     };
   }, TAG);
 }
@@ -213,7 +243,7 @@ async function record(demo, { extDir, origin, artDirs }) {
   try {
     const page = context.pages()[0] ?? await context.newPage();
     await page.goto(`${origin}/${demo.page}?fakeNow=${FAKE_NOW}`, { waitUntil: 'load' });
-    await waitForBanner(page);
+    demo.fonts = await waitForBanner(page);
 
     // 1. The reference: an ordinary screenshot, nothing paused or swapped.
     const live = await measure(page);
@@ -264,7 +294,7 @@ function compareLayout(a, b) {
 
 // Pixel checks, in device pixels: (a) frame 0 vs the t = 12 s frame (must be identical),
 // (b) outside the banner, live vs frame 0 (must be identical: the page is untouched), (c) the
-// credit line (static; must be identical), (d) the art box in the live shot against the art box
+// credit line if there is one (static; must be identical), (d) the art box in the live shot against the art box
 // in every recorded frame (the live shot is at some unknown phase; one frame must match it),
 // (e) the ticker's frame strip above and below the moving text.
 function pixelChecks(demo) {
@@ -272,7 +302,7 @@ function pixelChecks(demo) {
   const rect = (r) => [r[0], r[1], r[0] + r[2], r[1] + r[3]].map((v) => Math.round(v * dpr));
   const L = demo.live;
   const args = JSON.stringify({
-    dir: demo.dir, count: FRAME_COUNT, banner: rect(L.frame), art: rect(L.art), credit: rect(L.credit),
+    dir: demo.dir, count: FRAME_COUNT, banner: rect(L.frame), art: rect(L.art), credit: L.credit && rect(L.credit),
     tickerTop: rect([L.ticker[0], L.ticker[1], L.ticker[2], L.runY - L.ticker[1]]),
   });
   return JSON.parse(execFileSync('python3', ['-I', '-c', `
@@ -287,7 +317,8 @@ diff = lambda x, y: int((np.abs(x - y).sum(axis=2) > 0).sum())
 out = {'loop_frame240_vs_frame0_px': diff(f0, last)}
 mask = np.ones(live.shape[:2], bool); b = a['banner']; mask[b[1]:b[3], b[0]:b[2]] = False
 out['outside_banner_live_vs_frame0_px'] = int(((np.abs(live - f0).sum(axis=2) > 0) & mask).sum())
-out['credit_live_vs_frame0_px'] = diff(crop(live, a['credit']), crop(f0, a['credit']))
+if a['credit']:
+    out['credit_live_vs_frame0_px'] = diff(crop(live, a['credit']), crop(f0, a['credit']))
 out['ticker_strip_above_text_live_vs_frame0_px'] = diff(crop(live, a['tickerTop']), crop(f0, a['tickerTop']))
 la = crop(live, a['art']); best = None
 for i in range(a['count']):
@@ -327,8 +358,14 @@ function makeGif(demo) {
 const only = process.argv[2];
 const demos = DEMOS.filter((d) => !only || d.name.includes(only));
 fs.mkdirSync(OUT, { recursive: true });
+// One snapshot of src/ for the whole run (makeTestCopy adds only the fake clock), so every
+// demo and the decoded art come from the same version of the extension.
+const extDir = makeTestCopy(SRC);
+const manifest = JSON.parse(fs.readFileSync(path.join(extDir, 'manifest.json'), 'utf8'));
+const srcHash = execFileSync('sh', ['-c', 'cd "$1" && find . -type f ! -name test-clock.js ! -name manifest.json | sort | xargs sha256sum | sha256sum | cut -c1-12', 'sh', SRC]).toString().trim();
+log(`extension: ${manifest.name} ${manifest.version}, src/ snapshot ${srcHash} (sha256 of files other than manifest.json)`);
 log('decoding the artwork');
-const artDirs = Object.fromEntries([...new Set(demos.map((d) => d.device))].map((k) => [k, decodeArt(k)]));
+const artDirs = Object.fromEntries([...new Set(demos.map((d) => d.device))].map((k) => [k, decodeArt(extDir, k)]));
 
 // Serve the mock pages and the decoded art frames over http (the extension only runs on http/s).
 const routes = {};
@@ -336,7 +373,6 @@ for (const p of ['news.html', 'shop.html']) routes[`/${p}`] = fs.readFileSync(pa
 for (const [kind, dir] of Object.entries(artDirs))
   for (const f of fs.readdirSync(dir)) routes[`/art/${kind}/${f}`] = { body: fs.readFileSync(path.join(dir, f)), type: 'image/png', headers: { 'cache-control': 'max-age=3600' } };
 const { server, origin } = await serve(routes);
-const extDir = makeTestCopy(SRC);
 
 try {
   for (const demo of demos) { // serially: the machine is shared
@@ -346,6 +382,7 @@ try {
     fs.copyFileSync(path.join(demo.dir, 'f0000.png'), still);
     demo.pixels = pixelChecks(demo);
     const gif = makeGif(demo);
+    log(`  fonts: ${demo.fonts}`);
     log(`  layout vs live: ${demo.layout.length ? demo.layout.join('; ') : 'identical'}`);
     log(`  pixels: ${JSON.stringify(demo.pixels)}`);
     log(`  marquee: ${JSON.stringify(demo.marquee)}`);
