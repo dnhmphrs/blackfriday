@@ -1,8 +1,9 @@
-// The animated GIF banner, 1997. A low-resolution canvas on a handful of web-safe colours, blown
-// up with hard pixels: chunky 8-bit type, hard two-frame blinks, one pixel starburst, one pixel
-// CLICK HERE, and the cut globe as a classic spinning-globe GIF (rendered in 3D, then posterised
-// with ordered dithering and stepped at 10 frames a second). On the extension's banner the
-// starburst knows where it is: it points at the reader's page, the 70% that is left.
+// The animated GIF banner, 1997, with a marquee. A low-resolution canvas on a handful of web-safe
+// colours, blown up with hard pixels: hand-shaded 8-bit type (keyline, two-tone face, bevel
+// edges, solid drop), hard two-frame blinks on one 2 Hz beat, one pixel starburst, a few pixel
+// sparkles, a pixel CLICK HERE, the cut globe as a classic spinning-globe GIF (rendered in 3D,
+// then posterised with ordered dithering and stepped at 10 frames a second), and a scrolling
+// marquee strip along the bottom. Played straight, like a sincere 1997 ad.
 // Everything on screen is a pure function of time:  window.comp.setTime(seconds)
 import * as THREE from 'three';
 import { createStage } from '../lib/stage.js';
@@ -13,52 +14,62 @@ const DURATION = 12, FPS = 30, TAU = Math.PI * 2, GIF_FPS = 10;
 
 // The web-safe colours the banner is allowed.
 const C = { blue: '#0033ff', navy: '#000066', black: '#000000', white: '#ffffff', yellow: '#ffff00', red: '#ff0000', sky: '#3366ff' };
+// The marquee's five lines, in order.
+const MARQUEE = ['But wait… there’s less!', 'No purchase necessary!', 'Black Friday only!', 'Every website, 30% off!', 'Works like magic!'];
 const PS = '"Press Start 2P"', SK = '"Silkscreen"';
 
 // Layout in GIF pixels. P is the size of one GIF pixel on the stage.
 // text: x is a centre (align c) or a left edge (align l); y is the top of the ink.
+// style: 'gold' (yellow, white top edge, orange bottom edge), 'gold2' (two-tone yellow, for
+// the 16 px lines), 'silver' (white over web grey), 'plain' (one colour, for the small lines).
 const FORMATS = {
   '1x1': {
     w: 1080, h: 1080, P: 4,
     items: [
-      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 16, fill: 'yellow', ext: 3 },
-      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 62, fill: 'white', ext: 2 },
-      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 82, fill: 'white', ext: 2 },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 108, fill: 'yellow', blink: 'white', ext: 2 },
-      { t: 'globe', x: 92, y: 188, d: 112 },
-      { t: 'burst', x: 208, y: 166, r: 36, lines: ['NEW!'], f: `16px ${PS}` },
-      { t: 'button', x: 208, y: 224, s: 'CLICK HERE' },
-      { t: 'logo', x: 135, y: 257, w: 36 },
+      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 14, style: 'gold', ext: 3 },
+      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 60, style: 'silver', ext: 2 },
+      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 80, style: 'silver', ext: 2 },
+      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 106, style: 'gold2', blink: 'white', ext: 2 },
+      { t: 'globe', x: 90, y: 182, d: 108 },
+      { t: 'burst', x: 206, y: 160, r: 40, lines: ['NEW!'], f: `16px ${PS}` },
+      { t: 'button', x: 206, y: 219, s: 'CLICK HERE' },
+      { t: 'marquee', y: 248, h: 22 },
+      { t: 'spark', x: 146, y: 135, big: 1, phase: 0 },
+      { t: 'spark', x: 34, y: 225, big: 0, phase: 1 },
+      { t: 'spark', x: 259, y: 12, big: 0, phase: 1 },
     ],
   },
   'banner-v': {
     w: 1080, h: 2025, P: 6,
     items: [
-      { t: 'text', s: '30%', f: `48px ${PS}`, x: 90, y: 10, fill: 'yellow', ext: 3 },
-      { t: 'text', s: 'OFF', f: `48px ${PS}`, x: 90, y: 62, fill: 'yellow', ext: 3 },
-      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 120, fill: 'white', ext: 2 },
-      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 139, fill: 'white', ext: 2 },
-      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 158, fill: 'white', ext: 2 },
-      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 90, y: 182, fill: 'yellow', blink: 'white', ext: 2 },
-      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 90, y: 199, fill: 'yellow', blink: 'white', ext: 2 },
-      { t: 'globe', x: 124, y: 266, d: 88 },
-      { t: 'burst', x: 40, y: 258, r: 39, lines: ['INCLUDING', 'THIS PAGE!'], f: `8px ${SK}`, arrow: 'left' },
-      { t: 'button', x: 72, y: 322, s: 'CLICK HERE' },
-      { t: 'logo', x: 156, y: 324, w: 30 },
+      { t: 'text', s: '30%', f: `48px ${PS}`, x: 90, y: 10, style: 'gold', ext: 3 },
+      { t: 'text', s: 'OFF', f: `48px ${PS}`, x: 90, y: 62, style: 'gold', ext: 3 },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 121, style: 'silver', ext: 2 },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 140, style: 'silver', ext: 2 },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 159, style: 'silver', ext: 2 },
+      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 90, y: 184, style: 'gold2', blink: 'white', ext: 2 },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 90, y: 201, style: 'gold2', blink: 'white', ext: 2 },
+      { t: 'globe', x: 128, y: 264, d: 92 },
+      { t: 'burst', x: 42, y: 252, r: 40, lines: ['WOW!'], f: `16px ${PS}` },
+      { t: 'marquee', y: 316, h: 22 },
+      { t: 'spark', x: 166, y: 222, big: 1, phase: 0 },
+      { t: 'spark', x: 20, y: 296, big: 0, phase: 1 },
+      { t: 'spark', x: 170, y: 58, big: 0, phase: 1 },
     ],
   },
   'banner-h': {
     w: 1170, h: 834, P: 5,
     items: [
-      { t: 'text', s: '30%', f: `40px ${PS}`, x: 10, y: 10, align: 'l', fill: 'yellow', ext: 3 },
-      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 10, y: 56, align: 'l', fill: 'yellow', ext: 3 },
-      { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 10, y: 106, align: 'l', fill: 'white', ext: 1 },
-      { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 10, y: 118, align: 'l', fill: 'white', ext: 1 },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 10, y: 134, align: 'l', fill: 'yellow', blink: 'white', ext: 1 },
-      { t: 'globe', x: 186, y: 50, d: 84 },
-      { t: 'burst', x: 190, y: 129, r: 35, lines: ['INCLUDING', 'THIS PAGE!'], f: `8px ${SK}`, arrow: 'down' },
-      // no CLICK HERE on the phone: the strip is short, and the burst is its one device
-      { t: 'logo', x: 26, y: 156, w: 30 },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 10, y: 9, align: 'l', style: 'gold', ext: 3 },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 10, y: 54, align: 'l', style: 'gold', ext: 3 },
+      { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 10, y: 103, align: 'l', style: 'plain', fill: 'white', ext: 1 },
+      { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 10, y: 115, align: 'l', style: 'plain', fill: 'white', ext: 1 },
+      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 10, y: 130, align: 'l', style: 'plain', fill: 'yellow', blink: 'white', ext: 1 },
+      { t: 'globe', x: 186, y: 48, d: 80 },
+      { t: 'burst', x: 196, y: 119, r: 26, lines: ['WOW!'], f: `8px ${PS}` },
+      { t: 'marquee', y: 147, h: 20 },
+      { t: 'spark', x: 136, y: 18, big: 1, phase: 0 },
+      { t: 'spark', x: 152, y: 98, big: 0, phase: 1 },
     ],
   },
 };
@@ -112,7 +123,50 @@ function textMask(s, font) {
   x.font = font; x.textBaseline = 'top'; x.fillStyle = '#fff'; x.fillText(s, 4, 4);
   return crop(harden(c));
 }
-// A sprite: the mask in its colour over a solid pixel extrusion down and to the right.
+// The mask grown by one pixel all round (8-neighbour): the keyline.
+function grow(mask) {
+  const w = mask.width, h = mask.height, a = mask.getContext('2d').getImageData(0, 0, w, h).data;
+  const o = canvas(w + 2, h + 2), x = o.getContext('2d'); x.fillStyle = '#fff';
+  const on = (xx, yy) => xx >= 0 && yy >= 0 && xx < w && yy < h && a[(yy * w + xx) * 4 + 3];
+  for (let y = -1; y <= h; y++) for (let xx = -1; xx <= w; xx++) {
+    let hit = 0;
+    for (let dy = -1; dy <= 1 && !hit; dy++) for (let dx = -1; dx <= 1; dx++) if (on(xx + dx, y + dy)) { hit = 1; break; }
+    if (hit) x.fillRect(xx + 1, y + 1, 1, 1);
+  }
+  return o;
+}
+// Hand-shaded type: every pixel of the face picks its colour from where it sits in the glyph.
+// top/bot: the two bands of the face; hi: a pixel's top edge; lo: its bottom edge.
+const STYLES = {
+  gold: { top: '#ffff00', bot: '#ffcc00', hi: '#ffffff', lo: '#ff9900', split: 0.5, key: 'black', ext: 'navy' },
+  gold2: { top: '#ffff00', bot: '#ffcc00', split: 0.5, key: 'black', ext: 'navy' },
+  silver: { top: '#ffffff', bot: '#ccccff', lo: '#9999cc', split: 0.5, key: 'black', ext: 'navy' },
+  white2: { top: '#ffffff', bot: '#ccffff', split: 0.5, key: 'black', ext: 'navy' },
+};
+function face(mask, st) {
+  const w = mask.width, h = mask.height, a = mask.getContext('2d').getImageData(0, 0, w, h).data;
+  const o = canvas(w, h), x = o.getContext('2d');
+  const on = (xx, yy) => xx >= 0 && yy >= 0 && xx < w && yy < h && a[(yy * w + xx) * 4 + 3];
+  for (let y = 0; y < h; y++) for (let xx = 0; xx < w; xx++) {
+    if (!on(xx, y)) continue;
+    let c = y < Math.round(h * st.split) ? st.top : st.bot;
+    if (st.hi && !on(xx, y - 1)) c = st.hi;
+    else if (st.lo && !on(xx, y + 1)) c = st.lo;
+    x.fillStyle = c; x.fillRect(xx, y, 1, 1);
+  }
+  return o;
+}
+// A sprite: a shaded face in a black keyline over a solid pixel extrusion down and to the right.
+function fancy(mask, st, ext) {
+  const sil = grow(mask);
+  const o = canvas(sil.width + ext, sil.height + ext), x = o.getContext('2d');
+  const back = tint(sil, st.ext);
+  for (let i = ext; i >= 1; i--) x.drawImage(back, i, i);
+  x.drawImage(tint(sil, st.key), 0, 0);
+  x.drawImage(face(mask, st), 1, 1);
+  return o;
+}
+// The plain sprite, for type too small to shade: one colour over a solid extrusion.
 function sprite(mask, fill, ext = 0, extColour = 'navy') {
   const o = canvas(mask.width + ext, mask.height + ext), x = o.getContext('2d');
   const back = tint(mask, extColour);
@@ -122,14 +176,20 @@ function sprite(mask, fill, ext = 0, extColour = 'navy') {
 }
 
 // ---------- build every element as one or two pre-drawn frames ----------
-const layers = []; // { frames: [canvas, canvas?], x, y, rate (frame swaps per second) }
+const layers = []; // { frames: [canvas, canvas?], x, y, rate (frame swaps per second), phase }
 let globeItem = null;
 for (const it of F.items) {
   if (it.t === 'text') {
     const m = textMask(it.s, it.f);
-    const x = it.align === 'l' ? it.x : Math.round(it.x - m.width / 2);
-    const frames = [sprite(m, it.fill, it.ext)];
-    if (it.blink) frames.push(sprite(m, it.blink, it.ext));
+    let frames;
+    if (it.style === 'plain') {
+      frames = [sprite(m, it.fill, it.ext)];
+      if (it.blink) frames.push(sprite(m, it.blink, it.ext));
+    } else {
+      frames = [fancy(m, STYLES[it.style], it.ext)];
+      if (it.blink) frames.push(fancy(m, STYLES.white2, it.ext));
+    }
+    const x = it.align === 'l' ? it.x : Math.round(it.x - (frames[0].width - it.ext) / 2);
     layers.push({ frames, x, y: it.y, rate: 2 });
   } else if (it.t === 'burst') {
     layers.push(burst(it));
@@ -138,9 +198,10 @@ for (const it of F.items) {
   } else if (it.t === 'globe') {
     globeItem = it;
     layers.push({ globe: true });
-  } else if (it.t === 'logo') {
-    const L = $('logo'), w = it.w * P, h = w / 1.872;
-    Object.assign(L.style, { left: it.x * P - w / 2 + 'px', top: it.y * P - h / 2 + 'px', width: w + 'px', height: h + 'px' });
+  } else if (it.t === 'marquee') {
+    layers.push(marquee(it));
+  } else if (it.t === 'spark') {
+    layers.push(spark(it));
   }
 }
 
@@ -157,63 +218,72 @@ function burst(it) {
     }
     x.closePath(); x.fillStyle = '#fff'; x.fill();
     harden(shape);
-    // black one-pixel keyline, red body
-    const o = canvas(size + 2, size + 2), y = o.getContext('2d');
+    // a smaller copy of the star, for the hand-shaded rim
+    const inner = canvas(size, size), ix = inner.getContext('2d');
+    ix.translate(size / 2, size / 2);
+    ix.beginPath();
+    for (let i = 0; i < N * 2; i++) {
+      const a = (i / (N * 2)) * TAU + (k * Math.PI) / N, r = (i % 2 ? it.r * 0.74 : it.r) - 3;
+      ix.lineTo(Math.sin(a) * r, -Math.cos(a) * r);
+    }
+    ix.closePath(); ix.fillStyle = '#fff'; ix.fill();
+    harden(inner);
+    // navy drop, black keyline, dark red rim, red body, a lighter catch-light up and to the left
+    const o = canvas(size + 4, size + 4), y = o.getContext('2d');
     const ink = tint(shape, 'black');
+    y.drawImage(tint(shape, 'navy'), 3, 3);
     for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2]]) y.drawImage(ink, dx, dy);
-    y.drawImage(tint(shape, 'red'), 1, 1);
-    // words, and on the extension's banner an arrow at the reader's page
+    y.drawImage(tint(shape, '#990000'), 1, 1);
+    y.drawImage(tint(inner, '#ff6666'), 0, 0);
+    y.drawImage(tint(inner, 'red'), 1, 1);
+    // words
     const masks = it.lines.map((l) => textMask(l, it.f));
     const rows = masks.map((m) => sprite(m, k ? 'white' : 'yellow', 1, 'black'));
-    if (it.arrow === 'left') rows.unshift(arrow('left'));
-    if (it.arrow === 'down') rows.push(arrow('down'));
     const gap = 3, total = rows.reduce((s, r) => s + r.height, 0) + gap * (rows.length - 1);
-    let ty = Math.round((o.height - total) / 2);
+    let ty = Math.round((size + 2 - total) / 2);
     for (const r of rows) {
-      let dx = 0, dy = 0;
-      if (r.isArrow && k) { if (it.arrow === 'left') dx = -2; else dy = 2; }
-      y.drawImage(r, Math.round((o.width - r.width) / 2) + dx, ty + dy);
+      y.drawImage(r, Math.round((size + 2 - r.width) / 2), ty);
       ty += r.height + gap;
     }
     return o;
   });
-  return { frames, x: it.x - frames[0].width / 2, y: it.y - frames[0].height / 2, rate: 2 }; // on the same 2 Hz beat as the button and the message blink
+  return { frames, x: it.x - (frames[0].width - 2) / 2, y: it.y - (frames[0].height - 2) / 2, rate: 2 }; // on the same 2 Hz beat as the button and the message blink
 }
-function arrow(dir) {
-  // a fat pixel arrow, drawn pointing left: 13 px head, 7 px shaft, 18 px long
-  const AW = 18, AH = 13, HH = 6;
-  const c = canvas(AW, AH), x = c.getContext('2d');
-  x.fillStyle = '#fff';
-  for (let i = 0; i <= HH; i++) x.fillRect(i, HH - i, 1, i * 2 + 1);
-  x.fillRect(HH + 1, 3, AW - HH - 1, AH - 6);
-  let m = c;
-  if (dir === 'down') {
-    m = canvas(AH, AW);
-    const a = c.getContext('2d').getImageData(0, 0, AW, AH).data, y = m.getContext('2d');
-    y.fillStyle = '#fff';
-    for (let yy = 0; yy < AH; yy++) for (let xx = 0; xx < AW; xx++) if (a[(yy * AW + xx) * 4 + 3]) y.fillRect(yy, AW - 1 - xx, 1, 1);
-  }
-  const o = canvas(m.width + 2, m.height + 2), y = o.getContext('2d');
-  const ink = tint(m, 'black');
-  for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2], [2, 2]]) y.drawImage(ink, dx, dy);
-  y.drawImage(tint(m, 'yellow'), 1, 1);
-  o.isArrow = true;
-  return o;
-}
-function flipV(c) { const o = canvas(c.width, c.height), x = o.getContext('2d'); x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0); return o; }
 
-// A pixel CLICK HERE button: yellow slab, black keyline, navy drop; the arrows either side jump in.
+// A pixel sparkle: a four-point twinkle, small on one beat and big on the next.
+function spark(it) {
+  const S = 11, c0 = 5;
+  const frames = [0, 1].map((k) => {
+    const big = (k + it.big) % 2;
+    const o = canvas(S, S), x = o.getContext('2d');
+    const dot = (dx, dy, col) => { x.fillStyle = C[col] || col; x.fillRect(c0 + dx, c0 + dy, 1, 1); };
+    const arm = big ? 5 : 2;
+    for (let i = 1; i <= arm; i++) {
+      const col = i >= arm - (big ? 1 : 0) ? '#99ccff' : '#ffffff';
+      dot(i, 0, col); dot(-i, 0, col); dot(0, i, col); dot(0, -i, col);
+    }
+    if (big) { dot(1, 1, '#ffffff'); dot(-1, 1, '#ffffff'); dot(1, -1, '#ffffff'); dot(-1, -1, '#ffffff'); }
+    dot(0, 0, big ? '#ffffff' : '#ffff00');
+    return o;
+  });
+  return { frames, x: it.x - c0, y: it.y - c0, rate: 2, phase: it.phase || 0 };
+}
+
+// A pixel CLICK HERE button: yellow slab with a white top-left bevel and an orange bottom-right
+// one, black keyline, navy drop; the arrows either side jump in.
 function button(it) {
   const m = textMask(it.s, `8px ${PS}`);
-  const padX = 10, padY = 4, w = m.width + padX * 2, h = m.height + padY * 2;
+  const padX = 10, padY = 5, w = m.width + padX * 2, h = m.height + padY * 2;
   const frames = [0, 1].map((k) => {
     const o = canvas(w + 3, h + 3), x = o.getContext('2d');
     x.fillStyle = C.navy; x.fillRect(3, 3, w, h);
     x.fillStyle = C.black; x.fillRect(0, 0, w, h);
-    x.fillStyle = k ? C.white : C.yellow; x.fillRect(1, 1, w - 2, h - 2);
-    x.drawImage(tint(m, 'blue'), padX, padY);
+    x.fillStyle = k ? '#ff9900' : '#ffcc00'; x.fillRect(1, 1, w - 2, h - 2);
+    x.fillStyle = k ? '#ffffcc' : C.white; x.fillRect(1, 1, w - 3, h - 3);
+    x.fillStyle = k ? C.white : C.yellow; x.fillRect(2, 2, w - 4, h - 4);
+    x.drawImage(tint(m, k ? 'navy' : 'blue'), padX, padY);
     // arrows: 3 px tall triangles, one pixel further in on the second frame
-    x.fillStyle = C.blue;
+    x.fillStyle = k ? C.navy : C.blue;
     const ay = padY + Math.floor(m.height / 2), inset = 3 + k;
     for (let i = 0; i < 3; i++) {
       x.fillRect(inset + i, ay - (2 - i), 1, (2 - i) * 2 + 1);
@@ -222,6 +292,42 @@ function button(it) {
     return o;
   });
   return { frames, x: Math.round(it.x - w / 2), y: Math.round(it.y - h / 2), rate: 2 };
+}
+
+// The marquee: a navy strip, edge to edge, ruled in yellow, the five lines crawling right to
+// left with a pixel star between each. The run is padded to a whole number of pixels per video
+// frame, so it moves in even steps and comes round exactly once in the loop.
+function starMask() {
+  // a 9 px five-point star, drawn by hand
+  const rows = ['....#....', '....#....', '...###...', '#########', '.#######.', '..#####..', '..##.##..', '.##...##.', '.#.....#.'];
+  const c = canvas(9, 9), x = c.getContext('2d'); x.fillStyle = '#fff';
+  rows.forEach((r, y) => [...r].forEach((ch, xx) => { if (ch === '#') x.fillRect(xx, y, 1, 1); }));
+  return c;
+}
+function marquee(it) {
+  const font = `8px ${PS}`;
+  const words = MARQUEE.map((s) => sprite(textMask(s, font), 'white', 1, 'black'));
+  const star = sprite(starMask(), 'yellow', 1, '#ff9900');
+  const textW = words.reduce((s, w) => s + w.width, 0);
+  const minGap = star.width + 24;
+  const STEP = DURATION * FPS;
+  let L = Math.ceil((textW + minGap * words.length) / STEP) * STEP; // whole pixels a frame
+  const gap = (L - textW) / words.length;
+  const run = canvas(L, 12), rx = run.getContext('2d');
+  let x = 0;
+  words.forEach((w, i) => {
+    const x0 = Math.round(x);
+    rx.drawImage(w, x0, 1);
+    const sx0 = Math.round(x + w.width + gap / 2 - star.width / 2);
+    rx.drawImage(star, sx0, 0);
+    x += w.width + gap;
+  });
+  const band = canvas(W, it.h), bx = band.getContext('2d');
+  bx.fillStyle = C.black; bx.fillRect(0, 0, W, it.h);
+  bx.fillStyle = '#ffcc00'; bx.fillRect(0, 1, W, 1); bx.fillRect(0, it.h - 2, W, 1);
+  bx.fillStyle = C.navy; bx.fillRect(0, 2, W, it.h - 4);
+  bx.fillStyle = '#000099'; bx.fillRect(0, 2, W, 1);
+  return { marquee: true, band, run, L, y: it.y, ty: Math.round(it.y + (it.h - 12) / 2) + 1 };
 }
 
 // ---------- the globe GIF ----------
@@ -251,6 +357,7 @@ const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => 
 const small = canvas(D, D), sx = small.getContext('2d', { willReadFrequently: true });
 sx.imageSmoothingEnabled = true; sx.imageSmoothingQuality = 'high';
 const globeOut = canvas(D, D), gx = globeOut.getContext('2d');
+const globeDrop = canvas(D, D), dx = globeDrop.getContext('2d');
 const nearest = (r, gg, b) => {
   let best = 0, bd = Infinity;
   for (let i = 0; i < PAL.length; i++) {
@@ -297,6 +404,9 @@ function drawGlobe(step) {
     }
   }
   gx.putImageData(out, 0, 0);
+  dx.clearRect(0, 0, D, D); dx.drawImage(globeOut, 0, 0);
+  dx.globalCompositeOperation = 'source-in'; dx.fillStyle = C.navy; dx.fillRect(0, 0, D, D);
+  dx.globalCompositeOperation = 'source-over';
 }
 
 // The background: flat web blue with a soft halo behind the globe, done the 1997 way, as an
@@ -316,15 +426,28 @@ const bgCanvas = canvas(W, H);
   x.putImageData(d, 0, 0);
 }
 
-await Promise.all(['gme-primary'].map((n) => { const i = new Image(); i.src = `/assets/gme/${n}.png`; return i.decode(); }));
-
 function setTime(t) {
   t = ((t % DURATION) + DURATION) % DURATION;
   drawGlobe(Math.floor(t * GIF_FPS + 1e-6) % (DURATION * GIF_FPS));
   g.drawImage(bgCanvas, 0, 0);
   for (const L of layers) {
-    if (L.globe) { g.drawImage(globeOut, Math.round(globeItem.x - D / 2), Math.round(globeItem.y - D / 2)); continue; }
-    const k = L.frames.length > 1 ? Math.floor(t * L.rate + 1e-6) % 2 : 0;
+    if (L.globe) {
+      // a solid navy drop down and to the right, like the type's, then the sprite
+      const gx0 = Math.round(globeItem.x - D / 2), gy0 = Math.round(globeItem.y - D / 2);
+      g.drawImage(globeDrop, gx0 + 3, gy0 + 3);
+      g.drawImage(globeOut, gx0, gy0);
+      continue;
+    }
+    if (L.marquee) {
+      g.drawImage(L.band, 0, L.y);
+      // whole GIF pixels per video frame, right to left, once round in the loop
+      const off = Math.floor(t * FPS + 1e-6) * (L.L / (DURATION * FPS)) % L.L;
+      g.save(); g.beginPath(); g.rect(0, L.y + 2, W, L.band.height - 4); g.clip();
+      for (let x = -off; x < W; x += L.L) g.drawImage(L.run, Math.round(x), L.ty);
+      g.restore();
+      continue;
+    }
+    const k = L.frames.length > 1 ? (Math.floor(t * L.rate + 1e-6) + (L.phase || 0)) % 2 : 0;
     g.drawImage(L.frames[k], Math.round(L.x), Math.round(L.y));
   }
 }

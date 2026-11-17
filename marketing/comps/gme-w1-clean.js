@@ -1,8 +1,8 @@
 // The animated GIF banner, 1997. A low-resolution canvas on a handful of web-safe colours, blown
 // up with hard pixels: chunky 8-bit type, hard two-frame blinks, one pixel starburst, one pixel
-// CLICK HERE, and the cut globe as a classic spinning-globe GIF (rendered in 3D, then posterised
-// with ordered dithering and stepped at 10 frames a second). On the extension's banner the
-// starburst knows where it is: it points at the reader's page, the 70% that is left.
+// CLICK HERE, a couple of pixel twinkles, and the cut globe as a classic spinning-globe GIF
+// (rendered in 3D, then posterised with ordered dithering and stepped at 10 frames a second).
+// Played straight, like a sincere 1997 ad. The only mark is a tiny GME in a corner.
 // Everything on screen is a pure function of time:  window.comp.setTime(seconds)
 import * as THREE from 'three';
 import { createStage } from '../lib/stage.js';
@@ -12,7 +12,7 @@ const q = new URLSearchParams(location.search);
 const DURATION = 12, FPS = 30, TAU = Math.PI * 2, GIF_FPS = 10;
 
 // The web-safe colours the banner is allowed.
-const C = { blue: '#0033ff', navy: '#000066', black: '#000000', white: '#ffffff', yellow: '#ffff00', red: '#ff0000', sky: '#3366ff' };
+const C = { blue: '#0033ff', navy: '#000066', black: '#000000', white: '#ffffff', yellow: '#ffff00', red: '#ff0000', sky: '#3366ff', pale: '#99ccff', gold: '#ffcc00', orange: '#ff9900', darkred: '#990000' };
 const PS = '"Press Start 2P"', SK = '"Silkscreen"';
 
 // Layout in GIF pixels. P is the size of one GIF pixel on the stage.
@@ -21,44 +21,53 @@ const FORMATS = {
   '1x1': {
     w: 1080, h: 1080, P: 4,
     items: [
-      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 16, fill: 'yellow', ext: 3 },
-      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 62, fill: 'white', ext: 2 },
-      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 82, fill: 'white', ext: 2 },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 108, fill: 'yellow', blink: 'white', ext: 2 },
-      { t: 'globe', x: 92, y: 188, d: 112 },
-      { t: 'burst', x: 208, y: 166, r: 36, lines: ['NEW!'], f: `16px ${PS}` },
-      { t: 'button', x: 208, y: 224, s: 'CLICK HERE' },
-      { t: 'logo', x: 135, y: 257, w: 36 },
+      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 18, fill: 'gold', ext: 3 },
+      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 64, fill: 'white', ext: 2 },
+      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 84, fill: 'white', ext: 2 },
+      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 110, fill: 'yellow', blink: 'white', ext: 2 },
+      { t: 'globe', x: 92, y: 194, d: 112 },
+      { t: 'burst', x: 208, y: 172, r: 36, lines: ['NEW!'], f: `16px ${PS}` },
+      { t: 'button', x: 208, y: 232, s: 'CLICK HERE' },
+      { t: 'sparkle', x: 247, y: 15, phase: 0 },
+      { t: 'sparkle', x: 52, y: 146, phase: 1 },
+      { t: 'mark', x: 262, y: 262 },
     ],
   },
   'banner-v': {
     w: 1080, h: 2025, P: 6,
     items: [
-      { t: 'text', s: '30%', f: `48px ${PS}`, x: 90, y: 10, fill: 'yellow', ext: 3 },
-      { t: 'text', s: 'OFF', f: `48px ${PS}`, x: 90, y: 62, fill: 'yellow', ext: 3 },
+      { t: 'text', s: '30%', f: `48px ${PS}`, x: 90, y: 10, fill: 'gold', ext: 3 },
+      { t: 'text', s: 'OFF', f: `48px ${PS}`, x: 90, y: 62, fill: 'gold', ext: 3 },
       { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 120, fill: 'white', ext: 2 },
       { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 139, fill: 'white', ext: 2 },
       { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 158, fill: 'white', ext: 2 },
       { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 90, y: 182, fill: 'yellow', blink: 'white', ext: 2 },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 90, y: 199, fill: 'yellow', blink: 'white', ext: 2 },
       { t: 'globe', x: 124, y: 266, d: 88 },
-      { t: 'burst', x: 40, y: 258, r: 39, lines: ['INCLUDING', 'THIS PAGE!'], f: `8px ${SK}`, arrow: 'left' },
-      { t: 'button', x: 72, y: 322, s: 'CLICK HERE' },
-      { t: 'logo', x: 156, y: 324, w: 30 },
+      { t: 'burst', x: 40, y: 258, r: 39, lines: ['WOW!'], f: `16px ${PS}` },
+      { t: 'button', x: 90, y: 318, s: 'CLICK HERE' },
+      { t: 'sparkle', x: 160, y: 8, phase: 0 },
+      { t: 'sparkle', x: 88, y: 228, phase: 1 },
+      { t: 'mark', x: 174, y: 332 },
     ],
   },
   'banner-h': {
     w: 1170, h: 834, P: 5,
     items: [
-      { t: 'text', s: '30%', f: `40px ${PS}`, x: 10, y: 10, align: 'l', fill: 'yellow', ext: 3 },
-      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 10, y: 56, align: 'l', fill: 'yellow', ext: 3 },
-      { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 10, y: 106, align: 'l', fill: 'white', ext: 1 },
-      { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 10, y: 118, align: 'l', fill: 'white', ext: 1 },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 10, y: 134, align: 'l', fill: 'yellow', blink: 'white', ext: 1 },
-      { t: 'globe', x: 186, y: 50, d: 84 },
-      { t: 'burst', x: 190, y: 129, r: 35, lines: ['INCLUDING', 'THIS PAGE!'], f: `8px ${SK}`, arrow: 'down' },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 10, y: 8, align: 'l', fill: 'gold', ext: 3 },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 10, y: 52, align: 'l', fill: 'gold', ext: 3 },
+      // the small lines in the larger pixel face, so they still read at phone size
+      { t: 'text', s: 'EVERYTHING ON', f: `16px ${SK}`, x: 10, y: 101, align: 'l', fill: 'white', ext: 2 },
+      { t: 'text', s: 'THE INTERNET.', f: `16px ${SK}`, x: 10, y: 118, align: 'l', fill: 'white', ext: 2 },
+      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `16px ${SK}`, x: 10, y: 140, align: 'l', fill: 'yellow', blink: 'white', ext: 2 },
+      { t: 'globe', x: 184, y: 48, d: 84 },
+      // the burst slapped on the globe's lower corner like a sticker, right of the two white lines
+      // and wholly above BLACK FRIDAY ONLY!, its points inside the right edge
+      { t: 'burst', x: 203, y: 100, r: 28, lines: ['HOT!'], f: `16px ${SK}` },
       // no CLICK HERE on the phone: the strip is short, and the burst is its one device
-      { t: 'logo', x: 26, y: 156, w: 30 },
+      { t: 'sparkle', x: 128, y: 9, phase: 0 },
+      { t: 'sparkle', x: 140, y: 12, phase: 1 },
+      { t: 'mark', x: 230, y: 161 },
     ],
   },
 };
@@ -112,12 +121,43 @@ function textMask(s, font) {
   x.font = font; x.textBaseline = 'top'; x.fillStyle = '#fff'; x.fillText(s, 4, 4);
   return crop(harden(c));
 }
-// A sprite: the mask in its colour over a solid pixel extrusion down and to the right.
+// How each fill is lit: a hand-placed pixel bevel. hi lights the top edge of every stroke, lo
+// shades the bottom edge, band repaints the lower part of the face (two-band 8-bit title type),
+// key draws a one-pixel black keyline round the letters before the extrusion.
+const FACES = {
+  gold: { fill: 'yellow', band: 'gold', bandAt: 0.56, hi: 'white', lo: 'orange', key: true },
+  yellow: { fill: 'yellow', lo: 'gold' },
+  white: { fill: 'white', lo: 'pale' },
+};
+function face(mask, name) {
+  const F = FACES[name] || { fill: name };
+  const w = mask.width, h = mask.height;
+  const a = mask.getContext('2d').getImageData(0, 0, w, h).data;
+  const on = (x, y) => x >= 0 && y >= 0 && x < w && y < h && a[(y * w + x) * 4 + 3] > 0;
+  const o = canvas(w, h), x = o.getContext('2d');
+  for (let y = 0; y < h; y++) for (let xx = 0; xx < w; xx++) {
+    if (!on(xx, y)) continue;
+    let c = F.band && y >= h * F.bandAt ? F.band : F.fill;
+    if (F.lo && !on(xx, y + 1)) c = F.lo;
+    else if (F.hi && !on(xx, y - 1)) c = F.hi;
+    x.fillStyle = C[c] || c; x.fillRect(xx, y, 1, 1);
+  }
+  return o;
+}
+// A sprite: the lit face over a solid pixel extrusion down and to the right.
 function sprite(mask, fill, ext = 0, extColour = 'navy') {
-  const o = canvas(mask.width + ext, mask.height + ext), x = o.getContext('2d');
+  const key = FACES[fill] && FACES[fill].key ? 1 : 0;
+  const o = canvas(mask.width + ext + key * 2, mask.height + ext + key * 2), x = o.getContext('2d');
   const back = tint(mask, extColour);
-  for (let i = ext; i >= 1; i--) x.drawImage(back, i, i);
-  x.drawImage(tint(mask, fill), 0, 0);
+  if (key) {
+    const ink = tint(mask, 'black');
+    for (let i = ext + 1; i >= 1; i--) x.drawImage(ink, i + 1, i + 1);
+    for (let i = ext; i >= 1; i--) x.drawImage(back, i + 1, i + 1);
+    for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2], [0, 0], [2, 0], [0, 2], [2, 2]]) x.drawImage(ink, dx, dy);
+  } else {
+    for (let i = ext; i >= 1; i--) x.drawImage(back, i, i);
+  }
+  x.drawImage(face(mask, fill), key, key);
   return o;
 }
 
@@ -127,7 +167,8 @@ let globeItem = null;
 for (const it of F.items) {
   if (it.t === 'text') {
     const m = textMask(it.s, it.f);
-    const x = it.align === 'l' ? it.x : Math.round(it.x - m.width / 2);
+    const key = FACES[it.fill] && FACES[it.fill].key ? 1 : 0;
+    const x = (it.align === 'l' ? it.x : Math.round(it.x - m.width / 2)) - key;
     const frames = [sprite(m, it.fill, it.ext)];
     if (it.blink) frames.push(sprite(m, it.blink, it.ext));
     layers.push({ frames, x, y: it.y, rate: 2 });
@@ -138,9 +179,12 @@ for (const it of F.items) {
   } else if (it.t === 'globe') {
     globeItem = it;
     layers.push({ globe: true });
-  } else if (it.t === 'logo') {
-    const L = $('logo'), w = it.w * P, h = w / 1.872;
-    Object.assign(L.style, { left: it.x * P - w / 2 + 'px', top: it.y * P - h / 2 + 'px', width: w + 'px', height: h + 'px' });
+  } else if (it.t === 'sparkle') {
+    layers.push(sparkle(it));
+  } else if (it.t === 'mark') {
+    // the only branding: a tiny GME, one colour, a shade off the background, bottom-right
+    const m = textMask('GME', `8px ${SK}`);
+    layers.push({ frames: [tint(m, 'sky')], x: it.x - m.width, y: it.y - m.height, rate: 0 });
   }
 }
 
@@ -162,43 +206,24 @@ function burst(it) {
     const ink = tint(shape, 'black');
     for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2]]) y.drawImage(ink, dx, dy);
     y.drawImage(tint(shape, 'red'), 1, 1);
-    // words, and on the extension's banner an arrow at the reader's page
-    const masks = it.lines.map((l) => textMask(l, it.f));
-    const rows = masks.map((m) => sprite(m, k ? 'white' : 'yellow', 1, 'black'));
-    if (it.arrow === 'left') rows.unshift(arrow('left'));
-    if (it.arrow === 'down') rows.push(arrow('down'));
+    // a pixel of shine on the upper-left points: the body lit like the type
+    const body = shape.getContext('2d').getImageData(0, 0, size, size).data;
+    const inS = (px, py) => px >= 0 && py >= 0 && px < size && py < size && body[(py * size + px) * 4 + 3] > 0;
+    y.fillStyle = '#ff6666';
+    for (let py = 0; py < size; py++) for (let px = 0; px < size; px++) if (inS(px, py) && (!inS(px, py - 1) || !inS(px - 1, py)) && px + py < size * 0.9) y.fillRect(px + 1, py + 1, 1, 1);
+    y.fillStyle = C.darkred;
+    for (let py = 0; py < size; py++) for (let px = 0; px < size; px++) if (inS(px, py) && (!inS(px, py + 1) || !inS(px + 1, py)) && px + py > size * 1.1) y.fillRect(px + 1, py + 1, 1, 1);
+    // the word
+    const rows = it.lines.map((l) => sprite(textMask(l, it.f), k ? 'white' : 'yellow', 1, 'black'));
     const gap = 3, total = rows.reduce((s, r) => s + r.height, 0) + gap * (rows.length - 1);
     let ty = Math.round((o.height - total) / 2);
     for (const r of rows) {
-      let dx = 0, dy = 0;
-      if (r.isArrow && k) { if (it.arrow === 'left') dx = -2; else dy = 2; }
-      y.drawImage(r, Math.round((o.width - r.width) / 2) + dx, ty + dy);
+      y.drawImage(r, Math.round((o.width - r.width) / 2), ty);
       ty += r.height + gap;
     }
     return o;
   });
   return { frames, x: it.x - frames[0].width / 2, y: it.y - frames[0].height / 2, rate: 2 }; // on the same 2 Hz beat as the button and the message blink
-}
-function arrow(dir) {
-  // a fat pixel arrow, drawn pointing left: 13 px head, 7 px shaft, 18 px long
-  const AW = 18, AH = 13, HH = 6;
-  const c = canvas(AW, AH), x = c.getContext('2d');
-  x.fillStyle = '#fff';
-  for (let i = 0; i <= HH; i++) x.fillRect(i, HH - i, 1, i * 2 + 1);
-  x.fillRect(HH + 1, 3, AW - HH - 1, AH - 6);
-  let m = c;
-  if (dir === 'down') {
-    m = canvas(AH, AW);
-    const a = c.getContext('2d').getImageData(0, 0, AW, AH).data, y = m.getContext('2d');
-    y.fillStyle = '#fff';
-    for (let yy = 0; yy < AH; yy++) for (let xx = 0; xx < AW; xx++) if (a[(yy * AW + xx) * 4 + 3]) y.fillRect(yy, AW - 1 - xx, 1, 1);
-  }
-  const o = canvas(m.width + 2, m.height + 2), y = o.getContext('2d');
-  const ink = tint(m, 'black');
-  for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2], [2, 2]]) y.drawImage(ink, dx, dy);
-  y.drawImage(tint(m, 'yellow'), 1, 1);
-  o.isArrow = true;
-  return o;
 }
 function flipV(c) { const o = canvas(c.width, c.height), x = o.getContext('2d'); x.translate(0, c.height); x.scale(1, -1); x.drawImage(c, 0, 0); return o; }
 
@@ -211,6 +236,9 @@ function button(it) {
     x.fillStyle = C.navy; x.fillRect(3, 3, w, h);
     x.fillStyle = C.black; x.fillRect(0, 0, w, h);
     x.fillStyle = k ? C.white : C.yellow; x.fillRect(1, 1, w - 2, h - 2);
+    // pixel bevel: lit top and left, shaded bottom and right
+    x.fillStyle = k ? C.pale : C.gold; x.fillRect(2, h - 2, w - 3, 1); x.fillRect(w - 2, 2, 1, h - 3);
+    x.fillStyle = C.white; x.fillRect(1, 1, w - 3, 1); x.fillRect(1, 1, 1, h - 3);
     x.drawImage(tint(m, 'blue'), padX, padY);
     // arrows: 3 px tall triangles, one pixel further in on the second frame
     x.fillStyle = C.blue;
@@ -222,6 +250,24 @@ function button(it) {
     return o;
   });
   return { frames, x: Math.round(it.x - w / 2), y: Math.round(it.y - h / 2), rate: 2 };
+}
+
+// A pixel twinkle: a four-point star, white at the heart, fading to pale blue at the tips. Two
+// sizes on the 2 Hz beat (big, small), and gone on alternate beats so the two sparkles take turns.
+function sparkle(it) {
+  const star = (arm) => {
+    const n = arm * 2 + 1, o = canvas(n, n), x = o.getContext('2d');
+    for (let i = 1; i <= arm; i++) {
+      x.fillStyle = i > arm - 1 && arm > 1 ? C.pale : C.white;
+      for (const [dx, dy] of [[i, 0], [-i, 0], [0, i], [0, -i]]) x.fillRect(arm + dx, arm + dy, 1, 1);
+    }
+    x.fillStyle = C.white; x.fillRect(arm, arm, 1, 1);
+    if (arm > 2) { x.fillStyle = C.pale; for (const [dx, dy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) x.fillRect(arm + dx, arm + dy, 1, 1); }
+    return o;
+  };
+  const big = star(4), small = star(2);
+  const pad = (c) => { const o = canvas(big.width, big.height); o.getContext('2d').drawImage(c, (big.width - c.width) / 2, (big.height - c.height) / 2); return o; };
+  return { frames: [big, pad(small), null, null], x: it.x - 4, y: it.y - 4, rate: 2, phase: it.phase * 2 };
 }
 
 // ---------- the globe GIF ----------
@@ -316,16 +362,14 @@ const bgCanvas = canvas(W, H);
   x.putImageData(d, 0, 0);
 }
 
-await Promise.all(['gme-primary'].map((n) => { const i = new Image(); i.src = `/assets/gme/${n}.png`; return i.decode(); }));
-
 function setTime(t) {
   t = ((t % DURATION) + DURATION) % DURATION;
   drawGlobe(Math.floor(t * GIF_FPS + 1e-6) % (DURATION * GIF_FPS));
   g.drawImage(bgCanvas, 0, 0);
   for (const L of layers) {
     if (L.globe) { g.drawImage(globeOut, Math.round(globeItem.x - D / 2), Math.round(globeItem.y - D / 2)); continue; }
-    const k = L.frames.length > 1 ? Math.floor(t * L.rate + 1e-6) % 2 : 0;
-    g.drawImage(L.frames[k], Math.round(L.x), Math.round(L.y));
+    const n = L.frames.length, k = n > 1 ? (Math.floor(t * L.rate + 1e-6) + (L.phase || 0)) % n : 0;
+    if (L.frames[k]) g.drawImage(L.frames[k], Math.round(L.x), Math.round(L.y));
   }
 }
 
