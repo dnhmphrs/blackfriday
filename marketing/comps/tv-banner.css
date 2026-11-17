@@ -1,0 +1,8 @@
+/* The approved banner layout, re-shot as a 1990s home-shopping channel graphic: smooth full
+   resolution, a lit blue studio backdrop, a chrome monument in 3D and glossy sale graphics. */
+@font-face { font-family: "Archivo"; font-weight: 800; font-style: italic; src: url("/node_modules/@fontsource/archivo/files/archivo-latin-800-italic.woff2") format("woff2"); }
+@font-face { font-family: "Archivo"; font-weight: 900; font-style: italic; src: url("/node_modules/@fontsource/archivo/files/archivo-latin-900-italic.woff2") format("woff2"); }
+
+html, body { margin: 0; padding: 0; background: #0a1cc4; }
+#stage { position: relative; overflow: hidden; background: #0a1cc4; }
+#stage > canvas { position: absolute; left: 0; top: 0; }
