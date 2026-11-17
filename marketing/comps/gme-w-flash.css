@@ -1,0 +1,57 @@
+/* A Flash banner, 2001: vector-crisp, glossy aqua on a bright clean blue, a chrome swoosh, a lens
+   glint, a loading bar and a tiny SKIP INTRO. */
+html, body { margin: 0; padding: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: #1446ff; }
+#stage > * { position: absolute; }
+
+.bg, .grid, .halo { inset: 0; }
+/* the square advert keeps a banner-ad keyline just inside its edge; on the extension the page edge is the edge */
+.frame { display: none; inset: 10px; border: 3px solid rgba(160, 230, 255, 0.75); pointer-events: none; }
+.grid { opacity: 1; }
+#gl { left: 0; top: 0; }
+.swoosh { left: 0; top: 0; overflow: visible; }
+.glint svg { position: absolute; }
+.flare { inset: 0; mix-blend-mode: screen; pointer-events: none; }
+
+/* the maker's mark, white, tinted with a mask */
+.logo {
+  display: block;
+  -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat;
+  mask: url(/assets/gme/gme-primary.png) center / contain no-repeat;
+  background: #ffffff;
+}
+
+/* the message */
+.msg { left: 0; top: 0; }
+.msg > div { position: absolute; white-space: nowrap; }
+.big { font: 400 100px/1 "Archivo Black", sans-serif; letter-spacing: -0.035em; text-transform: uppercase;
+  filter: drop-shadow(0 0.05em 0.09em rgba(0, 18, 110, 0.55)); }
+.big .row { display: block; position: relative; }
+.big .face { display: block; color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffffff 49%, #d2f3ff 51.5%, #8fdfff 78%, #c8f1ff 100%); }
+.big .shine { position: absolute; left: 0; top: 0; display: block; font-style: normal; color: transparent; pointer-events: none;
+  -webkit-background-clip: text; background-clip: text; }
+.what { font: 800 100px/1.02 "Inter", sans-serif; color: #fff; text-transform: uppercase; letter-spacing: 0.01em;
+  text-shadow: 0 0.04em 0.12em rgba(0, 18, 110, 0.45); }
+.what span { display: block; }
+.when { font: 800 100px/1 "Inter", sans-serif; text-transform: uppercase; letter-spacing: 0.01em; color: #ffe94a;
+  text-shadow: 0 0.04em 0.12em rgba(0, 18, 110, 0.45); }
+
+/* the loading bar: thin, crisp, Flash-preloader style */
+.load { color: #fff; }
+.load .lbl { display: flex; justify-content: space-between; align-items: baseline;
+  font: 400 var(--lblSize, 26px)/1 "Silkscreen", monospace; text-transform: uppercase; letter-spacing: 0.04em; }
+.load .lbl b { font: 400 calc(var(--lblSize, 26px) * 0.82)/1 "Press Start 2P", monospace; color: #7ff0ff; }
+.load .bar { position: relative; margin-top: var(--gap, 14px); height: var(--barH, 34px);
+  border: var(--bw, 3px) solid #fff; box-sizing: border-box; background: rgba(0, 20, 120, 0.28); }
+.load .fill { position: absolute; left: var(--pad, 4px); top: var(--pad, 4px); bottom: var(--pad, 4px); overflow: hidden;
+  background: linear-gradient(180deg, #e9fdff 0%, #8ff4ff 45%, #22c8ff 55%, #49dcff 100%); }
+.load .sheen { position: absolute; top: 0; bottom: 0; width: 22%;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.95), rgba(255,255,255,0)); }
+
+.load .rest { position: absolute; display: flex; align-items: center; justify-content: center;
+  font-family: "Silkscreen", monospace; text-transform: uppercase; letter-spacing: 0.04em; color: #ffffff; font-weight: 700; white-space: nowrap;
+  background: repeating-linear-gradient(135deg, rgba(127,240,255,0.22) 0 4px, rgba(127,240,255,0) 4px 11px); }
+.skip { font: 400 var(--skipSize, 22px)/1 "Silkscreen", monospace; color: #cfe0ff; text-transform: uppercase; letter-spacing: 0.06em;
+  text-decoration: underline; text-underline-offset: 0.25em; white-space: nowrap; }
+

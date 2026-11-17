@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/comps/fonts.css">
+<style>body{margin:0;background:#0033ff} canvas{image-rendering:pixelated;width:1200px;height:600px;display:block}</style></head><body>
+<canvas id="c" width="300" height="150"></canvas>
+<script type="module">
+const fams=[['8px "Press Start 2P"'],['8px "Silkscreen"'],['700 8px "Silkscreen"'],['16px "VT323"'],['16px "Silkscreen"'],['700 16px "Silkscreen"'],['16px "Press Start 2P"']];
+for(const [f] of fams) await document.fonts.load(f);
+const c=document.getElementById('c'),g=c.getContext('2d');
+let y=2; const out={};
+for(const [f] of fams){ g.font=f; g.textBaseline='top'; g.fillStyle='#fff'; g.fillText('30% OFF EVERYTHING ÄQ…’',2,y); out[f]=g.measureText('EVERYTHING').width; y+= parseInt(f.match(/(\d+)px/)[1])+4; }
+// threshold
+const d=g.getImageData(0,0,300,150);let semi=0;for(let i=3;i<d.data.length;i+=4){if(d.data[i]>0&&d.data[i]<255)semi++;}
+out.semi=semi; window.out=out; window.ready=true;
+</script></body></html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>GME Flash Banner 2001</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-w-flash.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="bg" id="bg"></div>
+  <div class="grid" id="grid"></div>
+  <div class="halo" id="halo"></div>
+
+  <svg class="swoosh" id="swoosh-back"></svg>
+  <canvas id="gl"></canvas>
+  <svg class="swoosh" id="swoosh-front"></svg>
+  <div class="glint" id="glint"></div>
+  <svg class="flare" id="flare"></svg>
+
+  <i class="logo" id="logo"></i>
+
+  <div class="msg" id="msg">
+    <div class="big" id="big"></div>
+    <div class="what" id="what"></div>
+    <div class="when" id="when">Black Friday only!</div>
+  </div>
+
+  <div class="load" id="load">
+    <div class="lbl"><span id="load-lbl"></span><b id="load-pct">70%</b></div>
+    <div class="bar"><div class="fill" id="fill"><i class="sheen" id="sheen"></i></div></div>
+  </div>
+
+  <a class="skip" id="skip">Skip intro &raquo;</a>
+</div>
+<script type="module" src="./gme-w-flash.js"></script>
+</body>
+</html>
