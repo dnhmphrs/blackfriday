@@ -1,0 +1,46 @@
+/* The Classic: a standard American Black Friday sale sign, printed by GME on their navy night. */
+:root {
+  --ink: #04050c;
+  --navy: #070b1e;
+  --red: #e5141d;
+  --yellow: #ffd21a;
+  --white: #f4f1ea;
+  --serif: "EB Garamond", serif;
+  --sans: "Libre Franklin", "Inter", sans-serif;
+}
+html, body { margin: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: var(--ink); color: var(--white); font-family: var(--sans); }
+#stage > * { position: absolute; }
+
+/* GME's night: near-black at the top, deep navy, and a band of blue haze low down */
+.sky { inset: 0; background: linear-gradient(180deg, #030409 0%, #04060f 30%, #060a1b 58%, #08102a 80%, #0e1a40 93%, #172a5a 100%); }
+.haze { inset: 0; pointer-events: none; }
+#glow, #type, #sheen, #gl, #burst, #dust { left: 0; top: 0; }
+#sheen { mix-blend-mode: multiply; }
+#glow { filter: blur(var(--glowBlur, 26px)); }
+.grain, .vignette { inset: 0; pointer-events: none; }
+.grain { mix-blend-mode: overlay; opacity: 0.62; background-size: 384px 384px; }
+.fine-grain { mix-blend-mode: soft-light; opacity: 0.5; background-size: 192px 192px; }
+.vignette { background: radial-gradient(130% 90% at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%); }
+
+/* document header, as on the brand sheet */
+.doc { left: var(--gut); right: var(--gut); top: var(--docTop); display: flex; justify-content: space-between; font: 500 var(--docSize)/1.16 var(--sans); color: rgba(244, 241, 234, 0.9); }
+.doc .c2 { position: absolute; left: 50%; transform: translateX(-50%); }
+.doc .c3 { text-align: right; }
+
+/* under the red bar: the asterisk, the one serif line, the sponsor */
+.foot { left: var(--gut); right: var(--gut); display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+.foot p { margin: 0; }
+.star { font: 700 var(--starSize)/1.2 var(--sans); letter-spacing: 0.01em; color: var(--white); }
+.serif { margin-top: var(--serifGap) !important; font: italic 400 var(--serifSize)/1.08 var(--serif); color: rgba(244, 241, 234, 0.92); font-feature-settings: "liga" 1, "dlig" 1, "lnum" 1; }
+.sponsor { flex: none; display: flex; flex-direction: column; align-items: flex-end; }
+.sponsor span { font: 600 var(--presSize)/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(244, 241, 234, 0.7); margin-bottom: calc(var(--presSize) * 0.7); }
+.sponsor .mark { display: block; width: var(--markW); aspect-ratio: 1142 / 610; background: var(--white); -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+
+/* pinstripes and the small print at the very bottom */
+.base { left: 0; right: 0; }
+.rules { height: var(--rulesH); background: repeating-linear-gradient(180deg, rgba(244, 241, 234, 0.34) 0 2px, transparent 2px var(--ruleStep)); }
+.fine { margin: var(--fineGap) var(--gut) 0; display: flex; justify-content: space-between; font: 600 var(--fineSize)/1.3 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(244, 241, 234, 0.72); }
+
+#glint { left: 0; top: 0; width: 1px; height: 1px; }
+#glint svg { position: absolute; overflow: visible; }

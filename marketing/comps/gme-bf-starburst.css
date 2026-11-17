@@ -1,0 +1,56 @@
+/* The Starburst: a loud American doorbuster sign, printed by Gary Mustard Enterprises. */
+:root {
+  --ink: #05060c;
+  --red: #e8161b;
+  --yellow: #ffd60a;
+  --white: #f6f3ea;
+  --navy: #0a1638;
+  --serif: "EB Garamond", "Cormorant Garamond", serif;
+  --label: "Libre Franklin", "Inter", sans-serif;
+  --sign: "Anton", "Oswald", sans-serif;
+}
+html, body { margin: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: #000; color: var(--white); font-family: var(--label); }
+#stage > * { position: absolute; }
+
+/* Black Friday black, falling through GME navy into the brand sheet's grey-blue haze */
+.sky { inset: 0; background: linear-gradient(180deg, #000 0%, #020309 22%, #050a1d 42%, #0a1a48 62%, #1d3f8c 78%, #5e78ab 91%, #a3abbb 100%); }
+.glow, .haze { inset: 0; pointer-events: none; mix-blend-mode: screen; }
+#clouds { left: 0; top: 0; pointer-events: none; }
+#halation { left: 0; top: 0; pointer-events: none; mix-blend-mode: screen; transform-origin: 0 0; }
+.rays { pointer-events: none; border-radius: 50%; mix-blend-mode: screen; }
+#gl { left: 0; top: 0; }
+#dust, .grain, .vignette { inset: 0; pointer-events: none; }
+#dust { width: 100%; height: 100%; }
+.grain { mix-blend-mode: overlay; opacity: 0.34; background-size: 384px 384px; }
+.vignette { background: radial-gradient(130% 90% at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%); }
+
+/* the brand sheet's document header */
+.doc { left: var(--gut); right: var(--gut); top: var(--docTop); display: flex; justify-content: space-between; font: 500 var(--docSize)/1.16 var(--label); color: rgba(246, 243, 234, 0.9); }
+.doc .c2 { position: absolute; left: 50%; transform: translateX(-50%); }
+.doc .c3 { text-align: right; }
+
+/* the sign itself */
+.kicker { left: 0; right: 0; text-align: center; font: 600 var(--kick)/1 "Oswald", sans-serif; letter-spacing: 0.32em; text-transform: uppercase; color: var(--yellow); white-space: nowrap; }
+.title { left: 0; right: 0; }
+.title .ink, .title .bloom { position: absolute; left: 0; right: 0; top: 0; text-align: center; font-family: var(--sign); font-weight: 400; text-transform: uppercase; white-space: nowrap; }
+.title .line { display: block; line-height: 0.86; }
+.title .ink { color: var(--white); }
+.title .ink .line.hot { color: var(--white); }
+.title .bloom { display: none; }
+.title .ink { text-shadow: 0 0 calc(var(--bloomBlur) * 0.5) rgba(190, 210, 255, 0.45), 0 0 calc(var(--bloomBlur) * 1.6) rgba(120, 150, 255, 0.35); }
+
+.ribbon { left: 0; top: 0; overflow: visible; }
+#glints { left: 0; top: 0; width: 1px; height: 1px; }
+#glints svg { position: absolute; overflow: visible; }
+
+.under { left: 0; right: 0; text-align: center; font: 500 var(--under)/1 "Oswald", sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: var(--white); white-space: nowrap; }
+.under b { color: var(--yellow); font-weight: 600; }
+.lockup .mark { position: absolute; inset: 0; background: var(--white); -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+.foot { margin: 0; font: italic 400 var(--foot)/1.2 var(--serif); color: rgba(246, 243, 234, 0.94); font-feature-settings: "liga" 1, "dlig" 1; }
+.strip { left: 0; right: 0; display: flex; justify-content: center; gap: 0.9em; font: 600 var(--strip)/1 "Libre Franklin", sans-serif; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(10, 14, 34, 0.9); white-space: nowrap; }
+.fine { margin: 0; left: var(--gut); right: var(--gut); text-align: center; font: 500 var(--fine)/1.35 var(--label); letter-spacing: 0.02em; color: rgba(10, 14, 34, 0.78); }
+.side span { display: block; font: 400 100px/0.92 var(--sign); text-transform: uppercase; color: var(--white); white-space: nowrap; }
+.side span.hot { color: var(--yellow); }
+.side em { display: block; margin-top: 0.7em; font: 600 21px/1.35 "Oswald", sans-serif; font-style: normal; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(246, 243, 234, 0.85); }
+.pins { left: 0; right: 0; background: repeating-linear-gradient(180deg, rgba(8, 12, 32, 0.7) 0 2px, transparent 2px 6px); }
