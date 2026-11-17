@@ -53,8 +53,8 @@ const FORMATS = {
       { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 10, y: 148, align: 'l', st: 'body' },
       { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 10, y: 174, align: 'l', st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 10, y: 192, align: 'l', st: 'only' },
-      { t: 'globe', x: 224, y: 151, d: 96, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.5 } },
-      { t: 'sticker', x: 254, y: 114, r: 18, s: '-30%', f: `8px ${PS}` },
+      { t: 'globe', x: 224, y: 133, d: 96, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.75 } },
+      { t: 'sticker', x: 252, y: 96, r: 18, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 112, y: 222, r: 24, lines: ['NEW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 140, y: 30, ph: 0 },
       { t: 'sparkle', x: 152, y: 150, ph: 1 },
@@ -71,12 +71,12 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 104, st: 'body' },
       { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 124, st: 'body' },
       { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 144, st: 'body' },
-      { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 42, y: 176, st: 'only' },
-      { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 42, y: 194, st: 'only' },
-      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 42, y: 212, st: 'only' },
-      { t: 'globe', x: 122, y: 236, d: 80, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.5 } },
-      { t: 'sticker', x: 154, y: 206, r: 17, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 40, y: 270, r: 24, lines: ['WOW!'], f: `8px ${PS}` },
+      { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 51, y: 176, st: 'only' },
+      { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 51, y: 194, st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 51, y: 212, st: 'only' },
+      { t: 'globe', x: 124, y: 219, d: 78, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.75 } },
+      { t: 'sticker', x: 155, y: 190, r: 17, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 46, y: 270, r: 24, lines: ['WOW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
       { t: 'sparkle', x: 166, y: 62, ph: 1 },
       { t: 'sparkle', x: 82, y: 176, ph: 1 },
@@ -92,8 +92,8 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 192, y: 70, d: 80, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.5 } },
-      { t: 'sticker', x: 210, y: 40, r: 16, s: '-30%', f: `8px ${PS}` },
+      { t: 'globe', x: 194, y: 58, d: 72, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.75 } },
+      { t: 'sticker', x: 210, y: 30, r: 15, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 138, y: 98, r: 18, lines: ['HOT!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 146, y: 22, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
@@ -427,7 +427,7 @@ function buildMarquee(it) {
   });
   const speed = 60; // GIF pixels a second, rounded to a whole number of passes a loop
   const passes = Math.max(1, Math.round((speed * DURATION) / L));
-  const under = q.get('edge') === 'serrated' && format !== 'banner-v' ? 4 : 0; // room for teeth (TOOTH.depth)
+  const under = q.get('edge') === 'serrated' && format !== 'banner-v' ? (q.get('trim') === '0' ? 4 : 8) : 0; // room for teeth (TOOTH.depth)
   return { strip, frame, L, passes, y: H - it.h - under, h: it.h, under };
 }
 function drawMarquee(t) {
@@ -677,14 +677,24 @@ const bitten = (along, into) => {
 // The page-facing edge(s) for this format: the left edge down the side of a desktop page, the
 // bottom edge across the top of a phone, all four edges on the square (a coupon).
 const EDGES = format === 'banner-v' ? ['left'] : format === 'banner-h' ? ['bottom'] : ['left', 'right', 'top', 'bottom'];
+// The trim: a black keyline and a bevelled gold band that follow the teeth, like the type's own
+// edges; ?trim=dash adds a white perforation line inside it; ?trim=0 leaves the bare cut.
+const TRIM = q.get('trim') || 'gold';
+const TRIM_INK = { line: '#000000', hi: '#ffff00', band: '#ffcc00', perf: '#ffffff' };
 function cutEdges() {
   for (const e of EDGES) {
     for (let a = 0; a < (e === 'left' || e === 'right' ? H : W); a++) {
-      for (let d = 0; d < TOOTH.depth; d++) {
-        if (!bitten(a, d)) continue;
+      const p = ((a % TOOTH.period) + TOOTH.period) % TOOTH.period, half = TOOTH.period / 2;
+      const edge = Math.ceil(TOOTH.depth * (1 - Math.abs(p - half) / half)); // first solid pixel in from the edge
+      for (let d = 0; d < TOOTH.depth + 10; d++) {
         const x = e === 'left' ? d : e === 'right' ? W - 1 - d : a;
         const y = e === 'top' ? d : e === 'bottom' ? H - 1 - d : a;
-        g.clearRect(x, y, 1, 1);
+        if (d < TOOTH.depth && bitten(a, d)) { g.clearRect(x, y, 1, 1); continue; }
+        if (TRIM === '0') continue;
+        const k = d - edge;
+        const ink = k === 0 ? 'line' : k === 1 ? 'hi' : k === 2 ? 'band' : k === 3 ? 'line'
+          : TRIM === 'dash' && d === TOOTH.depth + 6 && a % 6 < 3 ? 'perf' : null;
+        if (ink) { g.fillStyle = TRIM_INK[ink]; g.fillRect(x, y, 1, 1); }
       }
     }
   }
