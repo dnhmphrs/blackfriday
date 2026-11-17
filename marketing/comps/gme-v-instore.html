@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>In-store Black Friday</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-v-instore.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <!-- a phone photo of an end-cap in a big-box store, held a little crooked -->
+  <div id="photo">
+    <canvas id="store"></canvas>
+    <canvas id="gl"></canvas>
+    <canvas id="bloom"></canvas>
+    <div id="hshade"></div>
+    <div id="strips"></div>
+
+    <!-- the printed header card on top of the end-cap, in its sign holder -->
+    <div id="card" class="card">
+      <div class="rays"></div>
+      <div class="body" id="card-body"></div>
+      <div class="band" id="band"></div>
+      <div class="logo-band"><i class="logo"></i></div>
+      <div class="shade"></div>
+      <div class="glare"></div>
+    </div>
+    <i class="clip" id="clip-l"></i><i class="clip" id="clip-r"></i>
+
+    <!-- the scrolling red LED sign bolted under the header -->
+    <div id="led" class="led"><div class="face"><canvas id="led-off"></canvas><canvas id="led-on"></canvas><i class="acrylic"></i></div><i class="screw a"></i><i class="screw b"></i></div>
+
+    <canvas id="sticker"></canvas>
+    <svg id="lines"><path id="line-a"/><path id="line-b"/></svg>
+    <div id="burst"><svg viewBox="-1 -1 2 2"><polygon class="edge" id="burst-edge"/><polygon class="face" id="burst-face"/></svg><div class="words" id="burst-words"></div></div>
+  </div>
+  <div id="fx"></div>
+</div>
+<script type="module" src="./gme-v-instore.js"></script>
+</body>
+</html>

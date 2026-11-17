@@ -1,0 +1,80 @@
+/* GME Shopping Channel: a still off a 1990s/2000s cable shopping channel. */
+html, body { margin: 0; padding: 0; background: #000; }
+.defs { position: absolute; width: 0; height: 0; }
+#stage { position: relative; overflow: hidden; background: #020624; }
+#stage > * { position: absolute; }
+
+/* ---------- the set ---------- */
+.cyc, .bokeh, .beams { inset: 0; }
+#gl, #bloom { left: 0; top: 0; }
+#bloom { mix-blend-mode: screen; opacity: 0.38; }
+.bokeh i { position: absolute; border-radius: 50%; filter: blur(var(--b, 6px)); }
+.beams i { position: absolute; top: -10%; transform-origin: 50% 0; filter: blur(18px); mix-blend-mode: screen; }
+
+.flare { inset: 0; pointer-events: none; mix-blend-mode: screen; }
+.flare i { position: absolute; border-radius: 50%; }
+.flare .core { background: radial-gradient(closest-side, #fff 0%, rgba(235,248,255,0.95) 18%, rgba(120,190,255,0.45) 45%, rgba(40,90,255,0) 100%); }
+.flare .streak { border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,0.95), rgba(140,200,255,0.55) 35%, rgba(40,110,255,0) 100%); }
+.flare .ghost { border: 0; }
+
+.glints svg { position: absolute; overflow: visible; }
+
+/* ---------- graphics ---------- */
+.gfx { transform-origin: 50% 50%; }
+.gfx svg { display: block; overflow: visible; }
+
+/* lower third: the item card */
+.l3 { font-size: var(--l3, 50px); width: var(--l3w, 720px); }
+.l3-tab { display: inline-block; position: relative; z-index: 2; margin-left: 0.5em; padding: 0.08em 0.55em 0.02em;
+  background: linear-gradient(180deg, #ff5a4a 0%, #f2101c 45%, #c00010 52%, #8e000c 100%);
+  border: 0.06em solid #ffe23a; border-bottom: 0; border-radius: 0.28em 0.28em 0 0;
+  box-shadow: inset 0 0.08em 0 rgba(255,255,255,0.55), 0 -0.06em 0 #000, -0.06em 0 0 #000, 0.06em 0 0 #000; }
+.l3-tab span { font: 400 0.82em/1 "Anton"; letter-spacing: 0.02em; color: #fff; text-transform: uppercase;
+  text-shadow: 0.05em 0.05em 0 #000, -0.02em -0.02em 0 #000, 0.02em -0.02em 0 #000, -0.02em 0.02em 0 #000; }
+.l3-name { position: relative; padding: 0.22em 0.5em 0.2em; border-radius: 0.16em 0.16em 0 0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 46%, rgba(255,255,255,0) 50%),
+    linear-gradient(180deg, #3a7dff 0%, #1440f0 50%, #0a23b8 51%, #06176e 100%);
+  border: 0.06em solid #000; box-shadow: inset 0 0 0 0.05em #9fc3ff, 0 0.12em 0.25em rgba(0,0,0,0.6); }
+.l3-name span { font: italic 700 1em/1.05 "Arimo"; color: #fff; white-space: nowrap;
+  text-shadow: 0.06em 0.06em 0 #000, 0 0 0.25em rgba(120,180,255,0.8); }
+.l3-offer { display: flex; align-items: baseline; gap: 0.35em; padding: 0.14em 0.5em 0.12em; border: 0.06em solid #000; border-top: 0;
+  background: linear-gradient(180deg, #fffbd0 0%, #ffe600 40%, #ffc800 55%, #ff9a00 100%);
+  box-shadow: inset 0 -0.05em 0 rgba(120,40,0,0.5), 0 0.14em 0.3em rgba(0,0,0,0.6); }
+.l3-offer b { font: 400 0.92em/1 "Archivo Black"; color: #0a0a0a; white-space: nowrap; }
+.l3-offer i { font: 400 1.18em/1 "Archivo Black"; font-style: normal; color: #e8000f; white-space: nowrap;
+  text-shadow: 0.04em 0.04em 0 #000, -0.015em -0.015em 0 #fff; }
+.l3-tabs { display: flex; align-items: flex-end; gap: 0.3em; }
+.l3-date { display: inline-flex; align-items: center; gap: 0.4em; padding: 0.14em 0.5em 0.12em; border: 0.05em solid #000; border-bottom: 0;
+  background: linear-gradient(180deg, #3a3a3a, #000); border-radius: 0.2em 0.2em 0 0; box-shadow: inset 0 0.05em 0 rgba(255,255,255,0.35); }
+.l3-date span { font: 600 0.62em/1 "Oswald"; color: #fff; letter-spacing: 0.04em; white-space: nowrap; }
+.l3-date .dot { width: 0.32em; height: 0.32em; border-radius: 50%; background: #ff1a1a; box-shadow: 0 0 0.3em #ff2a2a; }
+
+/* the channel bug: the store's logo, white and a little see-through */
+.bug { filter: drop-shadow(0.02em 0.04em 0 rgba(0,0,0,0.55)) drop-shadow(0 0 10px rgba(110,170,255,0.6)); }
+.bug i { display: block; width: 100%; height: 100%; background: #fff;
+  -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+
+/* the ticker */
+.ticker { left: 0; display: flex; align-items: stretch; font-size: var(--tk, 50px);
+  background: linear-gradient(180deg, #1b3cff 0%, #0b1fa6 48%, #050f5c 52%, #020830 100%);
+  border-top: 0.09em solid #ffd400; border-bottom: 0.09em solid #ffd400;
+  box-shadow: 0 -0.06em 0 #000, 0 0.06em 0 #000, 0 0.2em 0.5em rgba(0,0,0,0.7); }
+.tk-label { position: relative; z-index: 2; flex: none; display: flex; align-items: center; padding: 0 0.45em 0 0.4em;
+  background: linear-gradient(180deg, #ff5e4e 0%, #ee0d18 46%, #b8000f 54%, #7a0008 100%);
+  box-shadow: inset 0 0.06em 0 rgba(255,255,255,0.5), 0.08em 0 0 #000, 0.3em 0 0.4em rgba(0,0,0,0.5);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.35em) 100%, 0 100%); padding-right: 0.7em; }
+.tk-label span { font: 400 1.04em/1 "Anton"; color: #ffe600; letter-spacing: 0.02em;
+  text-shadow: 0.05em 0.05em 0 #000, -0.02em -0.02em 0 #000, 0.02em -0.02em 0 #000, -0.02em 0.02em 0 #000; }
+.tk-lane { position: relative; flex: 1; overflow: hidden; display: flex; align-items: center; }
+.tk-run { white-space: nowrap; display: inline-block; will-change: transform; }
+.tk-run span { font: 700 0.92em/1 "Arimo"; color: #fff; text-shadow: 0.05em 0.05em 0 #000; vertical-align: middle; }
+.tk-run svg { width: 0.72em; height: 0.72em; margin: 0 0.55em; vertical-align: middle; position: relative; top: -0.04em; overflow: visible; }
+
+/* the channel's bottom strip, under the ticker (9x16 only, below the safe zone) */
+.foot { left: 0; display: flex; align-items: center; justify-content: center; gap: 0.6em;
+  background: linear-gradient(180deg, #ff5e4e 0%, #e60c18 46%, #b0000e 54%, #6a0007 100%);
+  border-bottom: 0.08em solid #ffd400; box-shadow: inset 0 0.06em 0 rgba(255,255,255,0.45), 0 0.2em 0.5em rgba(0,0,0,0.7); }
+.foot span { font: italic 700 0.9em/1 "Arimo"; color: #fff; text-shadow: 0.05em 0.05em 0 #000; white-space: nowrap; }
+.foot b { font: 400 0.9em/1 "Anton"; color: #ffe600; letter-spacing: 0.02em; padding: 0.12em 0.4em; background: #000; border-radius: 0.15em;
+  text-shadow: 0.04em 0.04em 0 #600; }

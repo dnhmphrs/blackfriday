@@ -1,0 +1,87 @@
+/* GME Black Friday TV spot: the loud local-retailer kind. Everything big. */
+:root {
+  --red: #e8000d;
+  --red-deep: #8c0008;
+  --yellow: #ffe600;
+  --blue: #0a3cff;
+  --blue-deep: #001a9e;
+  --black: #050505;
+  --white: #ffffff;
+  --heavy: "Inter", "Libre Franklin", sans-serif;
+  --block: "Archivo Black", "Inter", sans-serif;
+}
+html, body { margin: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: #000; color: var(--white); font-family: var(--heavy); }
+#stage > * { position: absolute; }
+#rays, #gl, #bloom, #flare { left: 0; top: 0; }
+#bloom { mix-blend-mode: screen; opacity: 0.22; }
+#flare { mix-blend-mode: screen; }
+
+/* ---------- the big spiky flash ---------- */
+.burst { width: var(--bw); height: var(--bw); }
+.burst svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.burst .shadow { fill: rgba(0, 0, 0, 0.55); transform: translate(0.05px, 0.07px); }
+.burst .edge { fill: var(--red); }
+.burst .face { fill: url(#burst-grad); }
+.burst-txt { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 0.86; }
+.burst-txt b { display: block; font-family: var(--block); font-weight: 400; color: var(--red); letter-spacing: -0.02em;
+  -webkit-text-stroke: calc(var(--bw) * 0.016) #fff; paint-order: stroke fill;
+  text-shadow: calc(var(--bw) * 0.008) calc(var(--bw) * 0.012) 0 #000, calc(var(--bw) * 0.016) calc(var(--bw) * 0.022) 0 #000; }
+.burst-txt .pct { font-size: calc(var(--bw) * 0.275); transform: skewX(-8deg); }
+.burst-txt .off { font-size: calc(var(--bw) * 0.215); transform: skewX(-8deg); margin-top: calc(var(--bw) * 0.01); }
+
+/* ---------- the small second flash ---------- */
+.hurry { width: var(--hw); height: var(--hw); }
+.hurry svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 calc(var(--hw) * 0.03) calc(var(--hw) * 0.02) rgba(0,0,0,0.6)); }
+.hurry .edge { fill: #fff; }
+.hurry .face { fill: var(--red); }
+.hurry-txt { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 0.92; transform: skewX(-8deg); }
+.hurry-txt b { font-family: var(--heavy); font-weight: 900; font-style: italic; color: #fff; font-size: calc(var(--hw) * 0.128); text-shadow: 0 calc(var(--hw) * 0.015) 0 #000; }
+.hurry-txt b + b { color: var(--yellow); font-size: calc(var(--hw) * 0.17); }
+
+/* ---------- the chrome title ---------- */
+.title { left: 0; top: 0; overflow: visible; }
+
+/* ---------- the blue strip ---------- */
+.strip { box-sizing: border-box; height: var(--sh); display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #4d7bff 0%, var(--blue) 18%, #0629c9 60%, var(--blue-deep) 100%);
+  border-top: calc(var(--sh) * 0.06) solid #fff; border-bottom: calc(var(--sh) * 0.06) solid #fff;
+  box-shadow: 0 calc(var(--sh) * 0.1) calc(var(--sh) * 0.2) rgba(0,0,0,0.6); transform-origin: 50% 50%; }
+.strip span { font-weight: 900; font-style: italic; font-size: var(--ss); line-height: 1; color: #fff; letter-spacing: -0.01em; white-space: nowrap;
+  text-shadow: calc(var(--ss) * 0.04) calc(var(--ss) * 0.06) 0 #000, 0 0 calc(var(--ss) * 0.3) rgba(140, 190, 255, 0.8); }
+
+/* ---------- the store card (the retailer's own logo) ---------- */
+.store { box-sizing: border-box; height: var(--ch); display: flex; align-items: center; gap: calc(var(--ch) * 0.28); padding: 0 calc(var(--ch) * 0.3);
+  background: linear-gradient(180deg, #ffffff 0%, #f1f3f8 45%, #c9cfdc 100%); border-radius: calc(var(--ch) * 0.1);
+  border: calc(var(--ch) * 0.04) solid var(--yellow);
+  box-shadow: 0 calc(var(--ch) * 0.1) calc(var(--ch) * 0.16) rgba(0,0,0,0.65), inset 0 calc(var(--ch) * -0.05) 0 rgba(0,0,0,0.12); }
+.store .logo { flex: none; display: block; height: calc(var(--ch) * 0.9); width: calc(var(--ch) * 0.9 * 1.872); background: var(--blue-deep);
+  -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+.store .where { display: flex; flex-direction: column; line-height: 0.98; flex: 1; align-items: center; }
+.store .where b { font-weight: 900; font-style: italic; font-size: var(--cs); color: var(--blue-deep); white-space: nowrap; letter-spacing: -0.01em; }
+.store .where .date { color: var(--red); font-size: calc(var(--cs) * 1.12); }
+
+/* ---------- the ticker ---------- */
+.ticker { left: 0; width: 100%; height: var(--th); overflow: hidden; background: linear-gradient(180deg, #fff79a 0%, var(--yellow) 22%, #ffd000 100%);
+  border-top: calc(var(--th) * 0.07) solid var(--red); border-bottom: calc(var(--th) * 0.07) solid var(--red); box-sizing: border-box;
+  box-shadow: 0 calc(var(--th) * -0.06) calc(var(--th) * 0.2) rgba(0,0,0,0.5); }
+.ticker .track { position: absolute; left: 0; top: 0; height: 100%; display: flex; align-items: center; white-space: nowrap; }
+.ticker .unit { display: flex; align-items: center; flex: none; }
+.ticker .line { font-weight: 900; font-style: italic; font-size: var(--ts); color: #000; padding: 0 calc(var(--ts) * 0.5); letter-spacing: -0.005em; line-height: 1; }
+.ticker .sep { width: calc(var(--ts) * 0.8); height: calc(var(--ts) * 0.8); flex: none; }
+.ticker .sep path { fill: var(--red); }
+
+.sparks { left: 0; top: 0; }
+.sparks svg { position: absolute; overflow: visible; }
+
+/* ---------- the doorbuster sign: a black box with chaser bulbs ---------- */
+.door { box-sizing: border-box; background: linear-gradient(180deg, #1a1a1a 0%, #000 60%, #111 100%); border-radius: calc(var(--dh) * 0.08);
+  border: calc(var(--dh) * 0.025) solid #d9d9d9; box-shadow: 0 0 0 calc(var(--dh) * 0.012) #000, 0 calc(var(--dh) * 0.06) calc(var(--dh) * 0.12) rgba(0,0,0,0.7); }
+.door .bulbs { position: absolute; inset: 0; }
+.door .bulbs i { position: absolute; width: calc(var(--dh) * 0.085); height: calc(var(--dh) * 0.085); margin: calc(var(--dh) * -0.0425) 0 0 calc(var(--dh) * -0.0425); border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fff2c0 0%, #b07a10 55%, #4a3000 100%); }
+.door .bulbs i.on { background: radial-gradient(circle at 40% 35%, #ffffff 0%, #fff4a0 35%, #ffc400 70%, #ff8a00 100%); box-shadow: 0 0 calc(var(--dh) * 0.06) calc(var(--dh) * 0.02) rgba(255, 200, 40, 0.9); }
+.door-txt { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 0.95; transform: skewX(-8deg); }
+.door-txt em { font-style: italic; font-weight: 900; font-size: calc(var(--ds) * 0.42); color: #fff; text-shadow: 0 0 calc(var(--ds) * 0.15) rgba(255,255,255,0.6); }
+.door-txt b { font-family: var(--block); font-weight: 400; font-size: var(--ds); color: var(--yellow); letter-spacing: -0.01em;
+  -webkit-text-stroke: calc(var(--ds) * 0.05) var(--red); paint-order: stroke fill; text-shadow: 0 calc(var(--ds) * 0.05) 0 #000, 0 0 calc(var(--ds) * 0.25) rgba(255, 180, 0, 0.55); }
