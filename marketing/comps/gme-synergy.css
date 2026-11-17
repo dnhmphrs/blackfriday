@@ -1,0 +1,72 @@
+/* GME Synergy: the SYNERGY band from the GME sheet, put to work. Positions come from gme-synergy.js. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #05070d; }
+:root {
+  --paper: #e3e2dd;
+  --paper-2: #d6d5cf;
+  --ink: #1b1a18;
+  --chalk: #e9e7e1;      /* type on the navy */
+  --label: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --serif: "EB Garamond", Garamond, serif;
+}
+#stage {
+  position: relative; overflow: hidden; color: var(--chalk);
+  background: #070a14; font-family: var(--serif);
+  font-variant-numeric: lining-nums; font-kerning: normal;
+}
+.sky, #gl, #layout, #dust, .grain { position: absolute; left: 0; top: 0; }
+#layout { width: 100%; height: 100%; }
+.grain { inset: 0; pointer-events: none; }
+
+/* ---------- document header: the sheet's corner labels ---------- */
+.label {
+  position: absolute; font: 500 30px/1.16 var(--label); letter-spacing: 0.005em; color: var(--chalk);
+  white-space: pre;
+}
+.label.r { text-align: right; }
+.label.c { text-align: center; transform: translateX(-50%); }
+
+/* ---------- the lockup ---------- */
+.lockup { position: absolute; color: var(--chalk); }
+.lockup .big { display: block; font: 500 200px/0.86 var(--serif); letter-spacing: -0.018em; white-space: nowrap; }
+.lockup .sub { display: block; font: 400 92px/1 var(--serif); letter-spacing: 0.004em; white-space: nowrap; }
+.lockup .big .pc { font-size: 0.8em; letter-spacing: -0.02em; margin-left: -0.02em; }
+.asterisk { font-size: 0.42em; vertical-align: 0.95em; margin-left: 0.04em; font-weight: 400; }
+
+/* ---------- SYNERGY bands ---------- */
+.band { position: absolute; left: 0; width: 100%; background: var(--paper); overflow: hidden; color: var(--ink); }
+.band::before { /* a little mottling, like the paper on the sheet */
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 40% 120% at 18% 40%, rgba(255,255,255,0.35), rgba(255,255,255,0) 70%),
+    radial-gradient(ellipse 30% 140% at 78% 70%, rgba(120,118,110,0.12), rgba(120,118,110,0) 70%);
+}
+.row { position: absolute; left: 0; overflow: hidden; width: 100%; }
+.row .line { position: absolute; left: 0; top: 0; white-space: pre; font-weight: 700; font-style: italic; letter-spacing: 0.012em; }
+.row .line span { display: inline-block; }
+.cap { /* the wire-globe roundel at the start of the band, with paper behind it */
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: linear-gradient(90deg, var(--paper) 0, var(--paper) calc(100% - 130px), rgba(227,226,221,0) 100%);
+}
+.cap i, .mark {
+  position: absolute; display: block; background: var(--ink);
+  -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+}
+
+/* pinstripes: the rule bands between paper bands */
+.pin { position: absolute; left: 0; width: 100%; }
+
+/* ---------- the dimension: how much of the frame is the 30% ---------- */
+.dim { position: absolute; height: 40px; display: flex; align-items: center; color: var(--chalk); }
+.dim .tick { width: 2px; height: 100%; background: currentColor; flex: none; }
+.dim .ln { height: 2px; background: currentColor; flex: 1; }
+.dim .txt { padding: 0 14px; font: 500 24px/1 var(--label); letter-spacing: 0.08em; white-space: nowrap; }
+.pin .tag { position: absolute; right: 64px; top: 50%; transform: translateY(-50%); padding: 0 12px; background: var(--paper);
+  font: 600 19px/1 var(--label); letter-spacing: 0.06em; color: var(--ink); white-space: nowrap; }
+
+/* ---------- the foot ---------- */
+.say { position: absolute; font: italic 400 52px/1.1 var(--serif); color: var(--chalk); white-space: pre; text-align: inherit; }
+.f-banner-v .say { text-align: center; }
+.fine { position: absolute; font: 400 20px/1.35 var(--label); color: var(--chalk); opacity: 0.78; }
+.star { position: absolute; }

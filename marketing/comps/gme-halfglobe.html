@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>The World, Abridged</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-halfglobe.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="sky"></div>
+  <div class="halo"></div>
+  <canvas id="gl"></canvas>
+  <div id="glint"></div>
+
+  <svg class="leaders" id="leaders"></svg>
+  <div class="label" id="lab-core"></div>
+  <div class="label fig" id="lab-fig"></div>
+
+  <header class="doc">
+    <div class="c1">Gary Mustard<br>Enterprises</div>
+    <div class="c2">EST2026</div>
+    <div class="c3" id="doc-c3"></div>
+  </header>
+
+  <div class="copy">
+    <h1 id="headline"></h1>
+    <p class="sub" id="sub"></p>
+    <p class="date" id="date"></p>
+    <p class="note" id="note"></p>
+  </div>
+
+  <div class="lockup"><i class="mark"></i></div>
+  <div class="foot">
+    <div class="rules"></div>
+    <p class="fine" id="fine"></p>
+  </div>
+
+  <canvas id="dust"></canvas>
+  <div class="grain" id="grain"></div>
+</div>
+<script type="module" src="./gme-halfglobe.js"></script>
+</body>
+</html>

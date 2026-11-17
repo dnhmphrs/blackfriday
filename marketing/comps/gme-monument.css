@@ -1,0 +1,103 @@
+/* GME Monument. Sizes are for the 9x16 hero; other formats override below. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #0b0f1e; }
+#stage {
+  --paper: 1330px; --hz: 800px;
+  --ink: #17181a;
+  --paperc: #dcdcd7;
+  position: relative; overflow: hidden;
+  background: var(--paperc);
+  font-family: "Libre Franklin", "Inter", sans-serif;
+  color: #f1f0ea;
+}
+
+/* ---------- the photograph ---------- */
+.photo { position: absolute; left: 0; top: 0; width: 100%; height: var(--paper); overflow: hidden; filter: saturate(0.86) contrast(0.97) sepia(0.06); }
+.sky {
+  position: absolute; inset: 0 0 auto 0; height: calc(var(--hz) + 60px);
+  background: linear-gradient(180deg, #03061a 0%, #071547 16%, #0f3290 38%, #2a62c4 64%, #6d97d8 86%, #a9bdd6 100%);
+}
+#clouds { position: absolute; left: 0; top: 0; }
+#gl { position: absolute; left: 0; top: 0; }
+#marks { position: absolute; left: 0; top: 0; overflow: visible; }
+#marks .dash { fill: none; stroke: rgba(255, 255, 255, 0.78); stroke-width: 2; stroke-dasharray: 9 5; stroke-linejoin: round; }
+#marks .dim path { fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 1.6; }
+#marks .lbl { font: 500 26px "IBM Plex Mono", monospace; fill: #fff; text-anchor: middle; letter-spacing: 0.04em; }
+#marks .glint { fill: #fff; filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.9)); }
+.photo::after { content: ""; position: absolute; inset: 0; background: radial-gradient(130% 90% at 50% 45%, rgba(0,0,0,0) 55%, rgba(4,10,30,0.42) 100%); pointer-events: none; }
+.topshade { position: absolute; inset: 0 0 auto 0; height: 34%; background: linear-gradient(180deg, rgba(2, 4, 16, 0.78), rgba(2, 4, 16, 0)); }
+
+/* ---------- document header ---------- */
+.hdr { position: absolute; left: 44px; right: 44px; top: 268px; display: flex; justify-content: space-between; align-items: flex-start;
+  font: 500 30px/1.12 "Libre Franklin", sans-serif; letter-spacing: -0.005em; color: #eceae2; }
+.hdr .c { position: absolute; left: 50%; transform: translateX(-50%); }
+.hdr .r { text-align: right; }
+
+/* ---------- Garrett's line, set like "We're Bull-ish on business" ---------- */
+.line { position: absolute; left: 44px; top: 356px; font: italic 500 92px/1.02 "EB Garamond", serif; color: #f1efe6; text-align: left; letter-spacing: -0.01em; }
+.line span { display: block; }
+.line .b { margin-left: 130px; }
+
+/* ---------- the paper ---------- */
+.paper { position: absolute; left: 0; right: 0; top: var(--paper); bottom: 0; background:
+  radial-gradient(120% 80% at 30% 20%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 60%), var(--paperc); color: var(--ink); }
+.paper::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 22px; background: linear-gradient(180deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0)); }
+.rules { position: relative; height: 34px; background: repeating-linear-gradient(180deg, var(--ink) 0 2px, transparent 2px 8px); opacity: 0.85; }
+.rules.top { margin-top: 18px; }
+.band { position: relative; height: 200px; display: flex; align-items: center; overflow: hidden; }
+.band .globe { flex: none; width: 140px; height: 140px; margin-left: 40px; background: var(--ink);
+  -webkit-mask: url(/assets/gme/wire-globe.png) center / contain no-repeat; mask: url(/assets/gme/wire-globe.png) center / contain no-repeat; }
+.steps { position: absolute; left: 230px; top: 50%; transform: translateY(-50%); white-space: nowrap; }
+.steps .row { font: italic 700 62px/1.0 Tinos, serif; letter-spacing: 0.005em; word-spacing: 0.06em; }
+.steps .row span { display: inline-block; margin-right: 0.9em; }
+.steps .row:nth-child(1) { margin-left: 80px; }
+.steps .row:nth-child(2) { margin-left: 40px; }
+.steps .row:nth-child(3) { margin-left: 0; }
+.rules.mid { height: 22px; }
+.rules.bottom { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; }
+/* small print, below the safe zone where it may be covered: it is the only place it belongs */
+.fine { position: absolute; left: 44px; right: 44px; bottom: 168px; padding-top: 22px; border-top: 2px solid rgba(23, 24, 26, 0.8); font: 400 20px/1.45 "Libre Franklin", sans-serif; letter-spacing: 0.005em; color: rgba(23, 24, 26, 0.7); }
+.f-1x1 .fine, .f-banner-v .fine { display: none; }
+.foot { position: relative; padding: 28px 44px 0; display: grid; grid-template-columns: 1fr auto; column-gap: 40px; align-items: start; }
+.foot .cap { grid-column: 1; font: 400 30px/1.25 "EB Garamond", serif; max-width: 760px; }
+.foot .cap b { font-weight: 600; }
+.foot .date { grid-column: 1; margin-top: 18px; font: 600 26px/1.2 "Libre Franklin", sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
+.foot .mark { grid-column: 2; grid-row: 1 / span 2; width: 220px; height: 118px; background: var(--ink);
+  -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+
+#grain { position: absolute; left: 0; top: 0; mix-blend-mode: overlay; opacity: 0.42; pointer-events: none; }
+
+#stage .foot .date.short { display: none; }
+
+/* ---------- 1x1 ---------- */
+.f-1x1 .rules.bottom { display: none; }
+.f-1x1 .foot { align-items: center; padding-top: 14px; }
+.f-1x1 .foot .date { margin-top: 0; font-size: 24px; }
+.f-1x1 .foot .mark { grid-row: 1; width: 150px; height: 70px; }
+.f-1x1 .hdr { top: 40px; font-size: 26px; }
+.f-1x1 .line { top: 120px; right: 48px; font-size: 70px; }
+.f-1x1 .line .a { margin-right: 90px; }
+.f-1x1 .rules.top { margin-top: 10px; height: 26px; }
+.f-1x1 .band { height: 140px; }
+.f-1x1 .band .globe { width: 110px; height: 110px; }
+.f-1x1 .steps { left: 180px; }
+.f-1x1 .steps .row { font-size: 46px; }
+.f-1x1 .rules.mid, .f-1x1 .foot .cap { display: none; }
+.f-1x1 .foot { padding-top: 6px; }
+
+/* ---------- banner-v: the right-hand 30% of a desktop page, read at about 400px wide ---------- */
+.f-banner-v .hdr { top: 46px; font-size: 40px; }
+.f-banner-v .hdr .c { display: none; }
+.f-banner-v .line { top: 220px; right: 56px; font-size: 118px; }
+.f-banner-v .line .a { margin-right: 140px; }
+.f-banner-v .band { height: 270px; }
+.f-banner-v .steps .row { font-size: 84px; }
+.f-banner-v .foot .cap { display: none; }
+.f-banner-v .foot .date { display: none; }
+#stage.f-banner-v .foot .date.short { display: block; font-size: 42px; line-height: 1.22; margin-top: 6px; }
+.f-banner-v .foot .date.short span { display: block; }
+.f-banner-v .foot { align-items: center; padding-top: 34px; }
+.f-banner-v .foot .mark { grid-row: 1; width: 230px; height: 124px; }
+.f-banner-v .rules.bottom { display: none; }
+.f-banner-v #marks .lbl { font-size: 40px; }
+.f-banner-v #marks .dash, .f-banner-v #marks .dim path { stroke-width: 2.6; }

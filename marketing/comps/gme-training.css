@@ -1,0 +1,165 @@
+/* Black Friday: A Business Opportunity. A GME training video, 1080x1920; other formats below. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; }
+:root {
+  --ink: #ece7da;        /* character-generator white, a little warm */
+  --dim: rgba(236, 231, 218, 0.5);
+  --navy: #07112e;
+  --serif: "EB Garamond", "Cormorant Garamond", serif;
+  --sans: "Libre Franklin", "Inter", sans-serif;
+  --mono: "IBM Plex Mono", monospace;
+}
+#stage {
+  position: relative; width: 1080px; height: 1920px; overflow: hidden;
+  background: #050a1c; color: var(--ink); font-family: var(--sans);
+  font-feature-settings: "liga" 1, "dlig" 1, "kern" 1;
+}
+#pic { position: absolute; inset: 0; filter: url(#tape); }
+
+/* ---- the studio ---- */
+.bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(#03060f 0%, #08142f 18%, #0e2464 42%, #1a43a8 64%, #4a6db8 82%, #95a5c4 100%);
+}
+.mottle { position: absolute; inset: 0; opacity: 0.4; mix-blend-mode: soft-light; }
+.spot {
+  position: absolute; left: 50%; top: var(--spot-y, 1040px); width: 1300px; height: 1000px; margin: -500px 0 0 -650px;
+  background: radial-gradient(closest-side, rgba(120, 160, 255, 0.2), rgba(70, 110, 230, 0.08) 55%, rgba(40, 80, 200, 0) 100%);
+}
+#gl { position: absolute; left: 0; top: 0; }
+#glints { position: absolute; inset: 0; pointer-events: none; }
+#glints svg { position: absolute; overflow: visible; }
+
+/* ---- the docket: like the corner labels on a document ---- */
+.docket {
+  position: absolute; left: 64px; right: 64px; top: 92px; display: flex; justify-content: space-between; align-items: flex-start;
+  font: 500 30px/1.12 var(--sans); letter-spacing: -0.005em; color: var(--ink);
+}
+.docket .c { position: absolute; left: 50%; transform: translateX(-50%); }
+.docket .r { text-align: right; }
+
+/* ---- the title card ---- */
+.card { position: absolute; left: 0; right: 0; top: 256px; text-align: center; }
+.mark {
+  width: 150px; height: 61px; margin: 0 auto; background: var(--ink);
+  -webkit-mask: url(/assets/gme/gme-letters.png) center / contain no-repeat; mask: url(/assets/gme/gme-letters.png) center / contain no-repeat;
+}
+.presents { margin-top: 26px; font: 500 24px/1 var(--sans); letter-spacing: 0.32em; text-transform: uppercase; padding-left: 0.32em; }
+.title { margin-top: 28px; font: 400 170px/0.9 var(--serif); letter-spacing: -0.025em; text-shadow: 0 0 18px rgba(170, 200, 255, 0.28); }
+.title span { display: block; }
+.title .t2 { font-style: italic; font-size: 156px; margin-top: 4px; }
+.sub { margin-top: 26px; font: 400 46px/1 var(--serif); color: var(--ink); }
+.date { margin-top: 22px; font: 500 22px/1 var(--sans); letter-spacing: 0.3em; text-transform: uppercase; padding-left: 0.3em; color: rgba(236, 231, 218, 0.78); }
+#stage.f-9x16 .mark, #stage.f-1x1 .mark { display: none; }
+.sub i { font-style: italic; }
+
+/* ---- lower third: the subject of today's presentation ---- */
+.lower { position: absolute; left: 64px; top: 1192px; display: flex; align-items: stretch; height: 132px; }
+.lower .tab { width: 132px; background: var(--ink); display: grid; place-items: center; }
+.lower .tab i { width: 92px; height: 92px; background: #0b1d5c; -webkit-mask: url(/assets/gme/wire-globe.png) center / contain no-repeat; mask: url(/assets/gme/wire-globe.png) center / contain no-repeat; }
+.lower .txt {
+  padding: 14px 70px 0 30px; min-width: 650px;
+  background: linear-gradient(90deg, rgba(5, 12, 40, 0.88), rgba(5, 12, 40, 0.72) 70%, rgba(5, 12, 40, 0));
+  border-top: 2px solid var(--ink);
+}
+.lower .who { font: 400 64px/1 var(--serif); letter-spacing: -0.01em; }
+.lower .role { margin-top: 12px; font: 500 21px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(236, 231, 218, 0.82); }
+
+/* ---- the numbered points ---- */
+.points { position: absolute; left: 110px; right: 64px; top: 1346px; list-style: none; }
+.points li { display: flex; align-items: baseline; height: 56px; border-bottom: 1px solid rgba(236, 231, 218, 0.22); font: 400 44px/56px var(--serif); }
+.points li:first-child { border-top: 1px solid rgba(236, 231, 218, 0.22); }
+.points b { width: 78px; font: italic 400 44px/56px var(--serif); color: rgba(236, 231, 218, 0.8); }
+.points li.on span { color: var(--ink); }
+.points li span { color: rgba(236, 231, 218, 0.74); }
+.points li.on b { color: var(--ink); }
+.points .bullet { position: absolute; left: -46px; width: 30px; height: 30px; margin-top: 11px; color: var(--ink); opacity: 0; filter: drop-shadow(0 0 6px rgba(220, 230, 255, 0.8)); }
+.points li { position: relative; }
+.points li.on .bullet { opacity: 1; }
+
+/* ---- the foot ---- */
+.rules { position: absolute; left: 0; right: 0; top: 1640px; }
+.rules i { display: block; height: 2px; background: rgba(5, 10, 30, 0.55); margin-bottom: 9px; }
+.foot { position: absolute; left: 64px; right: 64px; top: 1712px; display: flex; justify-content: space-between; align-items: center; color: #0b1640; }
+.foot .fl { font: 600 22px/1.28 var(--sans); letter-spacing: 0.005em; max-width: 360px; }
+.foot .fl em { font: italic 400 34px/1.2 var(--serif); letter-spacing: 0; }
+.foot .logo { width: 220px; height: 118px; background: #0b1640; -webkit-mask: url(/assets/gme/gme-primary.png) right center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) right center / contain no-repeat; }
+
+.banner-only { display: none; }
+
+/* ---- closed captions, as the tape was delivered ---- */
+.cc { position: absolute; left: 0; right: 0; top: 1524px; text-align: center; font: 400 24px/1 var(--mono); letter-spacing: 0.06em; color: #f4f1e8; }
+.cc span { display: inline-block; background: rgba(0, 0, 0, 0.84); padding: 9px 14px 7px; }
+
+/* ---- burned-in window timecode: added at the dub, so it sits on top of the tape ---- */
+.bitc {
+  position: absolute; left: 50%; top: 1836px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;
+  font: 500 30px/1 var(--mono); color: #f4f1e8; letter-spacing: 0.04em;
+}
+.bitc .lbl { font: 400 15px/1 var(--mono); letter-spacing: 0.12em; background: rgba(0, 0, 0, 0.82); padding: 7px 10px 5px; }
+.bitc .tc { background: rgba(0, 0, 0, 0.88); padding: 8px 14px 7px; }
+
+/* ---- the tape ---- */
+.band { position: absolute; left: 0; right: 0; height: 180px; background: linear-gradient(rgba(220, 230, 255, 0), rgba(220, 230, 255, 0.06) 40%, rgba(255, 255, 255, 0.1) 52%, rgba(220, 230, 255, 0)); mix-blend-mode: screen; }
+#grain { position: absolute; left: 0; top: 0; width: 100%; height: 100%; mix-blend-mode: overlay; opacity: 0.42; image-rendering: auto; }
+.wash {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 50%, rgba(0, 0, 0, 0) 60%, rgba(2, 4, 14, 0.45) 100%),
+    linear-gradient(rgba(30, 36, 60, 0.0), rgba(30, 36, 60, 0.0));
+}
+
+/* ================= 1x1 ================= */
+#stage.f-1x1 .docket { top: 52px; left: 56px; right: 56px; font-size: 24px; }
+#stage.f-1x1 .card { left: 560px; right: 40px; top: 168px; text-align: left; }
+#stage.f-1x1 .date { margin-top: 16px; font-size: 15px; letter-spacing: 0.26em; padding-left: 0; }
+#stage.f-1x1 .mark { margin: 0; width: 112px; height: 46px; -webkit-mask-position: left center; mask-position: left center; }
+#stage.f-1x1 .presents { margin-top: 0; font-size: 15px; letter-spacing: 0.24em; padding-left: 0; white-space: nowrap; }
+#stage.f-1x1 .title { margin-top: 20px; font-size: 128px; margin-left: -6px; }
+#stage.f-1x1 .title .t2 { font-size: 116px; }
+#stage.f-1x1 .sub { margin-top: 22px; font-size: 29px; white-space: nowrap; }
+#stage.f-1x1 .lower { left: 56px; top: 700px; height: 104px; }
+#stage.f-1x1 .lower .tab { width: 104px; }
+#stage.f-1x1 .lower .tab i { width: 72px; height: 72px; }
+#stage.f-1x1 .lower .txt { min-width: 440px; padding-right: 40px; padding-top: 11px; }
+#stage.f-1x1 .lower .who { font-size: 50px; }
+#stage.f-1x1 .lower .role { font-size: 16px; margin-top: 9px; letter-spacing: 0.18em; }
+#stage.f-1x1 .points { left: 636px; right: 40px; top: 586px; }
+#stage.f-1x1 .points li { height: 50px; font-size: 32px; line-height: 50px; white-space: nowrap; }
+#stage.f-1x1 .points b { width: 44px; font-size: 32px; line-height: 50px; }
+#stage.f-1x1 .points .bullet { left: -36px; width: 22px; height: 22px; margin-top: 13px; }
+#stage.f-1x1 .rules { top: 850px; }
+#stage.f-1x1 .rules i { margin-bottom: 7px; }
+#stage.f-1x1 .foot { top: 920px; left: 56px; right: 56px; }
+#stage.f-1x1 .foot .fl { font-size: 16px; max-width: 270px; }
+#stage.f-1x1 .foot .fl em { font-size: 26px; }
+#stage.f-1x1 .foot .logo { width: 170px; height: 90px; }
+#stage.f-1x1 .bitc { top: 932px; font-size: 26px; }
+#stage.f-1x1 .bitc .lbl { font-size: 12px; }
+#stage.f-1x1 .cc { top: 636px; left: 40px; right: auto; width: 490px; font-size: 17px; }
+#stage.f-1x1 .spot { width: 900px; height: 900px; margin: -450px 0 0 -450px; left: 270px; }
+
+/* ================= banner-v: down the right of a desktop page, read at ~400px wide ================= */
+#stage.f-banner-v .docket { top: 70px; font-size: 38px; }
+#stage.f-banner-v .card { top: 236px; }
+#stage.f-banner-v .mark { width: 200px; height: 82px; }
+#stage.f-banner-v .presents { font-size: 30px; letter-spacing: 0.24em; padding-left: 0.24em; margin-top: 30px; }
+#stage.f-banner-v .title, #stage.f-banner-v .sub, #stage.f-banner-v .date, #stage.f-banner-v .points { display: none; }
+#stage.f-banner-v .banner-only { display: block; }
+#stage.f-banner-v .cc { top: 1000px; font-size: 30px; }
+#stage.f-banner-v .bigoff { position: absolute; left: 0; right: 0; top: 1090px; text-align: center; }
+#stage.f-banner-v .bigoff span { display: block; }
+#stage.f-banner-v .bigoff .n { font: 400 270px/0.9 var(--serif); letter-spacing: -0.03em; text-shadow: 0 0 22px rgba(170, 200, 255, 0.3); }
+#stage.f-banner-v .bigoff .w { font: italic 400 128px/1 var(--serif); margin-top: 6px; }
+#stage.f-banner-v .bigoff .a { font: 500 34px/1.3 var(--sans); letter-spacing: 0.04em; margin-top: 26px; }
+#stage.f-banner-v .lower { top: 1562px; left: 60px; height: 150px; }
+#stage.f-banner-v .lower .tab { width: 150px; }
+#stage.f-banner-v .lower .tab i { width: 104px; height: 104px; }
+#stage.f-banner-v .lower .txt { min-width: 800px; padding-top: 16px; }
+#stage.f-banner-v .lower .who { font-size: 76px; }
+#stage.f-banner-v .lower .role { font-size: 30px; letter-spacing: 0.1em; }
+#stage.f-banner-v .adjust { position: absolute; left: 0; right: 0; top: 1752px; text-align: center; font: italic 400 60px/1 var(--serif); color: #0b1640; }
+#stage.f-banner-v .rules { top: 1832px; }
+#stage.f-banner-v .foot { display: none; }
+#stage.f-banner-v .bitc { top: 1910px; font-size: 40px; }
+#stage.f-banner-v .bitc .lbl { font-size: 18px; }

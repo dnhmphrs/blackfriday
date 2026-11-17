@@ -1,0 +1,220 @@
+/* FOR IMMEDIATE RELEASE: a GME press release on letterhead.
+   Laid out for the 1080x1920 stage; the other formats override below. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; }
+:root {
+  --paper: #ebe8e0;
+  --ink: #15204d;          /* navy ink */
+  --ink-soft: #3b4466;
+  --accent: #b8810f;       /* mustard stamp-pad ink: the one accent */
+  --sans: "Libre Franklin", "Inter", sans-serif;
+  --serif: "EB Garamond", "Cormorant Garamond", serif;
+  --mono: "IBM Plex Mono", monospace;
+}
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #0b1430; color: var(--ink); font-family: var(--serif); }
+
+/* ---- the GME atmosphere behind the page ---- */
+.bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 90% 40% at 50% 104%, rgba(205, 212, 226, 0.95), rgba(170, 186, 214, 0.55) 40%, rgba(60, 100, 190, 0) 75%),
+    linear-gradient(#05070f 0%, #0a1638 18%, #123b8f 52%, #2c5fb3 70%, #8ea4c8 88%, #c3c8d2 100%);
+}
+.grain { position: absolute; inset: 0; pointer-events: none; background-repeat: repeat; }
+.grain.dark { mix-blend-mode: overlay; opacity: 0.32; }
+.grain.light { mix-blend-mode: multiply; opacity: 0.19; }
+
+.corners {
+  position: absolute; left: 44px; right: 44px; top: 54px; display: flex; justify-content: space-between; align-items: flex-start;
+  font: 500 27px/1.2 var(--sans); color: #e3e6ee; letter-spacing: -0.005em;
+}
+.corners span { flex: 1; }
+.corners span:nth-child(2) { text-align: center; }
+.corners .r { text-align: right; }
+
+/* ---- the page ---- */
+.sheet {
+  position: absolute; left: 70px; top: 196px; width: 940px; height: 1612px; padding: 58px 66px 0;
+  transform: rotate(-0.7deg); transform-origin: 50% 40%;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12), 0 30px 60px -18px rgba(2, 6, 24, 0.75), 0 8px 18px rgba(2, 6, 24, 0.35);
+}
+.paper { position: absolute; inset: 0; background-color: var(--paper); background-size: cover; }
+.sheet > :where(:not(.paper):not(.grain):not(.folds):not(.dim):not(.staple)) { position: relative; }
+.sheet > .dim { left: 70%; right: 0; top: -66px; }
+.folds { position: absolute; inset: 0; pointer-events: none; }
+.folds i { position: absolute; left: 0; right: 0; height: 26px; }
+.folds i:nth-child(1) { top: calc(var(--f1, 43.2%) - 13px); background: linear-gradient(rgba(0,0,0,0) 0%, rgba(20,24,40,0.07) 48%, rgba(255,255,255,0.5) 52%, rgba(0,0,0,0) 100%); }
+.folds i:nth-child(2) { top: calc(var(--f2, 67.6%) - 13px); background: linear-gradient(rgba(0,0,0,0) 0%, rgba(255,255,255,0.45) 47%, rgba(20,24,40,0.08) 53%, rgba(0,0,0,0) 100%); }
+
+/* letterhead */
+.lh { display: flex; justify-content: space-between; align-items: flex-end; }
+.logo {
+  display: block; width: 262px; height: 140px; background: var(--ink);
+  -webkit-mask: url(/assets/gme/gme-primary.png) left bottom / contain no-repeat; mask: url(/assets/gme/gme-primary.png) left bottom / contain no-repeat;
+}
+.lh-meta { display: flex; flex-direction: column; text-align: right; font: 400 19px/1.35 var(--sans); color: var(--ink-soft); padding-bottom: 4px; }
+.lh-meta b { font-weight: 600; color: var(--ink); }
+.pinstripe { height: 25px; margin: 24px 0 26px; background: repeating-linear-gradient(var(--ink) 0 1.6px, transparent 1.6px 6px); opacity: 0.88; }
+
+.release { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 30px; }
+.fir { font: 700 23px/1 var(--sans); letter-spacing: 0.22em; text-transform: uppercase; }
+.fir::before { content: ""; display: inline-block; width: 13px; height: 13px; background: var(--accent); margin-right: 14px; transform: translateY(-1px); }
+.ref, .mono { font-family: var(--mono); font-weight: 400; }
+.ref { font-size: 17px; letter-spacing: 0.04em; color: var(--ink-soft); }
+
+.headline {
+  font: 500 96px/0.97 var(--serif); letter-spacing: -0.018em; font-feature-settings: "liga", "dlig", "kern";
+  margin-bottom: 22px; text-wrap: balance;
+}
+.dek { font: italic 400 42px/1.15 var(--serif); color: var(--ink-soft); margin-bottom: 34px; }
+
+.cols { display: flex; gap: 40px; align-items: flex-start; }
+.body { flex: 1; font: 400 27.5px/1.36 var(--serif); font-feature-settings: "liga", "onum"; hyphens: auto; }
+.body p + p { text-indent: 1.4em; }
+.dateline { font: 600 0.74em/1 var(--sans); letter-spacing: 0.06em; }
+.fig { width: 292px; flex: none; }
+.plate { position: relative; width: 292px; height: 306px; overflow: hidden; background: radial-gradient(ellipse 80% 55% at 50% 62%, #3d74c6 0%, #173f95 45%, #0a1a48 80%, #060a1c 100%); }
+.plate canvas { position: absolute; left: 0; top: 0; }
+.plate-grain { mix-blend-mode: overlay; opacity: 0.22; }
+figcaption { font: italic 400 21px/1.25 var(--serif); margin-top: 12px; color: var(--ink-soft); }
+figcaption .mono { font-style: normal; font-size: 15px; letter-spacing: 0.06em; color: var(--ink); margin-right: 6px; }
+
+.signoff { margin-top: 26px; height: 212px; }
+.sign { position: absolute; left: -8px; top: 0; width: 360px; }
+.sig { width: 312px; height: 100px; display: block; margin-bottom: -8px; }
+.sig path { fill: none; stroke: #1b2a6e; stroke-width: 4.2; stroke-linecap: round; stroke-linejoin: round; }
+.sig-name { margin: 2px 0 0 10px; font: 600 21px/1.25 var(--sans); }
+.sig-name span { display: block; font-weight: 400; font-size: 17px; color: var(--ink-soft); }
+
+/* the stamp: double rule, condensed caps, mustard ink pressed into the paper */
+.stamp { position: absolute; right: -30px; top: -86px; transform-origin: 50% 50%; mix-blend-mode: multiply; }
+.stamp-ink {
+  filter: url(#ink); color: var(--accent);
+  display: flex; flex-direction: column; align-items: center; padding: 14px 30px 16px;
+  border: 7px solid currentColor; outline: 2.5px solid currentColor; outline-offset: 7px; border-radius: 6px;
+  font-family: "Archivo Narrow", var(--sans); text-transform: uppercase;
+}
+.s-top { font: 700 22px/1 "Archivo Narrow"; letter-spacing: 0.24em; }
+.s-big { white-space: nowrap; font: 700 128px/0.84 "Archivo Narrow"; letter-spacing: -0.015em; margin: 8px 0 2px; }
+.s-mid { font: 700 31px/1 "Archivo Narrow"; letter-spacing: 0.1em; border-top: 3px solid currentColor; border-bottom: 3px solid currentColor; padding: 6px 4px 5px; }
+.s-bot { font: 500 19px/1 var(--mono); letter-spacing: 0.14em; margin-top: 10px; }
+
+.end { text-align: center; font: 500 34px/1 var(--serif); letter-spacing: 0.4em; margin: 6px 0 22px; padding-left: 0.4em; }
+.notes { display: flex; flex-direction: column; font: 400 16.5px/1.5 var(--mono); color: var(--ink-soft); border-top: 1.5px solid var(--ink); padding-top: 12px; }
+.notes span:first-child { color: var(--ink); font-weight: 500; letter-spacing: 0.12em; }
+
+.tag { position: absolute; left: 0; right: 0; bottom: 40px; text-align: center; font: italic 400 38px/1 var(--serif); color: var(--ink); letter-spacing: 0.005em; }
+
+/* the right-hand 30% of the page, dimensioned like a drawing */
+.dim { position: absolute; height: 40px; color: #e9edf6; font: 500 17px/1 var(--mono); letter-spacing: 0.1em; }
+.dim::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1.5px solid currentColor; }
+.dim::after { content: ""; position: absolute; left: 0; right: 0; top: 4px; bottom: 4px; border-left: 1.5px solid currentColor; border-right: 1.5px solid currentColor; }
+.dim span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 0 12px; background: var(--dimbg, #0a1636); }
+.dim i { position: absolute; top: 50%; width: 0; height: 0; border: 7px solid transparent; margin-top: -7px; }
+.dim i:first-of-type { left: 1px; border-left: 12px solid currentColor; border-right: 0; }
+.dim i:last-of-type { right: 1px; border-right: 12px solid currentColor; border-left: 0; }
+
+/* ================= 1x1: the top of the page, cropped by the frame ================= */
+.f-1x1 .corners { top: 30px; font-size: 21px; }
+.f-1x1 .corners .r { visibility: hidden; }
+.f-1x1 .sheet { left: 58px; top: 120px; width: 964px; height: 1040px; padding: 40px 52px 0; }
+.f-1x1 .sheet > .dim { top: -58px; height: 34px; font-size: 15px; }
+.f-1x1 .logo { width: 196px; height: 105px; }
+.f-1x1 .lh-meta { font-size: 16px; }
+.f-1x1 .pinstripe { height: 20px; margin: 18px 0 20px; background: repeating-linear-gradient(var(--ink) 0 2px, transparent 2px 6px); }
+.f-1x1 .release { margin-bottom: 20px; }
+.f-1x1 .fir { font-size: 19px; }
+.f-1x1 .ref { font-size: 15px; }
+.f-1x1 .headline { font-size: 86px; margin-bottom: 14px; }
+.f-1x1 .dek { font-size: 34px; margin-bottom: 22px; }
+.f-1x1 .body { font-size: 22.5px; }
+.f-1x1 .body .p2 { display: none; }
+.f-1x1 .fig { display: none; }
+.f-1x1 .cols { width: 452px; }
+.f-1x1 .signoff { position: absolute; left: 52px; right: 52px; top: 560px; margin: 0; }
+.f-1x1 .sign { top: 278px; }
+.f-1x1 .sig { width: 300px; height: 95px; }
+.f-1x1 .sig-name { font-size: 18px; }
+.f-1x1 .sig-name span { font-size: 15px; }
+.f-1x1 .stamp { right: -10px; top: 70px; }
+.f-1x1 .end, .f-1x1 .notes, .f-1x1 .tag { display: none; }
+
+/* ================= banner-v: one page, headline huge ================= */
+.f-banner-v { background: var(--paper); }
+.f-banner-v .bg, .f-banner-v .grain.dark, .f-banner-v .corners, .f-banner-v .tag { display: none; }
+.f-banner-v .sheet { left: 0; top: 0; width: 1080px; height: 2025px; transform: none; box-shadow: none; padding: 80px 70px 0; }
+.f-banner-v .sheet > .dim { display: none; }
+.f-banner-v .lh { flex-direction: column; align-items: center; }
+.f-banner-v .logo { width: 470px; height: 252px; -webkit-mask-position: center; mask-position: center; }
+.f-banner-v .lh-meta { display: none; }
+.f-banner-v .pinstripe { height: 38px; margin: 40px -70px 40px; background: repeating-linear-gradient(var(--ink) 0 3px, transparent 3px 9.5px); }
+.f-banner-v .release { justify-content: center; margin-bottom: 40px; }
+.f-banner-v .fir { font-size: 40px; }
+.f-banner-v .fir::before { width: 22px; height: 22px; margin-right: 22px; }
+.f-banner-v .ref { display: none; }
+.f-banner-v .headline { font-size: 150px; line-height: 0.93; text-align: center; margin-bottom: 26px; }
+.f-banner-v .dek { text-align: center; font-size: 58px; margin-bottom: 40px; }
+.f-banner-v .cols, .f-banner-v .sign, .f-banner-v .notes { display: none; }
+.f-banner-v .signoff { height: auto; margin: 0; display: flex; justify-content: center; }
+.f-banner-v .stamp { position: relative; left: auto; right: auto; top: auto; }
+.f-banner-v .stamp-ink { border-width: 10px; outline-width: 3.5px; outline-offset: 10px; padding: 20px 40px 24px; }
+.f-banner-v .s-top { font-size: 30px; }
+.f-banner-v .s-big { font-size: 200px; }
+.f-banner-v .s-mid { font-size: 48px; border-width: 4px; }
+.f-banner-v .s-bot { font-size: 26px; }
+.f-banner-v .end { font-size: 56px; margin-top: 64px; }
+.notes em { float: right; font-style: normal; font-weight: 400; letter-spacing: 0.04em; color: var(--ink-soft); }
+.plate-id { position: absolute; left: 12px; bottom: 10px; font: 400 12.5px/1 var(--mono); letter-spacing: 0.1em; color: rgba(225, 232, 248, 0.75); }
+
+.pull, .foot { display: none; }
+.f-banner-v .pull { display: block; text-align: center; font: italic 400 66px/1.05 var(--serif); margin-top: 58px; }
+.f-banner-v .pull span { display: block; font: 600 26px/1 var(--sans); font-style: normal; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin-top: 22px; }
+.f-banner-v .end { margin-top: 50px; }
+.f-banner-v .foot {
+  display: flex; justify-content: space-between; position: absolute; left: 0; right: 0; bottom: 0; height: 128px; padding: 66px 70px 0;
+  font: 500 24px/1 var(--mono); letter-spacing: 0.08em; color: var(--ink);
+  background: repeating-linear-gradient(var(--ink) 0 3px, transparent 3px 9.5px) top / 100% 38px no-repeat;
+}
+.f-1x1 .s-big { font-size: 112px; }
+.f-1x1 .s-mid { font-size: 28px; }
+.f-1x1 .stamp { right: -16px; top: 112px; }
+.f-1x1 .sign { top: 252px; }
+
+/* a staple through the corner */
+.sheet > .staple { position: absolute; left: 22px; top: 30px; width: 46px; height: 7px; transform: rotate(-38deg); border-radius: 2px;
+  background: linear-gradient(#f4f6fa, #9aa1ae 55%, #6b7280); box-shadow: 0 1.5px 1.5px rgba(10, 14, 30, 0.45); }
+.sheet > .staple::before, .sheet > .staple::after { content: ""; position: absolute; top: 2px; width: 3px; height: 4px; background: rgba(20, 24, 40, 0.5); border-radius: 1px; }
+.sheet > .staple::before { left: -1px; } .sheet > .staple::after { right: -1px; }
+.f-banner-v .sheet > .staple { display: none; }
+
+/* ---- second pass ---- */
+/* 1x1: the stamp lands beside the copy, not on it; signature clear of the frame edge */
+.f-1x1 .sheet { --f1: 44%; --f2: 140%; top: 112px; }
+.f-1x1 .headline { font-size: 80px; margin-bottom: 12px; }
+.f-1x1 .dek { font-size: 32px; margin-bottom: 20px; }
+.f-1x1 .cols { width: 418px; }
+.f-1x1 .body { font-size: 22px; line-height: 1.34; }
+.f-1x1 .s-big { font-size: 100px; }
+.f-1x1 .s-mid { font-size: 25px; }
+.f-1x1 .s-top { font-size: 19px; }
+.f-1x1 .s-bot { font-size: 17px; }
+.f-1x1 .stamp { right: -6px; top: 56px; }
+.f-1x1 .signoff { top: 528px; }
+.f-1x1 .sign { top: 214px; }
+.f-1x1 .sig { width: 270px; height: 86px; }
+
+/* banner-v: the panel is the 30% we took off. A perforated stub down its left edge,
+   torn from the rest of the page, with the GME night showing through the holes. */
+.f-banner-v { background: #0a1638; }
+.f-banner-v .bg { display: block; }
+.f-banner-v .sheet { left: 30px; width: 1046px; padding: 80px 46px 0 92px; --f1: 24.6%; --f2: 80.6%;
+  -webkit-mask: radial-gradient(circle at 0 50%, #0000 10px, #000 10.6px) left top / 18px 34px repeat-y, linear-gradient(#000, #000) 18px 0 / calc(100% - 18px) 100% no-repeat;
+          mask: radial-gradient(circle at 0 50%, #0000 10px, #000 10.6px) left top / 18px 34px repeat-y, linear-gradient(#000, #000) 18px 0 / calc(100% - 18px) 100% no-repeat; }
+.f-banner-v .pinstripe { margin: 40px -46px 40px -92px; }
+.f-banner-v .headline { font-size: 142px; letter-spacing: -0.022em; }
+.f-banner-v .foot { padding: 66px 46px 0 92px; }
+.stub { display: none; }
+.f-banner-v .stub { display: block; position: absolute; left: 0; top: 0; bottom: 0; width: 66px; }
+.f-banner-v .stub::before { content: ""; position: absolute; left: 62px; top: 0; bottom: 0; border-left: 2.5px dashed var(--ink); opacity: 0.55; }
+.f-banner-v .stub span { position: absolute; left: 40px; top: 50%; width: 2025px; transform: translate(-50%, -50%) rotate(-90deg);
+  text-align: center; white-space: nowrap; font: 500 19px/1 var(--mono); letter-spacing: 0.22em; color: var(--ink-soft); }

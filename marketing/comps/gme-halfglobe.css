@@ -1,0 +1,101 @@
+/* The Half Globe: one object, lit like a luxury product, in the GME sheet's atmosphere. */
+:root {
+  --ink: #06091a;
+  --navy: #0a1638;
+  --deep: #10275e;
+  --blue: #1f4c9e;
+  --haze: #6f86ad;
+  --fog: #aeb6c2;
+  --paper: #e9e6dc;
+  --mustard: #c99a2e;
+  --white: #f1efe8;
+  --serif: "EB Garamond", "Cormorant Garamond", serif;
+  --sans: "Libre Franklin", "Inter", sans-serif;
+}
+html, body { margin: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: var(--navy); color: var(--white); font-family: var(--sans); }
+#stage > * { position: absolute; }
+
+/* the sheet's sky: near-black at the top, deep navy, a band of blue, then a grey haze at the bottom */
+.sky { inset: 0; background: linear-gradient(180deg, #04060f 0%, #070d24 14%, #0b1a48 34%, #13368a 56%, #2a5bb0 70%, #6d87b6 84%, #a9b1bf 96%, #b7b8b9 100%); }
+/* light falling on the backdrop behind the object */
+.halo { inset: 0; pointer-events: none; }
+#gl { left: 0; top: 0; }
+#dust, .grain { inset: 0; pointer-events: none; }
+#dust { width: 100%; height: 100%; }
+.grain { mix-blend-mode: overlay; opacity: 0.55; background-size: 384px 384px; }
+
+/* document header, like the top of the brand sheet */
+.doc { left: var(--gut); right: var(--gut); top: var(--docTop); display: flex; justify-content: space-between; font: 500 var(--docSize)/1.16 var(--sans); letter-spacing: 0.005em; color: rgba(241, 239, 232, 0.92); }
+.doc .c2 { position: absolute; left: 50%; transform: translateX(-50%); }
+.doc .c3 { text-align: right; }
+
+/* the one sentence */
+.copy { left: var(--gut); right: var(--gut); }
+h1 { margin: 0; font: 500 var(--h1)/0.98 var(--serif); letter-spacing: -0.012em; font-feature-settings: "liga" 1, "dlig" 1, "kern" 1; color: var(--white); text-wrap: balance; }
+h1 .pc { font-feature-settings: "lnum" 1, "liga" 1; }
+.sub { margin: var(--subGap) 0 0; font: italic 400 var(--sub)/1.15 var(--serif); color: rgba(241, 239, 232, 0.9); font-feature-settings: "liga" 1, "dlig" 1; }
+.date { margin: var(--dateGap) 0 0; font: 500 var(--dateSize)/1.3 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(241, 239, 232, 0.86); }
+
+.note { margin: 0; font: italic 400 var(--noteSize, 0px)/1.2 var(--serif); color: rgba(14, 20, 44, 0.88); }
+.note:empty { display: none; }
+.lockup .mark { position: absolute; inset: 0; background: var(--white); -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+
+/* pinstripe rule band, and the fine print under it */
+.foot { left: 0; right: 0; }
+.rules { height: var(--rulesH); background: repeating-linear-gradient(180deg, rgba(9, 14, 34, 0.78) 0 2px, transparent 2px var(--ruleStep)); }
+.fine { margin: var(--fineGap) var(--gut) 0; font: italic 400 var(--fineSize)/1.25 var(--serif); color: rgba(14, 20, 44, 0.86); display: flex; justify-content: space-between; }
+.fine span:last-child { font: 500 calc(var(--fineSize) * 0.62)/1.9 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; font-style: normal; }
+
+/* specimen labels with leader lines */
+.leaders { left: 0; top: 0; overflow: visible; }
+.leaders line { stroke: rgba(241, 239, 232, 0.8); stroke-width: var(--leadW); }
+.leaders circle { fill: var(--white); }
+.leaders circle.ring { fill: none; stroke: rgba(241, 239, 232, 0.85); stroke-width: var(--leadW); }
+.label { font: 500 var(--labSize)/1.3 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(241, 239, 232, 0.92); white-space: nowrap; }
+.label em { display: block; font: italic 400 calc(var(--labSize) * 1.5)/1.1 var(--serif); letter-spacing: 0; text-transform: none; margin-top: 0.15em; color: var(--white); }
+.label.right { text-align: right; }
+
+#glint { left: 0; top: 0; width: 1px; height: 1px; }
+#glint svg { position: absolute; overflow: visible; }
+
+/* ---------- formats ---------- */
+.f-9x16 {
+  --gut: 64px; --docTop: 262px; --docSize: 27px;
+  --h1: 112px; --sub: 50px; --subGap: 16px; --dateSize: 21px; --dateGap: 24px;
+  --labSize: 17px; --leadW: 1.4px;
+  --rulesH: 42px; --ruleStep: 8px; --fineSize: 30px; --fineGap: 20px;
+}
+.f-9x16 .copy { top: 1218px; }
+.f-9x16 .fig { left: 64px; top: 1120px; }
+.f-9x16 .lockup { left: auto; right: 64px; top: 1430px; width: 238px; height: 127px; }
+.f-9x16 .foot { top: 1610px; }
+
+.f-1x1 {
+  --gut: 56px; --docTop: 50px; --docSize: 22px;
+  --h1: 86px; --sub: 38px; --subGap: 16px; --dateSize: 17px; --dateGap: 22px;
+  --labSize: 14px; --leadW: 1.2px;
+  --rulesH: 30px; --ruleStep: 6px; --fineSize: 24px; --fineGap: 14px;
+}
+.f-1x1 .copy { top: 712px; right: 400px; }
+.f-1x1 .lockup { right: 56px; top: 902px; width: 190px; height: 101px; }
+.f-1x1 .foot { display: none; }
+.f-1x1 .fig { left: 56px; top: 404px; }
+
+.f-banner-v {
+  --gut: 72px; --docTop: 60px; --docSize: 32px;
+  --h1: 270px; --sub: 92px; --subGap: 18px; --dateSize: 34px; --dateGap: 46px;
+  --labSize: 26px; --leadW: 2.4px;
+  --rulesH: 60px; --ruleStep: 12px; --fineSize: 44px; --fineGap: 28px;
+}
+.f-banner-v .copy { top: 1150px; }
+.f-banner-v h1 { line-height: 0.9; letter-spacing: -0.03em; }
+.f-banner-v .lockup { left: 72px; top: 1790px; width: 360px; height: 192px; }
+.f-banner-v .note { position: absolute; left: 0; top: 486px; width: 936px; --noteSize: 48px; border-top: 2px solid rgba(14, 20, 44, 0.5); padding-top: 22px; }
+.f-banner-v .foot { display: none; }
+.f-banner-v .fig { display: none; }
+
+/* the square is short: hold the blue longer so the white copy keeps its contrast, and let the haze arrive only at the very bottom */
+.f-1x1 .sky { background: linear-gradient(180deg, #04060f 0%, #070d24 12%, #0b1a48 32%, #13368a 58%, #2350a6 78%, #4a6fb0 90%, #8d9bb6 100%); }
+/* the banner's lockup sits low in the grey haze: print it in navy ink, like the fine print */
+.f-banner-v .lockup .mark { background: rgba(12, 20, 48, 0.9); }
