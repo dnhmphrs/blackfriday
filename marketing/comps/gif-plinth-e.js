@@ -56,8 +56,8 @@ const FORMATS = {
       { t: 'globe', x: 222, y: 90, d: 90, col: { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
       { t: 'sticker', x: 250, y: 56, r: 18, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 112, y: 222, r: 24, lines: ['NEW!'], f: `8px ${PS}` },
-      { t: 'sparkle', x: 140, y: 30, ph: 0 },
-      { t: 'sparkle', x: 152, y: 150, ph: 1 },
+      { t: 'sparkle', x: 140, y: 30, ph: 0, at: [[20, 228], [262, 14], [150, 100]] },
+      { t: 'sparkle', x: 152, y: 150, ph: 1, at: [[180, 236], [124, 8], [262, 170]] },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
@@ -76,10 +76,11 @@ const FORMATS = {
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 51, y: 212, st: 'only' },
       { t: 'globe', x: 126, y: 202, d: 64, col: { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
       { t: 'sticker', x: 152, y: 178, r: 15, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 46, y: 270, r: 24, lines: ['WOW!'], f: `8px ${PS}` },
-      { t: 'sparkle', x: 14, y: 14, ph: 0 },
-      { t: 'sparkle', x: 166, y: 62, ph: 1 },
-      { t: 'sparkle', x: 82, y: 176, ph: 1 },
+      { t: 'burst', x: 44, y: 251, r: 22, lines: ['WOW!'], f: `8px ${PS}` },
+      { t: 'strip', y: 284, dx: 2, s: 'EVERY SITE 30% OFF!', f: `8px ${PS}`, angle: -8, ground: true },
+      { t: 'sparkle', x: 14, y: 14, ph: 0, at: [[160, 100], [20, 92], [150, 142]] },
+      { t: 'sparkle', x: 166, y: 62, ph: 1, at: [[100, 166], [24, 158], [168, 240]] },
+      { t: 'sparkle', x: 82, y: 176, ph: 0, at: [[14, 230], [168, 10], [62, 96]] },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
@@ -95,7 +96,7 @@ const FORMATS = {
       { t: 'globe', x: 196, y: 37, d: 64, col: { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
       { t: 'sticker', x: 172, y: 30, r: 14, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 138, y: 98, r: 18, lines: ['HOT!'], f: `8px ${PS}` },
-      { t: 'sparkle', x: 146, y: 22, ph: 1 },
+      { t: 'sparkle', x: 146, y: 22, ph: 1, at: [[228, 10], [118, 98], [170, 142]] },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
   },
@@ -236,6 +237,36 @@ function cropMask(m) {
   for (let y = 0; y < o.h; y++) for (let x = 0; x < o.w; x++) o.a[y * o.w + x] = m.a[(y + y0) * m.w + x + x0];
   return o;
 }
+// A yellow sale strip slapped across the banner at a slant: gold bevel, black keylines and black
+// lettering, a hard navy shadow; the lettering flips black / red on the beat.
+function strip(it) {
+  const m = textMask(it.s, it.f);
+  const L = W + 40, Hs = m.h + 8;
+  const frames = ['black', 'red'].map((ink) => {
+    const flat = paint(L, Hs, (x, y) => {
+      if (y === 0 || y === Hs - 1) return 'black';
+      if (y === 1) return 'cream';
+      if (y === Hs - 2) return 'gold';
+      const tx = x - Math.round((L - m.w) / 2) - (it.dx || 0), ty = y - 4;
+      if (at(m, tx, ty)) return ink;
+      return 'yellow';
+    });
+    const ang = ((it.angle ?? -8) * Math.PI) / 180;
+    const R = Math.ceil(Math.abs(L * Math.sin(ang)) + Hs * Math.cos(ang)) + 4;
+    const out = canvas(W, R + 3), o = out.getContext('2d');
+    o.imageSmoothingEnabled = false;
+    const draw = (dx, dy) => { o.save(); o.translate(W / 2 + dx, R / 2 + dy); o.rotate(ang); o.drawImage(flat, -L / 2, -Hs / 2); o.restore(); };
+    draw(3, 3);
+    o.globalCompositeOperation = 'source-in'; o.fillStyle = rgbStr('navy'); o.fillRect(0, 0, W, R + 3);
+    o.globalCompositeOperation = 'source-over';
+    draw(0, 0);
+    // snap to the palette: rotation without smoothing keeps colours, alpha is binary-ish
+    const d = o.getImageData(0, 0, W, R + 3); for (let i = 3; i < d.data.length; i += 4) d.data[i] = d.data[i] > 127 ? 255 : 0; o.putImageData(d, 0, 0);
+    return out;
+  });
+  return { frames, x: 0, y: Math.round(it.y - frames[0].height / 2), rate: 2 };
+}
+const rgbStr = (n) => { const p = rgb(n); return `rgb(${p[0]},${p[1]},${p[2]})`; };
 function textMask(s, font) {
   const size = Number(font.match(/(\d+)px/)[1]);
   const m = canvas(8, 8).getContext('2d'); m.font = font;
@@ -291,6 +322,8 @@ for (const it of F.items) {
     layers.push(sticker(it));
   } else if (it.t === 'sparkle') {
     layers.push(sparkle(it));
+  } else if (it.t === 'strip') {
+    layers.push(strip(it));
   } else if (it.t === 'globe') {
     globeItem = it;
     layers.push({ globe: true });
@@ -404,8 +437,11 @@ function sparkle(it) {
     if ((dx === 0 && dy <= 2) || (dy === 0 && dx <= 2)) return dx + dy === 0 ? 'white' : 'pale';
     return null;
   };
-  const a = paint(S, S, small), b = paint(S, S, big);
-  return { frames: it.ph ? [b, a] : [a, b], x: it.x - c, y: it.y - c, rate: 2 };
+  const a = paint(S, S, small), b = paint(S, S, big), none = paint(S, S, () => null);
+  // A twinkle a second: small, big, small, gone; then it pops up at its next spot (it.at), so
+  // the shine wanders round the banner the way it did on old GIF ads.
+  const spots = [[it.x, it.y], ...(it.at || [])];
+  return { frames: [a, b, a, none], spots: spots.map(([x, y]) => [x - c, y - c]), x: it.x - c, y: it.y - c, rate: 4, phase: it.ph ? 2 : 0 };
 }
 
 // ---------- the marquee ----------
@@ -727,8 +763,10 @@ function setTime(t) {
   for (const L of layers) {
     if (L.globe) { g.drawImage(globeOut, Math.round(globeItem.x) + GX0, Math.round(globeItem.y) + GY0); continue; }
     if (L.marquee) { if (!BODY_ONLY) drawMarquee(t); continue; }
-    const k = L.frames.length > 1 ? Math.floor(t * L.rate + 1e-6) % 2 : 0;
-    g.drawImage(L.frames[k], Math.round(L.x), Math.round(L.y));
+    const step = Math.floor(t * L.rate + 1e-6) + (L.phase || 0);
+    const k = L.frames.length > 1 ? step % L.frames.length : 0;
+    const [x, y] = L.spots ? L.spots[Math.floor(step / L.frames.length) % L.spots.length] : [L.x, L.y];
+    g.drawImage(L.frames[k], Math.round(x), Math.round(y));
   }
   if (TICK_SERR && !BODY_ONLY) cutTicker();
   if (EDGE) cutEdges();
