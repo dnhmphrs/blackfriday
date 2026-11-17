@@ -107,8 +107,8 @@ print(n, im.size[0], im.size[1])
 
 // --- browser --------------------------------------------------------------------------------
 
-// Like launchWithExtension() in test/helpers.mjs, plus a device scale factor (and touch/mobile
-// for the phone, as a phone would report).
+// Like launchWithExtension() in test/helpers.mjs, plus a device scale factor (2 for the phone,
+// so its 390x844 CSS px come out as 780x1688 images).
 async function launch(extDir, device) {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bf-demo-profile-'));
   fs.mkdirSync(path.join(userDataDir, 'Default'), { recursive: true });
