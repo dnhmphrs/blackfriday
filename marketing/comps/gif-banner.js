@@ -92,7 +92,7 @@ const FORMATS = {
   // ---- Chrome Web Store images: the same advert, the same footer on the bottom edge ----
   // the marquee promo tile
   marquee: {
-    w: 1400, h: 560, P: 4, credit: 28,
+    w: 1400, h: 560, P: 4, credit: 28, creditX: 120,
     items: [
       { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 120, y: 6, st: 'head' },
       { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 120, y: 47, st: 'body' },
@@ -100,7 +100,7 @@ const FORMATS = {
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 120, y: 88, st: 'only' },
       { t: 'globe', x: 288, y: 56, d: 86 },
       { t: 'sticker', x: 257, y: 24, r: 19, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 322, y: 95, r: 19, lines: ['NEW!'], f: `8px ${PS}` },
+      { t: 'burst', x: 324, y: 88, r: 20, lines: ['NEW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 10, y: 12, ph: 0 },
       { t: 'sparkle', x: 340, y: 10, ph: 1 },
       { t: 'marquee', h: 20, f: `8px ${PS}` },
@@ -115,7 +115,7 @@ const FORMATS = {
       { t: 'text', s: 'BLACK FRIDAY', f: `8px ${PS}`, x: 10, y: 86, align: 'l', st: 'onlyS' },
       { t: 'text', s: 'ONLY!', f: `8px ${PS}`, x: 10, y: 96, align: 'l', st: 'onlyS' },
       { t: 'globe', x: 166, y: 56, d: 80 },
-      { t: 'sticker', x: 136, y: 24, r: 18, s: '-30%', f: `8px ${PS}` },
+      { t: 'sticker', x: 138, y: 25, r: 20, s: '-30%', f: `8px ${PS}` },
       { t: 'marquee', h: 20, f: `8px ${PS}` },
     ],
   },
@@ -132,13 +132,11 @@ const FORMATS = {
       { t: 'sticker', x: 160, y: 32, r: 21, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 226, y: 112, r: 23, lines: ['HOT!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 244, y: 12, ph: 1 },
-      { t: 'sparkle', x: 130, y: 22, ph: 0 },
       { t: 'marquee', h: 18, f: `8px ${PS}` },
     ],
   },
   // The vertical story advert. Phone apps cover the top ~240 and bottom ~340 stage px, so the
-  // artwork sits between them and the footer is lifted (lift: GIF px of flat blue under the
-  // marquee) to end at y = 1580, clear of the reply bar.
+  // artwork sits between them (y 250-1560); the footer stays on the bottom edge, as everywhere.
   '9x16': {
     w: 1080, h: 1920, P: 4, credit: 30,
     items: [
@@ -146,13 +144,13 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 113, st: 'body' },
       { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 133, st: 'body' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 158, st: 'only' },
-      { t: 'globe', x: 98, y: 270, d: 124 },
-      { t: 'sticker', x: 151, y: 227, r: 26, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 218, y: 274, r: 42, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
+      { t: 'globe', x: 98, y: 296, d: 136 },
+      { t: 'sticker', x: 156, y: 249, r: 29, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 222, y: 308, r: 40, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
       { t: 'sparkle', x: 22, y: 72, ph: 0 },
       { t: 'sparkle', x: 252, y: 100, ph: 1 },
-      { t: 'sparkle', x: 24, y: 208, ph: 1 },
-      { t: 'marquee', h: 22, f: `8px ${PS}`, lift: 85 },
+      { t: 'sparkle', x: 22, y: 224, ph: 1 },
+      { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
   // The full-page horizontal advert: the message on the left, the globe and burst on the right.
@@ -415,7 +413,7 @@ function buildMarquee(it) {
   const speed = 60; // GIF pixels a second, rounded to a whole number of passes a loop
   const passes = Math.max(1, Math.round((speed * DURATION) / L));
   const under = q.get('edge') === 'serrated' && format !== 'banner-v' ? 4 : 0; // room for teeth (TOOTH.depth)
-  return { strip, frame, L, passes, y: H - it.h - under - (it.lift || 0), h: it.h, under };
+  return { strip, frame, L, passes, y: H - it.h - under, h: it.h, under };
 }
 function drawMarquee(t) {
   const M = marquee;
@@ -565,6 +563,8 @@ function setTime(t) {
 credit.style.bottom = (H - marquee.y + 3) * P - (H * P - F.h) + 'px';
 credit.style.fontSize = F.credit + 'px';
 if (format === 'banner-h' || F.creditLeft) credit.classList.add('left');
+// store tiles: centre the credit under the text column (creditX, GIF px) rather than the whole tile
+if (F.creditX) Object.assign(credit.style, { right: 'auto', left: F.creditX * P + 'px', transform: 'translateX(-50%)', whiteSpace: 'nowrap' });
 // What shows through the teeth: the page, in the live banner; a flat colour in a render.
 if (EDGE || TICK_SERR) { stage.style.background = OUTSIDE; document.body.style.background = OUTSIDE; }
 

@@ -6,7 +6,7 @@
 <style>
   /* The extension's icon in the GIF banner's pixel language: flat web blue (#0033ff) in a
      black-keylined, bevelled 1997 button, with the banner's gold bevelled "%" (cream highlight,
-     gold lower band, black keyline, hard navy extrusion) and, on the big one, a pixel sparkle.
+     gold lower band, hard navy extrusion; black keyline on the big one).
      Drawn as hand-placed pixels and scaled by whole numbers only, so every size is crisp.
        ?size=16 | 32 | 48   the 16-pixel design at 1x, 2x, 3x, filling the square
        ?size=128            the 32-pixel design at 3x: 96 px of artwork, 16 px transparent padding
@@ -26,17 +26,22 @@ const C = {
   pale: '#ccccff', yellow: '#ffff00', cream: '#ffffcc', gold: '#ffcc00',
 };
 
-// The "%": two 3x3 dots and a two-pixel diagonal, 9 x 8.
-const PCT = [
-  '###....##',
-  '###...##.',
-  '###..##..',
-  '....##...',
-  '...##....',
-  '..##..###',
-  '.##...###',
-  '##....###',
-];
+// The "%", drawn to the grid: n x n, two round-cornered d x d dots in opposite corners and an
+// s-pixel stair-step diagonal between them.
+function pct(n, d, s) {
+  const rows = [];
+  for (let y = 0; y < n; y++) {
+    let r = '';
+    for (let x = 0; x < n; x++) {
+      const dot = (ox, oy) => { const dx = x - ox, dy = y - oy; if (dx < 0 || dy < 0 || dx >= d || dy >= d) return false;
+        const cx = Math.min(dx, d - 1 - dx), cy = Math.min(dy, d - 1 - dy); return cx + cy >= (d >= 6 ? 2 : 1) || d < 4; };
+      const diag = x + y > n - 1 - s && x + y <= n - 1;
+      r += dot(0, 0) || dot(n - d, n - d) || diag ? '#' : '.';
+    }
+    rows.push(r);
+  }
+  return rows;
+}
 const mask = (rows, k = 1) => ({ w: rows[0].length * k, h: rows.length * k, at(x, y) { return x >= 0 && y >= 0 && x < this.w && y < this.h && rows[Math.floor(y / k)][Math.floor(x / k)] === '#'; } });
 
 // A pixel grid: g[y][x] = colour name or null.
@@ -80,22 +85,21 @@ function stamp(g, m, ox, oy, line, ext) {
   return { W, H };
 }
 
-// The 16-pixel design (16, 32, 48): % with a one-pixel keyline and extrusion, as large as it goes.
+// The 16-pixel design (16, 32, 48): a flat blue tile and a 12-pixel % with a one-pixel navy
+// extrusion; no keylines at this size, so the shape stays open.
 function design16() {
-  const g = button(16, 1);
-  const m = mask(PCT);
-  stamp(g, m, 2, 2, 1, 1); // 12 x 11
+  const g = grid(16);
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    const dx = Math.min(x, 15 - x), dy = Math.min(y, 15 - y);
+    if (dx + dy >= 2) g[y][x] = 'blue';
+  }
+  stamp(g, mask(pct(12, 4, 2)), 2, 2, 0, 1); // 13 x 13 -> x 2..14
   return g;
 }
-// The 32-pixel design (128 at 3x): the % at 2x with a deeper extrusion, and one pixel sparkle.
+// The 32-pixel design (128 at 3x): the bevelled button and a larger % with a keyline and deeper extrusion.
 function design32() {
   const g = button(32, 3);
-  const m = mask(PCT, 2); // 18 x 16
-  stamp(g, m, 5, 7, 1, 2); // 22 x 20 -> x 5..26, y 7..26
-  // sparkle, top right: a little four-point glint
-  const sp = [[26, 3, 'white'], [26, 4, 'white'], [26, 5, 'white'], [26, 6, 'white'], [26, 7, 'white'],
-    [24, 5, 'white'], [25, 5, 'white'], [27, 5, 'white'], [28, 5, 'white'], [26, 2, 'pale'], [26, 8, 'pale'], [23, 5, 'pale'], [29, 5, 'pale']];
-  for (const [x, y, c] of sp) if (g[y][x] && g[y][x] !== 'black') g[y][x] = c;
+  stamp(g, mask(pct(18, 6, 3)), 5, 5, 1, 2); // 22 x 22 -> x 5..26, y 5..26
   return g;
 }
 
