@@ -442,14 +442,14 @@ const D = globeItem.d;
 const K = D / 2.12;                                   // GIF px per world unit (the globe is 2.12 units across)
 const COL = globeItem.ground !== undefined || globeItem.column;
 const GROUND = COL ? (globeItem.ground ?? marquee.y) : null;
-const RW = COL ? Math.max(D + 4, Math.ceil(K * (globeItem.r0 ?? 0.38) * 4.6) + 6) : D;
+const RW = COL ? Math.max(D + 4, Math.ceil(K * (globeItem.r0 ?? 0.44) * 4.6) + 6) : D;
 const OX = Math.round(globeItem.x - RW / 2), OY = COL ? Math.round(globeItem.y - D / 2) - 2 : Math.round(globeItem.y - D / 2);
 const RH = COL ? GROUND - OY + 1 : D;
 const GXC = globeItem.x - OX, GYC = globeItem.y - OY;  // the globe's centre inside the render
 const gl = $('gl');
 const { renderer, scene, camera } = createStage({ canvas: gl, width: RW * SS, height: RH * SS, pixelRatio: 1, fov: 24 });
 renderer.shadowMap.enabled = false;
-const ELEV = (Number(q.get('elev') ?? (COL ? (globeItem.elev ?? 12) : 20)) * Math.PI) / 180;
+const ELEV = (Number(q.get('elev') ?? (COL ? (globeItem.elev ?? 16) : 20)) * Math.PI) / 180;
 {
   // The camera looks at the globe's centre; an off-axis window frames the column below it, so the
   // globe keeps exactly its size and place whatever the column's height.
@@ -470,39 +470,46 @@ globe.userData.slice.visible = false;
 pivot.add(globe);
 
 // ---- the column: crepidoma (three steps), a plain base (plinth and torus), a fluted shaft with
-// entasis, annulets, the echinus and the abacus. r0 = the shaft's radius at the foot.
+// entasis, annulets, the echinus and the abacus. r0 = the shaft's radius at the foot. The capital
+// and the steps are drawn a little heavier than Vitruvius would, so they survive at GIF size.
+const CP = { abacusW: 1.42, abacusH: 0.38, echH: 0.46, echW: 1.34, neck: 0.1, torusR: 1.06, torusT: 0.15, baseH: 0.3,
+  plinthW: 1.32, plinthH: 0.3, steps: [1.72, 2.08, 2.44], stepH: 0.3, flute: 0.2, top: 0.8 };
+const FIXED = CP.abacusH + CP.echH + CP.neck + CP.baseH + CP.plinthH + CP.steps.length * CP.stepH; // x r0
 function buildColumn({ r0, shaftH, flutes = 12 }) {
   const col = new THREE.Group();
-  const marble = new THREE.MeshStandardMaterial({ color: 0xf2f4ff, roughness: 0.42, metalness: 0, envMapIntensity: 0.9 });
-  const rTop = r0 * 0.8;
+  // Lit by the key light alone (no studio reflections): white on the lit side, a navy glow in the
+  // shade, so the posteriser finds whites, pale blue-greys and navy.
+  const marble = new THREE.MeshLambertMaterial({ emissive: 0x101860 });
+  marble.color.setRGB(1.3, 1.34, 1.5);
+  const rTop = r0 * CP.top;
   let y = 0; // building downward from the top of the abacus
   const box = (hw, h) => { const m = new THREE.Mesh(new THREE.BoxGeometry(hw * 2, h, hw * 2), marble); m.position.y = y - h / 2; col.add(m); y -= h; };
-  // abacus
-  box(r0 * 1.32, r0 * 0.3);
+  box(r0 * CP.abacusW, r0 * CP.abacusH);
   // echinus: a convex cushion from the neck out to under the abacus
   {
-    const h = r0 * 0.36, pts = [];
-    for (let i = 0; i <= 16; i++) { const s = i / 16; pts.push(new THREE.Vector2(rTop * 1.02 + (r0 * 1.24 - rTop * 1.02) * (1 - (1 - s) ** 2.2), y - h + s * h)); }
-    pts.unshift(new THREE.Vector2(0.001, y - h)); pts.push(new THREE.Vector2(0.001, y));
+    const h = r0 * CP.echH, pts = [new THREE.Vector2(0.001, y - h)];
+    for (let i = 0; i <= 16; i++) { const s = i / 16; pts.push(new THREE.Vector2(rTop * 1.04 + (r0 * CP.echW - rTop * 1.04) * (1 - (1 - s) ** 2.4), y - h + s * h)); }
+    pts.push(new THREE.Vector2(0.001, y));
     col.add(new THREE.Mesh(new THREE.LatheGeometry(pts, 96), marble));
     y -= h;
   }
-  // annulets: two thin rings
+  // annulets: two thin rings round the neck
   for (let i = 0; i < 2; i++) {
-    const ring = new THREE.Mesh(new THREE.CylinderGeometry(rTop * 1.05, rTop * 1.05, r0 * 0.06, 96), marble);
-    ring.position.y = y - r0 * 0.03 - i * r0 * 0.09; col.add(ring);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(rTop * 1.08, rTop * 1.08, r0 * 0.045, 96), marble);
+    ring.position.y = y - r0 * 0.025 - i * r0 * 0.06; col.add(ring);
   }
-  y -= r0 * 0.04;
-  // the fluted shaft, with entasis: the profile swells and then tapers to 0.8 r0 at the neck
+  y -= r0 * CP.neck;
+  // the fluted shaft, with entasis: a slight swell, then a taper to 0.8 r0 at the neck. The flutes
+  // are deep scallops meeting in sharp arrises, so the light picks them out as stripes.
   {
-    const rs = flutes * 10, hs = 40, pos = [], idx = [];
+    const rs = flutes * 12, hs = 40, pos = [], idx = [];
     for (let j = 0; j <= hs; j++) {
       const u = j / hs, yy = y - shaftH + u * shaftH;
-      const rEnt = r0 * (1 - 0.2 * u * u) + r0 * 0.012 * Math.sin(Math.PI * u);
+      const rEnt = r0 * (1 - (1 - CP.top) * u * u) + r0 * 0.012 * Math.sin(Math.PI * u);
       for (let i = 0; i <= rs; i++) {
-        const th = (i / rs) * TAU, ph = ((i / rs) * flutes) % 1;
+        const th = (i / rs) * TAU + Math.PI / flutes, ph = ((i / rs) * flutes) % 1;
         const sc = Math.sqrt(Math.max(0, 1 - (2 * ph - 1) ** 2));
-        const r = rEnt * (1 - 0.085 * sc);
+        const r = rEnt * (1 - CP.flute * sc);
         pos.push(Math.sin(th) * r, yy, Math.cos(th) * r);
       }
     }
@@ -512,32 +519,30 @@ function buildColumn({ r0, shaftH, flutes = 12 }) {
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    geo.setIndex(idx); geo.computeVertexNormals();
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
     col.add(new THREE.Mesh(geo, marble));
     y -= shaftH;
   }
   // base: a torus on a square plinth
   {
-    const t = new THREE.Mesh(new THREE.TorusGeometry(r0 * 1.04, r0 * 0.13, 16, 96), marble);
-    t.rotation.x = Math.PI / 2; t.position.y = y - r0 * 0.12; col.add(t);
-    y -= r0 * 0.22;
-    box(r0 * 1.3, r0 * 0.26);
+    const t = new THREE.Mesh(new THREE.TorusGeometry(r0 * CP.torusR, r0 * CP.torusT, 16, 96), marble);
+    t.rotation.x = Math.PI / 2; t.position.y = y - r0 * CP.torusT; col.add(t);
+    y -= r0 * CP.baseH;
+    box(r0 * CP.plinthW, r0 * CP.plinthH);
   }
   // crepidoma: three steps
-  for (const hw of [1.55, 1.8, 2.05]) box(r0 * hw, r0 * 0.27);
-  col.userData.bottom = y; col.userData.halfBase = r0 * 2.05;
+  for (const hw of CP.steps) box(r0 * hw, r0 * CP.stepH);
   return col;
 }
 
-// The column's fixed parts, top to bottom, in units of r0 (shaft not included): abacus 0.3,
-// echinus 0.36, annulets 0.04, base 0.22 + 0.26, steps 3 x 0.27.
 const TOP = -1.035; // the abacus top: the globe's south pole just rests on it
 let column = null;
 if (COL) {
-  const r0 = globeItem.r0 ?? 0.38, fixed = r0 * (0.3 + 0.36 + 0.04 + 0.22 + 0.26 + 0.81);
+  const r0 = globeItem.r0 ?? 0.44, fixed = r0 * FIXED, front = r0 * CP.steps[CP.steps.length - 1];
   // solve the shaft's height so the front edge of the bottom step lands on the ground line
   const yOf = (shaftH) => {
-    const v = new THREE.Vector3(0, TOP - fixed - shaftH, r0 * 2.05).project(camera);
+    const v = new THREE.Vector3(0, TOP - fixed - shaftH, front).project(camera);
     return ((1 - v.y) / 2) * RH;
   };
   let lo = 0.1, hi = 30;

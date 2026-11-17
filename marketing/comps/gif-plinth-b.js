@@ -70,8 +70,8 @@ const FORMATS = {
       { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 46, y: 174, st: 'only' },
       { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 46, y: 192, st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 46, y: 210, st: 'only' },
-      { t: 'column', x: 130, sw: 18, vr: 5, ext: 3, steps: [[3, 13], [3, 17], [3, 21]] },
-      { t: 'globe', x: 130, y: 202, d: 66 },
+      { t: 'column', x: 128, sw: 20, vr: 6, ext: 3, steps: [[3, 15], [3, 20], [3, 25]] },
+      { t: 'globe', x: 128, y: 204, d: 72 },
       { t: 'sticker', x: 160, y: 178, r: 17, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 46, y: 270, r: 26, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
@@ -524,11 +524,12 @@ function drawGlobe(step) {
 // upper left, black keyline round the silhouette and the type's hard navy drop shadow.
 const TONE = ['white', 'pale', 'sky', 'navy'];
 function columnSprite(it, top, bot) {
-  const s = it.sw, hs = s / 2, vr = it.vr, vx = hs + 1, E = it.ext ?? 3;
+  const s = it.sw, hs = s / 2, vr = it.vr, vx = hs + 1.5, E = it.ext ?? 3;
+  const abW = Math.ceil(vx + vr) + 1;
   const rows = [];
   const add = (id, h, hw, kind) => rows.push({ id, h, hw, kind });
-  add('abacus', it.ah ?? 3, vx + vr + 1, 'slab');
-  add('canalis', 2, vx, 'band');
+  add('abacus', it.ah ?? 3, abW, 'slab');
+  add('canalis', 2, Math.ceil(vx), 'band');
   add('echinus', it.eh ?? vr, hs + 1, 'egg');
   add('astragal', 2, hs + 1, 'bead');
   const tb = it.tb ?? (s >= 20 ? 3 : 3);
@@ -539,10 +540,22 @@ function columnSprite(it, top, bot) {
   for (const r of [...base, ...steps]) add(...r);
   let y = 0;
   for (const r of rows) { r.y0 = y; y += r.h; }
-  const total = y, maxHw = Math.max(...rows.map((r) => r.hw), vx + vr + 1);
+  const total = y, maxHw = Math.max(...rows.map((r) => r.hw), abW);
   const ax = maxHw + 1, cw = ax * 2 + E + 1, ch = total + 2 + E;
   const rowAt = (ly) => rows.find((r) => ly >= r.y0 && ly < r.y0 + r.h);
-  const cyV = (it.ah ?? 3) + vr; // volute centre row (continuous)
+  const cyV = (it.ah ?? 3) + vr + 0.5; // volute centre (continuous; on a pixel centre)
+  // the scroll's groove: an Archimedean spiral rasterised as one connected pixel line, starting
+  // just inside the rim at the top and winding outward-first, two pixels a turn, into the eye
+  const groove = new Set();
+  for (const sg of [-1, 1]) {
+    const R0 = vr - 1.5, pitch = it.pitch ?? 2;
+    for (let ph = 0; ; ph += 0.01) {
+      const r = R0 - (pitch * ph) / TAU;
+      if (r < 0.6) break;
+      const uu = sg * vx + sg * r * Math.sin(ph), vv = cyV - r * Math.cos(ph);
+      groove.add(Math.floor(uu + ax) + ',' + Math.floor(vv));
+    }
+  }
   // which part a pixel belongs to (local canvas coordinates; the body starts at row 1)
   const part = (x, y) => {
     const ly = y - 1, u = x - ax + 0.5;
@@ -562,14 +575,8 @@ function columnSprite(it, top, bot) {
     if (p.vol) {
       const dx = (u - p.vol * vx), dy = ly + 0.5 - cyV, d = Math.hypot(dx, dy);
       if (d > vr - 0.85) return 'black';
-      // the scroll: an Archimedean spiral winding inwards from the top, outward side first
-      let phi = Math.atan2(dx * p.vol, -dy); if (phi < 0) phi += TAU;
-      const R0 = vr - 1.2, T = it.turns ?? 1.5;
-      for (let kk = 0; kk < 4; kk++) {
-        const rk = R0 * (1 - (phi + TAU * kk) / (TAU * T));
-        if (rk > 0.5 && Math.abs(d - rk) < 0.5) return 'navy';
-      }
-      if (d < 0.9) return 'navy';
+      if (groove.has(x + ',' + ly)) return 'navy';
+      if (d < 0.5) return 'navy';
       const lit = (dx + dy) / vr;
       return lit < -0.35 ? 'white' : lit < 0.45 ? 'pale' : 'sky';
     }
@@ -647,7 +654,7 @@ if (columnItem) {
   const ga = gx.getImageData(0, 0, D, D).data;
   let low = 0;
   for (let y = 0; y < D; y++) for (let x = 0; x < D; x++) { const j = (y * D + x) * 4; if (ga[j + 3] && !(ga[j] === 0 && ga[j + 1] === 0 && ga[j + 2] === 0x66)) low = y; }
-  const top = Math.round(globeItem.y - D / 2) + low - (columnItem.sink ?? 2);
+  const top = Math.round(globeItem.y - D / 2) + low - (columnItem.sink ?? 0);
   const cs = columnSprite(columnItem, top, marquee.y);
   Object.assign(columnLayer, { frames: [cs.canvas], x: cs.x, y: cs.y });
 }
