@@ -14,8 +14,8 @@
   const EDGE = "straight";
 
   // The artwork's size in banner pixels (see banner.css), and the footer under it.
-  const ART = { desktop: { w: 180, h: 309 }, phone: { w: 234, h: 143 } };
-  const FOOT = { desktop: 31, phone: 26 }; // credit line + marquee, in banner pixels
+  const ART = { desktop: { w: 180, h: 315 }, phone: { w: 234, h: 152 } };
+  const FOOT = { desktop: 22, phone: 17 }; // the marquee, in banner pixels
   const TOOTH = { period: 8, depth: 4 }; // coupon teeth, in banner pixels
   const SPEED = 60; // the marquee, in banner pixels a second
 
@@ -32,13 +32,12 @@
   function html() {
     return `
       <link rel="stylesheet" href="${url("banner.css")}">
-      <div class="frame" role="img" aria-label="30% off everything on the internet. Black Friday only! Brought to you by Gary Mustard Enterprises.">
+      <div class="frame" role="img" aria-label="30% off everything on the internet. Black Friday only!">
         <div class="top"><div class="sheet">
           <img class="art desktop" alt="" src="${url(`images/desktop${still}.webp`)}">
           <img class="art phone" alt="" src="${url(`images/phone${still}.webp`)}">
         </div></div>
         <div class="foot"><div class="sheet">
-          <div class="credit">Brought to you by Gary Mustard Enterprises</div>
           <div class="ticker"><div class="run">
             <img class="desktop" alt="" src="${url("images/ticker-desktop.png")}"><img class="desktop" alt="" src="${url("images/ticker-desktop.png")}">
             <img class="phone" alt="" src="${url("images/ticker-phone.png")}"><img class="phone" alt="" src="${url("images/ticker-phone.png")}">
@@ -51,20 +50,9 @@
   let wanted = false;
   let appends = 0;
   let midnightTimer;
-  let fontAdded = false;
 
-  function addFont() {
-    if (fontAdded) return;
-    fontAdded = true;
-    try {
-      const face = new FontFace("TOE Inter", `url(${url("fonts/inter-semibold.woff2")})`, { weight: "600" });
-      document.fonts.add(face);
-      face.load().catch(() => {});
-    } catch {}
-  }
-
-  // Size everything to the frame: one zoom for the artwork and footer, so a banner pixel is the
-  // same size in both; the footer runs the full width; the marquee scrolls at a steady speed.
+  // Size everything to the frame: one zoom for the artwork and the marquee, so a banner pixel is
+  // the same size in both; the marquee runs the full width and scrolls at a steady speed.
   function fit(shadow) {
     const frame = shadow.querySelector(".frame");
     const [top, foot] = shadow.querySelectorAll(".sheet");
@@ -126,7 +114,6 @@
     if (!(root instanceof HTMLHtmlElement)) return;
     keeper.observe(root, { childList: true });
     if (!document.body) return;
-    addFont();
     host ??= createHost();
     if (host.parentNode !== root) {
       if (appends++ > 20) return; // the page removes it every time; stop fighting

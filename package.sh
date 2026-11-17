@@ -3,6 +3,6 @@
 set -e
 cd "$(dirname "$0")/src"
 rm -f ../black-friday.zip
-zip -X -q -r ../black-friday.zip manifest.json content.js banner.css images fonts icons
+zip -X -q -r ../black-friday.zip manifest.json content.js banner.css images icons
 cd ..
 unzip -l black-friday.zip

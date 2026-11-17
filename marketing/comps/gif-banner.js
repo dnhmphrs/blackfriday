@@ -6,7 +6,7 @@
 // Options: ?h= renders a format at another height (the footer stays on the bottom edge, as it
 // does in the live banner); ?edge=serrated cuts the page-facing edge like a coupon (?out= sets
 // what shows through the teeth, default white); ?ticker=serrated serrates the marquee strip;
-// ?credit=0 drops the credit line.
+// ?credit=1 adds the credit line "Brought to you by Gary Mustard Enterprises" above the marquee.
 // Everything on screen is a pure function of time:  window.comp.setTime(seconds)
 import * as THREE from 'three';
 import { createStage } from '../lib/stage.js';
@@ -42,16 +42,16 @@ const FORMATS = {
   '1x1': {
     w: 1080, h: 1080, P: 4, credit: 30,
     items: [
-      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 10, st: 'head' },
-      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 55, st: 'body' },
-      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 75, st: 'body' },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 99, st: 'only' },
-      { t: 'globe', x: 96, y: 178, d: 102 },
-      { t: 'sticker', x: 140, y: 143, r: 22, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 210, y: 175, r: 38, lines: ['NEW!'], f: `16px ${PS}` },
-      { t: 'sparkle', x: 18, y: 16, ph: 0 },
-      { t: 'sparkle', x: 254, y: 44, ph: 1 },
-      { t: 'sparkle', x: 26, y: 140, ph: 1 },
+      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 12, st: 'head' },
+      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 58, st: 'body' },
+      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 79, st: 'body' },
+      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 104, st: 'only' },
+      { t: 'globe', x: 94, y: 186, d: 110 },
+      { t: 'sticker', x: 141, y: 149, r: 23, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 212, y: 184, r: 40, lines: ['NEW!'], f: `16px ${PS}` },
+      { t: 'sparkle', x: 18, y: 18, ph: 0 },
+      { t: 'sparkle', x: 254, y: 46, ph: 1 },
+      { t: 'sparkle', x: 24, y: 152, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
@@ -65,27 +65,27 @@ const FORMATS = {
       { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 161, st: 'body' },
       { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 90, y: 186, st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 90, y: 204, st: 'only' },
-      { t: 'globe', x: 116, y: 264, d: 80 },
-      { t: 'sticker', x: 144, y: 231, r: 22, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 40, y: 258, r: 32, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
+      { t: 'globe', x: 116, y: 268, d: 84 },
+      { t: 'sticker', x: 146, y: 234, r: 23, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 40, y: 262, r: 33, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
       { t: 'sparkle', x: 166, y: 70, ph: 1 },
-      { t: 'sparkle', x: 82, y: 233, ph: 1 },
+      { t: 'sparkle', x: 82, y: 236, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
   'banner-h': {
     w: 1170, h: 834, P: 5, credit: 32,
     items: [
-      { t: 'text', s: '30%', f: `40px ${PS}`, x: 8, y: 6, align: 'l', st: 'head' },
-      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 8, y: 50, align: 'l', st: 'head' },
-      { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 96, align: 'l', st: 'bodyS' },
-      { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 108, align: 'l', st: 'bodyS' },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 122, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 189, y: 58, d: 76 },
-      { t: 'sticker', x: 157, y: 33, r: 21, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 204, y: 114, r: 23, lines: ['HOT!'], f: `8px ${PS}` },
-      { t: 'sparkle', x: 224, y: 12, ph: 1 },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 8, y: 7, align: 'l', st: 'head' },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 8, y: 52, align: 'l', st: 'head' },
+      { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
+      { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
+      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
+      { t: 'globe', x: 189, y: 62, d: 78 },
+      { t: 'sticker', x: 157, y: 36, r: 22, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 202, y: 122, r: 24, lines: ['HOT!'], f: `8px ${PS}` },
+      { t: 'sparkle', x: 224, y: 14, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
   },
@@ -176,7 +176,7 @@ const F = { ...FORMATS[format] };
 if (Number(q.get('h')) > 0) F.h = Math.round(Number(q.get('h')));
 // ?part=body draws only the artwork above the footer: what the live banner shows as an image.
 const BODY_ONLY = q.get('part') === 'body';
-const EDGE = !BODY_ONLY && q.get('edge') === 'serrated', TICK_SERR = q.get('ticker') === 'serrated', CREDIT = q.get('credit') !== '0';
+const EDGE = !BODY_ONLY && q.get('edge') === 'serrated', TICK_SERR = q.get('ticker') === 'serrated', CREDIT = q.get('credit') === '1';
 const OUTSIDE = '#' + (q.get('out') || 'ffffff').replace(/[^0-9a-f]/gi, '').slice(0, 6);
 const P = F.P, W = Math.ceil(F.w / P), H = Math.ceil(F.h / P);
 

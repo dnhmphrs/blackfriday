@@ -13,7 +13,6 @@ src/
   content.js      the date check, and puts the banner on the page
   banner.css      the banner's layout
   images/         the banner artwork (animated WebP) and the marquee strips
-  fonts/          Inter, for the credit line (SIL Open Font License)
   icons/
 ```
 

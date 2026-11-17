@@ -69,7 +69,6 @@ const probe = () => {
   if (!host) return { present: false, count: 0 };
   const s = host.shadowRoot;
   const rect = (el) => { const r = el?.getBoundingClientRect(); return r && [r.x, r.y, r.width, r.height].map(Math.round); };
-  const visible = (sel) => { const el = s.querySelector(sel); const r = el?.getBoundingClientRect(); return !!r && r.width > 0 && getComputedStyle(el).display !== 'none'; };
   let topLayer = null;
   try { topLayer = host.matches(':popover-open'); } catch {}
   const frame = s.querySelector('.frame');
@@ -82,9 +81,7 @@ const probe = () => {
     frame: rect(frame),
     art: rect([...s.querySelectorAll('.art')].find((i) => getComputedStyle(i).display !== 'none')),
     ticker: rect(s.querySelector('.ticker')),
-    credit: visible('.credit') && s.querySelector('.credit').textContent,
     images: [...s.querySelectorAll('img')].filter((i) => getComputedStyle(i).display !== 'none').map((i) => i.naturalWidth),
-    fonts: [...document.fonts].filter((f) => f.family.replace(/"/g, '') === 'TOE Inter' && f.status === 'loaded').length,
     viewport: [document.documentElement.clientWidth, innerHeight],
     hitRight: document.elementFromPoint(innerWidth - 60, innerHeight / 2)?.nodeName,
     hitLeft: document.elementFromPoint(100, 200)?.nodeName,
@@ -179,8 +176,8 @@ console.log('\n# 3. Nothing at all on other days');
   const errs = await watchErrors(context, page);
   for (const [label, t] of [['an ordinary day', ORDINARY], ['the day before', Date.parse('2026-11-26T12:00:00Z')], ['the day after', Date.parse('2026-11-28T12:00:00Z')]]) {
     await page.goto(url('/plain', t)); await sleep(300);
-    const touched = await page.evaluate(() => ({ el: document.querySelectorAll('thirty-off-everything').length, fonts: [...document.fonts].filter((f) => f.family.includes('TOE')).length }));
-    check(`${label}: no element, no fonts added to the page`, touched.el === 0 && touched.fonts === 0, JSON.stringify(touched));
+    const touched = await page.evaluate(() => document.querySelectorAll('thirty-off-everything').length);
+    check(`${label}: nothing added to the page`, touched === 0, touched);
   }
   check('no errors on those days', errs.length === 0, errs.join(' | '));
   await context.close();
@@ -197,8 +194,7 @@ console.log('\n# 4. The banner (Black Friday)');
   const [vw, vh] = base.viewport;
   check('right-hand 30%, full height', Math.abs(base.frame[2] - vw * 0.3) <= 2 && base.frame[1] === 0 && base.frame[3] === vh && base.frame[0] + base.frame[2] === vw, JSON.stringify(base.frame));
   check('under <html>, in the top layer', base.parent === 'HTML' && base.topLayer === true);
-  check('stylesheet, artwork, ticker and font loaded', base.styled && base.images.length === 3 && base.images.every((w) => w > 0) && base.fonts === 1, `${JSON.stringify(base.images)} font ${base.fonts}`);
-  check('credit line reads "Brought to you by Gary Mustard Enterprises"', base.credit === 'Brought to you by Gary Mustard Enterprises', base.credit);
+  check('stylesheet, artwork and ticker loaded', base.styled && base.images.length === 3 && base.images.every((w) => w > 0), JSON.stringify(base.images));
   check('the ticker sits on the bottom edge', base.ticker && Math.abs(base.ticker[1] + base.ticker[3] - (base.frame[1] + base.frame[3])) <= 1, JSON.stringify(base.ticker));
   check('blocks the right side, left side still clickable', base.hitRight === 'THIRTY-OFF-EVERYTHING' && base.hitLeft !== 'THIRTY-OFF-EVERYTHING', `${base.hitRight} / ${base.hitLeft}`);
   await page.mouse.move(400, 400); await page.mouse.wheel(0, 600); await sleep(200);
@@ -242,7 +238,7 @@ console.log('\n# 5. Hostile and unusual pages (Black Friday)');
   await page.goto(url('/csp', BF)); await sleep(1200);
   const cdp = await context.newCDPSession(page);
   const c = (await cdp.send('Runtime.evaluate', { expression: `(${probe})()`, returnByValue: true })).result.value;
-  check('strict Content-Security-Policy: styled, pictures and font loaded', c.present && c.styled && c.images.every((w) => w > 0) && c.fonts === 1 && JSON.stringify(c.frame) === JSON.stringify(base.frame), `${JSON.stringify(c.images)} font ${c.fonts}`);
+  check('strict Content-Security-Policy: styled and pictures loaded', c.present && c.styled && c.images.every((w) => w > 0) && JSON.stringify(c.frame) === JSON.stringify(base.frame), JSON.stringify(c.images));
 
   await page.goto(url('/frames', BF)); await sleep(800);
   const inFrames = await Promise.all(page.frames().slice(1).map((f) => f.evaluate(() => document.querySelectorAll('thirty-off-everything').length)));

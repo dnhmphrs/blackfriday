@@ -1,5 +1,5 @@
 /* The banner: an animated GIF-style picture on a grid of big square pixels, with a live marquee
-   and a credit line pinned to the bottom edge. Everything inside .sheet is measured in those
+   pinned to the bottom edge. Everything inside .sheet is measured in those
    banner pixels; content.js zooms each sheet so the picture fills the frame. The picture sizes
    come from marketing/tools/banner-export.mjs. */
 
@@ -16,12 +16,8 @@
 .art { display: block; image-rendering: pixelated; }
 .art.phone { display: none; }
 
-/* the footer: credit line, then the marquee, on the bottom edge, full width */
+/* the footer: the marquee, on the bottom edge, full width */
 .foot { position: absolute; left: 0; bottom: 0; }
-.credit {
-  padding-bottom: 3px; text-align: center; color: #fff; white-space: nowrap;
-  font: 600 6px/1.2 "TOE Inter", "Helvetica Neue", Arial, sans-serif;
-}
 .ticker {
   position: relative; height: 22px; overflow: hidden;
   background: url("images/ticker-frame.png") repeat-x; background-size: 1px 22px; image-rendering: pixelated;
@@ -36,13 +32,11 @@
   .frame { width: 100%; height: 33%; }
   .art.desktop, .run .desktop { display: none; }
   .art.phone, .run .phone { display: block; }
-  .credit { text-align: left; padding-left: 8px; font-size: 6.4px; }
   .ticker { height: 17px; background-size: 1px 17px; }
   .run { top: 4px; }
 }
 
 /* the coupon edge: what the teeth show is the page underneath (see content.js) */
-.frame.serrated .foot { padding-bottom: 0; }
 @media (max-width: 768px) {
   .frame.serrated .ticker { border-bottom: 4px solid #000066; height: 21px; }
 }
