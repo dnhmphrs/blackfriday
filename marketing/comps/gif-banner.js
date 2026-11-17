@@ -135,24 +135,26 @@ const FORMATS = {
       { t: 'marquee', h: 18, f: `8px ${PS}` },
     ],
   },
-  // The vertical story advert. Phone apps cover the top ~240 and bottom ~340 stage px, so the
-  // artwork sits between them (y 250-1560); the footer stays on the bottom edge, as everywhere.
+  // The vertical advert: the headline stacked big, as on the desktop banner; the marquee on the
+  // bottom edge, as everywhere.
   '9x16': {
     w: 1080, h: 1920, P: 4, credit: 30,
     items: [
-      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 66, st: 'head' },
-      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 113, st: 'body' },
-      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 133, st: 'body' },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 158, st: 'only' },
-      { t: 'globe', x: 98, y: 296, d: 136 },
-      { t: 'sticker', x: 156, y: 249, r: 29, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 222, y: 308, r: 40, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
-      { t: 'sparkle', x: 22, y: 72, ph: 0 },
-      { t: 'sparkle', x: 252, y: 100, ph: 1 },
-      { t: 'sparkle', x: 22, y: 224, ph: 1 },
+      { t: 'text', s: '30%', f: `64px ${PS}`, x: 135, y: 48, st: 'head' },
+      { t: 'text', s: 'OFF', f: `64px ${PS}`, x: 135, y: 120, st: 'head' },
+      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 198, st: 'body' },
+      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 218, st: 'body' },
+      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 244, st: 'only' },
+      { t: 'globe', x: 100, y: 358, d: 136 },
+      { t: 'sticker', x: 158, y: 311, r: 29, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 222, y: 370, r: 40, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
+      { t: 'sparkle', x: 24, y: 54, ph: 0 },
+      { t: 'sparkle', x: 248, y: 136, ph: 1 },
+      { t: 'sparkle', x: 22, y: 300, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
+
   // The full-page horizontal advert: the message on the left, the globe and burst on the right.
   '16x9': {
     w: 1920, h: 1080, P: 4, credit: 30,

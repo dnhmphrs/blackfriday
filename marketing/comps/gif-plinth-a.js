@@ -39,38 +39,41 @@ const TICKER = ['But wait… there’s less!', 'No purchase necessary!', 'Black 
 // Layout in GIF pixels. P is the size of one GIF pixel on the stage.
 // text: x is a centre (align c) or a left edge (align l); y is the top of the ink.
 const FORMATS = {
+  // The square: the message stacked down the left, the monument standing full height on the right.
   '1x1': {
     w: 1080, h: 1080, P: 4, credit: 30,
     items: [
-      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 12, st: 'head' },
-      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 58, st: 'body' },
-      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 79, st: 'body' },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 104, st: 'only' },
-      { t: 'globe', x: 94, y: 186, d: 110 },
-      { t: 'sticker', x: 141, y: 149, r: 23, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 212, y: 184, r: 40, lines: ['NEW!'], f: `16px ${PS}` },
-      { t: 'sparkle', x: 18, y: 18, ph: 0 },
-      { t: 'sparkle', x: 254, y: 46, ph: 1 },
-      { t: 'sparkle', x: 24, y: 152, ph: 1 },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 84, y: 10, st: 'head' },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 84, y: 56, st: 'head' },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 84, y: 108, st: 'body' },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 84, y: 128, st: 'body' },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 84, y: 148, st: 'body' },
+      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 84, y: 174, st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 84, y: 192, st: 'only' },
+      { t: 'globe', x: 216, y: 50, d: 84, column: true },
+      { t: 'sticker', x: 246, y: 22, r: 19, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 40, y: 222, r: 22, lines: ['NEW!'], f: `8px ${PS}` },
+      { t: 'sparkle', x: 160, y: 12, ph: 0 },
+      { t: 'sparkle', x: 170, y: 120, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
   'banner-v': {
     w: 1080, h: 2025, P: 6, credit: 36,
     items: [
-      { t: 'text', s: '30%', f: `48px ${PS}`, x: 90, y: 8, st: 'head' },
-      { t: 'text', s: 'OFF', f: `48px ${PS}`, x: 90, y: 62, st: 'head' },
-      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 121, st: 'body' },
-      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 141, st: 'body' },
-      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 161, st: 'body' },
-      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 90, y: 186, st: 'only' },
-      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 90, y: 204, st: 'only' },
-      { t: 'globe', x: 116, y: 268, d: 84 },
-      { t: 'sticker', x: 146, y: 234, r: 23, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 40, y: 262, r: 33, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 90, y: 8, st: 'head' },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 90, y: 53, st: 'head' },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 101, st: 'body' },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 121, st: 'body' },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 141, st: 'body' },
+      { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 6, y: 172, align: 'l', st: 'only' },
+      { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 6, y: 190, align: 'l', st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 6, y: 208, align: 'l', st: 'only' },
+      { t: 'globe', x: 132, y: 196, d: 60, column: true },
+      { t: 'sticker', x: 154, y: 172, r: 16, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 44, y: 268, r: 28, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
-      { t: 'sparkle', x: 166, y: 70, ph: 1 },
-      { t: 'sparkle', x: 82, y: 236, ph: 1 },
+      { t: 'sparkle', x: 166, y: 60, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
@@ -82,10 +85,10 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 189, y: 62, d: 78 },
-      { t: 'sticker', x: 157, y: 36, r: 22, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 202, y: 122, r: 24, lines: ['HOT!'], f: `8px ${PS}` },
-      { t: 'sparkle', x: 224, y: 14, ph: 1 },
+      { t: 'globe', x: 196, y: 36, d: 60, column: true },
+      { t: 'sticker', x: 168, y: 16, r: 16, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 152, y: 84, r: 20, lines: ['HOT!'], f: `8px ${PS}` },
+      { t: 'sparkle', x: 140, y: 14, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
   },
@@ -429,19 +432,36 @@ function drawMarquee(t) {
   g.restore();
 }
 
-// ---------- the globe GIF ----------
+// ---------- the globe GIF, on its column ----------
+// The globe and a white marble Doric column are one three.js scene, rendered at 4x, averaged down
+// and posterised with the same ordered dither, so they read as one 3D object. The column stands
+// still; the globe spins on its abacus. Layout (GIF px): x, y = the globe's centre, d = its
+// diameter, ground = where the bottom step stands (default: the top of the marquee).
 const SS = 4; // rendered at 4x and averaged down before it is posterised
 const D = globeItem.d;
+const K = D / 2.12;                                   // GIF px per world unit (the globe is 2.12 units across)
+const COL = globeItem.ground !== undefined || globeItem.column;
+const GROUND = COL ? (globeItem.ground ?? marquee.y) : null;
+const RW = COL ? Math.max(D + 4, Math.ceil(K * (globeItem.r0 ?? 0.38) * 4.6) + 6) : D;
+const OX = Math.round(globeItem.x - RW / 2), OY = COL ? Math.round(globeItem.y - D / 2) - 2 : Math.round(globeItem.y - D / 2);
+const RH = COL ? GROUND - OY + 1 : D;
+const GXC = globeItem.x - OX, GYC = globeItem.y - OY;  // the globe's centre inside the render
 const gl = $('gl');
-const { renderer, scene, camera } = createStage({ canvas: gl, width: D * SS, height: D * SS, pixelRatio: 1, fov: 24 });
+const { renderer, scene, camera } = createStage({ canvas: gl, width: RW * SS, height: RH * SS, pixelRatio: 1, fov: 24 });
 renderer.shadowMap.enabled = false;
+const ELEV = (Number(q.get('elev') ?? (COL ? (globeItem.elev ?? 12) : 20)) * Math.PI) / 180;
 {
-  const pxPerUnit = (D * SS) / 2 / 1.06;
-  const dist = (D * SS) / (2 * Math.tan((24 * Math.PI) / 360) * pxPerUnit);
-  const elev = (Number(q.get('elev') ?? 20) * Math.PI) / 180;
-  camera.position.set(0, Math.sin(elev) * dist, Math.cos(elev) * dist);
+  // The camera looks at the globe's centre; an off-axis window frames the column below it, so the
+  // globe keeps exactly its size and place whatever the column's height.
+  const dist = COL ? 11 : 2.12 / (2 * Math.tan((24 * Math.PI) / 360));
+  const FULL = 4 * SS * Math.max(RW, RH);
+  camera.fov = (2 * Math.atan(FULL / 2 / (dist * K * SS)) * 180) / Math.PI;
+  camera.aspect = 1;
+  camera.position.set(0, Math.sin(ELEV) * dist, Math.cos(ELEV) * dist);
   camera.lookAt(0, 0, 0);
-  camera.setViewOffset(D * SS, D * SS, 0, 0, D * SS, D * SS);
+  camera.setViewOffset(FULL, FULL, FULL / 2 - GXC * SS, FULL / 2 - GYC * SS, RW * SS, RH * SS);
+  camera.updateProjectionMatrix();
+  camera.updateMatrixWorld(true);
 }
 const pivot = new THREE.Group();
 scene.add(pivot);
@@ -449,15 +469,93 @@ const globe = await buildObject('globe-core');
 globe.userData.slice.visible = false;
 pivot.add(globe);
 
+// ---- the column: crepidoma (three steps), a plain base (plinth and torus), a fluted shaft with
+// entasis, annulets, the echinus and the abacus. r0 = the shaft's radius at the foot.
+function buildColumn({ r0, shaftH, flutes = 12 }) {
+  const col = new THREE.Group();
+  const marble = new THREE.MeshStandardMaterial({ color: 0xf2f4ff, roughness: 0.42, metalness: 0, envMapIntensity: 0.9 });
+  const rTop = r0 * 0.8;
+  let y = 0; // building downward from the top of the abacus
+  const box = (hw, h) => { const m = new THREE.Mesh(new THREE.BoxGeometry(hw * 2, h, hw * 2), marble); m.position.y = y - h / 2; col.add(m); y -= h; };
+  // abacus
+  box(r0 * 1.32, r0 * 0.3);
+  // echinus: a convex cushion from the neck out to under the abacus
+  {
+    const h = r0 * 0.36, pts = [];
+    for (let i = 0; i <= 16; i++) { const s = i / 16; pts.push(new THREE.Vector2(rTop * 1.02 + (r0 * 1.24 - rTop * 1.02) * (1 - (1 - s) ** 2.2), y - h + s * h)); }
+    pts.unshift(new THREE.Vector2(0.001, y - h)); pts.push(new THREE.Vector2(0.001, y));
+    col.add(new THREE.Mesh(new THREE.LatheGeometry(pts, 96), marble));
+    y -= h;
+  }
+  // annulets: two thin rings
+  for (let i = 0; i < 2; i++) {
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(rTop * 1.05, rTop * 1.05, r0 * 0.06, 96), marble);
+    ring.position.y = y - r0 * 0.03 - i * r0 * 0.09; col.add(ring);
+  }
+  y -= r0 * 0.04;
+  // the fluted shaft, with entasis: the profile swells and then tapers to 0.8 r0 at the neck
+  {
+    const rs = flutes * 10, hs = 40, pos = [], idx = [];
+    for (let j = 0; j <= hs; j++) {
+      const u = j / hs, yy = y - shaftH + u * shaftH;
+      const rEnt = r0 * (1 - 0.2 * u * u) + r0 * 0.012 * Math.sin(Math.PI * u);
+      for (let i = 0; i <= rs; i++) {
+        const th = (i / rs) * TAU, ph = ((i / rs) * flutes) % 1;
+        const sc = Math.sqrt(Math.max(0, 1 - (2 * ph - 1) ** 2));
+        const r = rEnt * (1 - 0.085 * sc);
+        pos.push(Math.sin(th) * r, yy, Math.cos(th) * r);
+      }
+    }
+    for (let j = 0; j < hs; j++) for (let i = 0; i < rs; i++) {
+      const a = j * (rs + 1) + i, b = a + rs + 1;
+      idx.push(a, a + 1, b, b, a + 1, b + 1);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setIndex(idx); geo.computeVertexNormals();
+    col.add(new THREE.Mesh(geo, marble));
+    y -= shaftH;
+  }
+  // base: a torus on a square plinth
+  {
+    const t = new THREE.Mesh(new THREE.TorusGeometry(r0 * 1.04, r0 * 0.13, 16, 96), marble);
+    t.rotation.x = Math.PI / 2; t.position.y = y - r0 * 0.12; col.add(t);
+    y -= r0 * 0.22;
+    box(r0 * 1.3, r0 * 0.26);
+  }
+  // crepidoma: three steps
+  for (const hw of [1.55, 1.8, 2.05]) box(r0 * hw, r0 * 0.27);
+  col.userData.bottom = y; col.userData.halfBase = r0 * 2.05;
+  return col;
+}
+
+// The column's fixed parts, top to bottom, in units of r0 (shaft not included): abacus 0.3,
+// echinus 0.36, annulets 0.04, base 0.22 + 0.26, steps 3 x 0.27.
+const TOP = -1.035; // the abacus top: the globe's south pole just rests on it
+let column = null;
+if (COL) {
+  const r0 = globeItem.r0 ?? 0.38, fixed = r0 * (0.3 + 0.36 + 0.04 + 0.22 + 0.26 + 0.81);
+  // solve the shaft's height so the front edge of the bottom step lands on the ground line
+  const yOf = (shaftH) => {
+    const v = new THREE.Vector3(0, TOP - fixed - shaftH, r0 * 2.05).project(camera);
+    return ((1 - v.y) / 2) * RH;
+  };
+  let lo = 0.1, hi = 30;
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (yOf(m) < RH - 1) lo = m; else hi = m; }
+  column = buildColumn({ r0, shaftH: lo, flutes: globeItem.flutes ?? 12 });
+  column.position.y = TOP;
+  scene.add(column);
+}
+
 // palette the globe is posterised to: the banner's own colours, a few more web-safe blues for the
 // shading, and the chrome greys
 const PAL = ['#000000', '#000066', '#000099', '#0000cc', '#0033ff', '#3366ff', '#6699ff', '#99ccff', '#ccccff', '#ffffff',
   '#999999', '#cccccc', '#ffff00', '#ffcc00', '#ff9900', '#ff0000', '#cc0000', '#990000']
   .map((h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16 - 0.5);
-const small = canvas(D, D), sx = small.getContext('2d', { willReadFrequently: true });
+const small = canvas(RW, RH), sx = small.getContext('2d', { willReadFrequently: true });
 sx.imageSmoothingEnabled = true; sx.imageSmoothingQuality = 'high';
-const globeOut = canvas(D + 4, D + 4), gx = globeOut.getContext('2d');
+const globeOut = canvas(RW + 4, RH + 4), gx = globeOut.getContext('2d');
 const nearest = (r, gg, b) => {
   let best = 0, bd = Infinity;
   for (let i = 0; i < PAL.length; i++) {
@@ -480,19 +578,19 @@ function drawGlobe(step) {
   pivot.rotation.y = yawAt(t);
   pivot.updateMatrixWorld(true);
   renderer.render(scene, camera);
-  sx.clearRect(0, 0, D, D);
-  sx.drawImage(gl, 0, 0, D, D);
-  const src = sx.getImageData(0, 0, D, D), a = src.data;
-  const OW = D + 4, out = gx.createImageData(OW, OW), o = out.data;
+  sx.clearRect(0, 0, RW, RH);
+  sx.drawImage(gl, 0, 0, RW, RH);
+  const src = sx.getImageData(0, 0, RW, RH), a = src.data;
+  const OW = RW + 4, OH = RH + 4, out = gx.createImageData(OW, OH), o = out.data;
   const SPREAD = 34, SAT = 1.45;
-  const solid = (x, y) => x >= 0 && y >= 0 && x < D && y < D && a[(y * D + x) * 4 + 3] >= 128;
+  const solid = (x, y) => x >= 0 && y >= 0 && x < RW && y < RH && a[(y * RW + x) * 4 + 3] >= 128;
   const put = (x, y, p) => { const j = (y * OW + x) * 4; o[j] = p[0]; o[j + 1] = p[1]; o[j + 2] = p[2]; o[j + 3] = 255; };
   // hard navy drop shadow, 3 px down and right, the same as the type
-  for (let y = 0; y < OW; y++) for (let x = 0; x < OW; x++) {
+  for (let y = 0; y < OH; y++) for (let x = 0; x < OW; x++) {
     if (solid(x - 1, y - 1) || solid(x - 2, y - 2) || solid(x - 3, y - 3) || solid(x - 3, y - 2) || solid(x - 2, y - 3)) put(x, y, [0, 0, 0x66]);
   }
-  for (let y = 0; y < D; y++) for (let x = 0; x < D; x++) {
-    const i = (y * D + x) * 4;
+  for (let y = 0; y < RH; y++) for (let x = 0; x < RW; x++) {
+    const i = (y * RW + x) * 4;
     if (a[i + 3] < 128) continue;
     const k = BAYER[(y & 3) * 4 + (x & 3)] * SPREAD;
     // a touch more saturation first, so the lit cut faces stay sign-red and sign-yellow
@@ -500,7 +598,7 @@ function drawGlobe(step) {
     put(x, y, nearest(l + (a[i] - l) * SAT + k, l + (a[i + 1] - l) * SAT + k, l + (a[i + 2] - l) * SAT + k));
   }
   // a one-pixel black keyline round the silhouette, like a hand-cleaned sprite
-  for (let y = -1; y <= D; y++) for (let x = -1; x <= D; x++) {
+  for (let y = -1; y <= RH; y++) for (let x = -1; x <= RW; x++) {
     if (solid(x, y) || x < 0 || y < 0) continue;
     if (solid(x - 1, y) || solid(x + 1, y) || solid(x, y - 1) || solid(x, y + 1)) put(x, y, [0, 0, 0]);
   }
@@ -550,7 +648,7 @@ function setTime(t) {
   drawGlobe(Math.floor(t * GIF_FPS + 1e-6) % (DURATION * GIF_FPS));
   g.drawImage(bgCanvas, 0, 0);
   for (const L of layers) {
-    if (L.globe) { g.drawImage(globeOut, Math.round(globeItem.x - D / 2), Math.round(globeItem.y - D / 2)); continue; }
+    if (L.globe) { g.drawImage(globeOut, OX, OY); continue; }
     if (L.marquee) { if (!BODY_ONLY) drawMarquee(t); continue; }
     const k = L.frames.length > 1 ? Math.floor(t * L.rate + 1e-6) % 2 : 0;
     g.drawImage(L.frames[k], Math.round(L.x), Math.round(L.y));
@@ -575,6 +673,6 @@ function marqueeParts() {
   return { strip: marquee.strip.toDataURL('image/png'), frame: frame.toDataURL('image/png'), h: marquee.h, gifW: W, gifH: H, speed: 60,
            stripTop: 3 + Math.floor((marquee.h - 5 - marquee.strip.height) / 2) + 1 };
 }
-window.comp = { duration: DURATION, fps: FPS, width: F.w, height: F.h, glitches: [], setTime, pixels, marqueeParts, three: { THREE, scene, camera, renderer, pivot, globe } };
+window.comp = { duration: DURATION, fps: FPS, width: F.w, height: F.h, glitches: [], setTime, pixels, marqueeParts, three: { THREE, scene, camera, renderer, pivot, globe, column } };
 setTime(Number(q.get('t') || 0));
 window.ready = true;

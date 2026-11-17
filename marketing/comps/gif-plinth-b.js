@@ -42,35 +42,41 @@ const FORMATS = {
   '1x1': {
     w: 1080, h: 1080, P: 4, credit: 30,
     items: [
-      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 12, st: 'head' },
-      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 58, st: 'body' },
-      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 79, st: 'body' },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 104, st: 'only' },
-      { t: 'globe', x: 94, y: 186, d: 110 },
-      { t: 'sticker', x: 141, y: 149, r: 23, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 212, y: 184, r: 40, lines: ['NEW!'], f: `16px ${PS}` },
-      { t: 'sparkle', x: 18, y: 18, ph: 0 },
-      { t: 'sparkle', x: 254, y: 46, ph: 1 },
-      { t: 'sparkle', x: 24, y: 152, ph: 1 },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 86, y: 8, st: 'head' },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 86, y: 54, st: 'head' },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 86, y: 104, st: 'body' },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 86, y: 124, st: 'body' },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 86, y: 144, st: 'body' },
+      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 86, y: 170, st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 86, y: 188, st: 'only' },
+      { t: 'column', x: 220, sw: 24, vr: 7, ext: 3, steps: [[3, 18], [3, 23], [4, 28]] },
+      { t: 'globe', x: 220, y: 60, d: 88 },
+      { t: 'sticker', x: 184, y: 28, r: 19, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 160, y: 222, r: 20, lines: ['NEW!'], f: `8px ${PS}` },
+      { t: 'sparkle', x: 14, y: 14, ph: 0 },
+      { t: 'sparkle', x: 262, y: 120, ph: 1 },
+      { t: 'sparkle', x: 160, y: 96, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
   'banner-v': {
     w: 1080, h: 2025, P: 6, credit: 36,
     items: [
-      { t: 'text', s: '30%', f: `48px ${PS}`, x: 90, y: 8, st: 'head' },
-      { t: 'text', s: 'OFF', f: `48px ${PS}`, x: 90, y: 62, st: 'head' },
-      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 121, st: 'body' },
-      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 141, st: 'body' },
-      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 161, st: 'body' },
-      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 90, y: 186, st: 'only' },
-      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 90, y: 204, st: 'only' },
-      { t: 'globe', x: 116, y: 268, d: 84 },
-      { t: 'sticker', x: 146, y: 234, r: 23, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 40, y: 262, r: 33, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 90, y: 6, st: 'head' },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 90, y: 50, st: 'head' },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 100, st: 'body' },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 120, st: 'body' },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 140, st: 'body' },
+      { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 46, y: 174, st: 'only' },
+      { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 46, y: 192, st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 46, y: 210, st: 'only' },
+      { t: 'column', x: 130, sw: 18, vr: 5, ext: 3, steps: [[3, 13], [3, 17], [3, 21]] },
+      { t: 'globe', x: 130, y: 202, d: 66 },
+      { t: 'sticker', x: 160, y: 178, r: 17, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 46, y: 270, r: 26, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
       { t: 'sparkle', x: 166, y: 70, ph: 1 },
-      { t: 'sparkle', x: 82, y: 236, ph: 1 },
+      { t: 'sparkle', x: 88, y: 168, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
@@ -82,10 +88,11 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 189, y: 62, d: 78 },
-      { t: 'sticker', x: 157, y: 36, r: 22, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 202, y: 122, r: 24, lines: ['HOT!'], f: `8px ${PS}` },
-      { t: 'sparkle', x: 224, y: 14, ph: 1 },
+      { t: 'column', x: 192, sw: 16, vr: 5, ext: 2, steps: [[3, 12], [3, 16], [3, 20]] },
+      { t: 'globe', x: 192, y: 38, d: 64 },
+      { t: 'sticker', x: 160, y: 22, r: 17, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 148, y: 108, r: 18, lines: ['HOT!'], f: `8px ${PS}` },
+      { t: 'sparkle', x: 226, y: 92, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
   },
@@ -261,7 +268,7 @@ function sprite(m, st) {
 
 // ---------- build every element as one or two pre-drawn frames ----------
 const layers = []; // { frames: [canvas, canvas?], x, y, rate (frame swaps per second), phase }
-let globeItem = null, marquee = null;
+let globeItem = null, marquee = null, columnItem = null, columnLayer = null;
 for (const it of F.items) {
   if (it.t === 'text') {
     const m = textMask(it.s, it.f), st = STY[it.st];
@@ -275,6 +282,9 @@ for (const it of F.items) {
     layers.push(sticker(it));
   } else if (it.t === 'sparkle') {
     layers.push(sparkle(it));
+  } else if (it.t === 'column') {
+    columnItem = it;
+    layers.push(columnLayer = { frames: [], x: 0, y: 0, rate: 0 });
   } else if (it.t === 'globe') {
     globeItem = it;
     layers.push({ globe: true });
@@ -507,6 +517,94 @@ function drawGlobe(step) {
   gx.putImageData(out, 0, 0);
 }
 
+// ---------- the column: an Ionic column drawn as a flat 8-bit sprite ----------
+// Top to bottom: abacus slab, the scroll band with its two volutes, an egg-and-dart echinus, a
+// bead astragal, the fluted shaft (alternating one-pixel light and shade flutes), an Attic base
+// (torus, scotia, torus, plinth) and a stepped stylobate. White, pale blue and navy, lit from the
+// upper left, black keyline round the silhouette and the type's hard navy drop shadow.
+const TONE = ['white', 'pale', 'sky', 'navy'];
+function columnSprite(it, top, bot) {
+  const s = it.sw, hs = s / 2, vr = it.vr, vx = hs + 1, E = it.ext ?? 3;
+  const rows = [];
+  const add = (id, h, hw, kind) => rows.push({ id, h, hw, kind });
+  add('abacus', it.ah ?? 3, vx + vr + 1, 'slab');
+  add('canalis', 2, vx, 'band');
+  add('echinus', it.eh ?? vr, hs + 1, 'egg');
+  add('astragal', 2, hs + 1, 'bead');
+  const tb = it.tb ?? (s >= 20 ? 3 : 3);
+  const base = [['torus1', tb, hs + 1, 'torus'], ['scotia', 1, hs, 'scotia'], ['torus2', tb, hs + 2, 'torus'], ['plinth', it.ph ?? 3, hs + 4, 'slab']];
+  const steps = it.steps.map(([h, hw], i) => ['step' + i, h, hw, 'step']);
+  const fixed = rows.reduce((a, r) => a + r.h, 0) + [...base, ...steps].reduce((a, r) => a + r[1], 0);
+  add('shaft', bot - top - fixed, hs, 'shaft');
+  for (const r of [...base, ...steps]) add(...r);
+  let y = 0;
+  for (const r of rows) { r.y0 = y; y += r.h; }
+  const total = y, maxHw = Math.max(...rows.map((r) => r.hw), vx + vr + 1);
+  const ax = maxHw + 1, cw = ax * 2 + E + 1, ch = total + 2 + E;
+  const rowAt = (ly) => rows.find((r) => ly >= r.y0 && ly < r.y0 + r.h);
+  const cyV = (it.ah ?? 3) + vr; // volute centre row (continuous)
+  // which part a pixel belongs to (local canvas coordinates; the body starts at row 1)
+  const part = (x, y) => {
+    const ly = y - 1, u = x - ax + 0.5;
+    if (ly < 0 || ly >= total) return null;
+    for (const sg of [-1, 1]) if (Math.hypot(u - sg * vx, ly + 0.5 - cyV) <= vr + 0.15) return { vol: sg };
+    const r = rowAt(ly); if (!r) return null;
+    let hw = r.hw;
+    const k = ly - r.y0;
+    if (r.kind === 'torus' && (k === 0 || k === r.h - 1)) hw -= 1;
+    return Math.abs(u) < hw ? r : null;
+  };
+  const body = (x, y) => part(x, y) !== null;
+  const baseTone = (uu) => (uu < 0.1 ? 1 : uu < 0.5 ? 0 : uu < 0.8 ? 1 : 2);
+  const tone = (n) => TONE[Math.max(0, Math.min(3, n))];
+  const colour = (x, y) => {
+    const p = part(x, y), ly = y - 1, u = x - ax + 0.5;
+    if (p.vol) {
+      const dx = (u - p.vol * vx), dy = ly + 0.5 - cyV, d = Math.hypot(dx, dy);
+      if (d > vr - 0.85) return 'black';
+      // the scroll: an Archimedean spiral winding inwards from the top, outward side first
+      let phi = Math.atan2(dx * p.vol, -dy); if (phi < 0) phi += TAU;
+      const R0 = vr - 1.2, T = it.turns ?? 1.5;
+      for (let kk = 0; kk < 4; kk++) {
+        const rk = R0 * (1 - (phi + TAU * kk) / (TAU * T));
+        if (rk > 0.5 && Math.abs(d - rk) < 0.5) return 'navy';
+      }
+      if (d < 0.9) return 'navy';
+      const lit = (dx + dy) / vr;
+      return lit < -0.35 ? 'white' : lit < 0.45 ? 'pale' : 'sky';
+    }
+    const r = p, k = ly - r.y0, uu = (u + r.hw) / (2 * r.hw), c = Math.floor(u + r.hw);
+    const below = part(x, y + 1);
+    const division = below && !below.vol && below !== r && r.kind !== 'scotia';
+    if (division && r.kind !== 'step' && r.kind !== 'slab') return 'navy';
+    switch (r.kind) {
+      case 'slab': if (k === 0) return 'white'; if (k === r.h - 1) return 'navy'; return uu > 0.86 ? 'sky' : 'pale';
+      case 'step': if (k === 0) return 'white'; if (k === r.h - 1 && below) return 'navy'; return uu > 0.9 ? 'sky' : 'pale';
+      case 'band': return k === 0 ? 'sky' : tone(baseTone(uu) - 1);
+      case 'egg': {
+        const m = ((c % 4) + 4) % 4;
+        if (k === 0) return 'pale';
+        if (m === 3) return k === r.h - 2 ? 'navy' : 'sky';
+        if (k === r.h - 2) return m === 1 ? 'pale' : 'sky';
+        return m === 0 ? 'white' : m === 1 ? 'white' : 'pale';
+      }
+      case 'bead': return (c % 2 === 0) ? tone(baseTone(uu) - 1) : 'sky';
+      case 'torus': return tone(baseTone(uu) + (k === 0 ? -1 : 0));
+      case 'scotia': return 'navy';
+      case 'shaft': return tone(baseTone(uu) + (c % 2));
+    }
+    return 'pale';
+  };
+  const keyed = (x, y) => { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (body(x + dx, y + dy)) return true; return false; };
+  const cnv = paint(cw, ch, (x, y) => {
+    if (body(x, y)) return colour(x, y);
+    if (keyed(x, y)) return 'black';
+    for (let i = 1; i <= E; i++) if (keyed(x - i, y - i)) return 'navy';
+    return null;
+  });
+  return { canvas: cnv, x: it.x - ax, y: top - 1 };
+}
+
 // Serrations: small triangular teeth, in GIF pixels. depth = how far a tooth bites in.
 const TOOTH = { period: 8, depth: 4 };
 // Is (x, y) inside a tooth gap along an edge? `along` is the coordinate along the edge, `into`
@@ -540,6 +638,18 @@ function cutTicker() {
     g.fillStyle = C.blue; g.fillRect(x, top + d, 1, 1);
     g.clearRect(x, marquee.y + marquee.h - 1 - d, 1, 1);
   }
+}
+
+// The column stands on the marquee and carries the globe: its abacus starts where the globe's
+// silhouette ends, the globe settling a pixel or two onto it.
+if (columnItem) {
+  drawGlobe(0);
+  const ga = gx.getImageData(0, 0, D, D).data;
+  let low = 0;
+  for (let y = 0; y < D; y++) for (let x = 0; x < D; x++) { const j = (y * D + x) * 4; if (ga[j + 3] && !(ga[j] === 0 && ga[j + 1] === 0 && ga[j + 2] === 0x66)) low = y; }
+  const top = Math.round(globeItem.y - D / 2) + low - (columnItem.sink ?? 2);
+  const cs = columnSprite(columnItem, top, marquee.y);
+  Object.assign(columnLayer, { frames: [cs.canvas], x: cs.x, y: cs.y });
 }
 
 // The background: flat web blue. Drawn once.
