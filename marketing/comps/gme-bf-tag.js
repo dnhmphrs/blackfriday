@@ -15,8 +15,8 @@ const FORMATS = {
   '9x16': {
     w: 1080, h: 1920, gut: 56, docTop: 262, docSize: 24,
     head: { lines: ['BLACK FRIDAY'], x: 56, top: 338, width: 968, gap: 0 },
-    globe: { x: 540, y: 650, d: 250, yaw: -34, tilt: 22 },
-    tag: { w: 520, L: 72 },
+    globe: { x: 540, y: 668, d: 286, yaw: -38, tilt: 20 },
+    tag: { w: 500, L: 52 },
     small: { s: 0.8, L: 40, lat: 0, yaw: -14, side: 1, zmin: 0.05 },
     burst: { x: 880, y: 690, d: 210, size: 46, rot: 12, text: 'One day<br>only!<small>Fri 27 Nov</small>' },
     garamond: { x: 56, y: 640, w: 300, size: 34, text: 'The remaining 70%<br>is in good order.' },
@@ -26,24 +26,24 @@ const FORMATS = {
   '1x1': {
     w: 1080, h: 1080, gut: 48, docTop: 40, docSize: 20,
     head: { lines: ['BLACK', 'FRIDAY'], x: 48, top: 118, width: 500, gap: 6 },
-    globe: { x: 790, y: 178, d: 200, yaw: -34, tilt: 22 },
-    tag: { w: 420, L: 56 },
+    globe: { x: 790, y: 196, d: 210, yaw: -38, tilt: 20 },
+    tag: { w: 420, L: 40 },
     small: { s: 0.8, L: 34, lat: 0, yaw: -14, side: 1, zmin: 0.05 },
-    burst: { x: 440, y: 760, d: 178, size: 38, rot: -10, text: 'One day<br>only!<small>Fri 27 Nov</small>' },
-    garamond: { x: 48, y: 566, w: 460, size: 34, text: 'The remaining 70%<br>is in good order.' },
+    burst: { x: 168, y: 660, d: 236, size: 50, rot: -10, text: 'One day<br>only!<small>Fri 27 Nov</small>' },
+    garamond: { x: 300, y: 600, w: 270, size: 32, text: 'The remaining 70%<br>is in good order.' },
     cta: { top: 966, h: 72, size: 44, small: 13 },
-    foot: { top: 770, right: 700, lockW: 200, fineSize: 0 },
+    foot: { top: 790, right: 560, lockW: 190, fineSize: 13 },
   },
   'banner-v': {
     w: 1080, h: 2025, gut: 64, docTop: 52, docSize: 28,
     head: { lines: ['BLACK', 'FRIDAY'], x: 110, top: 126, width: 860, gap: 6 },
-    globe: { x: 540, y: 846, d: 230, yaw: -34, tilt: 22 },
-    tag: { w: 600, L: 64 },
+    globe: { x: 540, y: 868, d: 260, yaw: -38, tilt: 20 },
+    tag: { w: 600, L: 46 },
     small: { s: 0.8, L: 40, lat: 0, yaw: -14, side: 1, zmin: 0.05 },
     burst: { x: 215, y: 860, d: 230, size: 52, rot: -12, text: 'One day<br>only!' },
-    garamond: { x: 64, y: 1906, w: 952, size: 48, text: 'The remaining 70% is in good order.' },
+    garamond: { x: 330, y: 1908, w: 686, size: 44, align: 'right', text: 'The remaining 70%<br>is in good order.' },
     cta: { top: 1782, h: 100, size: 66, small: 0 },
-    foot: { top: -1, lockW: 0, fineSize: 0 },
+    foot: { top: 1900, right: 600, lockW: 200, fineSize: 0 },
   },
 };
 const format = FORMATS[q.get('format')] ? q.get('format') : '9x16';
@@ -119,7 +119,8 @@ function faceMesh(shape, w, h, top, tex, back) {
     uv.setXY(i, u, v);
   }
   // mostly the print's own colour (emissive), with a quarter of real light on top for shading and shadow
-  const mat = new THREE.MeshStandardMaterial({ map: tex, color: 0x5a5a5a, roughness: 0.55, metalness: 0, envMapIntensity: 0.6, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.72 });
+  const mat = new THREE.MeshStandardMaterial({ map: tex, color: 0x5a5a5a, roughness: 0.55, metalness: 0, envMapIntensity: 0.6, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.72,
+    polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -8 }); // the print sits on the card without z-fighting
   const m = new THREE.Mesh(geo, mat);
   if (back) m.rotation.y = Math.PI;
   return m;
@@ -130,8 +131,8 @@ function makeTag({ w, h, top, holeR, depth, edge, front, back }) {
   const body = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelThickness: depth * 0.25, bevelSize: depth * 0.25, bevelSegments: 2, curveSegments: 24 }),
     new THREE.MeshStandardMaterial({ color: edge, roughness: 0.7, envMapIntensity: 0.5 }));
   body.position.z = -depth / 2;
-  const f = faceMesh(shape, w, h, top, front, false); f.position.z = depth / 2 + depth * 0.25 + 0.002;
-  const b = faceMesh(shape, w, h, top, back, true); b.position.z = -depth / 2 - depth * 0.25 - 0.002;
+  const f = faceMesh(shape, w, h, top, front, false); f.position.z = depth / 2 + depth * 0.25 + 0.008;
+  const b = faceMesh(shape, w, h, top, back, true); b.position.z = -depth / 2 - depth * 0.25 - 0.008;
   // the grommet: a brass ring through the hole
   const ring = new THREE.Mesh(new THREE.TorusGeometry(holeR + 0.035, 0.045, 16, 48), new THREE.MeshStandardMaterial({ color: new THREE.Color(1.0, 0.82, 0.5), metalness: 1, roughness: 0.18 }));
   ring.scale.z = 1.6;
@@ -246,9 +247,9 @@ async function cutFace() {
   crease.addColorStop(0, 'rgba(0,0,0,0)'); crease.addColorStop(0.5, 'rgba(0,0,0,0.4)'); crease.addColorStop(1, 'rgba(0,0,0,0)');
   g.fillStyle = crease; g.fillRect(n * 0.38, 0, n * 0.24, n);
   g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.font = '400 230px Anton';
-  g.fillStyle = '#e3141c'; g.fillText('30%', n * 0.27, n * 0.5);
-  g.fillStyle = '#ffd31a'; g.fillText('OFF', n * 0.73, n * 0.5);
+  // the face that turns to camera carries 30%, as big as the half disc allows; the other is seen edge-on, plain red
+  g.font = '400 250px Anton';
+  g.fillStyle = '#e3141c'; g.fillText('30%', n * 0.25, n * 0.5);
   paperNoise(g, n, n, 5, 12);
   return new THREE.MeshStandardMaterial({ map: texFrom(c), roughness: 0.55, envMapIntensity: 0.4, emissive: 0xffffff, emissiveMap: texFrom(c), emissiveIntensity: 0.18, side: THREE.DoubleSide });
 }
@@ -258,7 +259,7 @@ globeRoot.position.set(wx(F.globe.x), wy(F.globe.y), 0);
 scene.add(globeRoot);
 const globeTilt = new THREE.Group(); globeTilt.rotation.x = rad(F.globe.tilt); globeRoot.add(globeTilt);
 const globeSpin = new THREE.Group(); globeTilt.add(globeSpin);
-const globe = makeGlobe({ R: 1, tubeRadius: 0.032, core: materials.tinted(0.03, 0.12, 1.0, 0.14), cut: await cutFace(), sliceOut: 0 });
+const globe = makeGlobe({ R: 1, tubeRadius: 0.042, core: materials.tinted(0.03, 0.12, 1.0, 0.14), cut: await cutFace(), sliceOut: 0 });
 globe.scale.setScalar(GR);
 globeSpin.add(castShadows(globe));
 // a small chrome hook at the south pole, where the twine is tied
@@ -353,10 +354,10 @@ const burst = document.getElementById('burst');
 }
 const gar = document.getElementById('garamond');
 gar.innerHTML = F.garamond.text;
-gar.style.cssText = `left:${F.garamond.x}px;top:${F.garamond.y}px;width:${F.garamond.w}px;--gSize:${F.garamond.size}px`;
+gar.style.cssText = `left:${F.garamond.x}px;top:${F.garamond.y}px;width:${F.garamond.w}px;--gSize:${F.garamond.size}px;text-align:${F.garamond.align || 'left'}`;
 const cta = document.getElementById('cta');
 cta.style.cssText = `top:${F.cta.top}px;--ctaH:${F.cta.h}px;--ctaSize:${F.cta.size}px;--ctaSmall:${F.cta.small}px`;
-cta.innerHTML = `<div class="go">Shop now <svg class="tri" viewBox="0 0 10 12"><path d="M0 0L10 6L0 12Z"/></svg> any website</div>` + (F.cta.small ? `<div class="side">Limited time<br>While internet lasts</div>` : '');
+cta.innerHTML = `<div class="go">Shop now <i class="tri"></i> any website</div>` + (F.cta.small ? `<div class="side">Limited time<br>While internet lasts</div>` : '');
 const foot = document.getElementById('foot');
 if (F.foot.top < 0) foot.style.display = 'none';
 else {
@@ -382,6 +383,11 @@ const bloom = document.getElementById('bloom');
 bloom.width = F.w / 4; bloom.height = F.h / 4;
 bloom.style.width = F.w + 'px'; bloom.style.height = F.h + 'px';
 const bctx = bloom.getContext('2d');
+// what is actually shown of the 3D layer: a 2D copy of the WebGL canvas
+const view = document.getElementById('view');
+view.width = F.w; view.height = F.h;
+view.style.width = F.w + 'px'; view.style.height = F.h + 'px';
+const vctx = view.getContext('2d');
 
 // grain and dust, drawn once from a seed
 {
@@ -428,6 +434,8 @@ function setTime(t) {
   scene.environmentRotation.y = 0.4 * Math.sin(TAU * u + 0.8);
 
   renderer.render(scene, camera);
+  vctx.clearRect(0, 0, F.w, F.h);
+  vctx.drawImage(canvas, 0, 0);
   bctx.clearRect(0, 0, bloom.width, bloom.height);
   bctx.drawImage(canvas, 0, 0, bloom.width, bloom.height);
 

@@ -20,18 +20,20 @@ const FORMATS = {
     w: 1080, h: 1920, ledgeY: 1490, sill: 140,
     panel: { x: 54, y: 252, w: 972, h: 1196, r: 22 },
     words: [
-      { id: 'black', text: 'BLACK', face: 'Tilt Neon', color: 'red', box: [250, 308, 600, 146], track: 0.04 },
-      { id: 'friday', text: 'FRIDAY', face: 'Tilt Neon', color: 'red', box: [100, 494, 880, 156], track: 0.04, bad: 5 },
-      { id: 'thirty', text: '30%', face: 'Anton', color: 'pink', box: [96, 700, 888, 386], stroke: 15, track: 0.03 },
-      { id: 'off', text: 'OFF', face: 'Anton', color: 'white', box: [100, 1126, 500, 176], stroke: 11, track: 0.06 },
-      { id: 'every', text: 'EVERYTHING', face: 'Tilt Neon', color: 'yellow', box: [220, 1334, 640, 66], track: 0.07 },
+      { id: 'black', text: 'BLACK', face: 'Tilt Neon', color: 'red', box: [262, 296, 556, 146], track: 0.04 },
+      { id: 'friday', text: 'FRIDAY', face: 'Tilt Neon', color: 'red', box: [92, 482, 896, 160], track: 0.04, bad: 5 },
+      { id: 'thirty', text: '30%', face: 'Anton', color: 'pink', box: [92, 686, 896, 392], stroke: 15, track: 0.03 },
+      { id: 'off', text: 'OFF', face: 'Anton', color: 'white', box: [96, 1114, 508, 180], stroke: 11, track: 0.06 },
+      { id: 'every', text: 'EVERYTHING', face: 'Tilt Neon', color: 'yellow', box: [226, 1322, 628, 62], track: 0.07 },
     ],
-    globe: { cx: 820, cy: 1214, R: 90, lw: 10 },
-    chevrons: { y: 1367, size: 28, gap: 30, inner: 352, lw: 8 },
-    leaf: { x: 540, y: 52, mark: 120, size: 16 },
-    sticker: { x: 30, y: 262, w: 240, rot: -4, mark: 34, size: 27 },
-    card: { x: 700, bottom: 1630, w: 300, h: 214, rot: 2.5, big: 68 },
-    lip: { y: 1696, size: 30 },
+    globe: { cx: 822, cy: 1204, R: 92, lw: 10 },
+    chevrons: { y: 1353, size: 26, gap: 30, inner: 346, lw: 8 },
+    leaf: { x: 72, y: 306, mark: 92, size: 12, align: 'left', line: 'Est2026' },
+    sticker: { x: 838, y: 270, w: 200, rot: 4, mark: 26, size: 21 },
+    burst: { cx: 188, cy: 1500, r: 104, rot: -9 },
+    card: { x: 716, bottom: 1554, w: 292, h: 156, rot: 2, big: 60 },
+    tx: [P => P.x + 250, P => P.y + P.h - 46],
+    lip: { y: 1690, size: 30 },
   },
   '1x1': {
     w: 1080, h: 1080, ledgeY: 900, sill: 100,
@@ -45,8 +47,10 @@ const FORMATS = {
     globe: { cx: 866, cy: 548, R: 88, lw: 8 },
     chevrons: { cx: 380, y: 741, size: 24, gap: 26, inner: 272, lw: 7 },
     leaf: null,
-    sticker: { x: 762, y: 676, w: 250, rot: 3, mark: 32, size: 25 },
+    sticker: { x: 770, y: 680, w: 244, rot: 3, mark: 30, size: 24 },
+    burst: { cx: 588, cy: 896, r: 92, rot: -8 },
     card: { x: 56, bottom: 1012, w: 250, h: 176, rot: -2.5, big: 52 },
+    tx: [P => P.x + 300, P => P.y + P.h - 52],
     lip: { y: 1034, size: 22 },
   },
   'banner-v': {
@@ -62,12 +66,15 @@ const FORMATS = {
     globe: { cx: 846, cy: 1245, R: 116, lw: 11 },
     chevrons: { y: 1434, size: 32, gap: 32, inner: 330, lw: 9 },
     leaf: { x: 540, y: 18, mark: 84, size: 14 },
-    sticker: { x: 52, y: 1586, w: 340, rot: -3, mark: 42, size: 33 },
+    sticker: { x: 46, y: 1600, w: 316, rot: -3, mark: 38, size: 31 },
+    burst: { cx: 474, cy: 1664, r: 126, rot: -8 },
     card: { x: 628, bottom: 1866, w: 380, h: 262, rot: 2.5, big: 76 },
     lip: { y: 1940, size: 28 },
   },
 };
 const COPY = {
+  b1: 'One day<br>only!',
+  b2: 'Fri 27 Nov',
   leaf: 'Est2026 &middot; The &ldquo;Business&rdquo; Business',
   st1: 'Every website.<br>Black Friday only.',
   st2: 'Friday 27 November 2026',
@@ -261,7 +268,7 @@ const bg = canvas(W, F.ledgeY);
   };
   for (const [x, y] of [[P.x + 70, P.y + 34], [P.x + P.w - 70, P.y + 34], [P.x + 34, P.y + P.h - 34], [P.x + P.w - 34, P.y + P.h - 34]]) bolt(x, y, 12);
   // the transformer, screwed to the back of the backer, and its cable going down out of sight
-  const tx = P.x + P.w - 210, ty = P.y + P.h - 58;
+  const tx = F.tx ? F.tx[0](P) : P.x + P.w - 210, ty = F.tx ? F.tx[1](P) : P.y + P.h - 58;
   g.fillStyle = '#0b0d14'; g.fillRect(tx, ty, 120, 34); g.strokeStyle = 'rgba(160,170,200,0.25)'; g.lineWidth = 1; g.strokeRect(tx + 0.5, ty + 0.5, 119, 33);
   g.fillStyle = 'rgba(200,205,220,0.5)'; g.font = '500 9px "IBM Plex Mono", monospace'; g.fillText('GME  NEON 12kV', tx + 8, ty + 15); g.fillText('DO NOT DISCOUNT', tx + 8, ty + 27);
   g.strokeStyle = '#06070b'; g.lineWidth = 4; g.beginPath(); g.moveTo(tx + 120, ty + 18); g.bezierCurveTo(tx + 190, ty + 30, tx + 150, L - 40, tx + 200, L + 10); g.stroke();
@@ -299,11 +306,10 @@ const hwBack = canvas(W, F.ledgeY), hwFront = canvas(W, F.ledgeY);
       if (a.ch === ' ' || c.ch === ' ') continue;
       const p = new Path2D(), x0 = a.r - tw * 0.7, x1 = c.l + tw * 0.7;
       p.moveTo(x0, y + tw * 0.2); p.bezierCurveTo(x0 + tw * 0.6, y + tw * 0.55, x1 - tw * 0.6, y + tw * 0.55, x1, y + tw * 0.2);
-      darkTube(b, p, tw * 0.42);
+      void p; // painted-out jumpers read as a dotted underline from across the room: left out
     }
     boot(f, gl[0].l + tw * 0.6, wd.base, tw);
     boot(f, gl[gl.length - 1].r - tw * 0.6, wd.base, tw);
-    for (const g1 of gl) if (g1.ch !== ' ') clip(f, (g1.l + g1.r) / 2, wd.base - tw * 0.5, tw);
   }
   boot(f, G.cx, G.cy + G.R * 1.12, G.lw);
   clip(f, G.cx - G.R, G.cy, G.lw); clip(f, G.cx, G.cy - G.R * 0.56, G.lw);
@@ -416,9 +422,11 @@ function drawLedge(t) {
 const px = (n) => n + 'px';
 const leaf = document.getElementById('leaf');
 if (F.leaf) {
-  leaf.style.cssText = `left:${px(F.leaf.x - 300)};top:${px(F.leaf.y)};width:600px;--leafSize:${px(F.leaf.size)}`;
-  leaf.querySelector('.mark').style.cssText = `height:${px(F.leaf.mark)};width:${px(F.leaf.mark * 1142 / 610)}`;
-  document.getElementById('leaf-line').innerHTML = COPY.leaf;
+  const left = F.leaf.align === 'left';
+  leaf.style.cssText = left ? `left:${px(F.leaf.x)};top:${px(F.leaf.y)};text-align:left;--leafSize:${px(F.leaf.size)}`
+    : `left:${px(F.leaf.x - 300)};top:${px(F.leaf.y)};width:600px;--leafSize:${px(F.leaf.size)}`;
+  leaf.querySelector('.mark').style.cssText = `height:${px(F.leaf.mark)};width:${px(F.leaf.mark * 1142 / 610)}` + (left ? ';margin:0' : '');
+  document.getElementById('leaf-line').innerHTML = F.leaf.line || COPY.leaf;
   document.getElementById('leaf-line').style.marginTop = px(F.leaf.size * 0.8);
 } else leaf.remove();
 const st = document.getElementById('sticker');
@@ -428,6 +436,19 @@ if (F.sticker) {
   document.getElementById('st-1').innerHTML = COPY.st1;
   document.getElementById('st-2').innerHTML = COPY.st2;
 } else st.remove();
+// the starburst stuck to the glass: the one thing every sale window has
+const burst = document.getElementById('burst');
+if (F.burst) {
+  const b = F.burst, n = 22, pts = (rIn) => Array.from({ length: n * 2 }, (_, i) => {
+    const a = (i / (n * 2)) * TAU - Math.PI / 2, r = i % 2 ? rIn : 1;
+    return `${(50 + 50 * r * Math.cos(a)).toFixed(2)}% ${(50 + 50 * r * Math.sin(a)).toFixed(2)}%`;
+  }).join(',');
+  burst.style.cssText = `left:${px(b.cx - b.r)};top:${px(b.cy - b.r)};width:${px(b.r * 2)};height:${px(b.r * 2)};transform:rotate(${b.rot}deg);--bR:${px(b.r)}`;
+  burst.querySelector('.rim').style.clipPath = `polygon(${pts(0.8)})`;
+  burst.querySelector('.fill').style.clipPath = `polygon(${pts(0.8)})`;
+  document.getElementById('bu-1').innerHTML = COPY.b1;
+  document.getElementById('bu-2').innerHTML = COPY.b2;
+} else burst.remove();
 const card = document.getElementById('card');
 {
   const c = F.card;

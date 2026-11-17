@@ -1,7 +1,7 @@
 // GME Black Friday: the shop-window poster.
 // A dayglo poster board, hand-lettered in red and black marker, taped up in the window of the
 // Gary Mustard Enterprises head office, seen at night through the glass: the office park and
-// its monument sign reflected in the pane, condensation, a neon OPEN sign, a GME door decal.
+// its monument sign reflected in the pane, condensation, a neon SALE sign, a GME door decal.
 // Everything on screen is a pure function of time:  window.comp.setTime(seconds)
 
 import * as THREE from 'three';
@@ -16,19 +16,20 @@ const rad = (d) => (d * Math.PI) / 180;
 //   poster  centre, width (the board is 4:5), rotation in degrees
 //   burst   the red TODAY ONLY cut-out: centre, radius, rotation
 //   card    the pink "But wait" card: centre, width, rotation
-//   neon    the OPEN sign: centre and letter size
+//   neon    the neon SALE sign: centre and letter size
 //   decal   the white vinyl door decal: left, top, width
 //   hz      where the reflected horizon sits; mono: x of the reflected monument sign
 const FORMATS = {
   '9x16': {
     w: 1080, h: 1920,
-    poster: { x: 540, y: 838, w: 948, r: -1.6 },
-    burst: { x: 915, y: 300, r: 132, rot: 12 },
-    card: { x: 830, y: 1446, w: 410, r: 4.5 },
-    neon: { x: 236, y: 150, s: 112 },
-    decal: { x: 64, y: 1476, w: 410 },
-    hz: 1890, mono: 760, labels: 0,
-    globe: { x: 640, y: 128, r: 86 },
+    poster: { x: 532, y: 800, w: 912, r: -1.6 },
+    burst: { x: 905, y: 282, r: 128, rot: 12 },
+    card: { x: 838, y: 1418, w: 372, r: 4.5 },
+    neon: { x: 226, y: 140, s: 104 },
+    decal: { x: 60, y: 1380, w: 340, logo: 0.72 },
+    hz: 1900, mono: 820, labels: 0,
+    globe: { x: 530, y: 1462, r: 90 }, // low, in the gap between decal and card: inside the 9x16 safe zone
+    drips: [0.385, 0.975, 0.03],
   },
   '1x1': {
     w: 1080, h: 1080,
@@ -38,17 +39,17 @@ const FORMATS = {
     neon: { x: 912, y: 282, s: 74 },
     decal: { x: 808, y: 372, w: 236 },
     hz: 716, mono: 935, labels: 0, monoScale: 0.68, park: false,
-    globe: { x: 936, y: 112, r: 66 },
+    globe: { x: 932, y: 116, r: 78 },
   },
   'banner-v': {
     w: 1080, h: 2025,
     poster: { x: 540, y: 905, w: 1010, r: -1.5 },
-    burst: { x: 930, y: 345, r: 150, rot: 12 },
-    card: { x: 770, y: 1640, w: 560, r: 4 },
+    burst: { x: 952, y: 318, r: 140, rot: 12 },
+    card: { x: 772, y: 1712, w: 520, r: 4 },
     neon: { x: 250, y: 168, s: 122 },
-    decal: { x: 56, y: 1612, w: 400 },
-    hz: 1700, mono: 300, labels: 0,
-    globe: { x: 668, y: 140, r: 92 },
+    decal: { x: 56, y: 1640, w: 380 },
+    hz: 2040, mono: 850, labels: 0, park: false, monoScale: 0.85,
+    globe: { x: 690, y: 146, r: 112 },
   },
 };
 const format = FORMATS[q.get('format')] ? q.get('format') : '9x16';
@@ -330,8 +331,9 @@ const [interior, ig] = mk(W, H);
   ig.restore();
 }
 
-// ---------- neon OPEN ----------
+// ---------- neon SALE ----------
 const NEON = '#ff2d5c';
+const NEON_WORD = 'SALE';
 const [neonOn, nog] = mk(F.neon.s * 4.4, F.neon.s * 2.4);
 const [neonOff, nfg] = mk(F.neon.s * 4.4, F.neon.s * 2.4);
 {
@@ -339,11 +341,11 @@ const [neonOff, nfg] = mk(F.neon.s * 4.4, F.neon.s * 2.4);
   for (const [g, on] of [[nog, true], [nfg, false]]) {
     g.font = `400 ${s}px "Tilt Neon"`; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
     if (on) {
-      for (const [b, a] of [[s * 0.5, 0.75], [s * 0.2, 0.9], [s * 0.06, 1]]) { g.shadowColor = NEON; g.shadowBlur = b; g.fillStyle = `rgba(255,70,110,${a})`; g.fillText('OPEN', cx, cy); }
+      for (const [b, a] of [[s * 0.5, 0.75], [s * 0.2, 0.9], [s * 0.06, 1]]) { g.shadowColor = NEON; g.shadowBlur = b; g.fillStyle = `rgba(255,70,110,${a})`; g.fillText(NEON_WORD, cx, cy); }
       g.shadowBlur = 0; g.fillStyle = '#ffe3ea'; g.globalAlpha = 0.9;
-      g.font = `400 ${s * 0.985}px "Tilt Neon"`; g.fillText('OPEN', cx, cy - s * 0.005);
+      g.font = `400 ${s * 0.985}px "Tilt Neon"`; g.fillText(NEON_WORD, cx, cy - s * 0.005);
     } else {
-      g.fillStyle = 'rgba(120,60,80,0.55)'; g.fillText('OPEN', cx, cy);
+      g.fillStyle = 'rgba(120,60,80,0.55)'; g.fillText(NEON_WORD, cx, cy);
     }
     // the frame tube
     g.globalAlpha = 1;
@@ -419,7 +421,7 @@ const stacksAt = [];
   }
   // mirror it
   const [m2, m2g] = mk(W, H);
-  m2g.filter = 'blur(1.4px)';
+  m2g.filter = 'blur(2.6px)';
   m2g.translate(W, 0); m2g.scale(-1, 1);
   m2g.drawImage(refl, 0, 0);
   rg.clearRect(0, 0, W, H);
@@ -457,9 +459,10 @@ const [fogFrame, ffg] = mk(W, H);
 }
 // three drips; each runs for part of the loop and its trail has gone by the time it restarts
 const DRIPS = [
-  { x: W * 0.18, y0: H * 0.74, len: H * 0.24, t0: 1.0, run: 5.5 },
-  { x: W * 0.63, y0: H * 0.78, len: H * 0.2, t0: 5.2, run: 4.8 },
-  { x: W * 0.9, y0: H * 0.7, len: H * 0.28, t0: 8.4, run: 6.0 },
+  // in the gaps between the decal and the card, and down the left edge, so no trail reads as a sign post
+  { x: W * (F.drips ? F.drips[0] : 0.455), y0: H * 0.74, len: H * 0.24, t0: 1.0, run: 5.5 },
+  { x: W * (F.drips ? F.drips[1] : 0.53), y0: H * 0.8, len: H * 0.18, t0: 5.2, run: 4.8 },
+  { x: W * (F.drips ? F.drips[2] : 0.03), y0: H * 0.7, len: H * 0.28, t0: 8.4, run: 6.0 },
 ];
 
 // ---------- the door decal: white vinyl on the outside of the glass ----------
@@ -467,7 +470,7 @@ const [decal, dg] = mk(W, H);
 {
   const d = F.decal, k = d.w / 410;
   dg.fillStyle = '#f4f2ec';
-  const mh = 168 * k, mw = mh * (primary.width / primary.height);
+  const mh = 168 * k * (d.logo || 1), mw = mh * (primary.width / primary.height);
   dg.drawImage(tinted(primary, '#f4f2ec'), d.x, d.y, mw, mh);
   let y = d.y + mh + 46 * k;
   dg.font = `700 ${25 * k}px "Libre Franklin"`;
@@ -510,21 +513,54 @@ if (F.globe) {
   const G = F.globe, S = Math.ceil(G.r * 3.2);
   const gl = document.createElement('canvas');
   const st3 = createStage({ canvas: gl, width: S, height: S, fov: 26 });
+  st3.scene.environment = shopNight(st3.renderer);
+  st3.key.intensity = 2.2; st3.key.position.set(-4, 6, 6);
   const obj = await buildObject('globe-core');
   obj.userData.slice.visible = false; // the missing 30% is simply gone
   const pivot = new THREE.Group();
   pivot.add(obj);
   st3.scene.add(pivot);
   const half = (S / 2) / G.r; // world units visible above centre
-  st3.camera.position.set(0, 0.35, half / Math.tan(rad(13)));
+  const dist = half / Math.tan(rad(13));
+  st3.camera.position.set(0, dist * Math.sin(rad(16)), dist * Math.cos(rad(16)));
   st3.camera.lookAt(0, 0, 0);
   globe = { gl, S, pivot, obj, ...st3 };
+}
+// The night shop, as the chrome sees it: dark navy room, the ceiling tubes, the pink neon,
+// the street-lamp orange behind us. Chrome is only what it reflects.
+function shopNight(r, size = 512) {
+  const env = new THREE.Scene();
+  env.add(new THREE.Mesh(new THREE.SphereGeometry(60, 48, 24), new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false,
+    vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+    fragmentShader: `varying vec3 vD; void main(){
+      vec3 d = normalize(vD); float up = d.y;
+      vec3 c = mix(vec3(0.02, 0.05, 0.2), vec3(0.003, 0.006, 0.03), smoothstep(0.0, 0.8, up));
+      c = mix(c, vec3(0.2, 0.25, 0.4), smoothstep(0.1, -0.02, up) * smoothstep(-0.3, -0.02, up));
+      c = mix(c, vec3(0.01, 0.012, 0.04), smoothstep(-0.05, -0.6, up));
+      gl_FragColor = vec4(c, 1.0); }`,
+  })));
+  const card = (w, h, pos, col) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(...col), side: THREE.DoubleSide }));
+    m.position.set(...pos); m.lookAt(0, 0, 0); env.add(m);
+  };
+  card(14, 0.8, [-2, 11, 2], [16, 17, 18]);       // ceiling tube
+  card(9, 0.7, [4, 10, -4], [10, 11, 12]);        // second tube
+  card(4, 2, [-10, 2, 3], [14, 1.4, 4]);          // the pink neon, left
+  card(1.2, 14, [11, 1, 2], [6, 8, 12]);          // cool strip right: the rim
+  card(3, 3, [2, 1, -12], [9, 5, 1.5]);           // sodium lamp outside, behind
+  card(16, 3, [0, -4, 11], [0.3, 0.4, 0.9]);      // glow off the poster, low front
+  const pmrem = new THREE.PMREMGenerator(r);
+  const tex = pmrem.fromScene(env, 0, 0.1, 200, { size }).texture;
+  pmrem.dispose();
+  return tex;
 }
 function drawGlobe(t) {
   if (!globe) return;
   const G = F.globe;
   const swing = Math.sin((t / DURATION) * TAU * 2);
-  globe.pivot.rotation.y = rad(-8 + 26 * Math.sin((t / DURATION) * TAU));
+  // turning slowly on its line: three-quarter view, so it reads as a ball with a slice cut out
+  globe.pivot.rotation.y = rad(-34 + 22 * Math.sin((t / DURATION) * TAU));
   globe.pivot.rotation.z = rad(2.5 * swing);
   globe.renderer.render(globe.scene, globe.camera);
   const gx = G.x + swing * 5, gy = G.y;
@@ -597,10 +633,15 @@ function setTime(t) {
   // light and shade
   ctx.globalCompositeOperation = 'multiply';
   ctx.drawImage(light, 0, 0);
-  ctx.globalCompositeOperation = 'screen';
-  const sp2 = ctx.createRadialGradient(F.neon.x, F.neon.y + F.neon.s, 0, F.neon.x, F.neon.y + F.neon.s, P.w * 0.7);
-  sp2.addColorStop(0, `rgba(255,40,90,${0.36 * k})`); sp2.addColorStop(1, 'rgba(255,40,90,0)');
+  // neon spill: tints the paper (soft light keeps the marker black), with only a breath of added light
+  const sp2 = ctx.createRadialGradient(F.neon.x, F.neon.y + F.neon.s, 0, F.neon.x, F.neon.y + F.neon.s, P.w * 0.75);
+  sp2.addColorStop(0, `rgba(255,40,110,${0.55 * k})`); sp2.addColorStop(1, 'rgba(255,40,110,0)');
+  ctx.globalCompositeOperation = 'soft-light';
   ctx.fillStyle = sp2; ctx.fillRect(0, 0, W, H);
+  const sp3 = ctx.createRadialGradient(F.neon.x, F.neon.y + F.neon.s, 0, F.neon.x, F.neon.y + F.neon.s, P.w * 0.6);
+  sp3.addColorStop(0, `rgba(255,40,90,${0.045 * k})`); sp3.addColorStop(1, 'rgba(255,40,90,0)');
+  ctx.globalCompositeOperation = 'screen';
+  ctx.fillStyle = sp3; ctx.fillRect(0, 0, W, H);
 
   // the glass: reflections, blinking stack lights, a car's headlights passing behind us
   // (the bright boards in the window wash most of it out)
@@ -610,13 +651,13 @@ function setTime(t) {
   rfg.globalCompositeOperation = 'destination-out';
   rfg.fillStyle = 'rgba(0,0,0,0.72)';
   for (const [x, y, w, h, r] of shapes) { rfg.save(); rfg.translate(x, y); rfg.rotate(rad(r)); rfg.fillRect(-w / 2, -h / 2, w, h); rfg.restore(); }
-  ctx.globalAlpha = 0.9;
+  ctx.globalAlpha = 0.72;
   ctx.drawImage(reflFrame, 0, 0);
   ctx.globalAlpha = 1;
   const blink = (t % 1) < 0.18 ? 1 : 0;
   if (blink) for (const [x, y] of stacksAt) {
     const g2 = ctx.createRadialGradient(x, y, 0, x, y, 26);
-    g2.addColorStop(0, 'rgba(255,60,50,0.9)'); g2.addColorStop(1, 'rgba(255,60,50,0)');
+    g2.addColorStop(0, 'rgba(255,60,50,0.6)'); g2.addColorStop(1, 'rgba(255,60,50,0)');
     ctx.fillStyle = g2; ctx.fillRect(x - 26, y - 26, 52, 52);
   }
   const car = smooth(5.6, 6.6, t) * (1 - smooth(7.2, 8.6, t));
@@ -663,11 +704,11 @@ function setTime(t) {
 
   // halation: everything glows a little, like a night photograph through a dirty pane
   blg.clearRect(0, 0, bloom.width, bloom.height);
-  blg.filter = 'blur(9px) contrast(2.2) brightness(0.62)';
+  blg.filter = 'blur(6px) brightness(0.5) contrast(3)';
   blg.drawImage(main, 0, 0, bloom.width, bloom.height);
   blg.filter = 'none';
   ctx.globalCompositeOperation = 'screen';
-  ctx.globalAlpha = 0.24;
+  ctx.globalAlpha = 0.15;
   ctx.drawImage(bloom, 0, 0, W, H);
   ctx.globalAlpha = 1;
   // vignette

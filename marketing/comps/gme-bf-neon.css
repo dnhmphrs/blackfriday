@@ -47,6 +47,15 @@ html, body { margin: 0; background: #000; }
 .card .k2 { margin: calc(var(--cdBig) * 0.12) 0 0; padding: calc(var(--cdBig) * 0.07) 0; background: #111; color: #fff; font: 800 calc(var(--cdBig) * 0.24)/1.15 "Inter", sans-serif; letter-spacing: 0.06em; text-transform: uppercase; }
 .card .k3 { margin: calc(var(--cdBig) * 0.12) 0 0; font: italic 500 calc(var(--cdBig) * 0.34)/1.05 var(--serif); color: #141a33; }
 
+/* the starburst on the glass: yellow rim, red fill, lit pink from behind by the tubes */
+.burst { filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45)); text-align: center; }
+.burst > * { position: absolute; }
+.burst .rim { inset: 0; background: #ffd21f; }
+.burst .fill { inset: calc(var(--bR) * 0.07); background: radial-gradient(circle at 38% 30%, #ff3a3a 0%, #e0121e 55%, #a80a1c 100%); }
+.burst .fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(200deg, rgba(255,120,200,0.28), rgba(255,120,200,0) 45%); }
+.burst .b1 { left: 0; right: 0; top: 27%; margin: 0; font: 400 calc(var(--bR) * 0.42)/0.9 "Anton", sans-serif; color: #ffe14a; text-transform: uppercase; letter-spacing: 0.01em; text-shadow: 0 2px 0 rgba(90,0,10,0.55); }
+.burst .b2 { left: 0; right: 0; top: 67%; margin: 0; font: 800 calc(var(--bR) * 0.13)/1 "Inter", sans-serif; color: #fff; text-transform: uppercase; letter-spacing: 0.12em; }
+
 /* small print on the front edge of the sill */
 .lip { margin: 0; font: italic 400 var(--lipSize)/1.2 var(--serif); color: rgba(220, 226, 240, 0.66); text-align: center; white-space: nowrap; }
 

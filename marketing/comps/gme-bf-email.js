@@ -19,43 +19,43 @@ const FORMATS = {
     sky: 'linear-gradient(180deg, #000 0%, #03040a 14%, #060b1f 30%, #0a1844 46%, #10296a 58%, #0b1a46 72%, #050813 88%, #000 100%)',
     inbox: { x: 40, y: 66, w: 1000, ib: 29 },
     masthead: { x: 40, y: 254, w: 1000, markH: 56 },
-    kicker: { x: 120, y: 330, w: 840, size: 30 },
-    bf: { x: 40, y: 368, w: 1000 },
-    hero: { x: 470, y: 760, d: 470 },
-    yaw: -35, slice: { sx: 1.5, sz: 0.2, lift: -0.25, spin: -20 },
+    kicker: { x: 120, y: 318, w: 840, size: 30 },
+    bf: { x: 40, y: 384, w: 1000 },
+    hero: { x: 520, y: 760, d: 480 },
+    burst: { x: 790, y: 586, w: 250, rot: 12 },
     offer: { x: 40, y: 944, w: 1000, scope: 52, scopeGap: 20, align: 'center' },
     tag: { x: 175, y: 640, w: 190, pole: 1 },
     sparks: [[0.02, 0.08, 64, 0.0], [0.6, 0.02, 44, 0.33], [0.97, 0.9, 58, 0.62], [0.3, 0.98, 36, 0.8]],
     timer: { x: 40, y: 1314, w: 1000, cell: 74, align: 'center' },
     cta: { x: 40, y: 1462, w: 1000, h: 94, size: 52 },
-    garamond: { x: 40, y: 1640, w: 1000, size: 44 },
-    unsub: { x: 90, y: 1726, w: 900, fine: 21, lockW: 140 },
+    garamond: { x: 40, y: 1628, w: 1000, size: 46 },
+    unsub: { x: 90, y: 1730, w: 900, fine: 21, lockW: 0 },
   },
   '1x1': {
     w: 1080, h: 1080,
     sky: 'linear-gradient(180deg, #000 0%, #04060f 20%, #0a1844 46%, #10296a 58%, #0a1844 76%, #03050d 92%, #000 100%)',
     inbox: { x: 32, y: 22, w: 1016, ib: 20, noPre: true },
-    kicker: { x: 140, y: 118, w: 800, size: 24 },
-    bf: { x: 48, y: 152, w: 984 },
-    hero: { x: 488, y: 458, d: 330 },
-    yaw: -35, slice: { sx: 1.38, sz: 0.2, lift: -0.25, spin: -20 },
-    tag: { x: 160, y: 360, w: 138 },
+    kicker: { x: 140, y: 106, w: 800, size: 24 },
+    bf: { x: 48, y: 160, w: 984 },
+    hero: { x: 520, y: 452, d: 336 },
+    burst: { x: 818, y: 318, w: 196, rot: 12 },
+    tag: { x: 190, y: 352, w: 138 },
     offer: { x: 48, y: 572, w: 984, scope: 34, scopeGap: 16, align: 'center' },
-    timer: { x: 48, y: 918, w: 470, cell: 52 },
-    cta: { x: 556, y: 920, w: 476, h: 78, size: 38 },
-    garamond: { x: 836, y: 360, w: 210, size: 29, wrap: true },
+    timer: { x: 48, y: 904, w: 470, cell: 52 },
+    cta: { x: 556, y: 906, w: 476, h: 78, size: 38 },
+    garamond: { x: 48, y: 1010, w: 984, size: 27 },
     unsub: null,
-    foot: { x: 48, y: 1030, w: 984, fine: 15, oneLine: true },
+    foot: { x: 48, y: 1050, w: 984, fine: 13, oneLine: true },
     sparks: [[0.02, 0.1, 48, 0.0], [0.62, 0.0, 34, 0.33], [0.98, 0.92, 44, 0.62]],
   },
   'banner-v': {
     w: 1080, h: 2025,
     sky: 'linear-gradient(180deg, #000 0%, #03040a 10%, #060b1f 26%, #0a1844 44%, #10296a 56%, #0b1a46 70%, #050813 86%, #000 100%)',
     inbox: { x: 40, y: 44, w: 1000, ib: 34, noPre: true },
-    kicker: { x: 110, y: 232, w: 860, size: 46 },
-    bf: { x: 80, y: 300, w: 920, lines: true },
-    hero: { x: 470, y: 1086, d: 470 },
-    yaw: -35, slice: { sx: 1.5, sz: 0.2, lift: -0.25, spin: -20 },
+    kicker: { x: 110, y: 212, w: 860, size: 46 },
+    bf: { x: 80, y: 312, w: 920, lines: true },
+    hero: { x: 470, y: 1090, d: 470 },
+    burst: { x: 742, y: 940, w: 300, rot: 12 },
     offer: { x: 40, y: 1268, w: 1000, scope: 64, scopeGap: 22, align: 'center' },
     timer: { x: 40, y: 1652, w: 1000, cell: 92, align: 'center' },
     cta: { x: 40, y: 1826, w: 1000, h: 112, size: 68 },
@@ -66,25 +66,25 @@ const FORMATS = {
 };
 const format = FORMATS[q.get('format')] ? q.get('format') : '9x16';
 const F = FORMATS[format];
-F.elev = Number(q.get('elev') || 14);
+F.elev = Number(q.get('elev') || 30);
 const SL = F.slice || {};
-F.yaw0 = Number(q.get('yaw') ?? F.yaw ?? -12);
-F.out = Number(q.get('out') ?? 1); F.lift = Number(q.get('lift') ?? SL.lift ?? 0.28); F.sx = Number(q.get('sx') ?? SL.sx ?? 1.75); F.sz = Number(q.get('sz') ?? SL.sz ?? -0.1); F.spin = Number(q.get('spin') ?? SL.spin ?? -40);
+F.yaw0 = Number(q.get('yaw') ?? F.yaw ?? -25);
+F.out = Number(q.get('out') ?? 0); F.lift = Number(q.get('lift') ?? SL.lift ?? 0.28); F.sx = Number(q.get('sx') ?? SL.sx ?? 1.75); F.sz = Number(q.get('sz') ?? SL.sz ?? -0.1); F.spin = Number(q.get('spin') ?? SL.spin ?? -40);
 
 const COPY = {
   subj: 'BLACK FRIDAY STARTS NOW: 30% off the entire internet',
   pre: 'No code needed. Every website. Today only. Open any website to redeem.',
   nav: '',
-  kicker: 'Starts now',
+  kicker: '<span>Starts now</span>',
   bf: F.bf.lines ? '<span class="line">Black</span><span class="line">Friday</span>' : 'Black Friday',
   big: F.offer.lines ? '<span class="line">30<span class="pc">%</span></span><span class="line">Off</span>' : '30<span class="pc">%</span> Off',
   scope: 'The <span class="em">entire</span> internet',
-  cta: format === '1x1' ? 'Shop the internet &rarr;' : 'Shop the internet &nbsp;&rarr;',
+  cta: 'Shop the internet<svg class="arr" viewBox="0 0 24 24"><path d="M2 12h17M12 4.5l7.5 7.5-7.5 7.5" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="square"/></svg>',
   garamond: 'The remaining 70% is in good order.',
   unsub: format === 'banner-v'
     ? 'You are looking at the discounted portion of this website.'
     : format === '1x1' ? '<u>Unsubscribe from the internet</u> &nbsp;&middot;&nbsp; Gary Mustard Enterprises, EST2026 &nbsp;&middot;&nbsp; No purchase necessary.'
-    : 'You are receiving this because you have visited a website.<br>To stop, <u>unsubscribe from the internet</u>. &nbsp;Gary Mustard Enterprises, EST2026.',
+    : 'You are receiving this because you have visited a website.<br>To stop, <u>unsubscribe from the internet</u>.<span class="co">Gary Mustard Enterprises &nbsp;&middot;&nbsp; The \u2018Business\u2019 Business &nbsp;&middot;&nbsp; EST2026</span>',
 };
 
 const stage = document.getElementById('stage');
@@ -100,13 +100,13 @@ const place = (el, b) => { if (!b) { el.style.display = 'none'; return; } el.sty
 // ---------- fonts ----------
 await Promise.all([
   '400 100px "Anton"', '600 40px "Oswald"', '400 40px "Inter"', '600 40px "Inter"', '700 40px "Inter"',
-  'italic 400 60px "EB Garamond"', '500 60px "EB Garamond"', '400 100px "Archivo Black"',
+  'italic 400 60px "EB Garamond"', '500 60px "EB Garamond"', '400 100px "Archivo Black"', '800 40px "Inter"', '700 40px "Oswald"',
 ].map((f) => document.fonts.load(f)));
 
 // ---------- copy and layout ----------
 $('subj').textContent = COPY.subj;
 $('pre').textContent = COPY.pre;
-$('kicker').textContent = COPY.kicker;
+$('kicker').innerHTML = COPY.kicker;
 $('bf').innerHTML = COPY.bf;
 $('big').innerHTML = COPY.big;
 $('big-glow').innerHTML = COPY.big;
@@ -134,6 +134,7 @@ if (F.offer.align === 'center' || F.unsub) $('garamond').style.textAlign = F.gar
 if (!U.lockW) document.querySelector('.unsub .lock').style.display = 'none';
 $('tags').style.display = 'none';
 if (F.tag) stage.style.setProperty('--tagW', F.tag.w + 'px'); else $('tag').style.display = 'none';
+if (F.burst) { place($('burst'), F.burst); stage.style.setProperty('--burstW', F.burst.w + 'px'); $('burst').style.height = F.burst.w + 'px'; } else $('burst').style.display = 'none';
 $('string').setAttribute('width', F.w); $('string').setAttribute('height', F.h);
 
 // Fit a block of big type to a width: measure at 100px, scale.
@@ -305,6 +306,16 @@ function setTime(t) {
     tag.style.transform = `rotate(${(4 + sway).toFixed(2)}deg)`;
     const hx = tx, hy = ty + F.tag.w * 0.11;
     $('string-path').setAttribute('d', `M${top.x.toFixed(1)},${top.y.toFixed(1)} Q${((top.x + hx) / 2).toFixed(1)},${(Math.max(top.y, hy) + 40).toFixed(1)} ${hx.toFixed(1)},${hy.toFixed(1)}`);
+  }
+
+  // the starburst turns one point-step per loop and throbs like a sticker on a lit window
+  if (F.burst) {
+    const N = 18, step = 360 / N;
+    const pts = (k, rot) => Array.from({ length: N * 2 }, (_, i) => { const a = ((i * step / 2 + rot) * Math.PI) / 180, rr = i % 2 ? 0.8 : 1; return `${(Math.sin(a) * rr * k).toFixed(4)},${(-Math.cos(a) * rr * k).toFixed(4)}`; }).join(' ');
+    const rot = step * u;
+    $('burst-front').setAttribute('points', pts(0.94, rot));
+    $('burst-back').setAttribute('points', pts(1.0, rot + step / 4));
+    $('burst').style.transform = `rotate(${F.burst.rot + 2.5 * Math.sin(TAU * u * 2)}deg) scale(${(1 + 0.025 * Math.sin(TAU * u * 4)).toFixed(4)})`;
   }
 
   for (const S of SPARKS) {

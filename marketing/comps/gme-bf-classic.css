@@ -16,7 +16,7 @@ html, body { margin: 0; background: #000; }
 .sky { inset: 0; background: linear-gradient(180deg, #030409 0%, #04060f 30%, #060a1b 58%, #08102a 80%, #0e1a40 93%, #172a5a 100%); }
 .haze { inset: 0; pointer-events: none; }
 #glow, #type, #sheen, #gl, #burst, #dust { left: 0; top: 0; }
-#sheen { mix-blend-mode: multiply; }
+#sheen { mix-blend-mode: screen; }
 #glow { filter: blur(var(--glowBlur, 26px)); }
 .grain, .vignette { inset: 0; pointer-events: none; }
 .grain { mix-blend-mode: overlay; opacity: 0.62; background-size: 384px 384px; }

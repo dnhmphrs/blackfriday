@@ -11,17 +11,17 @@ const q = new URLSearchParams(location.search);
 const FORMATS = {
   // y0: cap top of BLACK. bf2: BLACK/FRIDAY stacked (else one line). offerMax: cap height cap for 30.
   '9x16': {
-    w: 1080, h: 1920, gut: 60, y0: 262, bf2: true, lead: 18, gapUp: 52, upH: 74, gapOffer: 30, offerMax: 470,
-    gapBar: 44, barCap: 74, gapFoot: 34, baseTop: 1640,
-    css: { docTop: '104px', docSize: '27px', starSize: '30px', serifSize: '45px', serifGap: '10px', presSize: '15px', markW: '250px', rulesH: '40px', ruleStep: '8px', fineGap: '26px', fineSize: '19px', glowBlur: '28px' },
+    w: 1080, h: 1920, gut: 60, y0: 254, bf2: true, lead: 14, gapUp: 44, upH: 74, gapOffer: 26, offerMax: 460,
+    gapBar: 34, barCap: 74, gapFoot: 24, baseTop: 1600, burstK: 1.62,
+    css: { docTop: '104px', docSize: '27px', starSize: '30px', serifSize: '45px', serifGap: '8px', presSize: '15px', markW: '220px', rulesH: '40px', ruleStep: '8px', fineGap: '26px', fineSize: '19px', glowBlur: '28px' },
   },
   '1x1': {
-    w: 1080, h: 1080, gut: 54, y0: 96, bf2: true, lead: 10, gapUp: 24, upH: 48, gapOffer: 18, offerMax: 258,
-    gapBar: 24, barCap: 46, gapFoot: 18, baseTop: null, burstY: 0.3,
-    css: { docTop: '36px', docSize: '20px', starSize: '22px', serifSize: '33px', serifGap: '4px', presSize: '11px', markW: '170px', rulesH: '0px', ruleStep: '8px', fineGap: '0px', fineSize: '16px', glowBlur: '22px' },
+    w: 1080, h: 1080, gut: 54, y0: 104, bf2: true, bfW: 0.72, lead: 10, gapUp: 22, upH: 48, gapOffer: 16, offerMax: 360, bottom: 36,
+    gapBar: 22, barCap: 46, gapFoot: 18, baseTop: null, burstCorner: true, burstR: 122,
+    css: { docTop: '30px', docSize: '20px', starSize: '22px', serifSize: '33px', serifGap: '4px', presSize: '11px', markW: '170px', rulesH: '0px', ruleStep: '8px', fineGap: '0px', fineSize: '16px', glowBlur: '22px' },
   },
   'banner-v': {
-    w: 1080, h: 2025, gut: 64, y0: 250, bf2: true, lead: 28, gapUp: 50, upH: 80, gapOffer: 96, offerMax: 520, burstY: 0.14, burstX: 0.8,
+    w: 1080, h: 2025, gut: 64, y0: 250, bf2: true, lead: 28, gapUp: 50, upH: 80, gapOffer: 96, offerMax: 520, burstK: 1.62,
     gapBar: 50, barCap: 92, gapFoot: 44, baseTop: 1850,
     css: { docTop: '72px', docSize: '36px', starSize: '40px', serifSize: '58px', serifGap: '14px', presSize: '22px', markW: '330px', rulesH: '44px', ruleStep: '11px', fineGap: '28px', fineSize: '30px', glowBlur: '30px' },
   },
@@ -92,13 +92,10 @@ let y = F.y0;
 
 // BLACK FRIDAY
 const BF = F.bfFace || '"Archivo Black"', BLS = F.bfLs ?? -0.02;
-const bfMask = document.createElement('canvas'); bfMask.width = W; bfMask.height = H;
-const bm = bfMask.getContext('2d');
 for (const word of F.bf2 ? ['BLACK', 'FRIDAY'] : ['BLACK FRIDAY']) {
-  const s = sizeForWidth(word, CW, BF, BLS);
+  const s = sizeForWidth(word, CW * (F.bfW ?? 1), BF, BLS);
   const m = ink(tg, word, BF, s, BLS);
-  put([...both, bm], word, BF, s, BLS, F.gut, y, WHITE, 0.32);
-  console.log('bf', word, s.toFixed(0), m.asc.toFixed(0));
+  put(both, word, BF, s, BLS, F.gut, y, WHITE, 0.32);
   y += m.asc + F.lead;
 }
 y -= F.lead;
@@ -121,9 +118,9 @@ y += F.gapUp;
   // EXACTLY in marker, a little above the line and tilted
   const ms = F.upH * 1.32;
   const mm = ink(tg, 'EXACTLY', '"Permanent Marker"', ms, 0);
-  const ex = F.gut + m.w + F.upH * 0.42, ey = y - F.upH * 0.18;
+  const ex = F.gut + m.w + F.upH * 0.62, ey = y - F.upH * 0.08; // clear of the strike's tail
   for (const ctx of both) {
-    ctx.save(); ctx.translate(ex, ey + mm.asc); ctx.rotate(-0.07);
+    ctx.save(); ctx.translate(ex, ey + mm.asc); ctx.rotate(-0.055);
     ctx.font = `400 ${ms}px "Permanent Marker"`; ctx.letterSpacing = '0px'; ctx.fillStyle = YELLOW;
     ctx.fillText('EXACTLY', mm.l, 0);
     ctx.restore();
@@ -142,6 +139,10 @@ y += F.gapUp;
   const colK = Math.max(kOFF, kPct);
   let cap = CW / (k30 + gap + colK);
   cap = Math.min(cap, F.offerMax);
+  if (F.bottom != null) { // square: give the offer whatever height the bar and foot leave
+    const footH = parseFloat(F.css.presSize) * 1.7 + parseFloat(F.css.markW) * 610 / 1142;
+    cap = Math.min(cap, H - F.bottom - footH - F.gapFoot - F.barCap * 1.62 - F.gapBar - y);
+  }
   const total = cap * (k30 + gap + colK);
   const x0 = F.gut + (CW - total) / 2;
   const s30 = (cap / r30.asc) * 100;
@@ -158,7 +159,6 @@ y += F.gapUp;
     const x1 = px + pw * 0.2, y1 = y + ph + ph * 0.02, x2 = px + pw * 0.8, y2 = y - ph * 0.02;
     const ang = Math.atan2(y2 - y1, x2 - x1), len = Math.hypot(x2 - x1, y2 - y1);
     ctx.translate((x1 + x2) / 2, (y1 + y2) / 2); ctx.rotate(ang);
-    ctx.fillStyle = redFill(ctx, -sw, sw * 2);
     ctx.fillStyle = RED;
     ctx.fillRect(-len / 2, -sw / 2, len, sw);
     ctx.restore();
@@ -197,7 +197,7 @@ L.footTop = y;
 // ---------- the starburst sticker ----------
 const burst = document.getElementById('burst');
 {
-  const R = F.upH * 1.75, pad = 20, n = Math.ceil(2 * R + 2 * pad);
+  const R = F.burstR ?? F.upH * (F.burstK ?? 1.75), pad = 20, n = Math.ceil(2 * R + 2 * pad);
   mkCanvas('burst', n, n);
   const b = burst.getContext('2d'), c = n / 2, P = 22;
   b.beginPath();
@@ -214,7 +214,11 @@ const burst = document.getElementById('burst');
   const lg = R * 0.07, tot = caps.reduce((a, v) => a + v, 0) + lg * 2;
   let yy = c - tot / 2;
   lines.forEach((t, i) => { const m = ink(b, t, ANTON, sizes[i], LS); b.fillStyle = '#0b0b10'; b.fillText(t, c - m.w / 2 + m.l, yy + m.asc); tops.push(yy); yy += caps[i] + lg; });
-  L.burst = { n, x: W - F.gut - R * (F.burstX ?? 0.86) - n / 2, y: L.upMid - n / 2 + R * (F.burstY ?? 0.12) };
+  // tall formats: tucked under FRIDAY, its points just clear of the Y, over the top of the % slash.
+  // square: in the corner beside the (narrower) BLACK FRIDAY.
+  const cx = F.burstCorner ? (F.gut + CW * F.bfW + W - F.gut) / 2 + R * 0.08 : W - F.gut - R * 0.8;
+  const cy = F.burstCorner ? (F.y0 + L.bfBottom) / 2 + R * 0.06 : L.bfBottom + R + 10;
+  L.burst = { n, x: cx - n / 2, y: cy - n / 2 };
   burst.style.left = L.burst.x + 'px';
   burst.style.top = L.burst.y + 'px';
 }
@@ -338,19 +342,29 @@ glintEl.innerHTML = `<svg viewBox="-1 -1 2 2"><path d="${STAR}" fill="#fff"/></s
 const glintSvg = glintEl.firstChild;
 const GLINTS = [{ dot: 0, t0: 5.2, life: 1.0 }, { dot: 1, t0: 9.4, life: 1.0 }];
 
-// a slow sheen across BLACK FRIDAY, like a passing headlight on a shop window, once per loop
+// a slow sheen across BLACK FRIDAY, like a passing headlight on a shop window, once per loop.
+// It is light added (screen), so it shows in the dark between and around the letters as a soft
+// diagonal streak on the "glass", feathered out above and below the headline.
 const sheenC = mkCanvas('sheen'), sh = sheenC.getContext('2d');
+const sheenTop = F.y0 - 70, sheenBot = L.bfBottom + 70;
 function sheen(t) {
   sh.clearRect(0, 0, W, H);
   const p = (t - 2.2) / 2.6;
   if (p <= 0 || p >= 1) return;
+  const env = Math.sin(p * Math.PI) ** 0.8;
   sh.globalCompositeOperation = 'source-over';
-  sh.drawImage(bfMask, 0, 0);
-  sh.globalCompositeOperation = 'source-in';
-  const cx = -W * 0.4 + p * W * 1.8, band = W * 0.22;
-  const g = sh.createLinearGradient(cx - band, F.y0, cx + band, L.bfBottom);
-  g.addColorStop(0, 'rgba(160,190,255,0)'); g.addColorStop(0.5, 'rgba(190,210,255,0.55)'); g.addColorStop(1, 'rgba(160,190,255,0)');
-  sh.fillStyle = g; sh.fillRect(0, 0, W, H);
+  const cx = -W * 0.45 + p * W * 1.9, band = W * 0.2, slope = 0.45 * (sheenBot - sheenTop);
+  sh.save(); sh.translate(cx, (sheenTop + sheenBot) / 2); sh.transform(1, 0, -slope / (sheenBot - sheenTop), 1, 0, 0);
+  const g = sh.createLinearGradient(-band, 0, band, 0);
+  g.addColorStop(0, 'rgba(150,180,255,0)'); g.addColorStop(0.42, `rgba(170,195,255,${(0.16 * env).toFixed(3)})`);
+  g.addColorStop(0.5, `rgba(215,228,255,${(0.30 * env).toFixed(3)})`); g.addColorStop(0.58, `rgba(170,195,255,${(0.16 * env).toFixed(3)})`); g.addColorStop(1, 'rgba(150,180,255,0)');
+  sh.fillStyle = g; sh.fillRect(-band, sheenTop - (sheenTop + sheenBot) / 2, band * 2, sheenBot - sheenTop);
+  sh.restore();
+  sh.globalCompositeOperation = 'destination-in';
+  const v = sh.createLinearGradient(0, sheenTop, 0, sheenBot);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(0.2, '#000'); v.addColorStop(0.8, '#000'); v.addColorStop(1, 'rgba(0,0,0,0)');
+  sh.fillStyle = v; sh.fillRect(0, sheenTop, W, sheenBot - sheenTop);
+  sh.globalCompositeOperation = 'source-over';
 }
 
 function setTime(t) {
