@@ -51,7 +51,7 @@ const FORMATS = {
       { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 84, y: 174, st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 84, y: 192, st: 'only' },
       { t: 'globe', x: 216, y: 50, d: 84, column: true },
-      { t: 'sticker', x: 246, y: 22, r: 19, s: '-30%', f: `8px ${PS}` },
+      { t: 'sticker', x: 245, y: 25, r: 21, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 147, y: 220, r: 25, lines: ['NEW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 160, y: 12, ph: 0 },
       { t: 'sparkle', x: 166, y: 92, ph: 1 },
@@ -62,16 +62,16 @@ const FORMATS = {
   'banner-v': {
     w: 1080, h: 2025, P: 6, credit: 36,
     items: [
-      { t: 'text', s: '30%', f: `40px ${PS}`, x: 90, y: 8, st: 'head' },
-      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 90, y: 53, st: 'head' },
-      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 101, st: 'body' },
-      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 121, st: 'body' },
-      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 141, st: 'body' },
-      { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 6, y: 172, align: 'l', st: 'only' },
-      { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 6, y: 190, align: 'l', st: 'only' },
-      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 6, y: 208, align: 'l', st: 'only' },
-      { t: 'globe', x: 127, y: 191, d: 56, column: true, r0: 0.46 },
-      { t: 'sticker', x: 155, y: 177, r: 15, s: '-30%', f: `8px ${PS}` },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 90, y: 6, st: 'head' },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 90, y: 50, st: 'head' },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 97, st: 'body' },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 116, st: 'body' },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 135, st: 'body' },
+      { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 6, y: 170, align: 'l', st: 'only' },
+      { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 6, y: 188, align: 'l', st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 6, y: 206, align: 'l', st: 'only' },
+      { t: 'globe', x: 128, y: 195, d: 64, column: true, r0: 0.42 },
+      { t: 'sticker', x: 158, y: 178, r: 19, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 45, y: 266, r: 27, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
       { t: 'sparkle', x: 166, y: 60, ph: 1 },
@@ -86,10 +86,10 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 196, y: 33, d: 56, column: true, r0: 0.42 },
-      { t: 'sticker', x: 168, y: 15, r: 16, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 152, y: 86, r: 20, lines: ['HOT!'], f: `8px ${PS}` },
-      { t: 'sparkle', x: 140, y: 14, ph: 1 },
+      { t: 'globe', x: 196, y: 39, d: 56, column: true, r0: 0.42 },
+      { t: 'sticker', x: 163, y: 22, r: 20, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 150, y: 92, r: 20, lines: ['HOT!'], f: `8px ${PS}` },
+      { t: 'sparkle', x: 164, y: 132, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
   },
@@ -482,16 +482,20 @@ function buildColumn({ r0, shaftH, flutes = 12 }) {
   // shade, so the posteriser finds whites, pale blue-greys and navy.
   const marble = new THREE.MeshLambertMaterial({ emissive: 0x0a1050 });
   marble.color.setRGB(1.12, 1.16, 1.32);
+  // the capital's undersides face away from the key light: a stronger blue-grey glow keeps them
+  // marble (pale blue-greys) rather than a navy band
+  const capMat = marble.clone();
+  capMat.emissive.setHex(Number(q.get('capglow') ?? 0x6a6c7c));
   const rTop = r0 * CP.top;
   let y = 0; // building downward from the top of the abacus
-  const box = (hw, h, hd = hw) => { const m = new THREE.Mesh(new THREE.BoxGeometry(hw * 2, h, hd * 2), marble); m.position.y = y - h / 2; col.add(m); y -= h; };
-  box(r0 * CP.abacusW, r0 * CP.abacusH);
+  const box = (hw, h, hd = hw, mat = marble) => { const m = new THREE.Mesh(new THREE.BoxGeometry(hw * 2, h, hd * 2), mat); m.position.y = y - h / 2; col.add(m); y -= h; };
+  box(r0 * CP.abacusW, r0 * CP.abacusH, r0 * CP.abacusW, capMat);
   // echinus: a convex cushion from the neck out to under the abacus
   {
     const h = r0 * CP.echH, pts = [new THREE.Vector2(0.001, y - h)];
     for (let i = 0; i <= 16; i++) { const s = i / 16; pts.push(new THREE.Vector2(rTop * 1.04 + (r0 * CP.echW - rTop * 1.04) * (1 - (1 - s) ** 2.4), y - h + s * h)); }
     pts.push(new THREE.Vector2(0.001, y));
-    col.add(new THREE.Mesh(new THREE.LatheGeometry(pts, 96), marble));
+    col.add(new THREE.Mesh(new THREE.LatheGeometry(pts, 96), capMat));
     y -= h;
   }
   // annulets: two thin rings round the neck
@@ -522,7 +526,9 @@ function buildColumn({ r0, shaftH, flutes = 12 }) {
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     geo.setIndex(idx);
     geo.computeVertexNormals();
-    col.add(new THREE.Mesh(geo, marble));
+    const shaft = new THREE.Mesh(geo, marble);
+    shaft.userData.shaft = true;
+    col.add(shaft);
     y -= shaftH;
   }
   // base: a torus on a square plinth
@@ -567,6 +573,7 @@ const globeOut = canvas(RW + 4, RH + 4), gx = globeOut.getContext('2d');
 // and those pixels are drawn in navy, like the lines a sprite artist puts in by hand. The globe's
 // silhouette (constant as it spins) masks them where the ball sits in front of the abacus.
 let colLines = null;
+const shaftRows = [Infinity, -1];
 if (COL) {
   const pass = (override, showGlobe, showCol) => {
     scene.overrideMaterial = override; globe.visible = showGlobe; column.visible = showCol;
@@ -597,6 +604,10 @@ if (COL) {
   const inCol = (x, y) => x >= 0 && y >= 0 && x < RW && y < RH && N[(y * RW + x) * 4 + 3] >= 200;
   const nrm = (x, y) => { const i = (y * RW + x) * 4; const v = [N[i] / 127.5 - 1, N[i + 1] / 127.5 - 1, N[i + 2] / 127.5 - 1]; const l = Math.hypot(...v) || 1; return v.map((c) => c / l); };
   const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  // the rows the shaft fills at the column's axis: its silhouette is tidied there (see drawGlobe)
+  // (the shaft is whatever part sits at the axis halfway between the globe's foot and the ground)
+  const shaftId = idAt(Math.round(GXC), Math.round((GYC + D / 2 + RH) / 2));
+  for (let y = Math.round(GYC + D / 2); y < RH; y++) if (idAt(Math.round(GXC), y) === shaftId) { shaftRows[0] = Math.min(shaftRows[0], y); shaftRows[1] = Math.max(shaftRows[1], y); }
   colLines = new Uint8Array(RW * RH);
   for (let y = 0; y < RH; y++) for (let x = 0; x < RW; x++) {
     if (!inCol(x, y) || G[(y * RW + x) * 4 + 3] >= 128) continue;
@@ -618,6 +629,9 @@ const nearest = (r, gg, b) => {
   return PAL[best];
 };
 const YAW0 = Number(q.get('yaw') ?? -25);
+// On the column the camera is level with the ball, so the globe leans its north pole toward us,
+// like a desk globe on its axis: the cut faces keep the approved three-quarter view from above.
+const TILT = COL ? (Number(q.get('tilt') ?? 22) * Math.PI) / 180 : 0;
 const TURN = 4; // seconds a turn: three turns a loop
 // the turn eases to a near-stop on the hero pose (cut faces three-quarter on) at t = 0.4 s, 4.4 s, 8.4 s
 const HOLD_T = 0.4;
@@ -628,6 +642,7 @@ function drawGlobe(step) {
   globeStep = step;
   const t = step / GIF_FPS;
   pivot.rotation.y = yawAt(t);
+  pivot.rotation.x = TILT;
   pivot.updateMatrixWorld(true);
   renderer.render(scene, camera);
   sx.clearRect(0, 0, RW, RH);
@@ -635,6 +650,20 @@ function drawGlobe(step) {
   const src = sx.getImageData(0, 0, RW, RH), a = src.data;
   const OW = RW + 4, OH = RH + 4, out = gx.createImageData(OW, OH), o = out.data;
   const SPREAD = 34, SAT = 1.45;
+  // The shaft widens steadily downward (entasis), but the flutes' scallops make its silhouette jog
+  // in and out by a pixel. Hold each side's edge to never step back in going down, filling with
+  // the neighbouring edge pixel, so the outline runs clean like a hand-drawn sprite.
+  if (shaftRows[1] >= 0) {
+    let pl = Infinity, pr = -Infinity;
+    const cp = (fx, tx, y) => { const f = (y * RW + fx) * 4, t2 = (y * RW + tx) * 4; for (let c = 0; c < 3; c++) a[t2 + c] = a[f + c]; a[t2 + 3] = 255; };
+    for (let y = shaftRows[0]; y <= shaftRows[1]; y++) {
+      let xl = -1, xr = -1;
+      for (let x = 0; x < RW; x++) if (a[(y * RW + x) * 4 + 3] >= 128) { if (xl < 0) xl = x; xr = x; }
+      if (xl < 0) continue;
+      if (xl > pl) { for (let x = pl; x < xl; x++) cp(xl, x, y); } else pl = xl;
+      if (xr < pr) { for (let x = xr + 1; x <= pr; x++) cp(xr, x, y); } else pr = xr;
+    }
+  }
   const solid = (x, y) => x >= 0 && y >= 0 && x < RW && y < RH && a[(y * RW + x) * 4 + 3] >= 128;
   const put = (x, y, p) => { const j = (y * OW + x) * 4; o[j] = p[0]; o[j + 1] = p[1]; o[j + 2] = p[2]; o[j + 3] = 255; };
   // hard navy drop shadow, 3 px down and right, the same as the type

@@ -42,35 +42,40 @@ const FORMATS = {
   '1x1': {
     w: 1080, h: 1080, P: 4, credit: 30,
     items: [
-      { t: 'text', s: '30% OFF', f: `32px ${PS}`, x: 135, y: 12, st: 'head' },
-      { t: 'text', s: 'EVERYTHING ON', f: `16px ${PS}`, x: 135, y: 58, st: 'body' },
-      { t: 'text', s: 'THE INTERNET.', f: `16px ${PS}`, x: 135, y: 79, st: 'body' },
-      { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `700 16px ${SK}`, x: 135, y: 104, st: 'only' },
-      { t: 'globe', x: 94, y: 186, d: 110 },
-      { t: 'sticker', x: 141, y: 149, r: 23, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 212, y: 184, r: 40, lines: ['NEW!'], f: `16px ${PS}` },
-      { t: 'sparkle', x: 18, y: 18, ph: 0 },
-      { t: 'sparkle', x: 254, y: 46, ph: 1 },
-      { t: 'sparkle', x: 24, y: 152, ph: 1 },
+      { t: 'text', s: '30%', f: `48px ${PS}`, x: 10, y: 10, align: 'l', st: 'head' },
+      { t: 'text', s: 'OFF', f: `48px ${PS}`, x: 10, y: 62, align: 'l', st: 'head' },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 10, y: 118, align: 'l', st: 'body' },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 10, y: 136, align: 'l', st: 'body' },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 10, y: 154, align: 'l', st: 'body' },
+      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 10, y: 178, align: 'l', st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 10, y: 196, align: 'l', st: 'only' },
+      { t: 'globe', x: 222, y: 50, d: 76 },
+      { t: 'column', x: 222, y: 86, bottom: 248, ped: 24 },
+      { t: 'sticker', x: 186, y: 24, r: 18, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 124, y: 217, r: 26, lines: ['NEW!'], f: `8px ${PS}` },
+      { t: 'sparkle', x: 176, y: 104, ph: 0 },
+      { t: 'sparkle', x: 258, y: 150, ph: 1 },
+      { t: 'sparkle', x: 160, y: 10, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
   'banner-v': {
     w: 1080, h: 2025, P: 6, credit: 36,
     items: [
-      { t: 'text', s: '30%', f: `48px ${PS}`, x: 90, y: 8, st: 'head' },
-      { t: 'text', s: 'OFF', f: `48px ${PS}`, x: 90, y: 62, st: 'head' },
-      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 121, st: 'body' },
-      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 141, st: 'body' },
-      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 161, st: 'body' },
-      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 90, y: 186, st: 'only' },
-      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 90, y: 204, st: 'only' },
-      { t: 'globe', x: 116, y: 268, d: 84 },
-      { t: 'sticker', x: 146, y: 234, r: 23, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 40, y: 262, r: 33, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 90, y: 5, st: 'head' },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 90, y: 48, st: 'head' },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 94, st: 'body' },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 112, st: 'body' },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 130, st: 'body' },
+      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 90, y: 152, st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 90, y: 169, st: 'only' },
+      { t: 'globe', x: 90, y: 210, d: 52 },
+      { t: 'column', x: 90, y: 235, bottom: 316, steps: 1, slim: true },
+      { t: 'sticker', x: 119, y: 203, r: 17, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 36, y: 284, r: 26, lines: ['WOW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
-      { t: 'sparkle', x: 166, y: 70, ph: 1 },
-      { t: 'sparkle', x: 82, y: 236, ph: 1 },
+      { t: 'sparkle', x: 166, y: 60, ph: 1 },
+      { t: 'sparkle', x: 150, y: 262, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
@@ -82,10 +87,11 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 189, y: 62, d: 78 },
-      { t: 'sticker', x: 157, y: 36, r: 22, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 202, y: 122, r: 24, lines: ['HOT!'], f: `8px ${PS}` },
-      { t: 'sparkle', x: 224, y: 14, ph: 1 },
+      { t: 'globe', x: 198, y: 33, d: 54 },
+      { t: 'column', x: 198, y: 58, bottom: 150, steps: 2, slim: true },
+      { t: 'sticker', x: 172, y: 18, r: 16, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 157, y: 104, r: 22, lines: ['HOT!'], f: `8px ${PS}` },
+      { t: 'sparkle', x: 226, y: 80, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
   },
@@ -259,6 +265,174 @@ function sprite(m, st) {
   });
 }
 
+// ---------- the column: a gold Corinthian column, the gold standard of sales ----------
+// A pixel sprite in the "30% OFF" type's own ramp (cream bevel, yellow face, gold band, orange for
+// the deep shade), with the type's black keyline and its 3 px navy extrusion. Built back to front
+// from small stamps: abacus, the bell, the upper acanthus tier, the volutes, the lower tier, the
+// astragal; then a fluted shaft, an Attic base and, where there is room, a pedestal with a sunk panel.
+// it: x = centre line, y = top of the abacus, bottom = the floor it stands on (the marquee),
+//     ped = rows of the pedestal's die (0 = no pedestal).
+const VOLUTE = [
+  'KKKKKKKK',
+  'KcccccyK',
+  'KcKKKKyK',
+  'KcKcyKgK',
+  'KcKKyKgK',
+  'KyKKKgoK',
+  '.KyyggK.',
+  '..KKKK..',
+];
+const ACANTHUS = [
+  '.KKKK.',
+  'KccyyK',
+  'KcoogK',
+  'ocyogo',
+  'ocyogo',
+  'oyyogo',
+  'oyyogo',
+  'oyyogo',
+];
+// the slim column's smaller stamps, for the tall narrow banners
+const VOLUTE_S = [
+  'KKKKKK',
+  'KccyyK',
+  'KcKKyK',
+  'KcKcgK',
+  'KyyggK',
+  '.KKKK.',
+];
+const ACANTHUS_S = [
+  '.KK.',
+  'KcoK',
+  'ocgo',
+  'oygo',
+  'oygo',
+  'oygo',
+];
+const RAMP = 'cygo', RAMP_COL = { c: 'cream', y: 'yellow', g: 'gold', o: 'orange', K: 'black' };
+function columnGrid(shaft, ped, steps, slim) {
+  const SW = slim ? 12 : 18, CW = slim ? 26 : 34, cx = CW / 2, hw0 = SW / 2;
+  const G = new Map(), key = (x, y) => y * 4096 + x + 1024;
+  const put = (x, y, ch) => { if (ch !== '.') G.set(key(x, y), ch); };
+  const stamp = (S, x0, y0, flip) => S.forEach((r, j) => [...r].forEach((ch, i) => put(x0 + (flip ? r.length - 1 - i : i), y0 + j, ch)));
+  const row = (y, hw, ch) => { for (let x = cx - hw; x < cx + hw; x++) put(x, y, ch); };
+  let AST;
+  if (!slim) {
+    // abacus
+    // (its horns overhang the volutes by a pixel)
+    for (let x = 0; x < CW; x++) { put(x, 0, 'K'); put(x, 4, 'K'); }
+    [[1, 'c'], [2, 'y'], [3, 'g']].forEach(([yy, ch]) => { for (let x = -1; x < CW + 1; x++) put(x, yy, ch); });
+    // the bell, in shade under the abacus
+    const BT = 5; AST = 21;
+    for (let yy = BT; yy < AST; yy++) row(yy, Math.round(13 - ((yy - BT) * 3) / (AST - BT)), yy < 7 ? 'o' : 'g');
+    // the upper acanthus tier (behind), the volutes, the lower tier (in front), the centre leaf
+    for (const [lx, ly] of [[4, 10], [10, 8]]) { stamp(ACANTHUS, lx, ly); stamp(ACANTHUS, CW - lx - 6, ly, true); }
+    stamp(VOLUTE, 0, 4); stamp(VOLUTE, CW - 8, 4, true);
+    stamp(ACANTHUS, 5, 15); stamp(ACANTHUS, CW - 11, 15, true);
+    stamp(ACANTHUS.slice(0, 7), 14, 14);
+    // the astragal, a bright bead
+    row(AST, 10, 'c'); row(AST + 1, 10, 'g'); row(AST + 2, 10, 'K');
+  } else {
+    // the same capital in fewer pixels: a four-row abacus, six-pixel volutes, four-pixel leaves
+    for (let x = 0; x < CW; x++) { put(x, 0, 'K'); put(x, 3, 'K'); }
+    [[1, 'c'], [2, 'g']].forEach(([yy, ch]) => { for (let x = -1; x < CW + 1; x++) put(x, yy, ch); });
+    const BT = 4; AST = 15;
+    for (let yy = BT; yy < AST; yy++) row(yy, Math.round(cx - 3 - ((yy - BT) * (cx - 4 - hw0)) / (AST - BT)), yy < 6 ? 'o' : 'g');
+    for (const [lx, ly] of [[3, 7], [7, 5]]) { stamp(ACANTHUS_S, lx, ly); stamp(ACANTHUS_S, CW - lx - 4, ly, true); }
+    stamp(VOLUTE_S, 0, 3); stamp(VOLUTE_S, CW - 6, 3, true);
+    stamp(ACANTHUS_S, 4, 10); stamp(ACANTHUS_S, CW - 8, 10, true);
+    stamp(ACANTHUS_S.slice(0, 5), cx - 2, 9);
+    row(AST, hw0 + 1, 'c'); row(AST + 1, hw0 + 1, 'g'); row(AST + 2, hw0 + 1, 'K');
+  }
+  // the right of the capital turns from the light: one step darker
+  for (const [k, ch] of G) {
+    const x = (k % 4096) - 1024, yy = Math.floor(k / 4096);
+    if (yy < AST && RAMP.includes(ch) && (x + 0.5 - cx) / cx > 0.3) G.set(k, RAMP[Math.min(3, RAMP.indexOf(ch) + 1)]);
+  }
+  let y = AST + 3;
+  // the shaft: lit as a cylinder, six flutes cut into it (they stop short of the ends)
+  const flutes = [];
+  const NF = slim ? 6 : 8;
+  for (let k = 0; k < NF; k++) { const u = Math.sin(((k + 0.5) / NF) * Math.PI - Math.PI / 2); if (Math.abs(u) < 0.9) flutes.push(Math.floor(cx + u * hw0)); }
+  for (let j = 0; j < shaft; j++) {
+    for (let x = cx - hw0; x < cx + hw0; x++) {
+      const u = (x + 0.5 - cx) / hw0;
+      let lv = u < -0.8 ? 1 : u < -0.3 ? 0 : u < 0.3 ? 1 : 2;
+      if (j >= 2 && j < shaft - 2 && flutes.includes(x)) lv = lv < 2 ? 2 : 3;
+      put(x, y + j, RAMP[lv]);
+    }
+  }
+  y += shaft;
+  // mouldings: rows of levels (-1 = a black line), lit from the left
+  const band = (hw, levels) => {
+    for (const base of levels) {
+      for (let x = cx - hw; x < cx + hw; x++) {
+        const u = (x + 0.5 - cx) / hw;
+        let sh = u < 0.3 ? 0 : 1;
+        if (u < -0.85) sh = base === 0 ? 1 : 0;
+        put(x, y, base < 0 ? 'K' : RAMP[Math.min(3, base + sh)]);
+      }
+      y++;
+    }
+  };
+  if (slim) {
+    band(hw0 + 1, [0]);            // fillet
+    band(hw0 + 2, [0, 2]);         // upper torus
+    band(hw0 + 1, [-1, 3]);        // scotia
+    band(hw0 + 3, [0, 1, 2]);      // lower torus
+    band(hw0 + 4, [-1, 0, 1, 2]);  // plinth
+  } else {
+    band(hw0 + 1, [0]);              // fillet
+    band(hw0 + 2, [0, 1, 2]);        // upper torus
+    band(hw0 + 1, [-1, 3, 2]);       // scotia
+    band(hw0 + 3, [0, 1, 1, 2]);     // lower torus
+    band(hw0 + 5, [-1, 0, 1, 1, 2]); // plinth
+  }
+  if (ped) {
+    band(hw0 + 7, [-1, 0, 1, 2]);  // the pedestal's cornice
+    band(hw0 + 6, [-1, 3]);
+    const top = y, hw = hw0 + 5;
+    band(hw, Array(ped).fill(1));  // the die
+    // a sunk panel on the die: shaded top and left walls, lit bottom and right lips
+    const x0 = cx - hw + 3, x1 = cx + hw - 4, y0 = top + 3, y1 = top + ped - 4;
+    for (let yy = y0; yy <= y1; yy++) for (let x = x0; x <= x1; x++) {
+      const u = (x + 0.5 - cx) / hw;
+      let ch = u < 0.3 ? 'y' : 'g';
+      if (yy === y0 || x === x0) ch = 'o';
+      else if (yy === y1 || x === x1) ch = 'c';
+      put(x, yy, ch);
+    }
+    band(hw0 + 6, [-1, 0, 1, 2]);  // its base
+    band(hw0 + 7, [-1, 1, 2]);
+  }
+  // a stylobate: broad steps, each wider than the last
+  for (let k = 0; k < steps; k++) band(hw0 + (slim ? 7 : 8) + k * 3, slim ? [-1, 0, 1] : [-1, 0, 1, 2]);
+  // the black keyline round the whole silhouette
+  const solid = new Set(G.keys());
+  for (const k of solid) {
+    if (G.get(k) === 'K') continue;
+    for (const d of [1, -1, 4096, -4096]) if (!solid.has(k + d)) G.set(k + d, 'K');
+  }
+  return { G, rows: y, cx };
+}
+function column(it) {
+  const fixed = columnGrid(0, it.ped || 0, it.steps || 0, it.slim).rows;
+  // the keyline under the last row stands on the floor
+  const shaft = Math.max(4, it.bottom - 1 - it.y - fixed);
+  const { G, cx } = columnGrid(shaft, it.ped || 0, it.steps || 0, it.slim);
+  let x0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const k of G.keys()) { const x = (k % 4096) - 1024, y = Math.floor(k / 4096); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+  const E = 3, w = x1 - x0 + 1 + E, h = y1 + 1 + E;
+  const has = (x, y) => G.has(y * 4096 + x + x0 + 1024);
+  const c = paint(w, h, (x, y) => {
+    const ch = G.get(y * 4096 + x + x0 + 1024);
+    if (ch) return RAMP_COL[ch];
+    for (let i = 1; i <= E; i++) if (has(x - i, y - i)) return 'navy';
+    return null;
+  });
+  return { frames: [c], x: it.x - cx + x0, y: it.y, rate: 0 };
+}
+
 // ---------- build every element as one or two pre-drawn frames ----------
 const layers = []; // { frames: [canvas, canvas?], x, y, rate (frame swaps per second), phase }
 let globeItem = null, marquee = null;
@@ -275,6 +449,8 @@ for (const it of F.items) {
     layers.push(sticker(it));
   } else if (it.t === 'sparkle') {
     layers.push(sparkle(it));
+  } else if (it.t === 'column') {
+    layers.push(column(it));
   } else if (it.t === 'globe') {
     globeItem = it;
     layers.push({ globe: true });

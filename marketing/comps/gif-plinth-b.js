@@ -70,7 +70,7 @@ const FORMATS = {
       { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 46, y: 168, st: 'only' },
       { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 46, y: 186, st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 46, y: 204, st: 'only' },
-      { t: 'column', x: 128, sw: 18, vr: 6, ext: 3, steps: [[3, 14], [3, 19], [3, 24]] },
+      { t: 'column', x: 128, sw: 22, vr: 7, ext: 3, steps: [[3, 16], [3, 21], [3, 26]] },
       { t: 'globe', x: 128, y: 194, d: 68 },
       { t: 'sticker', x: 160, y: 177, r: 17, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 47, y: 270, r: 30, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
@@ -88,11 +88,11 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'column', x: 192, sw: 16, vr: 6, ext: 2, steps: [[3, 12], [3, 16], [3, 20]] },
-      { t: 'globe', x: 192, y: 38, d: 64 },
-      { t: 'sticker', x: 160, y: 22, r: 17, s: '-30%', f: `8px ${PS}` },
+      { t: 'column', x: 196, sw: 16, vr: 6, ext: 2, steps: [[3, 12], [3, 16], [3, 20]] },
+      { t: 'globe', x: 196, y: 38, d: 64 },
+      { t: 'sticker', x: 164, y: 22, r: 17, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 151, y: 103, r: 22, lines: ['HOT!'], f: `8px ${PS}` },
-      { t: 'sparkle', x: 226, y: 92, ph: 1 },
+      { t: 'sparkle', x: 227, y: 96, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
   },
@@ -565,7 +565,7 @@ function columnSprite(it, top, bot) {
   const add = (id, h, hw, kind) => rows.push({ id, h, hw, kind });
   add('abacus', it.ah ?? 3, abW, 'slab');
   add('canalis', 2, Math.ceil(vx), 'band');
-  add('echinus', it.eh ?? vr, hs + 1, 'egg');
+  add('echinus', it.eh ?? (vr >= 6 ? 5 : 4), hs + 1, 'egg');
   add('astragal', 2, hs + 1, 'bead');
   const tb = it.tb ?? (s >= 20 ? 3 : 3);
   const base = [['torus1', tb, hs + 2, 'torus'], ['scotia', it.sc ?? 1, hs + 1, 'scotia'], ['torus2', tb + 1, hs + 3, 'torus'], ['plinth', it.ph ?? 3, hs + 5, 'slab']];
