@@ -77,6 +77,7 @@ const FORMATS = {
       { t: 'globe', x: 126, y: 202, d: 64, col: { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
       { t: 'sticker', x: 152, y: 178, r: 15, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 44, y: 251, r: 22, lines: ['WOW!'], f: `8px ${PS}` },
+      { t: 'logo', src: '/assets/gme/family-gme-box.png', x: Number(q.get('lx') ?? 44), y: Number(q.get('ly') ?? 294), w: Number(q.get('lw') ?? 62), angle: Number(q.get('la') ?? 0), ground: true },
       { t: 'strip', y: Number(q.get('sy') ?? 253), angle: Number(q.get('sa') ?? -6), dx: 2, s: 'EVERY SITE 30% OFF!', f: `8px ${PS}`, ground: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0, at: [[160, 100], [20, 92], [150, 142]] },
       { t: 'sparkle', x: 166, y: 62, ph: 1, at: [[100, 166], [24, 158], [168, 240]] },
@@ -237,6 +238,31 @@ function cropMask(m) {
   for (let y = 0; y < o.h; y++) for (let x = 0; x < o.w; x++) o.a[y * o.w + x] = m.a[(y + y0) * m.w + x + x0];
   return o;
 }
+// A small Gary Mustard Enterprises sticker: the brand pack's boxed "gme" mark, knocked down to
+// banner pixels (white plate, the letters cut through to the blue), slapped on a little crooked
+// with a black keyline and a navy drop shadow. Quiet: no animation.
+async function logo(it) {
+  const img = new Image(); img.src = it.src; await img.decode();
+  const w = it.w, h = Math.round((img.height / img.width) * w), pad = 4;
+  const SSL = 4, big = canvas((w + pad * 2) * SSL, (h + pad * 2) * SSL), bx = big.getContext('2d');
+  bx.translate(big.width / 2, big.height / 2); bx.rotate(((it.angle || 0) * Math.PI) / 180);
+  bx.drawImage(img, (-w * SSL) / 2, (-h * SSL) / 2, w * SSL, h * SSL);
+  const sm = canvas(w + pad * 2, h + pad * 2), sx2 = sm.getContext('2d');
+  sx2.imageSmoothingEnabled = true; sx2.imageSmoothingQuality = 'high';
+  sx2.drawImage(big, 0, 0, sm.width, sm.height);
+  const d = sx2.getImageData(0, 0, sm.width, sm.height).data, N = sm.width, M = sm.height;
+  const on = (x, y) => x >= 0 && y >= 0 && x < N && y < M && d[(y * N + x) * 4 + 3] > 110;
+  // the plate's outline (letters included), so the keyline wraps the sticker, not each letter
+  const plate = (x, y) => { if (!(x >= 0 && y >= 0 && x < N && y < M)) return false; let l = false, rr = false; for (let i = x; i >= 0; i--) if (on(i, y)) { l = true; break; } for (let i = x; i < N; i++) if (on(i, y)) { rr = true; break; } return l && rr; };
+  const o = paint(N + 4, M + 4, (x, y) => {
+    if (on(x, y)) return 'white';
+    if (plate(x, y)) return null; // a letter: the blue shows through
+    if (on(x - 1, y) || on(x + 1, y) || on(x, y - 1) || on(x, y + 1)) return 'black';
+    if (on(x - 2, y - 2) || on(x - 1, y - 2) || on(x - 2, y - 1)) return 'navy';
+    return null;
+  });
+  return { frames: [o], x: Math.round(it.x - N / 2), y: Math.round(it.y - M / 2), rate: 0 };
+}
 // A yellow sale strip slapped across the banner at a slant: gold bevel, black keylines and black
 // lettering, a hard navy shadow; the lettering flips black / red on the beat.
 function strip(it) {
@@ -323,6 +349,8 @@ for (const it of F.items) {
     layers.push(sticker(it));
   } else if (it.t === 'sparkle') {
     layers.push(sparkle(it));
+  } else if (it.t === 'logo') {
+    layers.push(await logo(it));
   } else if (it.t === 'strip' && q.get('strip') !== '0') {
     layers.push(strip(it));
   } else if (it.t === 'globe') {
