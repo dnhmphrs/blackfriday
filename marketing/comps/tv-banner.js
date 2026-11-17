@@ -1,9 +1,9 @@
-// The approved banner (gif-plinth-e: the chrome globe hovering over a chrome Tuscan column, the
-// stacked sale message, the pink -30% sticker, the WOW! burst, the slanted EVERY SITE 30% OFF!
-// strip with the Gary Mustard Enterprises tape under it, sparkles and the crawl), kept in exactly
-// the same places but re-shot as a 1990s home-shopping channel graphic: smooth full resolution,
-// a lit blue studio backdrop, the globe and column in real 3D chrome, heavy slanted sale type with
-// glossy faces and hard navy extrusions, glossy vector stickers and a broadcast lower-third crawl.
+// The approved banner (gif-plinth-e) in the look of our old ad, the 30% OFF Channel (broadcast):
+// the same blue studio backdrop, the slanted heavy sale type with hard navy shadows, the chrome
+// globe, yellow and red. The content and its places are the approved layout's, nothing more:
+// the stacked message, the chrome globe hovering and spinning over a chrome Tuscan column, the
+// pink -30% sticker, the WOW! burst, on the desktop banner the yellow EVERY SITE 30% OFF! strip
+// with the navy Gary Mustard Enterprises tape under it, a few glints, and the crawl.
 // Formats: banner-v (1080x2025), banner-h (1170x834), 1x1 (1080x1080).
 // ?h= renders a format at another height: the crawl stays on the bottom edge, the globe stays
 // level with the message and the column's shaft grows down to the crawl (the strips go with it),
@@ -15,59 +15,68 @@ import { buildObject } from '../lib/catalog.js';
 
 const q = new URLSearchParams(location.search);
 const DURATION = 12, FPS = 30, TAU = Math.PI * 2;
-const SKEW = Math.tan((9 * Math.PI) / 180); // the slant of the sale type, as in the old ad
+
+// broadcast.css
+const YELLOW = '#fff035', SHADE = '#0a0f66', RED = '#ff1616', DROP = 'rgba(6,8,70,0.95)', HARD = 'rgba(6,8,70,0.9)';
+const SKEW = Math.tan((9 * Math.PI) / 180); // skewX(-9deg)
+const BLACK = (s) => `400 ${s}px "Archivo Black"`;
+const ARIMO = (s) => `italic 700 ${s}px Arimo`;
 
 // The crawl: exactly these lines, in this order, looping.
 const TICKER = ['But wait… there’s less!', 'No purchase necessary!', 'Black Friday only!', 'Every website, 30% off!', 'Works like magic!'];
 
 // Layout in stage px, measured from gif-plinth-e's FORMATS (GIF px x P).
-// type: groups of lines that share one size; each line is a box (cx = centre, or left) with the
-// top and height of the approved lettering; the new type is fitted to the box and centred on it.
+// type: groups of lines sharing one size; each line is [text, x, top, width, height] of the
+// approved lettering (x is the centre, or the left edge with align 'l'). The new type is as big as
+// fits every box across (fitW), no taller than maxH x the approved lettering, centred on the box.
 const COL = { shaft: 1.5, wide: 1.4, gap: 0.18, steps: 2, bob: 0.05 };
 const FORMATS = {
   'banner-v': {
     w: 1080, h: 2025,
     type: [
-      { st: 'head', align: 'c', fitW: 1.0, maxH: 1.06, lines: [['30%', 543, 48, 690, 210], ['OFF', 543, 324, 690, 210]] },
-      { st: 'body', align: 'c', fitW: 0.97, maxH: 1.18, lines: [['EVERYTHING', 540, 624, 948, 84], ['ON THE', 540, 744, 564, 84], ['INTERNET.', 540, 864, 804, 84]] },
+      { st: 'pct', align: 'c', fitW: 1.0, maxH: 1.1, lines: [['30%', 543, 48, 690, 210], ['OFF', 543, 324, 690, 210]] },
+      { st: 'title', align: 'c', fitW: 0.98, maxH: 1.2, lines: [['EVERYTHING', 540, 624, 948, 84], ['ON THE', 540, 744, 564, 84], ['INTERNET.', 540, 864, 804, 84]] },
       { st: 'only', align: 'c', fitW: 1.0, maxH: 1.3, lines: [['BLACK', 306, 1056, 384, 60], ['FRIDAY', 306, 1164, 444, 60], ['ONLY!', 306, 1272, 372, 60]] },
     ],
     globe: { x: 756, y: 1212, d: 384 },
+    glow: { rx: 648, ry: 729 },
     sticker: { x: 912, y: 1068, r: 90 },
     burst: { x: 264, y: 1506, r: 132, word: 'WOW!' },
     strips: [
       { sub: true, y: 1620, h: 68, angle: -6, dx: 18, s: 'GARY MUSTARD ENTERPRISES', cap: 30 },
-      { y: 1518, h: 126, angle: -6, dx: 12, s: 'EVERY SITE 30% OFF!', cap: 50 },
+      { y: 1518, h: 126, angle: -6, dx: 12, s: 'EVERY SITE 30% OFF!', cap: 54 },
     ],
     sparkles: [
       { x: 84, y: 84, ph: 0, at: [[960, 600], [120, 552], [900, 852]] },
       { x: 996, y: 372, ph: 1, at: [[600, 996], [144, 948], [1008, 1440]] },
       { x: 492, y: 1056, ph: 0, at: [[84, 1380], [1008, 60], [372, 576]] },
     ],
-    spark: 46, ticker: { h: 132, speed: 360 },
+    spark: 100, ticker: { h: 132, speed: 360 },
   },
   'banner-h': {
     w: 1170, h: 834,
     type: [
-      { st: 'head', align: 'l', fitW: 1.0, maxH: 1.06, lines: [['30%', 45, 35, 575, 175], ['OFF', 45, 260, 575, 175]] },
-      { st: 'bodyS', align: 'l', fitW: 1.0, maxH: 1.3, lines: [['EVERYTHING ON', 40, 500, 515, 35], ['THE INTERNET.', 40, 560, 495, 35]] },
-      { st: 'onlyS', align: 'l', fitW: 1.0, maxH: 1.3, lines: [['BLACK FRIDAY ONLY!', 40, 635, 705, 35]] },
+      { st: 'pct', align: 'l', fitW: 1.0, maxH: 1.1, lines: [['30%', 45, 35, 575, 175], ['OFF', 45, 260, 575, 175]] },
+      { st: 'title', align: 'l', fitW: 1.0, maxH: 1.35, lines: [['EVERYTHING ON', 40, 500, 515, 35], ['THE INTERNET.', 40, 560, 495, 35]] },
+      { st: 'only', align: 'l', fitW: 1.0, maxH: 1.35, lines: [['BLACK FRIDAY ONLY!', 40, 635, 705, 35]] },
     ],
     globe: { x: 980, y: 185, d: 320 },
+    glow: { rx: 538, ry: 517 },
     sticker: { x: 860, y: 150, r: 70 },
     burst: { x: 690, y: 490, r: 90, word: 'HOT!' },
     strips: [],
     sparkles: [{ x: 730, y: 110, ph: 1, at: [[1140, 50], [590, 490], [850, 710]] }],
-    spark: 38, ticker: { h: 85, speed: 300 },
+    spark: 84, ticker: { h: 85, speed: 300 },
   },
   '1x1': {
     w: 1080, h: 1080,
     type: [
-      { st: 'head', align: 'l', fitW: 1.0, maxH: 1.06, lines: [['30%', 44, 40, 460, 140], ['OFF', 44, 228, 460, 140]] },
-      { st: 'body', align: 'l', fitW: 0.97, maxH: 1.18, lines: [['EVERYTHING', 44, 432, 632, 56], ['ON THE', 44, 512, 376, 56], ['INTERNET.', 44, 592, 536, 56]] },
+      { st: 'pct', align: 'l', fitW: 1.0, maxH: 1.1, lines: [['30%', 44, 40, 460, 140], ['OFF', 44, 228, 460, 140]] },
+      { st: 'title', align: 'l', fitW: 0.98, maxH: 1.2, lines: [['EVERYTHING', 44, 432, 632, 56], ['ON THE', 44, 512, 376, 56], ['INTERNET.', 44, 592, 536, 56]] },
       { st: 'only', align: 'l', fitW: 1.0, maxH: 1.3, lines: [['BLACK FRIDAY', 44, 696, 600, 40], ['ONLY!', 44, 768, 248, 40]] },
     ],
     globe: { x: 888, y: 360, d: 360 },
+    glow: { rx: 648, ry: 460 },
     sticker: { x: 1000, y: 224, r: 72 },
     burst: { x: 448, y: 888, r: 96, word: 'NEW!' },
     strips: [],
@@ -75,7 +84,7 @@ const FORMATS = {
       { x: 560, y: 120, ph: 0, at: [[80, 912], [1048, 56], [600, 400]] },
       { x: 608, y: 600, ph: 1, at: [[720, 944], [496, 32], [1048, 680]] },
     ],
-    spark: 34, ticker: { h: 88, speed: 240 },
+    spark: 80, ticker: { h: 88, speed: 240 },
   },
 };
 const format = FORMATS[q.get('format')] ? q.get('format') : '1x1';
@@ -86,159 +95,98 @@ if (Number(q.get('h')) > 0) F.h = Math.round(Number(q.get('h')));
 // the message, the shaft grows down to the crawl and the strips move down with it.
 const GROUND = F.h - BASE.h;
 F.strips = BASE.strips.map((s) => ({ ...s, y: s.y + GROUND }));
-const W = F.w, H = F.h;
+const W = F.w, H = F.h, G = F.globe, U = G.d / 2.12; // U: stage px per world unit (globe radius 1)
+const tickerTop = H - F.ticker.h;
 
 const stage = document.getElementById('stage');
 stage.classList.add('f-' + format);
 stage.style.width = W + 'px';
 stage.style.height = H + 'px';
-const $ = (id) => document.getElementById(id);
+const $ = (s) => document.querySelector(s);
 const canvas = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.ceil(w)); c.height = Math.max(1, Math.ceil(h)); return c; };
-const sizeCanvas = (c) => { c.width = W; c.height = H; c.style.width = W + 'px'; c.style.height = H + 'px'; return c.getContext('2d'); };
+const layer = (sel) => { const c = $(sel); c.width = W; c.height = H; c.style.width = W + 'px'; c.style.height = H + 'px'; return c.getContext('2d'); };
 
-// ---------- fonts ----------
-const DISPLAY = (s) => `400 ${s}px "Archivo Black"`;
-const CRAWL = (s) => `italic 800 ${s}px Archivo`;
-const TAPE = (s) => `italic 700 ${s}px Arimo`;
-await Promise.all([DISPLAY(100), CRAWL(100), TAPE(100)].map((f) => document.fonts.load(f)));
+// ---------- the backdrop: broadcast.css .bg, its light centred just under the globe ----------
+$('.bg').style.background = `radial-gradient(ellipse ${F.glow.rx}px ${F.glow.ry}px at ${G.x}px ${Math.round(G.y + U * 0.4)}px, #5fd0ff 0%, #2f95ff 22%, #1450f8 44%, rgba(10,34,214,0) 72%), linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c)`;
 
-// ---------- colours ----------
-const NAVY = '#0a0f66', INK = '#05083f';
-// glossy faces: a bright top, a hard horizon a little under half way (the "gloss"), a deeper bottom
-const FACES = {
-  yellow: { stops: [[0, '#fffbd2'], [0.2, '#fff35c'], [0.5, '#ffe81e'], [0.53, '#ffd000'], [0.9, '#ffb400'], [1, '#f39d00']], hi: 'rgba(255,255,236,0.95)', lo: 'rgba(150,70,0,0.55)' },
-  white: { stops: [[0, '#ffffff'], [0.5, '#ffffff'], [0.53, '#e6edff'], [1, '#b4c6f6']], hi: 'rgba(255,255,255,1)', lo: 'rgba(40,60,160,0.5)' },
-  black: { stops: [[0, '#2b2b33'], [0.5, '#16161c'], [0.53, '#050507'], [1, '#000000']], hi: 'rgba(255,255,255,0.25)', lo: 'rgba(0,0,0,0)' },
-  red: { stops: [[0, '#ff6a50'], [0.5, '#ff2a14'], [0.53, '#e80c00'], [1, '#b80000']], hi: 'rgba(255,220,200,0.6)', lo: 'rgba(80,0,0,0.5)' },
-};
-// type styles: face(s), extrusion depth and outline as a share of the cap height
-const STY = {
-  head: { face: 'yellow', ext: 0.075, line: 0.022 },
-  body: { face: 'white', ext: 0.11, line: 0.03 },
-  bodyS: { face: 'white', ext: 0.12, line: 0.04 },
-  only: { face: 'yellow', blink: 'white', ext: 0.11, line: 0.035 },
-  onlyS: { face: 'yellow', blink: 'white', ext: 0.12, line: 0.04 },
-};
+await Promise.all([BLACK(100), ARIMO(100)].map((f) => document.fonts.load(f)));
 
 // ---------- lettering ----------
 function scanBounds(c, thr = 100) {
-  const w = c.width, h = c.height, d = c.getContext('2d').getImageData(0, 0, w, h).data;
+  const w = c.width, h = c.height, d = c.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, w, h).data;
   let x0 = w, y0 = h, x1 = -1, y1 = -1;
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] >= thr) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
   return { x0, y0, x1: x1 + 1, y1: y1 + 1 };
 }
-function setFont(x, font, ls = 0) { x.font = font; x.letterSpacing = ls ? ls + 'px' : '0px'; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; }
-// ink box of a line of type, relative to its origin (baseline, left), slanted by k
-function inkOf(text, font, size, k = SKEW, ls = 0) {
+function setFont(x, font, ls) { x.font = font; x.letterSpacing = (ls || 0) + 'px'; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; }
+// the ink box of a line of type relative to its origin (left end of the baseline), slanted by k
+function inkOf(text, font, size, k, ls = 0) {
   const c = canvas(size * (text.length * 1.1 + 2), size * 2.2), x = c.getContext('2d', { willReadFrequently: true });
   const ox = size * 0.6, oy = size * 1.5;
   setFont(x, font(size), ls); x.setTransform(1, 0, -k, 1, ox, oy); x.fillStyle = '#fff'; x.fillText(text, 0, 0);
   const b = scanBounds(c);
   return { x0: b.x0 - ox, y0: b.y0 - oy, x1: b.x1 - ox, y1: b.y1 - oy };
 }
-const capCache = new Map();
-const capOf = (font, size) => { const key = font(size); if (!capCache.has(key)) { const b = inkOf('H', font, size, 0); capCache.set(key, b.y1 - b.y0); } return capCache.get(key); };
+const caps = new Map();
+const capOf = (font, size) => { const key = font(size); if (!caps.has(key)) { const b = inkOf('H', font, size, 0); caps.set(key, b.y1 - b.y0); } return caps.get(key); };
 const tint = (src, color) => { const c = canvas(src.width, src.height), x = c.getContext('2d'); x.drawImage(src, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); return c; };
 
-// A line of sale type: a glossy face with a bevelled rim, a thin dark outline and a hard navy
-// extrusion down and to the right. Returns the sprite and where its baseline origin sits in it.
-function typeSprite(text, { font = DISPLAY, size, k = SKEW, ls = 0, face = 'yellow', ext = 0, line = 0, extColor = NAVY, lineColor = INK, bevel = 0.03, soft = 0 }) {
-  const b = inkOf(text, font, size, k, ls), cap = capOf(font, size);
-  const E = Math.round(ext), L = line, pad = Math.ceil(L + 4 + soft * 2);
-  const w = b.x1 - b.x0 + pad * 2 + E, h = b.y1 - b.y0 + pad * 2 + E;
+// The type treatments of broadcast.css, as a function of the font size:
+//   pct    .offer .pct/.off: Archivo Black, letter-spacing -0.05em, skewX(-9deg), a solid navy
+//          extrusion (six 2px steps at 236px)
+//   title  .title: Arimo bold italic, letter-spacing -0.04em, white fading to pale blue, one hard
+//          navy drop shadow (8px at 176px)
+//   crawl  .ticker.bottom: Archivo Black, letter-spacing -0.02em, skewX(-9deg), three 3px steps at 112px
+const STY = {
+  pct: { font: BLACK, k: SKEW, ls: -0.05, fill: YELLOW, steps: 6, step: 2 / 236 },
+  only: { font: BLACK, k: SKEW, ls: -0.03, fill: YELLOW, blink: '#ffffff', steps: 4, step: 2 / 150 },
+  title: { font: ARIMO, k: 0, ls: -0.04, fill: 'title', drop: 8 / 176 },
+  crawl: { font: BLACK, k: SKEW, ls: -0.02, fill: YELLOW, steps: 3, step: 3 / 112 },
+};
+// One line of type as a sprite, with where its baseline origin and ink sit inside it.
+function typeSprite(text, size, { font, k = 0, ls = 0, fill, steps = 0, step = 0, drop = 0, shade = SHADE }) {
+  const L = ls * size, b = inkOf(text, font, size, k, L), cap = capOf(font, size);
+  const depth = Math.round(steps * step * size), dd = Math.round(drop * size);
+  const pad = 4, ext = Math.max(depth, dd);
+  const w = b.x1 - b.x0 + pad * 2 + ext, h = b.y1 - b.y0 + pad * 2 + ext;
   const ox = pad - b.x0, oy = pad - b.y0;
-  const S = canvas(w, h), s = S.getContext('2d');
-  const shape = (ctx, dx = 0, dy = 0, mode = 'fill', lw = 0) => {
-    setFont(ctx, font(size), ls); ctx.setTransform(1, 0, -k, 1, ox + dx, oy + dy);
-    if (mode === 'fill') ctx.fillText(text, 0, 0); else { ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.strokeText(text, 0, 0); }
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-  };
-  // the outline mask (face grown by the line width) carries the extrusion
   const M = canvas(w, h), m = M.getContext('2d');
-  m.fillStyle = '#fff'; m.strokeStyle = '#fff'; shape(m); if (L) shape(m, 0, 0, 'stroke', L * 2);
-  if (soft) { s.save(); s.filter = `blur(${soft}px)`; s.globalAlpha = 0.45; s.drawImage(tint(M, '#000033'), E + soft * 0.6, E + soft * 0.6); s.restore(); }
-  if (E) { const T = tint(M, extColor); for (let i = E; i >= 1; i--) s.drawImage(T, i, i); }
-  if (L) s.drawImage(tint(M, lineColor), 0, 0);
-  // the face: gradient from the cap top to the baseline, clipped to the letters
-  const fc = FACES[face];
+  setFont(m, font(size), L); m.setTransform(1, 0, -k, 1, ox, oy); m.fillStyle = '#fff'; m.fillText(text, 0, 0);
+  const S = canvas(w, h), s = S.getContext('2d');
+  if (depth) { const T = tint(M, shade); for (let i = depth; i >= 1; i--) s.drawImage(T, i, i); }
+  if (dd) s.drawImage(tint(M, DROP), dd, dd);
+  let face;
+  if (fill === 'title') { // background: linear-gradient(#ffffff 35%, #c5d4fb 100%) over a 0.9 line box
+    face = M.getContext('2d').createLinearGradient(0, oy - size * 0.75, 0, oy + size * 0.15);
+    face.addColorStop(0.35, '#ffffff'); face.addColorStop(1, '#c5d4fb');
+  } else face = fill;
   const Fc = canvas(w, h), f = Fc.getContext('2d');
-  const g = f.createLinearGradient(0, oy - cap, 0, oy + cap * 0.08);
-  for (const [o, c] of fc.stops) g.addColorStop(o, c);
-  f.fillStyle = g; f.fillRect(0, 0, w, h);
-  const FM = canvas(w, h), fm = FM.getContext('2d'); fm.fillStyle = '#fff'; shape(fm);
-  f.globalCompositeOperation = 'destination-in'; f.drawImage(FM, 0, 0);
-  // bevel: a bright rim on the top-left edges, a darker one on the bottom-right edges
-  const bv = Math.max(1, Math.round(cap * bevel));
-  for (const [dx, col] of [[bv, fc.hi], [-bv, fc.lo]]) {
-    const R = canvas(w, h), r = R.getContext('2d');
-    r.drawImage(FM, 0, 0); r.globalCompositeOperation = 'destination-out'; r.drawImage(FM, dx, dx);
-    r.globalCompositeOperation = 'source-in'; r.fillStyle = col; r.fillRect(0, 0, w, h);
-    f.globalCompositeOperation = 'source-over'; f.drawImage(R, 0, 0);
-  }
+  f.fillStyle = face; f.fillRect(0, 0, w, h); f.globalCompositeOperation = 'destination-in'; f.drawImage(M, 0, 0);
   s.drawImage(Fc, 0, 0);
-  return { c: S, ox, oy, cap, inkW: b.x1 - b.x0, pad, b };
+  return { c: S, ox, oy, cap, pad, inkW: b.x1 - b.x0 };
 }
-
-// ---------- the backdrop: a blue studio cyclorama, lit behind the monument ----------
-const bgx = sizeCanvas($('bg'));
-const G = F.globe, U = G.d / 2.12; // stage px per world unit (globe radius 1)
-const tickerTop = H - F.ticker.h;
-function backdrop(x) {
-  let g = x.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, '#0a1ab8'); g.addColorStop(0.45, '#0b22d4'); g.addColorStop(1, '#06109a');
-  x.fillStyle = g; x.fillRect(0, 0, W, H);
-  const pool = (cx, cy, rx, ry, stops) => {
-    x.save(); x.translate(cx, cy); x.scale(rx / ry, 1);
-    const r = x.createRadialGradient(0, 0, 0, 0, 0, ry);
-    for (const [o, c] of stops) r.addColorStop(o, c);
-    x.fillStyle = r; x.fillRect(-ry * 3, -ry * 3, ry * 6, ry * 6); x.restore();
-  };
-  // a soft key light washing the top of the wall where the headline sits
-  pool(W * 0.48, H * 0.02, W * 0.75, Math.min(H, 1400) * 0.42, [[0, 'rgba(70,140,255,0.42)'], [0.6, 'rgba(40,100,255,0.12)'], [1, 'rgba(30,80,255,0)']]);
-  // the bright cyan bloom on the cyclorama behind the globe, falling off into the blue
-  const R = U * 2.6;
-  pool(G.x, G.y + U * 0.35, R * 0.95, R * 1.15, [[0, 'rgba(110,220,255,0.95)'], [0.18, 'rgba(70,175,255,0.8)'], [0.42, 'rgba(30,100,250,0.5)'], [0.72, 'rgba(15,50,230,0.15)'], [1, 'rgba(10,34,214,0)']]);
-  // a pool of light on the floor of the set where the column stands
-  pool(G.x, tickerTop, U * 2.2, U * 0.9, [[0, 'rgba(120,200,255,0.55)'], [0.5, 'rgba(60,140,255,0.2)'], [1, 'rgba(40,100,255,0)']]);
-  // fall-off to the corners
-  x.save(); x.translate(W / 2, H / 2); x.scale(1, H / W);
-  const v = x.createRadialGradient(0, 0, W * 0.35, 0, 0, W * 0.95);
-  v.addColorStop(0, 'rgba(2,4,60,0)'); v.addColorStop(1, 'rgba(2,4,60,0.55)');
-  x.fillStyle = v; x.fillRect(-W, -W, W * 2, W * 2); x.restore();
-  // faint horizontal light banding, like a lit studio wall
-  for (let y = 0; y < H; y += 6) { x.fillStyle = `rgba(150,190,255,${(0.018 + 0.012 * Math.sin(y * 0.021)).toFixed(4)})`; x.fillRect(0, y, W, 2); }
-}
-backdrop(bgx);
+const fitSize = (text, font, k, ls, width) => { const b = inkOf(text, font, 100, k, ls * 100); return (width / (b.x1 - b.x0)) * 100; };
 
 // ---------- the message ----------
-// Each group shares one size: as big as fits every line's box across (fitW), no taller than maxH x
-// the approved lettering. Lines are centred on their boxes' middles, so the rhythm stays.
-const typeLayers = []; // { a: sprite, b?: blink sprite, x, y }
+const typeCtx = layer('#type'), blinkCtx = layer('#blink');
+const blinkers = [];
 for (const grp of F.type) {
   const st = STY[grp.st];
   let size = Infinity;
-  for (const [s, , , bw, bh] of grp.lines) {
-    const b = inkOf(s, DISPLAY, 100);
-    size = Math.min(size, (bw * grp.fitW) / ((b.x1 - b.x0) / 100), (bh * grp.maxH) / (capOf(DISPLAY, 100) / 100));
-  }
+  for (const [s, , , bw, bh] of grp.lines) size = Math.min(size, fitSize(s, st.font, st.k, st.ls, bw * grp.fitW), (bh * grp.maxH * 100) / capOf(st.font, 100));
   size = Math.floor(size);
-  const cap = capOf(DISPLAY, size);
   for (const [s, x, top, , bh] of grp.lines) {
-    const opt = { size, ext: cap * st.ext, line: Math.max(1.5, cap * st.line), soft: Math.round(cap * 0.05) };
-    const a = typeSprite(s, { ...opt, face: st.face });
-    const b = st.blink ? typeSprite(s, { ...opt, face: st.blink }) : null;
-    const baseline = top + bh / 2 + cap / 2;
-    const dx = grp.align === 'l' ? x - a.pad : x - a.pad - a.inkW / 2;
-    typeLayers.push({ a, b, x: Math.round(dx), y: Math.round(baseline - a.oy) });
+    const a = typeSprite(s, size, st);
+    const baseline = top + bh / 2 + a.cap / 2;
+    const px = Math.round(grp.align === 'l' ? x - a.pad : x - a.pad - a.inkW / 2), py = Math.round(baseline - a.oy);
+    if (st.blink) blinkers.push({ a, b: typeSprite(s, size, { ...st, fill: st.blink }), x: px, y: py });
+    else typeCtx.drawImage(a.c, px, py);
   }
 }
-// static type goes on the backdrop; the blinking lines are drawn every frame
-for (const L of typeLayers) if (!L.b) bgx.drawImage(L.a.c, L.x, L.y);
-const ux = sizeCanvas($('under'));
 
 // ---------- the chrome monument: the globe hovering over a Tuscan column ----------
-const gl = $('gl');
-const FOV = 10, DIST = 30, PR = Number(q.get('pr') || 2); // rendered at 2x and shown at 1x
+const gl = $('#gl');
+const FOV = 10, DIST = 30, PR = Number(q.get('pr') || 2); // a long lens, as gif-plinth-e; rendered at 2x, shown at 1x
 const { renderer, scene, camera } = createStage({ canvas: gl, width: 16, height: 16, pixelRatio: PR, fov: FOV });
 renderer.shadowMap.enabled = false;
 const pivot = new THREE.Group();
@@ -246,52 +194,48 @@ scene.add(pivot);
 const globe = await buildObject('globe-core');
 globe.userData.slice.visible = false;
 pivot.add(globe);
+// the lettered cut faces keep their full sign yellow and red (no tone-mapping squeeze)
+globe.traverse((o) => { if (o.isMesh && o.material.map) o.material.toneMapped = false; });
 
-// A Tuscan order in chrome (ported from gif-plinth-e): square abacus, ovolo echinus, a collar,
+// A Tuscan order in chrome (gif-plinth-e's buildColumn): square abacus, ovolo echinus, a collar,
 // a fluted shaft with entasis, a torus, a square plinth and steps. y runs down from the globe's
 // south pole; wide scales it across; gap is the air between the globe and the abacus.
 function buildColumn({ shaft = 3, flutes = 12, steps = 1, wide = 1, gap = 0 } = {}) {
   const mat = materials.chrome();
-  mat.roughness = 0.05;
   mat.envMap = scene.environment;
   mat.envMapRotation.set((15 * Math.PI) / 180, 0, 0); // the studio turned a little so the fronts catch the softboxes
-  const col = new THREE.Group();
-  const pts = [];
+  const col = new THREE.Group(), pts = [];
   let y = -1.035 - gap;
+  const abacusTop = y;
   const add = (m) => { col.add(m); return m; };
+  // the square mouldings: rounded edges that catch the softboxes, and the studio tilted the other
+  // way so their faces mirror the deep blue of the set rather than a flat white card
+  const smat = materials.chrome();
+  smat.envMap = scene.environment;
+  smat.envMapRotation.set((-10 * Math.PI) / 180, 0, 0);
   const slab = (w, h) => {
-    // a box with softly rounded edges reads as polished metal rather than a flat card
-    const m = add(new THREE.Mesh(roundedBox(w, h, w, Math.min(0.025, h * 0.2)), mat));
+    const m = add(new THREE.Mesh(roundedBox(w, h, w, Math.min(0.04, h * 0.3)), smat));
     m.position.y = y - h / 2;
     for (const sx of [-1, 1]) for (const sz of [-1, 1]) for (const yy of [y, y - h]) pts.push(new THREE.Vector3(sx * w / 2, yy, sz * w / 2));
     y -= h;
   };
-  const lathe = (prof, h) => {
-    const g = new THREE.LatheGeometry(prof.map(([r, v]) => new THREE.Vector2(r, y - h + v * h)), 96);
-    add(new THREE.Mesh(g, mat)); y -= h;
-  };
+  const lathe = (prof, h) => { add(new THREE.Mesh(new THREE.LatheGeometry(prof.map(([r, v]) => new THREE.Vector2(r, y - h + v * h)), 96), mat)); y -= h; };
   const rTop = 0.33, rBot = 0.39;
   slab(1.06, 0.17); // abacus
-  const abacusTop = -1.035 - gap;
   { const prof = []; for (let i = 0; i <= 16; i++) { const s = i / 16; prof.push([rTop + 0.03 + (0.5 - rTop - 0.03) * Math.sin((s * Math.PI) / 2), s]); } lathe(prof, 0.19); } // echinus
   { const tor = add(new THREE.Mesh(new THREE.TorusGeometry(rTop + 0.03, 0.045, 16, 96), mat)); tor.rotation.x = Math.PI / 2; tor.position.y = y - 0.07; } // collar
   lathe([[rTop + 0.01, 0], [rTop + 0.01, 1]], 0.14); // neck
-  {
-    const M = 12, N = flutes * M, NY = 48, h = shaft, depth = 0.055;
-    const pos = [], idx = [];
+  { // the fluted shaft
+    const M = 12, N = flutes * M, NY = 48, h = shaft, depth = 0.055, pos = [], idx = [];
     for (let j = 0; j <= NY; j++) {
-      const v = j / NY;
-      const R = rBot - (rBot - rTop) * Math.pow(1 - v, 1.6);
+      const v = j / NY, R = rBot - (rBot - rTop) * Math.pow(1 - v, 1.6);
       for (let i = 0; i <= N; i++) {
         const th = (i / N) * TAU + Math.PI / flutes, ph = (i % M) / M;
         const r = R - depth * Math.sqrt(Math.max(0, 1 - (2 * ph - 1) ** 2));
         pos.push(r * Math.sin(th), y - v * h, r * Math.cos(th));
       }
     }
-    for (let j = 0; j < NY; j++) for (let i = 0; i < N; i++) {
-      const a = j * (N + 1) + i, b = a + 1, c = a + N + 1, d = c + 1;
-      idx.push(a, c, b, b, c, d);
-    }
+    for (let j = 0; j < NY; j++) for (let i = 0; i < N; i++) { const a = j * (N + 1) + i, b = a + 1, c = a + N + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     g.setIndex(idx); g.computeVertexNormals();
@@ -304,17 +248,17 @@ function buildColumn({ shaft = 3, flutes = 12, steps = 1, wide = 1, gap = 0 } = 
   for (let k = 0; k < steps; k++) slab(1.3 + k * 0.26, 0.13);
   col.scale.set(wide, 1, wide);
   for (const v of pts) { v.x *= wide; v.z *= wide; }
-  return { col, pts, bottom: y, abacusTop };
+  return { col, pts, abacusTop };
 }
 function roundedBox(w, h, d, r) {
-  // a box whose edges are rounded by r: built from a rounded-rectangle extrusion
-  const s = new THREE.Shape(), x0 = -w / 2, z0 = -d / 2;
-  s.moveTo(x0 + r, z0); s.lineTo(x0 + w - r, z0); s.quadraticCurveTo(x0 + w, z0, x0 + w, z0 + r);
-  s.lineTo(x0 + w, z0 + d - r); s.quadraticCurveTo(x0 + w, z0 + d, x0 + w - r, z0 + d);
-  s.lineTo(x0 + r, z0 + d); s.quadraticCurveTo(x0, z0 + d, x0, z0 + d - r); s.lineTo(x0, z0 + r); s.quadraticCurveTo(x0, z0, x0 + r, z0);
-  const g = new THREE.ExtrudeGeometry(s, { depth: h - r * 2, bevelEnabled: true, bevelThickness: r, bevelSize: r * 0.6, bevelSegments: 4, curveSegments: 6 });
-  g.rotateX(Math.PI / 2);
-  g.translate(0, h / 2 - r, 0);
+  // a box with its edges rounded by r (an extruded rounded rectangle, bevelled top and bottom)
+  const s = new THREE.Shape(), x0 = -w / 2 + r * 0.4, z0 = -d / 2 + r * 0.4, ww = w - r * 0.8, dd = d - r * 0.8, rr = r * 0.6;
+  s.moveTo(x0 + rr, z0); s.lineTo(x0 + ww - rr, z0); s.quadraticCurveTo(x0 + ww, z0, x0 + ww, z0 + rr);
+  s.lineTo(x0 + ww, z0 + dd - rr); s.quadraticCurveTo(x0 + ww, z0 + dd, x0 + ww - rr, z0 + dd);
+  s.lineTo(x0 + rr, z0 + dd); s.quadraticCurveTo(x0, z0 + dd, x0, z0 + dd - rr); s.lineTo(x0, z0 + rr); s.quadraticCurveTo(x0, z0, x0 + rr, z0);
+  const g = new THREE.ExtrudeGeometry(s, { depth: h - r * 2, bevelEnabled: true, bevelThickness: r, bevelSize: r * 0.4, bevelSegments: 6, curveSegments: 8 });
+  g.rotateX(-Math.PI / 2);
+  g.translate(0, -(h - r * 2) / 2, 0);
   g.computeVertexNormals();
   return g;
 }
@@ -323,17 +267,17 @@ const C3 = buildColumn({ ...COL, shaft: COL.shaft + GROUND / U });
 scene.add(C3.col);
 const bobAt = (t) => COL.bob * Math.sin((TAU * t) / 4);
 
-// a soft shadow on the abacus under the hovering globe, darker as it comes down
-const blobTex = (() => {
+// the soft shadow blob of broadcast's plinth (stage.js makePlinth), on the abacus under the globe
+const blob = (() => {
   const c = canvas(256, 256), g = c.getContext('2d'), r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
-  r.addColorStop(0, 'rgba(4,8,50,0.85)'); r.addColorStop(0.5, 'rgba(4,8,50,0.35)'); r.addColorStop(1, 'rgba(4,8,50,0)');
+  r.addColorStop(0, 'rgba(10,16,60,0.6)'); r.addColorStop(0.55, 'rgba(10,16,60,0.21)'); r.addColorStop(1, 'rgba(10,16,60,0)');
   g.fillStyle = r; g.fillRect(0, 0, 256, 256);
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.45, 1.45), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, toneMapped: false }));
+  m.rotation.x = -Math.PI / 2; m.position.y = C3.abacusTop + 0.003;
+  scene.add(m);
+  return m;
 })();
-const blob = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, toneMapped: false }));
-blob.rotation.x = -Math.PI / 2;
-blob.position.y = C3.abacusTop + 0.003;
-scene.add(blob);
 
 // Frame the monument: a far camera looking at the globe's centre; the canvas is cropped to the
 // monument by projecting the column's corners and every pose of the spinning, bobbing globe.
@@ -349,253 +293,190 @@ const fit = (v) => { const p = v.clone().project(camera); const x = (p.x * FULL)
 for (const v of C3.pts) fit(v);
 for (let k = 0; k < 64; k++) { const a = (k / 64) * TAU; for (const e of [-0.6, 0, 0.6]) for (const b of [-COL.bob, COL.bob]) { fit(new THREE.Vector3(Math.cos(a) * Math.cos(e) * 1.08, Math.sin(e) * 1.08 + b, Math.sin(a) * Math.cos(e) * 1.08)); fit(new THREE.Vector3(0, 1.08 + b, 0)); } }
 const GX0 = Math.floor(bx0) - 6, GY0 = Math.floor(by0) - 6;
-const DW = Math.ceil(bx1) + 6 - GX0, DH = Math.min(Math.ceil(by1) + 6, H - G.y) - GY0; // nothing below the stage
+const DW = Math.ceil(bx1) + 6 - GX0, DH = Math.min(Math.ceil(by1) + 6, tickerTop - G.y) - GY0; // it stands on the crawl
 camera.setViewOffset(FULL, FULL, FULL / 2 + GX0, FULL / 2 + GY0, DW, DH);
 renderer.setSize(DW, DH, false);
 Object.assign(gl.style, { left: G.x + GX0 + 'px', top: G.y + GY0 + 'px', width: DW + 'px', height: DH + 'px' });
 
-const YAW0 = -25, TURN = 4, HOLD_T = 0.4; // three turns a loop, easing to a near-stop on the hero pose (cut three-quarter on)
+const YAW0 = -25, TURN = 4, HOLD_T = 0.4; // three turns a loop, easing to a near-stop on the hero pose (the cut three-quarter on)
 const yawAt = (t) => { const u = (t - HOLD_T) / TURN; return (YAW0 * Math.PI) / 180 + TAU * u - 0.7 * Math.sin(TAU * u); };
 function drawGlobe(t) {
   pivot.rotation.y = yawAt(t);
   pivot.position.y = bobAt(t);
   const lift = (pivot.position.y + COL.bob) / (2 * COL.bob); // 0 low .. 1 high
-  blob.material.opacity = 0.85 - 0.3 * lift;
-  blob.scale.setScalar(0.9 + 0.2 * lift);
+  blob.material.opacity = 1 - 0.35 * lift;
+  blob.scale.setScalar(0.92 + 0.16 * lift);
   renderer.render(scene, camera);
 }
 
-// ---------- the overlay: sticker, burst, strips, sparkles, crawl ----------
-const ox = sizeCanvas($('over'));
+// ---------- the overlay: sticker, burst, strips, glints, crawl ----------
+const ox = layer('#over');
 const ease = (x) => x * x * (3 - 2 * x);
 const frac = (x) => x - Math.floor(x);
-// a two-state flip on the 2 Hz beat with a short crossfade: 0 on the first half second, 1 on the second
-const FADE = 0.07;
+// two states on the 2 Hz beat with a short crossfade: 0 for the first half second, 1 for the second
+const FADE = 0.06;
 const flip = (t) => { const x = frac(t); return x < FADE ? 1 - ease(x / FADE) : x < 0.5 ? 0 : x < 0.5 + FADE ? ease((x - 0.5) / FADE) : 1; };
 
-// The -30% sticker: a glossy hot-pink dot slapped on the globe, its lower-right edge peeling up to
-// show the white back. Drawn once; it hops on the off-beat.
+// The -30% sticker: a pink dot in the manner of broadcast's yellow oval (a radial highlight, an
+// inset rim, a hard navy shadow), white slanted lettering, its lower-right edge peeling up to
+// show the white back. It hops on the off-beat.
 function buildSticker({ r: R }) {
-  const S = Math.ceil(R * 2.8), c = canvas(S, S), x = c.getContext('2d'), C = S / 2 - R * 0.04;
-  const k = R * 0.95; // the fold line: x + y = k (from the centre)
+  const S = Math.ceil(R * 2.6), c = canvas(S, S), x = c.getContext('2d'), C = Math.round(S / 2 - R * 0.06);
+  const k = R * 0.95; // the fold line: x + y = k, from the centre
+  const unpeeled = () => { x.beginPath(); x.moveTo(-3 * R, k + 3 * R); x.lineTo(k + 3 * R, -3 * R); x.lineTo(-3 * R, -3 * R); x.closePath(); x.clip(); };
+  const disc = (cx = 0, cy = 0) => { x.beginPath(); x.arc(cx, cy, R, 0, TAU); };
   x.translate(C, C);
-  const body = () => { x.beginPath(); x.arc(0, 0, R, 0, TAU); x.clip(); x.beginPath(); x.moveTo(-3 * R, k + 3 * R); x.lineTo(k + 3 * R, -3 * R); x.lineTo(-3 * R, -3 * R); x.closePath(); };
-  // hard navy drop shadow under the stuck-down part
-  x.save(); x.translate(R * 0.09, R * 0.11); body(); x.clip(); x.fillStyle = 'rgba(8,12,90,0.92)'; x.fillRect(-2 * R, -2 * R, 4 * R, 4 * R); x.restore();
-  // the dot
-  x.save(); body(); x.clip();
-  let g = x.createRadialGradient(-R * 0.35, -R * 0.4, R * 0.05, -R * 0.1, -R * 0.1, R * 1.25);
-  g.addColorStop(0, '#ffc2e2'); g.addColorStop(0.25, '#ff6ab8'); g.addColorStop(0.65, '#ff2d95'); g.addColorStop(1, '#c80a66');
+  x.save(); x.translate(R * 0.075, R * 0.085); unpeeled(); disc(); x.fillStyle = HARD; x.fill(); x.restore();
+  x.save(); unpeeled(); disc(); x.clip();
+  const g = x.createRadialGradient(-R * 0.2, -R * 0.4, 0, -R * 0.2, -R * 0.4, R * 1.45);
+  g.addColorStop(0, '#ff9fd0'); g.addColorStop(0.72, '#ff2d95'); g.addColorStop(1, '#e8107c');
   x.fillStyle = g; x.fillRect(-2 * R, -2 * R, 4 * R, 4 * R);
-  // a gloss crescent across the top
-  x.beginPath(); x.ellipse(-R * 0.12, -R * 0.42, R * 0.78, R * 0.42, -0.35, 0, TAU);
-  g = x.createLinearGradient(0, -R, 0, -R * 0.05); g.addColorStop(0, 'rgba(255,255,255,0.65)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-  x.fillStyle = g; x.fill();
-  // printed rim
-  x.beginPath(); x.arc(0, 0, R - R * 0.025, 0, TAU); x.lineWidth = R * 0.05; x.strokeStyle = '#a3004f'; x.stroke();
-  x.beginPath(); x.arc(0, 0, R * 0.86, 0, TAU); x.lineWidth = R * 0.025; x.strokeStyle = 'rgba(255,255,255,0.75)'; x.setLineDash([R * 0.09, R * 0.07]); x.stroke(); x.setLineDash([]);
+  disc(); x.lineWidth = R * 0.09; x.strokeStyle = 'rgba(150,0,70,0.5)'; x.stroke(); // inset 0 0 0 4px
   x.restore();
   // the word, a little crooked
-  const word = typeSprite('-30%', { size: 10, face: 'white' });
-  const sz = Math.floor((10 * R * 1.42) / word.inkW);
-  const cap = capOf(DISPLAY, sz);
-  const w = typeSprite('-30%', { size: sz, face: 'white', ext: cap * 0.12, line: Math.max(2, cap * 0.07), extColor: '#5a0030', lineColor: '#5a0030' });
-  x.save(); x.translate(-R * 0.08, -R * 0.12); x.rotate((-10 * Math.PI) / 180);
-  x.drawImage(w.c, -w.pad - w.inkW / 2, -w.oy + cap / 2); x.restore();
-  // the flap: the lifted cap folded back across the fold line, white backing paper, curling
-  x.save();
-  x.beginPath(); x.arc(k, k, R, 0, TAU); x.clip();
-  x.beginPath(); x.moveTo(-3 * R, k + 3 * R); x.lineTo(k + 3 * R, -3 * R); x.lineTo(-3 * R, -3 * R); x.closePath(); x.clip();
-  x.shadowColor = 'rgba(70,0,40,0.55)'; x.shadowBlur = R * 0.12; x.shadowOffsetX = -R * 0.04; x.shadowOffsetY = R * 0.05;
-  const n = Math.SQRT1_2;
-  g = x.createLinearGradient((k / 2) * 1, (k / 2) * 1, (k / 2) - R * 0.5 * n, (k / 2) - R * 0.5 * n);
-  g.addColorStop(0, '#ffffff'); g.addColorStop(0.35, '#f1f2f8'); g.addColorStop(1, '#a9adc4');
-  x.fillStyle = g; x.fillRect(-2 * R, -2 * R, 5 * R, 5 * R);
+  const st = { ...STY.pct, fill: '#ffffff', steps: 4, step: 2 / 150 };
+  const size = Math.floor(fitSize('-30%', BLACK, SKEW, st.ls, R * 1.52));
+  const w = typeSprite('-30%', size, st);
+  x.save(); x.translate(-R * 0.1, -R * 0.1); x.rotate((-10 * Math.PI) / 180);
+  x.drawImage(w.c, Math.round(-w.pad - w.inkW / 2), Math.round(-w.oy + w.cap / 2)); x.restore();
+  // the flap: the lifted cap folded back across the fold line, white backing paper
+  x.save(); disc(k, k); x.clip(); unpeeled();
+  x.shadowColor = 'rgba(6,8,70,0.45)'; x.shadowBlur = R * 0.08; x.shadowOffsetX = -R * 0.03; x.shadowOffsetY = R * 0.04;
+  const fg = x.createLinearGradient(k / 2, k / 2, k / 2 - R * 0.35, k / 2 - R * 0.35);
+  fg.addColorStop(0, '#ffffff'); fg.addColorStop(0.5, '#eef0f7'); fg.addColorStop(1, '#b9bdd0');
+  x.fillStyle = fg; x.fillRect(-2 * R, -2 * R, 5 * R, 5 * R);
   x.restore();
-  // a crisp edge on the flap's curve
-  x.save(); x.beginPath(); x.moveTo(-3 * R, k + 3 * R); x.lineTo(k + 3 * R, -3 * R); x.lineTo(-3 * R, -3 * R); x.closePath(); x.clip();
-  x.beginPath(); x.arc(k, k, R, 0, TAU); x.lineWidth = R * 0.025; x.strokeStyle = '#8c90a8'; x.stroke(); x.restore();
-  return { c, C, R };
+  return { c, C };
 }
 const sticker = buildSticker(F.sticker);
 function drawSticker(t) {
-  const x = frac(t + 0.5), air = 0.3; // hops on the off-beat
+  const x = frac(t + 0.5), air = 0.3; // a little hop on the off-beat
   const u = x < air ? x / air : 0;
   const hop = F.sticker.r * 0.14 * 4 * u * (1 - u);
   ox.drawImage(sticker.c, Math.round(F.sticker.x - sticker.C), Math.round(F.sticker.y - sticker.C - hop));
 }
 
-// The starburst: sixteen glossy red points with a yellow rim and a hard navy shadow, turning
-// slowly (six of its own steps a loop) and pumping on the beat; the word swaps yellow and white.
+// The starburst: broadcast's red with a radial highlight, a black keyline (the price card's
+// border) and a hard navy shadow; the word in the yellow slanted sale type, white on the
+// off-beat. It pumps on the beat.
 const B = F.burst;
-const burstWords = (() => {
-  const probe = typeSprite(B.word, { size: 10 });
-  const sz = Math.floor((10 * B.r * 1.28) / probe.inkW), cap = capOf(DISPLAY, sz);
-  const o = { size: sz, ext: cap * 0.13, line: Math.max(2, cap * 0.08), extColor: '#3a0000', lineColor: '#3a0000' };
-  return { a: typeSprite(B.word, { ...o, face: 'yellow' }), b: typeSprite(B.word, { ...o, face: 'white' }), cap };
+const burstWord = (() => {
+  const st = { ...STY.pct, steps: 4, step: 2 / 150 };
+  const size = Math.floor(fitSize(B.word, BLACK, SKEW, st.ls, B.r * 1.3));
+  return { a: typeSprite(B.word, size, st), b: typeSprite(B.word, size, { ...st, fill: '#ffffff' }) };
 })();
-function burstPath(x, R, rot) {
+function burstPath(R) {
   const N = 16;
-  x.beginPath();
-  for (let i = 0; i < N * 2; i++) { const a = (i / (N * 2)) * TAU + rot, r = i % 2 ? R * 0.76 : R; x.lineTo(Math.sin(a) * r, -Math.cos(a) * r); }
-  x.closePath();
+  ox.beginPath();
+  for (let i = 0; i < N * 2; i++) { const a = (i / (N * 2)) * TAU, r = i % 2 ? R * 0.76 : R; ox.lineTo(Math.sin(a) * r, -Math.cos(a) * r); }
+  ox.closePath();
 }
 function drawBurst(t) {
-  const xb = frac(t), atk = 0.07;
-  const pulse = xb < atk ? Math.exp(-(1 - atk) * 4.5) + (1 - Math.exp(-(1 - atk) * 4.5)) * ease(xb / atk) : Math.exp(-(xb - atk) * 4.5);
-  const s = 0.9 + 0.11 * pulse, R = B.r * s, rot = ((11.25 * t) * Math.PI) / 180;
-  ox.save(); ox.translate(B.x, B.y);
-  const sh = B.r * 0.085;
-  ox.save(); ox.translate(sh, sh); burstPath(ox, R, rot); ox.fillStyle = NAVY; ox.fill(); ox.restore();
-  burstPath(ox, R, rot);
-  ox.lineJoin = 'round'; ox.lineWidth = B.r * 0.1; ox.strokeStyle = INK; ox.stroke();
-  const g = ox.createRadialGradient(-R * 0.3, -R * 0.35, R * 0.05, 0, 0, R);
-  g.addColorStop(0, '#ff9a80'); g.addColorStop(0.3, '#ff3b22'); g.addColorStop(0.7, '#e80800'); g.addColorStop(1, '#a00000');
+  const xb = frac(t), atk = 0.07, rest = Math.exp(-(1 - atk) * 4.5);
+  const pulse = xb < atk ? rest + (1 - rest) * ease(xb / atk) : Math.exp(-(xb - atk) * 4.5);
+  const s = 0.9 + 0.1 * pulse, R = B.r;
+  ox.save(); ox.translate(B.x, B.y); ox.scale(s, s);
+  ox.save(); ox.translate(R * 0.07, R * 0.08); burstPath(R); ox.fillStyle = HARD; ox.fill(); ox.restore();
+  burstPath(R);
+  const g = ox.createRadialGradient(-R * 0.2, -R * 0.4, 0, -R * 0.2, -R * 0.4, R * 1.5);
+  g.addColorStop(0, '#ff8a6e'); g.addColorStop(0.72, RED); g.addColorStop(1, '#d40000');
   ox.fillStyle = g; ox.fill();
-  ox.lineWidth = B.r * 0.045; ox.strokeStyle = '#ffe11a'; ox.stroke();
-  ox.save(); burstPath(ox, R * 0.97, rot); ox.clip();
-  ox.beginPath(); ox.ellipse(-R * 0.08, -R * 0.42, R * 0.78, R * 0.4, -0.2, 0, TAU);
-  const gl2 = ox.createLinearGradient(0, -R * 0.85, 0, -R * 0.05); gl2.addColorStop(0, 'rgba(255,255,255,0.55)'); gl2.addColorStop(1, 'rgba(255,255,255,0)');
-  ox.fillStyle = gl2; ox.fill(); ox.restore();
-  // the word, pumping with the burst
-  const f = flip(t), w = burstWords;
-  ox.scale(s, s); ox.rotate((-8 * Math.PI) / 180);
-  const dx = -w.a.pad - w.a.inkW / 2, dy = -w.a.oy + w.cap / 2;
+  ox.lineJoin = 'round'; ox.lineWidth = Math.max(3, R * 0.04); ox.strokeStyle = '#000'; ox.stroke();
+  const f = flip(t), w = burstWord;
+  ox.rotate((-8 * Math.PI) / 180);
+  const dx = Math.round(-w.a.pad - w.a.inkW / 2), dy = Math.round(-w.a.oy + w.a.cap / 2);
   ox.drawImage(w.a.c, dx, dy);
   if (f > 0) { ox.globalAlpha = f; ox.drawImage(w.b.c, dx, dy); }
   ox.restore();
 }
 
-// The strips: a chunky yellow sale tape at a slant, running off both edges, black lettering that
-// flashes red; tucked under it at the same angle a slim navy tape with white lettering.
+// The strips, at a slant and running off both edges: broadcast's yellow pill (gradient, inset
+// rim, hard navy shadow, black Arimo bold italic) stretched into a chunky tape, its lettering
+// flashing red; tucked under it a slim navy tape with white lettering.
 function buildStrip(it, ink) {
   const ang = (it.angle * Math.PI) / 180, L = W / Math.cos(ang) + 240, Hs = it.h;
   const span = Math.ceil(Math.abs(L * Math.sin(ang)) + Hs * Math.cos(ang)) + 60;
   const c = canvas(W, span), x = c.getContext('2d'), cy = span / 2;
-  const sh = it.sub ? Hs * 0.16 : Hs * 0.11;
   const band = (dx, dy) => { x.setTransform(1, 0, 0, 1, W / 2 + dx, cy + dy); x.rotate(ang); };
-  band(sh, sh); x.fillStyle = it.sub ? 'rgba(2,4,40,0.9)' : NAVY; x.fillRect(-L / 2, -Hs / 2, L, Hs);
+  const sh = Math.round(Hs * 0.085);
+  if (!it.sub) { band(sh, sh); x.fillStyle = HARD; x.fillRect(-L / 2, -Hs / 2, L, Hs); }
   band(0, 0);
-  let g = x.createLinearGradient(0, -Hs / 2, 0, Hs / 2);
-  if (it.sub) { g.addColorStop(0, '#2c46d8'); g.addColorStop(0.1, '#16259e'); g.addColorStop(0.5, '#0d1780'); g.addColorStop(0.53, '#0a1268'); g.addColorStop(1, '#050a48'); }
-  else { g.addColorStop(0, '#fffbd0'); g.addColorStop(0.08, '#fff36a'); g.addColorStop(0.46, '#ffe714'); g.addColorStop(0.5, '#ffd400'); g.addColorStop(0.9, '#f7b400'); g.addColorStop(1, '#d08c00'); }
-  x.fillStyle = g; x.fillRect(-L / 2, -Hs / 2, L, Hs);
-  // crisp edges: a dark keyline outside, pinstripes inside
-  x.fillStyle = it.sub ? '#000022' : INK;
-  const kl = Math.max(2, Hs * 0.03);
-  x.fillRect(-L / 2, -Hs / 2 - kl, L, kl); x.fillRect(-L / 2, Hs / 2, L, kl);
-  if (!it.sub) {
-    x.fillStyle = 'rgba(200,120,0,0.75)';
-    const p = Hs * 0.1, t = Math.max(2, Hs * 0.022);
-    x.fillRect(-L / 2, -Hs / 2 + p, L, t); x.fillRect(-L / 2, Hs / 2 - p - t, L, t);
-    x.fillStyle = 'rgba(255,255,255,0.6)';
-    x.fillRect(-L / 2, -Hs / 2 + p + t, L, t * 0.6);
+  if (it.sub) {
+    x.fillStyle = SHADE; x.fillRect(-L / 2, -Hs / 2, L, Hs);
   } else {
-    x.fillStyle = 'rgba(120,150,255,0.8)'; x.fillRect(-L / 2, -Hs / 2, L, Math.max(1.5, Hs * 0.035));
+    const g = x.createLinearGradient(0, -Hs / 2, 0, Hs / 2); g.addColorStop(0, '#fffb86'); g.addColorStop(1, '#f0e11c');
+    x.fillStyle = g; x.fillRect(-L / 2, -Hs / 2, L, Hs);
+    const rim = Math.max(3, Math.round(Hs * 0.055)); // inset 0 0 0 4px rgba(170,158,0,0.6)
+    x.fillStyle = 'rgba(170,158,0,0.6)'; x.fillRect(-L / 2, -Hs / 2, L, rim); x.fillRect(-L / 2, Hs / 2 - rim, L, rim);
   }
-  // the lettering
   x.setTransform(1, 0, 0, 1, 0, 0);
-  const font = it.sub ? TAPE : DISPLAY;
-  const ls = it.sub ? it.cap * 0.32 : it.cap * 0.04;
-  const probe = inkOf(it.s, font, 100, SKEW, ls * 100 / it.cap);
-  const size = Math.round((it.cap / capOf(font, 100)) * 100);
-  const spr = typeSprite(it.s, it.sub
-    ? { font, size, ls, face: 'white', ext: it.cap * 0.1, line: 0, extColor: '#000020' }
-    : { font, size, ls, face: ink, ext: it.cap * 0.07, line: 0, extColor: 'rgba(150,80,0,0.55)', bevel: 0.025 });
+  const st = it.sub
+    ? { font: ARIMO, k: 0, ls: 0.14, fill: '#ffffff' }
+    : { font: ARIMO, k: 0, ls: 0.01, fill: ink };
+  const size = Math.round((it.cap * 100) / capOf(st.font, 100));
+  const spr = typeSprite(it.s, size, st);
   band(it.dx, 0);
   x.drawImage(spr.c, -spr.pad - spr.inkW / 2, -spr.oy + spr.cap / 2);
-  void probe;
   return { c, y: Math.round(it.y - cy) };
 }
-const strips = F.strips.map((it) => ({ it, states: it.sub ? [buildStrip(it, 'white')] : [buildStrip(it, 'black'), buildStrip(it, 'red')] }));
+const strips = F.strips.map((it) => (it.sub ? [buildStrip(it, '#ffffff')] : [buildStrip(it, '#111111'), buildStrip(it, RED)]));
 function drawStrips(t) {
   const f = flip(t);
-  for (const { states } of strips) {
-    ox.drawImage(states[0].c, 0, states[0].y);
-    if (states[1] && f > 0) { ox.globalAlpha = f; ox.drawImage(states[1].c, 0, states[1].y); ox.globalAlpha = 1; }
+  for (const [a, b] of strips) {
+    ox.drawImage(a.c, 0, a.y);
+    if (b && f > 0) { ox.globalAlpha = f; ox.drawImage(b.c, 0, b.y); ox.globalAlpha = 1; }
   }
 }
 
-// Sparkles: glowing four-point lens glints that twinkle once a second and then pop up at the
-// next spot, wandering round the banner.
-const STAR = new Path2D('M0,-1 C0.05,-0.2 0.2,-0.05 1,0 C0.2,0.05 0.05,0.2 0,1 C-0.05,0.2 -0.2,0.05 -1,0 C-0.2,-0.05 -0.05,-0.2 0,-1Z');
-function glint(x, y, R, e, rot) {
-  if (e <= 0.001) return;
-  ox.save(); ox.translate(x, y);
-  ox.globalCompositeOperation = 'lighter';
-  let g = ox.createRadialGradient(0, 0, 0, 0, 0, R * 1.1 * e);
-  g.addColorStop(0, 'rgba(200,235,255,0.75)'); g.addColorStop(0.25, 'rgba(120,190,255,0.3)'); g.addColorStop(1, 'rgba(60,120,255,0)');
-  ox.fillStyle = g; ox.beginPath(); ox.arc(0, 0, R * 1.1 * e, 0, TAU); ox.fill();
-  // long thin flares, like a cross filter on the studio camera
-  for (const [w, h] of [[R * 2.6, R * 0.05], [R * 0.05, R * 1.9]]) {
-    const lg = w > h ? ox.createLinearGradient(-w * e, 0, w * e, 0) : ox.createLinearGradient(0, -h * e, 0, h * e);
-    lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, 'rgba(255,255,255,0.85)'); lg.addColorStop(1, 'rgba(255,255,255,0)');
-    ox.fillStyle = lg; ox.fillRect(-w * e, -h * e, w * 2 * e, h * 2 * e);
-  }
-  ox.globalCompositeOperation = 'source-over';
-  ox.rotate(rot); ox.scale(R * e, R * e);
-  ox.shadowColor = 'rgba(255,255,255,0.9)'; ox.shadowBlur = R * 0.35;
-  ox.fillStyle = '#ffffff'; ox.fill(STAR);
-  ox.restore();
-}
-function drawSparkles(t) {
+// Glints: broadcast's four-point stars with a white glow, each flaring once a second and then
+// popping up at its next spot.
+const STAR = new Path2D('M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z');
+function drawGlints(t) {
   for (const s of F.sparkles) {
     const spots = [[s.x, s.y], ...(s.at || [])];
-    const c = t + (s.ph ? 0.5 : 0); // one twinkle a second; the second one is half a cycle behind
-    const k = frac(c), spot = spots[Math.floor(c) % spots.length];
-    const e = k < 0.75 ? Math.pow(Math.sin((Math.PI * k) / 0.75), 0.8) : 0;
-    glint(spot[0], spot[1], F.spark, e, (k * Math.PI) / 4);
+    const c = t + (s.ph ? 0.5 : 0), p = frac(c) / 0.75; // visible for three quarters of a second
+    if (p >= 1) continue;
+    const [x, y] = spots[Math.floor(c) % spots.length], k = Math.sin(p * Math.PI), r = (F.spark / 2) * k;
+    if (r < 0.5) continue;
+    ox.save(); ox.translate(x, y); ox.rotate(((-20 + 40 * p) * Math.PI) / 180); ox.scale(r, r);
+    ox.shadowColor = '#ffffff'; ox.shadowBlur = 6; ox.fillStyle = '#ffffff';
+    ox.fill(STAR); ox.fill(STAR);
+    ox.restore();
   }
 }
 
-// The crawl: a broadcast lower third on the bottom edge. A gold rule, a glossy navy bar and the
-// five lines in slanted yellow, separated by stars, crawling right to left, a whole number of
+// The crawl on the bottom edge: broadcast's lower crawl type (yellow, slanted, three navy steps)
+// with its four-point stars between the lines, on the fine-print bar's navy, a whole number of
 // passes per loop.
 const T = F.ticker;
 const crawl = (() => {
-  const th = T.h, rule = Math.max(4, Math.round(th * 0.07));
-  const cap = Math.round((th - rule) * 0.4);
-  const size = Math.round((cap / capOf(CRAWL, 100)) * 100);
-  const pieces = TICKER.map((s) => typeSprite(s, { font: CRAWL, size, face: 'yellow', ext: Math.max(2, cap * 0.09), line: 0, extColor: '#01031f', bevel: 0.02 }));
-  const starR = cap * 0.62, gap = cap * 0.9;
+  const cap = Math.round(T.h * 0.42);
+  const size = Math.round((cap * 100) / capOf(BLACK, 100));
+  const pieces = TICKER.map((s) => typeSprite(s, size, STY.crawl));
+  const starR = cap * 0.55, gap = cap * 0.75, depth = Math.round(3 * STY.crawl.step * size);
   const L = Math.round(pieces.reduce((n, p) => n + p.inkW + gap * 2 + starR * 2, 0));
-  const h = Math.max(...pieces.map((p) => p.c.height));
-  const oy = Math.max(...pieces.map((p) => p.oy));
-  const strip = canvas(L + 40, h), x = strip.getContext('2d');
+  const oy = Math.max(...pieces.map((p) => p.oy)), h = Math.max(...pieces.map((p) => p.c.height - p.oy)) + oy;
+  const strip = canvas(L + 60, h), x = strip.getContext('2d');
   let at = 0;
   for (const p of pieces) {
-    x.drawImage(p.c, at - p.pad, oy - p.oy);
+    x.drawImage(p.c, Math.round(at - p.pad), oy - p.oy);
     at += p.inkW + gap;
-    // a glossy gold star
-    x.save(); x.translate(at + starR, oy - cap / 2);
-    x.beginPath(); for (let i = 0; i < 10; i++) { const a = (i / 10) * TAU, r = i % 2 ? starR * 0.42 : starR; x.lineTo(Math.sin(a) * r, -Math.cos(a) * r); } x.closePath();
-    x.save(); x.translate(2, 2); x.fillStyle = '#01031f'; x.fill(); x.restore();
-    const g = x.createLinearGradient(0, -starR, 0, starR); g.addColorStop(0, '#ffffff'); g.addColorStop(0.45, '#fff35c'); g.addColorStop(0.55, '#ffcf00'); g.addColorStop(1, '#f09a00');
-    x.fillStyle = g; x.fill(); x.restore();
+    x.save(); x.translate(at + starR, oy - cap / 2); x.scale(starR, starR);
+    x.fillStyle = SHADE; for (let i = depth; i >= 1; i--) { x.save(); x.translate(i / starR, i / starR); x.fill(STAR); x.restore(); }
+    x.fillStyle = YELLOW; x.fill(STAR); x.restore();
     at += starR * 2 + gap;
   }
-  // the bar, drawn once
-  const bar = canvas(W, th), b = bar.getContext('2d');
-  let g = b.createLinearGradient(0, rule, 0, th);
-  g.addColorStop(0, '#2638c4'); g.addColorStop(0.08, '#1426a8'); g.addColorStop(0.5, '#0b178a'); g.addColorStop(0.52, '#08126e'); g.addColorStop(1, '#040a4a');
-  b.fillStyle = g; b.fillRect(0, rule, W, th - rule);
-  g = b.createLinearGradient(0, 0, 0, rule);
-  g.addColorStop(0, '#fff9b8'); g.addColorStop(0.4, '#ffe21a'); g.addColorStop(1, '#d99a00');
-  b.fillStyle = g; b.fillRect(0, 0, W, rule);
-  b.fillStyle = '#01031f'; b.fillRect(0, rule, W, Math.max(2, rule * 0.35));
   const passes = Math.max(1, Math.round((T.speed * DURATION) / L));
-  const textY = rule + (th - rule) / 2 + cap / 2 - oy; // the strip's top, so caps sit centred in the bar
-  return { strip, bar, L, passes, textY, rule };
+  return { strip, L, passes, lead: Math.round(gap * 0.6), y: Math.round(tickerTop + T.h / 2 + cap / 2 - oy) };
 })();
 function drawCrawl(t) {
-  const M = crawl, y0 = tickerTop;
-  ox.drawImage(M.bar, 0, y0);
+  const M = crawl;
+  ox.fillStyle = 'rgba(2,4,52,0.72)'; ox.fillRect(0, tickerTop, W, T.h); // the fine-print bar
   // phased so that frame 12, the still everyone sees, opens on "But wait…"
-  const lead = Math.round(W * 0.025);
-  const start = (0.4 / DURATION) * M.L * M.passes + lead;
+  const start = (0.4 / DURATION) * M.L * M.passes + M.lead;
   const off = ((((t / DURATION) * M.L * M.passes - start) % M.L) + M.L) % M.L;
-  ox.save(); ox.beginPath(); ox.rect(0, y0 + M.rule, W, T.h - M.rule); ox.clip();
-  for (let x = -off; x < W; x += M.L) ox.drawImage(M.strip, Math.round(x), Math.round(y0 + M.textY));
+  ox.save(); ox.beginPath(); ox.rect(0, tickerTop, W, T.h); ox.clip();
+  for (let x = -off; x < W; x += M.L) ox.drawImage(M.strip, Math.round(x), M.y);
   ox.restore();
 }
 
@@ -603,19 +484,19 @@ function drawCrawl(t) {
 function setTime(t) {
   t = ((t % DURATION) + DURATION) % DURATION;
   drawGlobe(t);
-  // the blinking lines: yellow on the beat, white on the off-beat
-  ux.clearRect(0, 0, W, H);
+  // BLACK FRIDAY ONLY! blinks: yellow on the beat, white on the off-beat
+  blinkCtx.clearRect(0, 0, W, H);
   const f = flip(t);
-  for (const L of typeLayers) if (L.b) {
-    ux.globalAlpha = 1; ux.drawImage(L.a.c, L.x, L.y);
-    if (f > 0) { ux.globalAlpha = f; ux.drawImage(L.b.c, L.x, L.y); }
+  for (const L of blinkers) {
+    blinkCtx.globalAlpha = 1; blinkCtx.drawImage(L.a.c, L.x, L.y);
+    if (f > 0) { blinkCtx.globalAlpha = f; blinkCtx.drawImage(L.b.c, L.x, L.y); }
   }
-  ux.globalAlpha = 1;
+  blinkCtx.globalAlpha = 1;
   ox.clearRect(0, 0, W, H);
   drawSticker(t);
   drawBurst(t);
   drawStrips(t);
-  drawSparkles(t);
+  drawGlints(t);
   drawCrawl(t);
 }
 
