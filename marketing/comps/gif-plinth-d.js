@@ -461,7 +461,8 @@ pivot.add(globe);
 
 // A Tuscan order in chrome: square abacus, ovolo echinus, a collar, a fluted shaft with entasis,
 // a torus and a square plinth on one step. y runs down from the globe's south pole.
-function buildColumn({ shaft = 3, flutes = 12, steps = 1 } = {}) {
+// wide scales it across (a squat display plinth); gap is the air between the globe and the abacus.
+function buildColumn({ shaft = 3, flutes = 12, steps = 1, wide = 1, gap = 0 } = {}) {
   // the globe's own chrome, with the studio turned a little so the column's front faces catch
   // the softboxes rather than the dark floor
   const mat = materials.chrome();
@@ -470,7 +471,7 @@ function buildColumn({ shaft = 3, flutes = 12, steps = 1 } = {}) {
   mat.envMapRotation.set((Number(q.get('colrx') ?? 15) * Math.PI) / 180, (Number(q.get('colry') ?? 0) * Math.PI) / 180, 0);
   const col = new THREE.Group();
   const pts = []; // bound points
-  let y = -1.035;
+  let y = -1.035 - gap;
   let id = 2; // each moulding gets its own id for the line pass
   const add = (m) => { m.userData.part = id++; col.add(m); return m; };
   const slab = (w, h) => {
@@ -519,9 +520,13 @@ function buildColumn({ shaft = 3, flutes = 12, steps = 1 } = {}) {
   { const tor = add(new THREE.Mesh(new THREE.TorusGeometry(rBot + 0.05, 0.08, 16, 64), mat)); tor.rotation.x = Math.PI / 2; tor.position.y = y - 0.08; y -= 0.16; }
   slab(1.04, 0.16);
   for (let k = 0; k < steps; k++) slab(1.3 + k * 0.26, 0.13);
+  col.scale.set(wide, 1, wide);
+  for (const v of pts) { v.x *= wide; v.z *= wide; }
   return { col, pts, bottom: y };
 }
 const C3 = buildColumn(globeItem.col || {});
+const BOB = (globeItem.col || {}).bob || 0; // the globe hovers: a slow bob, in globe radii
+const bobAt = (t) => BOB * Math.sin((TAU * t) / 4);
 scene.add(C3.col);
 
 // Frame the monument: a far camera looking at the globe's centre; the crop is worked out by
@@ -536,7 +541,7 @@ const FULL = 2 * Math.tan((FOV * Math.PI) / 360) * DIST * U; // the full virtual
 let bx0 = 0, bx1 = 0, by0 = 0, by1 = 0;
 const fit = (v) => { const p = v.clone().project(camera); const x = (p.x * FULL) / 2 / SS, y = (-p.y * FULL) / 2 / SS; bx0 = Math.min(bx0, x); bx1 = Math.max(bx1, x); by0 = Math.min(by0, y); by1 = Math.max(by1, y); };
 for (const v of C3.pts) fit(v);
-for (let k = 0; k < 64; k++) { const a = (k / 64) * TAU; for (const e of [-0.6, 0, 0.6]) fit(new THREE.Vector3(Math.cos(a) * Math.cos(e) * 1.08, Math.sin(e) * 1.08, Math.sin(a) * Math.cos(e) * 1.08)); fit(new THREE.Vector3(0, 1.08, 0)); }
+for (let k = 0; k < 64; k++) { const a = (k / 64) * TAU; for (const e of [-0.6, 0, 0.6]) for (const b of [-BOB, BOB]) { fit(new THREE.Vector3(Math.cos(a) * Math.cos(e) * 1.08, Math.sin(e) * 1.08 + b, Math.sin(a) * Math.cos(e) * 1.08)); fit(new THREE.Vector3(0, 1.08 + b, 0)); } }
 const GX0 = Math.floor(bx0) - 1, GY0 = Math.floor(by0) - 1, DW = Math.ceil(bx1) + 2 - GX0, DH = Math.ceil(by1) + 2 - GY0;
 camera.setViewOffset(FULL, FULL, FULL / 2 + GX0 * SS, FULL / 2 + GY0 * SS, DW * SS, DH * SS);
 renderer.setSize(DW * SS, DH * SS, false);
@@ -610,6 +615,7 @@ function drawGlobe(step) {
   globeStep = step;
   const t = step / GIF_FPS;
   pivot.rotation.y = yawAt(t);
+  pivot.position.y = bobAt(t);
   pivot.updateMatrixWorld(true);
   renderer.render(scene, camera);
   sx.clearRect(0, 0, DW, DH);
