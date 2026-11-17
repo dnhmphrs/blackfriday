@@ -53,8 +53,8 @@ const FORMATS = {
       { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 10, y: 148, align: 'l', st: 'body' },
       { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 10, y: 174, align: 'l', st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 10, y: 192, align: 'l', st: 'only' },
-      { t: 'globe', x: 224, y: 133, d: 96, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.75 } },
-      { t: 'sticker', x: 252, y: 96, r: 18, s: '-30%', f: `8px ${PS}` },
+      { t: 'globe', x: 222, y: 90, d: 90, col: { shaft: 1.5, wide: 1.2, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
+      { t: 'sticker', x: 250, y: 56, r: 18, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 112, y: 222, r: 24, lines: ['NEW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 140, y: 30, ph: 0 },
       { t: 'sparkle', x: 152, y: 150, ph: 1 },
@@ -74,8 +74,8 @@ const FORMATS = {
       { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 51, y: 176, st: 'only' },
       { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 51, y: 194, st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 51, y: 212, st: 'only' },
-      { t: 'globe', x: 124, y: 219, d: 78, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.75 } },
-      { t: 'sticker', x: 155, y: 190, r: 17, s: '-30%', f: `8px ${PS}` },
+      { t: 'globe', x: 126, y: 202, d: 64, col: { shaft: 1.5, wide: 1.2, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
+      { t: 'sticker', x: 152, y: 178, r: 15, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 46, y: 270, r: 24, lines: ['WOW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
       { t: 'sparkle', x: 166, y: 62, ph: 1 },
@@ -92,8 +92,8 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 194, y: 58, d: 72, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.75 } },
-      { t: 'sticker', x: 210, y: 30, r: 15, s: '-30%', f: `8px ${PS}` },
+      { t: 'globe', x: 196, y: 37, d: 64, col: { shaft: 1.5, wide: 1.2, gap: 0.18, steps: 2, bob: 0.05, size: 1 } },
+      { t: 'sticker', x: 172, y: 30, r: 14, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 138, y: 98, r: 18, lines: ['HOT!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 146, y: 22, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
@@ -300,7 +300,8 @@ for (const it of F.items) {
 }
 
 // A pixel starburst: red body with a dithered maroon inner ring, black keyline, navy drop shadow.
-// Two frames: the points jump half a step and the word swaps colour.
+// Two frames on the 2 Hz beat: it pumps (shrinks a size), the points jump half a step and the word
+// swaps colour.
 function burst(it) {
   const N = 16, R = it.r, size = R * 2 + 2;
   const frames = [0, 1].map((k) => {
@@ -308,7 +309,7 @@ function burst(it) {
     x.translate(size / 2, size / 2);
     x.beginPath();
     for (let i = 0; i < N * 2; i++) {
-      const a = (i / (N * 2)) * TAU + (k * Math.PI) / N, r = i % 2 ? R * 0.76 : R;
+      const Rk = k ? R * 0.84 : R, a = (i / (N * 2)) * TAU + (k * Math.PI) / N, r = i % 2 ? Rk * 0.76 : Rk;
       x.lineTo(Math.sin(a) * r, -Math.cos(a) * r);
     }
     x.closePath(); x.fillStyle = '#fff'; x.fill();
@@ -355,6 +356,7 @@ function sticker(it) {
   const body = (x, y) => inDisc(x, y) && !lifted(x, y);
   const word = sprite(textMask(it.s, it.f), { fill: 'white', band: 'white', hi: 'white', line: 0, ext: 1 });
   const wm = maskOf(word);
+  const frames = ['pink', 'yellow'].map((fill) => {
   const o = paint(N, N, (x, y) => {
     if (flap(x, y)) {
       const s = (x - cx) + (y - cy);
@@ -364,8 +366,8 @@ function sticker(it) {
     if (body(x, y)) {
       if (!body(x - 1, y) || !body(x, y - 1) || !body(x + 1, y) || !body(x, y + 1)) return 'black';
       const d = Math.hypot(x + 0.5 - cx + R * 0.35, y + 0.5 - cy + R * 0.35) / R;
-      if (d < 0.32 && (x + y) % 2 === 0) return 'hotpink';
-      return 'pink';
+      if (d < 0.32 && (x + y) % 2 === 0) return fill === 'pink' ? 'hotpink' : 'cream';
+      return fill;
     }
     // a hard navy drop shadow under the stuck-down part
     if (body(x - 2, y - 2) || body(x - 1, y - 2) || body(x - 2, y - 1)) return 'navy';
@@ -377,8 +379,10 @@ function sticker(it) {
   const ink = paint(word.width + 2, word.height + 2, (x, y) => (at(wm, x - 1, y - 1) || at(wm, x, y - 1) || at(wm, x - 2, y - 1) || at(wm, x - 1, y) || at(wm, x - 1, y - 2)) ? 'black' : null);
   ox.drawImage(ink, wx - 1, wy - 1);
   ox.drawImage(word, wx, wy);
-  // a straight sticker reads as stuck on: keep it still; the peel holds.
-  return { frames: [o], x: Math.round(it.x - cx), y: Math.round(it.y - cy), rate: 0 };
+  return o;
+  });
+  // it flashes pink / yellow on the off-beat to the bursts, like a 1997 "SALE!" sticker
+  return { frames: [frames[1], frames[0]], x: Math.round(it.x - cx), y: Math.round(it.y - cy), rate: 2 };
 }
 
 // A pixel sparkle: two frames on the beat, a small plus and a long four-point glint.
