@@ -53,8 +53,8 @@ const FORMATS = {
       { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 10, y: 148, align: 'l', st: 'body' },
       { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 10, y: 174, align: 'l', st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 10, y: 192, align: 'l', st: 'only' },
-      { t: 'globe', x: 221, y: 125, d: 90, col: { shaft: 0.55, wide: 1.25, gap: 0.22, steps: 2, bob: 0.05 } },
-      { t: 'sticker', x: 252, y: 90, r: 18, s: '-30%', f: `8px ${PS}` },
+      { t: 'globe', x: 224, y: 151, d: 96, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.5 } },
+      { t: 'sticker', x: 254, y: 114, r: 18, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 112, y: 222, r: 24, lines: ['NEW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 140, y: 30, ph: 0 },
       { t: 'sparkle', x: 152, y: 150, ph: 1 },
@@ -74,8 +74,8 @@ const FORMATS = {
       { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 42, y: 176, st: 'only' },
       { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 42, y: 194, st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 42, y: 212, st: 'only' },
-      { t: 'globe', x: 124, y: 228, d: 66, col: { shaft: 0.55, wide: 1.25, gap: 0.22, steps: 2, bob: 0.05 } },
-      { t: 'sticker', x: 152, y: 200, r: 16, s: '-30%', f: `8px ${PS}` },
+      { t: 'globe', x: 122, y: 236, d: 80, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.5 } },
+      { t: 'sticker', x: 154, y: 206, r: 17, s: '-30%', f: `8px ${PS}` },
       { t: 'burst', x: 40, y: 270, r: 24, lines: ['WOW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
       { t: 'sparkle', x: 166, y: 62, ph: 1 },
@@ -92,9 +92,9 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 192, y: 62, d: 64, col: { shaft: 0.55, wide: 1.25, gap: 0.22, steps: 2, bob: 0.05 } },
-      { t: 'sticker', x: 213, y: 31, r: 15, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 146, y: 88, r: 19, lines: ['HOT!'], f: `8px ${PS}` },
+      { t: 'globe', x: 192, y: 70, d: 80, col: { shaft: 0.55, wide: 1.25, gap: 0.18, steps: 2, bob: 0.05, size: 0.5 } },
+      { t: 'sticker', x: 210, y: 40, r: 16, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 138, y: 98, r: 18, lines: ['HOT!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 146, y: 22, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
@@ -465,7 +465,8 @@ pivot.add(globe);
 // A Tuscan order in chrome: square abacus, ovolo echinus, a collar, a fluted shaft with entasis,
 // a torus and a square plinth on one step. y runs down from the globe's south pole.
 // wide scales it across (a squat display plinth); gap is the air between the globe and the abacus.
-function buildColumn({ shaft = 3, flutes = 12, steps = 1, wide = 1, gap = 0 } = {}) {
+// size scales the whole plinth down against the globe.
+function buildColumn({ shaft = 3, flutes = 12, steps = 1, wide = 1, gap = 0, size = 1 } = {}) {
   // the globe's own chrome, with the studio turned a little so the column's front faces catch
   // the softboxes rather than the dark floor
   const mat = materials.chrome();
@@ -523,8 +524,10 @@ function buildColumn({ shaft = 3, flutes = 12, steps = 1, wide = 1, gap = 0 } = 
   { const tor = add(new THREE.Mesh(new THREE.TorusGeometry(rBot + 0.05, 0.08, 16, 64), mat)); tor.rotation.x = Math.PI / 2; tor.position.y = y - 0.08; y -= 0.16; }
   slab(1.04, 0.16);
   for (let k = 0; k < steps; k++) slab(1.3 + k * 0.26, 0.13);
-  col.scale.set(wide, 1, wide);
-  for (const v of pts) { v.x *= wide; v.z *= wide; }
+  const y0 = -1.035 - gap; // the top of the abacus stays put; everything below it shrinks toward it
+  col.scale.set(wide * size, size, wide * size);
+  col.position.y = y0 * (1 - size);
+  for (const v of pts) { v.x *= wide * size; v.z *= wide * size; v.y = v.y * size + y0 * (1 - size); }
   return { col, pts, bottom: y };
 }
 const C3 = buildColumn(globeItem.col || {});
