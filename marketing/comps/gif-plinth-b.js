@@ -42,17 +42,17 @@ const FORMATS = {
   '1x1': {
     w: 1080, h: 1080, P: 4, credit: 30,
     items: [
-      { t: 'text', s: '30%', f: `40px ${PS}`, x: 86, y: 8, st: 'head' },
-      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 86, y: 54, st: 'head' },
-      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 86, y: 104, st: 'body' },
-      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 86, y: 124, st: 'body' },
-      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 86, y: 144, st: 'body' },
-      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 86, y: 170, st: 'only' },
-      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 86, y: 188, st: 'only' },
+      { t: 'text', s: '30%', f: `40px ${PS}`, x: 86, y: 10, st: 'head' },
+      { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 86, y: 56, st: 'head' },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 86, y: 108, st: 'body' },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 86, y: 128, st: 'body' },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 86, y: 148, st: 'body' },
+      { t: 'text', s: 'BLACK FRIDAY', f: `700 16px ${SK}`, x: 86, y: 176, st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 86, y: 194, st: 'only' },
       { t: 'column', x: 220, sw: 24, vr: 7, ext: 3, steps: [[3, 18], [3, 23], [4, 28]] },
       { t: 'globe', x: 220, y: 60, d: 88 },
       { t: 'sticker', x: 184, y: 28, r: 19, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 160, y: 222, r: 20, lines: ['NEW!'], f: `8px ${PS}` },
+      { t: 'burst', x: 150, y: 224, r: 23, lines: ['NEW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
       { t: 'sparkle', x: 262, y: 120, ph: 1 },
       { t: 'sparkle', x: 160, y: 96, ph: 1 },
@@ -64,19 +64,19 @@ const FORMATS = {
     items: [
       { t: 'text', s: '30%', f: `40px ${PS}`, x: 90, y: 6, st: 'head' },
       { t: 'text', s: 'OFF', f: `40px ${PS}`, x: 90, y: 50, st: 'head' },
-      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 100, st: 'body' },
-      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 120, st: 'body' },
-      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 140, st: 'body' },
-      { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 46, y: 174, st: 'only' },
-      { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 46, y: 192, st: 'only' },
-      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 46, y: 210, st: 'only' },
-      { t: 'column', x: 128, sw: 20, vr: 6, ext: 3, steps: [[3, 15], [3, 20], [3, 25]] },
-      { t: 'globe', x: 128, y: 204, d: 72 },
-      { t: 'sticker', x: 160, y: 178, r: 17, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 46, y: 270, r: 26, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
+      { t: 'text', s: 'EVERYTHING', f: `16px ${PS}`, x: 90, y: 98, st: 'body' },
+      { t: 'text', s: 'ON THE', f: `16px ${PS}`, x: 90, y: 117, st: 'body' },
+      { t: 'text', s: 'INTERNET.', f: `16px ${PS}`, x: 90, y: 136, st: 'body' },
+      { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 46, y: 168, st: 'only' },
+      { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 46, y: 186, st: 'only' },
+      { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 46, y: 204, st: 'only' },
+      { t: 'column', x: 128, sw: 18, vr: 6, ext: 3, steps: [[3, 14], [3, 19], [3, 24]] },
+      { t: 'globe', x: 128, y: 194, d: 68 },
+      { t: 'sticker', x: 160, y: 177, r: 17, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 47, y: 270, r: 30, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
       { t: 'sparkle', x: 166, y: 70, ph: 1 },
-      { t: 'sparkle', x: 88, y: 168, ph: 1 },
+      { t: 'sparkle', x: 90, y: 162, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
@@ -88,10 +88,10 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'column', x: 192, sw: 16, vr: 5, ext: 2, steps: [[3, 12], [3, 16], [3, 20]] },
+      { t: 'column', x: 192, sw: 16, vr: 6, ext: 2, steps: [[3, 12], [3, 16], [3, 20]] },
       { t: 'globe', x: 192, y: 38, d: 64 },
       { t: 'sticker', x: 160, y: 22, r: 17, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 148, y: 108, r: 18, lines: ['HOT!'], f: `8px ${PS}` },
+      { t: 'burst', x: 151, y: 103, r: 22, lines: ['HOT!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 226, y: 92, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
@@ -468,6 +468,9 @@ const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => 
 const small = canvas(D, D), sx = small.getContext('2d', { willReadFrequently: true });
 sx.imageSmoothingEnabled = true; sx.imageSmoothingQuality = 'high';
 const globeOut = canvas(D + 4, D + 4), gx = globeOut.getContext('2d');
+// with a column, the globe's drop shadow is drawn separately, under the column, so it falls on
+// the blue and the capital stays clean
+const globeShadow = canvas(D + 4, D + 4), gsx = globeShadow.getContext('2d');
 const nearest = (r, gg, b) => {
   let best = 0, bd = Infinity;
   for (let i = 0; i < PAL.length; i++) {
@@ -493,13 +496,15 @@ function drawGlobe(step) {
   sx.clearRect(0, 0, D, D);
   sx.drawImage(gl, 0, 0, D, D);
   const src = sx.getImageData(0, 0, D, D), a = src.data;
-  const OW = D + 4, out = gx.createImageData(OW, OW), o = out.data;
+  const OW = D + 4, out = gx.createImageData(OW, OW), o = out.data, shd = gsx.createImageData(OW, OW);
   const SPREAD = 34, SAT = 1.45;
   const solid = (x, y) => x >= 0 && y >= 0 && x < D && y < D && a[(y * D + x) * 4 + 3] >= 128;
   const put = (x, y, p) => { const j = (y * OW + x) * 4; o[j] = p[0]; o[j + 1] = p[1]; o[j + 2] = p[2]; o[j + 3] = 255; };
   // hard navy drop shadow, 3 px down and right, the same as the type
   for (let y = 0; y < OW; y++) for (let x = 0; x < OW; x++) {
-    if (solid(x - 1, y - 1) || solid(x - 2, y - 2) || solid(x - 3, y - 3) || solid(x - 3, y - 2) || solid(x - 2, y - 3)) put(x, y, [0, 0, 0x66]);
+    if (solid(x - 1, y - 1) || solid(x - 2, y - 2) || solid(x - 3, y - 3) || solid(x - 3, y - 2) || solid(x - 2, y - 3)) {
+      if (columnItem) { const j = (y * OW + x) * 4; shd.data[j + 2] = 0x66; shd.data[j + 3] = 255; } else put(x, y, [0, 0, 0x66]);
+    }
   }
   for (let y = 0; y < D; y++) for (let x = 0; x < D; x++) {
     const i = (y * D + x) * 4;
@@ -515,6 +520,7 @@ function drawGlobe(step) {
     if (solid(x - 1, y) || solid(x + 1, y) || solid(x, y - 1) || solid(x, y + 1)) put(x, y, [0, 0, 0]);
   }
   gx.putImageData(out, 0, 0);
+  gsx.putImageData(shd, 0, 0);
 }
 
 // ---------- the column: an Ionic column drawn as a flat 8-bit sprite ----------
@@ -523,6 +529,35 @@ function drawGlobe(step) {
 // (torus, scotia, torus, plinth) and a stepped stylobate. White, pale blue and navy, lit from the
 // upper left, black keyline round the silhouette and the type's hard navy drop shadow.
 const TONE = ['white', 'pale', 'sky', 'navy'];
+const VOLUTE = {
+  7: ['...NNNNN...',
+      '........NN.',
+      '....NNN..N.',
+      'NNNN...N..N',
+      'N.......N.N',
+      'N.N..N..N.N',
+      'N.N.....N.N',
+      'N..N...N..N',
+      '.N..NNN..N.',
+      '.NN.....NN.',
+      '...NNNNN...'],
+  6: ['...NNN...',
+      '......NN.',
+      '.NNNNN.N.',
+      'N.....N.N',
+      'N.N.N.N.N',
+      'N.N...N.N',
+      '.N.NNN.N.',
+      '.NN...NN.',
+      '...NNN...'],
+  5: ['..NNN..',
+      '.....N.',
+      'NNNN..N',
+      'N...N.N',
+      'N.NN..N',
+      '.N...N.',
+      '..NNN..'],
+};
 function columnSprite(it, top, bot) {
   const s = it.sw, hs = s / 2, vr = it.vr, vx = hs + 1.5, E = it.ext ?? 3;
   const abW = Math.ceil(vx + vr) + 1;
@@ -533,7 +568,7 @@ function columnSprite(it, top, bot) {
   add('echinus', it.eh ?? vr, hs + 1, 'egg');
   add('astragal', 2, hs + 1, 'bead');
   const tb = it.tb ?? (s >= 20 ? 3 : 3);
-  const base = [['torus1', tb, hs + 1, 'torus'], ['scotia', 1, hs, 'scotia'], ['torus2', tb, hs + 2, 'torus'], ['plinth', it.ph ?? 3, hs + 4, 'slab']];
+  const base = [['torus1', tb, hs + 2, 'torus'], ['scotia', it.sc ?? 1, hs + 1, 'scotia'], ['torus2', tb + 1, hs + 3, 'torus'], ['plinth', it.ph ?? 3, hs + 5, 'slab']];
   const steps = it.steps.map(([h, hw], i) => ['step' + i, h, hw, 'step']);
   const fixed = rows.reduce((a, r) => a + r.h, 0) + [...base, ...steps].reduce((a, r) => a + r[1], 0);
   add('shaft', bot - top - fixed, hs, 'shaft');
@@ -544,18 +579,15 @@ function columnSprite(it, top, bot) {
   const ax = maxHw + 1, cw = ax * 2 + E + 1, ch = total + 2 + E;
   const rowAt = (ly) => rows.find((r) => ly >= r.y0 && ly < r.y0 + r.h);
   const cyV = (it.ah ?? 3) + vr + 0.5; // volute centre (continuous; on a pixel centre)
-  // the scroll's groove: an Archimedean spiral rasterised as one connected pixel line, starting
-  // just inside the rim at the top and winding outward-first, two pixels a turn, into the eye
-  const groove = new Set();
-  for (const sg of [-1, 1]) {
-    const R0 = vr - 1.5, pitch = it.pitch ?? 2;
-    for (let ph = 0; ; ph += 0.01) {
-      const r = R0 - (pitch * ph) / TAU;
-      if (r < 0.6) break;
-      const uu = sg * vx + sg * r * Math.sin(ph), vv = cyV - r * Math.cos(ph);
-      groove.add(Math.floor(uu + ax) + ',' + Math.floor(vv));
-    }
-  }
+  // the scroll's groove, hand-drawn for the right volute (mirrored for the left): a coil that
+  // leaves the rim at the top, runs round once and turns into the eye
+  const G = VOLUTE[vr];
+  const grooved = (sg, x, ly) => {
+    const xc = Math.floor(sg * vx + ax), X = x - (xc - vr), Y = ly - (it.ah ?? 3);
+    let gx = X - 2; const gy = Y - 2;
+    if (sg < 0) gx = G.length - 1 - gx;
+    return gy >= 0 && gx >= 0 && gy < G.length && gx < G.length && G[gy][gx] === 'N';
+  };
   // which part a pixel belongs to (local canvas coordinates; the body starts at row 1)
   const part = (x, y) => {
     const ly = y - 1, u = x - ax + 0.5;
@@ -574,29 +606,36 @@ function columnSprite(it, top, bot) {
     const p = part(x, y), ly = y - 1, u = x - ax + 0.5;
     if (p.vol) {
       const dx = (u - p.vol * vx), dy = ly + 0.5 - cyV, d = Math.hypot(dx, dy);
-      if (d > vr - 0.85) return 'black';
-      if (groove.has(x + ',' + ly)) return 'navy';
-      if (d < 0.5) return 'navy';
+      // the scroll band runs into the top of each volute: no rim where they meet
+      const ah = it.ah ?? 3;
+      if (d > vr - 0.85) {
+        if (ly < ah + 2 && p.vol * u < vx) return ly === ah ? 'sky' : 'pale';
+        return 'black';
+      }
+      if (grooved(p.vol, x, ly)) return 'navy';
       const lit = (dx + dy) / vr;
       return lit < -0.35 ? 'white' : lit < 0.45 ? 'pale' : 'sky';
     }
     const r = p, k = ly - r.y0, uu = (u + r.hw) / (2 * r.hw), c = Math.floor(u + r.hw);
     const below = part(x, y + 1);
     const division = below && !below.vol && below !== r && r.kind !== 'scotia';
-    if (division && r.kind !== 'step' && r.kind !== 'slab') return 'navy';
+    if (division && (r.kind === 'shaft' || r.kind === 'egg' || r.kind === 'band')) return 'navy';
     switch (r.kind) {
       case 'slab': if (k === 0) return 'white'; if (k === r.h - 1) return 'navy'; return uu > 0.86 ? 'sky' : 'pale';
       case 'step': if (k === 0) return 'white'; if (k === r.h - 1 && below) return 'navy'; return uu > 0.9 ? 'sky' : 'pale';
       case 'band': return k === 0 ? 'sky' : tone(baseTone(uu) - 1);
-      case 'egg': {
+      case 'egg': { // egg-and-dart: three-pixel eggs with round bottoms, navy darts between
         const m = ((c % 4) + 4) % 4;
-        if (k === 0) return 'pale';
-        if (m === 3) return k === r.h - 2 ? 'navy' : 'sky';
-        if (k === r.h - 2) return m === 1 ? 'pale' : 'sky';
-        return m === 0 ? 'white' : m === 1 ? 'white' : 'pale';
+        if (k === 0) return 'sky';
+        if (m === 3) return 'navy';
+        if (k === r.h - 2) return m === 1 ? 'pale' : 'navy';
+        return m === 0 ? 'white' : m === 1 ? (uu < 0.6 ? 'white' : 'pale') : 'pale';
       }
-      case 'bead': return (c % 2 === 0) ? tone(baseTone(uu) - 1) : 'sky';
-      case 'torus': return tone(baseTone(uu) + (k === 0 ? -1 : 0));
+      case 'bead': return k === 0 ? ((c % 2 === 0) ? tone(baseTone(uu) - 1) : 'sky') : 'navy';
+      case 'torus': // a round moulding: light on top, highlight across the middle, shade under
+        if (k === 0) return uu < 0.6 ? 'white' : 'pale';
+        if (k === r.h - 1) return uu < 0.5 ? 'pale' : 'sky';
+        return uu < 0.1 ? 'pale' : uu < 0.55 ? 'white' : uu < 0.85 ? 'pale' : 'sky';
       case 'scotia': return 'navy';
       case 'shaft': return tone(baseTone(uu) + (c % 2));
     }
@@ -653,7 +692,7 @@ if (columnItem) {
   drawGlobe(0);
   const ga = gx.getImageData(0, 0, D, D).data;
   let low = 0;
-  for (let y = 0; y < D; y++) for (let x = 0; x < D; x++) { const j = (y * D + x) * 4; if (ga[j + 3] && !(ga[j] === 0 && ga[j + 1] === 0 && ga[j + 2] === 0x66)) low = y; }
+  for (let y = 0; y < D; y++) for (let x = 0; x < D; x++) { const j = (y * D + x) * 4; if (ga[j + 3]) low = y; }
   const top = Math.round(globeItem.y - D / 2) + low - (columnItem.sink ?? 0);
   const cs = columnSprite(columnItem, top, marquee.y);
   Object.assign(columnLayer, { frames: [cs.canvas], x: cs.x, y: cs.y });
@@ -666,6 +705,7 @@ function setTime(t) {
   t = ((t % DURATION) + DURATION) % DURATION;
   drawGlobe(Math.floor(t * GIF_FPS + 1e-6) % (DURATION * GIF_FPS));
   g.drawImage(bgCanvas, 0, 0);
+  if (columnItem) g.drawImage(globeShadow, Math.round(globeItem.x - D / 2), Math.round(globeItem.y - D / 2));
   for (const L of layers) {
     if (L.globe) { g.drawImage(globeOut, Math.round(globeItem.x - D / 2), Math.round(globeItem.y - D / 2)); continue; }
     if (L.marquee) { if (!BODY_ONLY) drawMarquee(t); continue; }

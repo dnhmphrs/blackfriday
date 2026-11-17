@@ -235,7 +235,7 @@ function setFrame(page, artIndex, marqueeMs) {
 
 // --- one demo -------------------------------------------------------------------------------
 
-async function record(demo, { extDir, origin, artDirs }) {
+async function record(demo, { extDir, origin }) {
   const dir = path.join(FRAMES, `demo-${demo.name}`);
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
@@ -377,7 +377,7 @@ const { server, origin } = await serve(routes);
 try {
   for (const demo of demos) { // serially: the machine is shared
     log(`recording ${demo.name}`);
-    await record(demo, { extDir, origin, artDirs });
+    await record(demo, { extDir, origin });
     const still = path.join(OUT, `${demo.name}.png`);
     fs.copyFileSync(path.join(demo.dir, 'f0000.png'), still);
     demo.pixels = pixelChecks(demo);
@@ -393,6 +393,10 @@ try {
   fs.rmSync(extDir, { recursive: true, force: true });
 }
 
-const bad = demos.filter((d) => d.layout.length || d.pixels.loop_frame240_vs_frame0_px || d.pixels.outside_banner_live_vs_frame0_px || d.pixels.credit_live_vs_frame0_px || fs.statSync(path.join(OUT, `${d.name}.gif`)).size > GIF_LIMIT);
+// Every check must come out at zero: layout, loop seam, page outside the banner, credit line, the
+// ticker's frame strip, the live art matching one recorded frame exactly, and the GIF size.
+const bad = demos.filter((d) => d.layout.length || d.pixels.loop_frame240_vs_frame0_px || d.pixels.outside_banner_live_vs_frame0_px
+  || d.pixels.credit_live_vs_frame0_px || d.pixels.ticker_strip_above_text_live_vs_frame0_px || d.pixels.art_live_best_match.differing_px
+  || fs.statSync(path.join(OUT, `${d.name}.gif`)).size > GIF_LIMIT);
 log(bad.length ? `CHECK FAILED: ${bad.map((d) => d.name).join(', ')}` : 'all checks passed');
 process.exitCode = bad.length ? 1 : 0;

@@ -1,4 +1,4 @@
-// The animated GIF banner, 1997, full classic set: the chosen direction. A low-resolution canvas on web-safe colours,
+// The animated GIF banner, 1997, variant A: the spinning globe atop a white marble Doric column, both in one 3D GIF render. A low-resolution canvas on web-safe colours,
 // blown up with hard pixels. Played completely straight: chunky bevelled 8-bit type with black
 // keylines and hard navy drop shadows, hard two-frame blinks on one 2 Hz beat, a pixel starburst,
 // a dayglo discount sticker slapped on the spinning globe (rendered in 3D, posterised with ordered
@@ -52,9 +52,10 @@ const FORMATS = {
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 84, y: 192, st: 'only' },
       { t: 'globe', x: 216, y: 50, d: 84, column: true },
       { t: 'sticker', x: 246, y: 22, r: 19, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 40, y: 222, r: 22, lines: ['NEW!'], f: `8px ${PS}` },
+      { t: 'burst', x: 147, y: 220, r: 25, lines: ['NEW!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 160, y: 12, ph: 0 },
-      { t: 'sparkle', x: 170, y: 120, ph: 1 },
+      { t: 'sparkle', x: 166, y: 92, ph: 1 },
+      { t: 'sparkle', x: 30, y: 226, ph: 0 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
     ],
   },
@@ -69,9 +70,9 @@ const FORMATS = {
       { t: 'text', s: 'BLACK', f: `700 16px ${SK}`, x: 6, y: 172, align: 'l', st: 'only' },
       { t: 'text', s: 'FRIDAY', f: `700 16px ${SK}`, x: 6, y: 190, align: 'l', st: 'only' },
       { t: 'text', s: 'ONLY!', f: `700 16px ${SK}`, x: 6, y: 208, align: 'l', st: 'only' },
-      { t: 'globe', x: 132, y: 196, d: 60, column: true },
-      { t: 'sticker', x: 154, y: 172, r: 16, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 44, y: 268, r: 28, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
+      { t: 'globe', x: 127, y: 191, d: 56, column: true, r0: 0.46 },
+      { t: 'sticker', x: 155, y: 177, r: 15, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 45, y: 266, r: 27, lines: ['WOW!'], f: `16px ${SK}`, bold: true },
       { t: 'sparkle', x: 14, y: 14, ph: 0 },
       { t: 'sparkle', x: 166, y: 60, ph: 1 },
       { t: 'marquee', h: 22, f: `8px ${PS}` },
@@ -85,9 +86,9 @@ const FORMATS = {
       { t: 'text', s: 'EVERYTHING ON', f: `8px ${PS}`, x: 8, y: 100, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'THE INTERNET.', f: `8px ${PS}`, x: 8, y: 112, align: 'l', st: 'bodyS' },
       { t: 'text', s: 'BLACK FRIDAY ONLY!', f: `8px ${PS}`, x: 8, y: 127, align: 'l', st: 'onlyS' },
-      { t: 'globe', x: 196, y: 36, d: 60, column: true },
-      { t: 'sticker', x: 168, y: 16, r: 16, s: '-30%', f: `8px ${PS}` },
-      { t: 'burst', x: 152, y: 84, r: 20, lines: ['HOT!'], f: `8px ${PS}` },
+      { t: 'globe', x: 196, y: 33, d: 56, column: true, r0: 0.42 },
+      { t: 'sticker', x: 168, y: 15, r: 16, s: '-30%', f: `8px ${PS}` },
+      { t: 'burst', x: 152, y: 86, r: 20, lines: ['HOT!'], f: `8px ${PS}` },
       { t: 'sparkle', x: 140, y: 14, ph: 1 },
       { t: 'marquee', h: 17, f: `8px ${PS}`, thin: true },
     ],
@@ -449,11 +450,11 @@ const GXC = globeItem.x - OX, GYC = globeItem.y - OY;  // the globe's centre ins
 const gl = $('gl');
 const { renderer, scene, camera } = createStage({ canvas: gl, width: RW * SS, height: RH * SS, pixelRatio: 1, fov: 24 });
 renderer.shadowMap.enabled = false;
-const ELEV = (Number(q.get('elev') ?? (COL ? (globeItem.elev ?? 16) : 20)) * Math.PI) / 180;
+const ELEV = (Number(q.get('elev') ?? (COL ? (globeItem.elev ?? -3) : 20)) * Math.PI) / 180;
 {
   // The camera looks at the globe's centre; an off-axis window frames the column below it, so the
   // globe keeps exactly its size and place whatever the column's height.
-  const dist = COL ? 11 : 2.12 / (2 * Math.tan((24 * Math.PI) / 360));
+  const dist = COL ? 30 : 2.12 / (2 * Math.tan((24 * Math.PI) / 360));
   const FULL = 4 * SS * Math.max(RW, RH);
   camera.fov = (2 * Math.atan(FULL / 2 / (dist * K * SS)) * 180) / Math.PI;
   camera.aspect = 1;
@@ -472,18 +473,18 @@ pivot.add(globe);
 // ---- the column: crepidoma (three steps), a plain base (plinth and torus), a fluted shaft with
 // entasis, annulets, the echinus and the abacus. r0 = the shaft's radius at the foot. The capital
 // and the steps are drawn a little heavier than Vitruvius would, so they survive at GIF size.
-const CP = { abacusW: 1.42, abacusH: 0.38, echH: 0.46, echW: 1.34, neck: 0.1, torusR: 1.06, torusT: 0.15, baseH: 0.3,
-  plinthW: 1.32, plinthH: 0.3, steps: [1.72, 2.08, 2.44], stepH: 0.3, flute: 0.2, top: 0.8 };
+const CP = { abacusW: 1.42, abacusH: 0.32, echH: 0.52, echW: 1.36, neck: 0.1, torusR: 1.06, torusT: 0.14, baseH: 0.28,
+  plinthW: 1.3, plinthH: 0.24, steps: [1.62, 2.02, 2.42], stepD: [1.5, 1.72, 1.94], stepH: 0.26, flute: 0.2, top: 0.8 };
 const FIXED = CP.abacusH + CP.echH + CP.neck + CP.baseH + CP.plinthH + CP.steps.length * CP.stepH; // x r0
 function buildColumn({ r0, shaftH, flutes = 12 }) {
   const col = new THREE.Group();
   // Lit by the key light alone (no studio reflections): white on the lit side, a navy glow in the
   // shade, so the posteriser finds whites, pale blue-greys and navy.
-  const marble = new THREE.MeshLambertMaterial({ emissive: 0x101860 });
-  marble.color.setRGB(1.3, 1.34, 1.5);
+  const marble = new THREE.MeshLambertMaterial({ emissive: 0x0a1050 });
+  marble.color.setRGB(1.12, 1.16, 1.32);
   const rTop = r0 * CP.top;
   let y = 0; // building downward from the top of the abacus
-  const box = (hw, h) => { const m = new THREE.Mesh(new THREE.BoxGeometry(hw * 2, h, hw * 2), marble); m.position.y = y - h / 2; col.add(m); y -= h; };
+  const box = (hw, h, hd = hw) => { const m = new THREE.Mesh(new THREE.BoxGeometry(hw * 2, h, hd * 2), marble); m.position.y = y - h / 2; col.add(m); y -= h; };
   box(r0 * CP.abacusW, r0 * CP.abacusH);
   // echinus: a convex cushion from the neck out to under the abacus
   {
@@ -532,14 +533,14 @@ function buildColumn({ r0, shaftH, flutes = 12 }) {
     box(r0 * CP.plinthW, r0 * CP.plinthH);
   }
   // crepidoma: three steps
-  for (const hw of CP.steps) box(r0 * hw, r0 * CP.stepH);
+  CP.steps.forEach((hw, i) => box(r0 * hw, r0 * CP.stepH, r0 * CP.stepD[i]));
   return col;
 }
 
 const TOP = -1.035; // the abacus top: the globe's south pole just rests on it
 let column = null;
 if (COL) {
-  const r0 = globeItem.r0 ?? 0.44, fixed = r0 * FIXED, front = r0 * CP.steps[CP.steps.length - 1];
+  const r0 = globeItem.r0 ?? 0.44, fixed = r0 * FIXED, front = r0 * CP.stepD[CP.stepD.length - 1];
   // solve the shaft's height so the front edge of the bottom step lands on the ground line
   const yOf = (shaftH) => {
     const v = new THREE.Vector3(0, TOP - fixed - shaftH, front).project(camera);
@@ -561,6 +562,52 @@ const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => 
 const small = canvas(RW, RH), sx = small.getContext('2d', { willReadFrequently: true });
 sx.imageSmoothingEnabled = true; sx.imageSmoothingQuality = 'high';
 const globeOut = canvas(RW + 4, RH + 4), gx = globeOut.getContext('2d');
+// The column's inner lines, worked out once (the column never moves): a normal pass finds where
+// one face turns into another (step tops and fronts, abacus, echinus, base, the flutes' arrises)
+// and those pixels are drawn in navy, like the lines a sprite artist puts in by hand. The globe's
+// silhouette (constant as it spins) masks them where the ball sits in front of the abacus.
+let colLines = null;
+if (COL) {
+  const pass = (override, showGlobe, showCol) => {
+    scene.overrideMaterial = override; globe.visible = showGlobe; column.visible = showCol;
+    renderer.render(scene, camera);
+    sx.clearRect(0, 0, RW, RH); sx.drawImage(gl, 0, 0, RW, RH);
+    const d = sx.getImageData(0, 0, RW, RH).data;
+    scene.overrideMaterial = null; globe.visible = true; column.visible = true;
+    return d;
+  };
+  const nm = new THREE.MeshNormalMaterial(); nm.toneMapped = false;
+  const bm = new THREE.MeshBasicMaterial({ color: 0xffffff }); bm.toneMapped = false;
+  const N = pass(nm, false, true), G = pass(bm, true, false);
+  // an ID pass: every part of the column in its own flat colour, sampled at each GIF pixel's
+  // centre, so the lines between the steps, the plinth, the torus and the capital come out crisp
+  const parts = [];
+  column.traverse((o) => { if (o.isMesh) parts.push(o); });
+  const keep = parts.map((o) => o.material);
+  parts.forEach((o, i) => { o.material = new THREE.MeshBasicMaterial({ color: new THREE.Color(((i * 53) % 255) / 255, ((i * 97 + 40) % 255) / 255, ((i * 31 + 90) % 255) / 255) }); o.material.toneMapped = false; });
+  globe.visible = false;
+  renderer.render(scene, camera);
+  globe.visible = true;
+  parts.forEach((o, i) => { o.material.dispose(); o.material = keep[i]; });
+  const big = canvas(RW * SS, RH * SS), bx = big.getContext('2d', { willReadFrequently: true });
+  bx.drawImage(gl, 0, 0);
+  const B = bx.getImageData(0, 0, RW * SS, RH * SS).data;
+  const idAt = (x, y) => { const i = ((y * SS + (SS >> 1)) * RW * SS + x * SS + (SS >> 1)) * 4; return B[i + 3] < 128 ? -1 : (B[i] << 16) | (B[i + 1] << 8) | B[i + 2]; };
+  const COS = Math.cos((Number(q.get('crease') ?? 28) * Math.PI) / 180);
+  const inCol = (x, y) => x >= 0 && y >= 0 && x < RW && y < RH && N[(y * RW + x) * 4 + 3] >= 200;
+  const nrm = (x, y) => { const i = (y * RW + x) * 4; const v = [N[i] / 127.5 - 1, N[i + 1] / 127.5 - 1, N[i + 2] / 127.5 - 1]; const l = Math.hypot(...v) || 1; return v.map((c) => c / l); };
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  colLines = new Uint8Array(RW * RH);
+  for (let y = 0; y < RH; y++) for (let x = 0; x < RW; x++) {
+    if (!inCol(x, y) || G[(y * RW + x) * 4 + 3] >= 128) continue;
+    const n = nrm(x, y);
+    const id = idAt(x, y), up = y > 0 ? idAt(x, y - 1) : -1, left = x > 0 ? idAt(x - 1, y) : -1;
+    if ((up >= 0 && id >= 0 && up !== id) || (left >= 0 && id >= 0 && left !== id)) colLines[y * RW + x] = 1;
+    // (not along the shaft's silhouette, where the arrises crowd together and would only stutter)
+    if (!inCol(x - 2, y) || !inCol(x + 2, y)) continue;
+    if ((inCol(x, y - 1) && dot(n, nrm(x, y - 1)) < COS) || (inCol(x - 1, y) && dot(n, nrm(x - 1, y)) < COS)) colLines[y * RW + x] = 1;
+  }
+}
 const nearest = (r, gg, b) => {
   let best = 0, bd = Infinity;
   for (let i = 0; i < PAL.length; i++) {
@@ -602,6 +649,7 @@ function drawGlobe(step) {
     const l = a[i] * 0.3 + a[i + 1] * 0.59 + a[i + 2] * 0.11;
     put(x, y, nearest(l + (a[i] - l) * SAT + k, l + (a[i + 1] - l) * SAT + k, l + (a[i + 2] - l) * SAT + k));
   }
+  if (colLines) for (let y = 0; y < RH; y++) for (let x = 0; x < RW; x++) if (colLines[y * RW + x] && solid(x, y)) put(x, y, [0, 0, 0x66]);
   // a one-pixel black keyline round the silhouette, like a hand-cleaned sprite
   for (let y = -1; y <= RH; y++) for (let x = -1; x <= RW; x++) {
     if (solid(x, y) || x < 0 || y < 0) continue;
