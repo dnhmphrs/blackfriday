@@ -72,3 +72,14 @@
 @font-face { font-family: "Archivo Narrow"; font-weight: 600; font-style: italic; src: url("/node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-600-italic.woff2") format("woff2"); }
 @font-face { font-family: "Archivo Narrow"; font-weight: 700; font-style: normal; src: url("/node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-normal.woff2") format("woff2"); }
 @font-face { font-family: "Archivo Narrow"; font-weight: 700; font-style: italic; src: url("/node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-italic.woff2") format("woff2"); }
+
+/* Sale-sign typefaces (all open licence). */
+@font-face { font-family: "Anton"; font-weight: 400; src: url("/node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-weight: 300; src: url("/node_modules/@fontsource/oswald/files/oswald-latin-300-normal.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-weight: 400; src: url("/node_modules/@fontsource/oswald/files/oswald-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-weight: 500; src: url("/node_modules/@fontsource/oswald/files/oswald-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-weight: 600; src: url("/node_modules/@fontsource/oswald/files/oswald-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Oswald"; font-weight: 700; src: url("/node_modules/@fontsource/oswald/files/oswald-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Bebas Neue"; font-weight: 400; src: url("/node_modules/@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Permanent Marker"; font-weight: 400; src: url("/node_modules/@fontsource/permanent-marker/files/permanent-marker-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Tilt Neon"; font-weight: 400; src: url("/node_modules/@fontsource/tilt-neon/files/tilt-neon-latin-400-normal.woff2") format("woff2"); }
