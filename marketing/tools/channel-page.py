@@ -241,7 +241,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     place($('globe'), mx, my, MON.globe * k, MON.globe * k);
     const capTop = my + MON.capY * k, capL = mx + MON.capX * k, colW = MON.colW * k;
     place($('cap'), capL, capTop, colW, MON.capH * k);
-    const baseTop = Math.max(capTop + MON.capH * k + 4, crawlTop - MON.baseH * k + 2);
+    const baseTop = Math.max(capTop + MON.capH * k + 4, ah - MON.baseH * k); // it stands on the bottom edge, the crawl runs over it
     place($('base'), capL, baseTop, colW, MON.baseH * k);
     place($('shaft'), capL, capTop + MON.capH * k - 2, colW, baseTop - (capTop + MON.capH * k) + 4);
     const gl = g.glow, gcx = mx + (MON.globe / 2) * k, gcy = my + (MON.globe / 2) * k;
