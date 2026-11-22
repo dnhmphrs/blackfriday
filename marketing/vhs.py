@@ -20,14 +20,16 @@ def blur(a, sx, sy):
     return cv2.GaussianBlur(a, (0, 0), sigmaX=sx, sigmaY=max(sy, 0.01))
 
 
-def degrade(rgb, index, fps, glitch, amount=1.0, scratches=True):
+def degrade(rgb, index, fps, glitch, amount=1.0, scratches=True, scale=None):
     """rgb: uint8 HxWx3. glitch: 0..1 strength of a tape glitch on this frame.
     scratches=False leaves out the dropout scratches (for clips whose grain is held still, where a
-    scratch would sit in one place for the whole clip)."""
+    scratch would sit in one place for the whole clip). scale: the size of the look, as a fraction of
+    its size on a picture 1080 wide (default: the picture's own width / 1080); small pictures such as
+    icons need it larger than that, or the look is too fine to see."""
     rng = np.random.default_rng(1000 + index)
     f = rgb.astype(np.float32) / 255.0
     H, W = f.shape[:2]
-    k = W / 1080.0                       # scale every pixel distance with the frame
+    k = scale or W / 1080.0              # scale every pixel distance with the frame
     line = max(2.0, H / 480.0) if H >= W else max(2.0, H / 270.0)   # scanline pitch
 
     # --- to luma/chroma (YIQ), where tape does its damage ---
