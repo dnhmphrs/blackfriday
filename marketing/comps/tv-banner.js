@@ -8,6 +8,8 @@
 // ?h= renders a format at another height: the crawl stays on the bottom edge, the globe stays
 // level with the message and the column's shaft grows down to the crawl (the strips go with it),
 // as in gif-plinth-e.
+// For the live banner's still artwork: ?crawl=0 (no crawl), ?only=0 (no BLACK FRIDAY ONLY!),
+// ?glints=0 (no sparkles), ?burst=0 (no starburst).
 // Everything on screen is a pure function of time:  window.comp.setTime(seconds)
 import * as THREE from 'three';
 import { createStage, materials } from '../lib/stage.js';
@@ -171,6 +173,7 @@ const fitSize = (text, font, k, ls, width) => { const b = inkOf(text, font, 100,
 const typeCtx = layer('#type'), blinkCtx = layer('#blink');
 const blinkers = [];
 for (const grp of F.type) {
+  if (grp.st === 'only' && q.get('only') === '0') continue; // ?only=0: the live banner shows the price card here instead
   const st = STY[grp.st];
   let size = Infinity;
   for (const [s, , , bw, bh] of grp.lines) size = Math.min(size, fitSize(s, st.font, st.k, st.ls, bw * grp.fitW), (bh * grp.maxH * 100) / capOf(st.font, 100));
@@ -494,10 +497,10 @@ function setTime(t) {
   blinkCtx.globalAlpha = 1;
   ox.clearRect(0, 0, W, H);
   drawSticker(t);
-  drawBurst(t);
+  if (q.get('burst') !== '0') drawBurst(t);
   drawStrips(t);
-  drawGlints(t);
-  drawCrawl(t);
+  if (q.get('glints') !== '0') drawGlints(t);
+  if (q.get('crawl') !== '0') drawCrawl(t); // ?crawl=0: the live banner runs its own tickers
 }
 
 window.comp = { duration: DURATION, fps: FPS, width: W, height: H, glitches: [], setTime, three: { THREE, scene, camera, renderer, pivot, globe } };
