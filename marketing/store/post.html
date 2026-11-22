@@ -6,8 +6,8 @@
 <!-- The banner's pieces composed as standalone pictures on a grid: one margin, two columns, one
      set of gaps. The message stacks down the left column, set flush left; the globe on its column
      stands in the right one; the tapes and the crawl close the bottom.
-       ?f=square|story                        the posts: 1080 x 1080, and 1080 x 1920 for stories (its
-                                              message keeps clear of the app's bars, top and bottom)
+       ?f=square|story                        the posts: 1080 x 1080, and 1080 x 1920 for stories, which
+                                              is the banner's own arrangement, top to bottom
        ?f=shot|marquee|tile                   the store's images
        ?bg=slant|step|wall|mono|none          the faint tiled ground of Gary Mustard Enterprises marks (default: slant)
      store/posts.mjs renders it, stepping window.setT(t) through a 12 s loop. -->
@@ -82,13 +82,14 @@
   // diameter, centred in what is left right of the gutter; strips: the tapes' scale (0: none);
   // tick 0: no ticker.
   //   split: the sub lines and the card in a second column beside the headline, on the same cap line
-  //   top, bottom: bands at the top and bottom edge left to the app's own bars (stories); the
-  //     ticker and the crawl move in to clear them, and the column still runs to the bottom edge
+  //   stack: the live banner's own arrangement for a tall frame, at u times its size: the lettering
+  //     centred (its top at headTop), glints either side of 30% OFF, the card and the globe in a row
+  //     under it (card: left, top; globe: centre x, top of its picture), the tapes and the crawl below
   const TWO = ['30%', 'OFF'];
   const F = {
     square:   { w: 1080, h: 1080, m: 60, tick: 54, crawl: 96, col: 436, gutter: 44, head: TWO, headTop: 100, lead: 0.3, toSub: 42, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, toCard: 40, card: 0.62, ball: 372, strips: 0.62 },
-    // stories: the top 250 and the bottom 420 are left to the app (Instagram's bars; TikTok's caption and buttons)
-    story:    { w: 1080, h: 1920, m: 60, top: 250, bottom: 420, tick: 56, crawl: 100, col: 440, gutter: 44, head: TWO, headTop: 356, lead: 0.3, toSub: 52, sub: ['EVERYTHING', 'ON THE', 'INTERNET.'], subLead: 0.38, toCard: 52, card: 0.72, ball: 372, strips: 0.64 },
+    // stories: the ticker and the crawl on the frame's edges; the message starts below where the apps put their own header
+    story:    { w: 1080, h: 1920, m: 60, stack: true, u: 0.86, tick: 72, crawl: 129, headTop: 190, toSub: 44, toRow: 40, card: [72, 112], globe: 756 },
     shot:     { w: 1280, h: 800, m: 56, tick: 44, crawl: 76, col: 700, gutter: 48, head: ['30% OFF'], headTop: 96, lead: 0.3, toSub: 34, sub: ['EVERYTHING ON THE INTERNET.'], subLead: 0.4, toCard: 34, card: 0.7, ball: 300, strips: 0.5 },
     marquee:  { w: 1400, h: 560, m: 56, tick: 40, crawl: 70, col: 552, gutter: 56, head: TWO, headTop: 80, lead: 0.3, split: { col: 264, gutter: 56 }, sub: ['EVERYTHING', 'ON THE', 'INTERNET.'], subLead: 0.38, toCard: 30, card: 0.66, ball: 260, strips: 0 },
     tile:     { w: 880, h: 560, m: 56, tick: 0, crawl: 76, col: 400, gutter: 44, head: TWO, headTop: 64, lead: 0.3, toSub: 30, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, card: 0, ball: 270, strips: 0 },
@@ -126,8 +127,9 @@
 
   // ---- the grid ----
   const L = f.m, R = f.w - f.m, L2 = L + f.col + (f.split ? f.split.gutter : 0), colR = f.split ? L2 + f.split.col : L + f.col, monL = colR + f.gutter, monX = (monL + R) / 2;
-  const crawlTop = f.h - (f.bottom || 0) - f.crawl;
+  const crawlTop = f.h - f.crawl;
   // the tapes: the navy one's lower left corner meets the crawl; the yellow one lies on it
+  if (f.stack) f.strips = f.u;
   const tapeH = 126 * f.strips, byH = 68 * f.strips;
   const byC = crawlTop - (f.w / 2) * TAN6 - (byH / 2) / COS6, tapeC = byC - ((tapeH + byH) / 2 + 4 * f.strips) / COS6;
   const tapeTop = (x) => tapeC - (tapeH / 2) / COS6 - (x - f.w / 2) * TAN6;
@@ -155,8 +157,11 @@
 
   // ---- the monument: the globe in the middle of the right-hand column, its top level with the
   //      headline's cap line, its column running down behind the tapes to the bottom edge ----
-  const gd = f.ball / (374 / 480), k = gd / 480;       // the ball is 374 of the picture's 480
-  const gx = monX - gd / 2, gy = f.headTop - 6 - 47 * k; // a round thing overshoots the cap line a little
+  // (stacked: the lettering is the banner's two pictures, 706 x 522 and 895 x 349, one under the other, centred)
+  const T1 = { w: 706 * f.u, h: 522 * f.u }, T2 = { w: 895 * f.u, h: 349 * f.u };
+  const t1y = f.headTop, t2y = t1y + T1.h + f.toSub, rowY = t2y + T2.h + f.toRow; // rowY: the top of the ball
+  const gd = f.stack ? 480 * f.u : f.ball / (374 / 480), k = gd / 480;       // the ball is 374 of the picture's 480
+  const gx = (f.stack ? f.globe : monX) - gd / 2, gy = f.stack ? rowY - 47 * k : f.headTop - 6 - 47 * k; // a round thing overshoots the cap line a little
   place(add('<div class="glow"></div>'), gx + gd / 2 - gd * 1.3, gy + gd * 0.487 - gd * 1.45, gd * 2.6, gd * 2.9);
   const colX = gx + 40 * k, colW = 400 * k, capTop = gy + 410 * k, baseTop = Math.max(capTop + 136 * k + 4, f.h - 144 * k);
   place(add(`<img src="${IMAGES}shaft.webp">`), colX, capTop + 136 * k - 2, colW, baseTop - capTop - 136 * k + 4);
@@ -165,29 +170,44 @@
   const globe = add(`<img src="${PARTS}globe-00.png">`);
   place(globe, gx, gy, gd, gd);
 
-  // ---- the message, flush left down the column (or two columns, in the wide formats) ----
+  // ---- the message: stacked and centred as in the banner, or flush left down the column (or two
+  //      columns, in the wide formats) ----
+  const putCard = (x, top, scale) => {
+    const card = add('<div class="card"><div class="hd">The Internet (All Of It)</div><div class="ln">WAS: <s>100%</s></div><div class="ln">NOW:</div><div class="big">70%</div></div>');
+    Object.assign(card.style, { left: x + 'px', top: top + 'px', transform: `scale(${scale}) rotate(-1.4deg)` });
+    return top + (306 + 54) * scale;
+  };
+  const glint = (cls, cx, cy, r) => place(add(`<div class="glint ${cls}"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
+  const ballL = gx + 53 * k, ballT = gy + 47 * k, bd = 374 * k;
+  let hs = 0, ss = 0, y = 0, cardBottom = 0, sx = L;
+  if (f.stack) {
+    const t1x = (f.w - T1.w) / 2, u = f.u;
+    place(add(`<img src="${IMAGES}type-top.webp">`), t1x, t1y, T1.w, T1.h);
+    place(add(`<img src="${IMAGES}type-mid.webp">`), (f.w - T2.w) / 2, t2y, T2.w, T2.h);
+    // the glints either side of 30% OFF: a large one out wide, a small one nearer in and lower
+    for (const side of [-1, 1]) {
+      const edge = side < 0 ? t1x : t1x + T1.w, out = (d) => edge + side * d * u;
+      glint('', out(149), t1y + 204 * u, 49 * u);
+      glint('b', out(92), t1y + 295 * u, 29 * u);
+    }
+    y = t2y + T2.h;
+    cardBottom = putCard(f.card[0], rowY + f.card[1] * u, u);
+    sx = f.card[0];
+  } else {
   const hw = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9;
   const widest = (lines, w) => lines.reduce((a, b) => (w(a) > w(b) ? a : b));
-  const hs = fitHead(widest(f.head, hw), f.col), hc = ink('H', HEAD, -0.05).cap * hs;
-  let y = f.headTop;
+  hs = fitHead(widest(f.head, hw), f.col); const hc = ink('H', HEAD, -0.05).cap * hs;
+  y = f.headTop;
   for (const [n, line] of f.head.entries()) { y += hc + (n ? hc * f.lead : 0); set('head', line, HEAD, -0.05, hs, L, y, true); }
-  const sx = f.split ? L2 : L;
-  const ss = fitSub(widest(f.sub, (t) => width(t, SUB, -0.04)), f.split ? f.split.col : f.col), sc = ink('H', SUB, -0.04).cap * ss;
+  sx = f.split ? L2 : L;
+  ss = fitSub(widest(f.sub, (t) => width(t, SUB, -0.04)), f.split ? f.split.col : f.col); const sc = ink('H', SUB, -0.04).cap * ss;
   y = f.split ? f.headTop : y + f.toSub;
   for (const [n, line] of f.sub.entries()) { y += sc + (n ? sc * f.subLead : 0); set('sub', line, SUB, -0.04, ss, sx, y); }
-  let cardBottom = y;
-  if (f.card) {
-    y += f.toCard;
-    const card = add('<div class="card"><div class="hd">The Internet (All Of It)</div><div class="ln">WAS: <s>100%</s></div><div class="ln">NOW:</div><div class="big">70%</div></div>');
-    Object.assign(card.style, { left: sx + 'px', top: y + 'px', transform: `scale(${f.card}) rotate(-1.4deg)` });
-    cardBottom = y + (306 + 54) * f.card;
-  }
-
-  // ---- glints: one on the globe's shoulder, one at its foot ----
-  const glint = (cls, cx, cy, r) => place(add(`<div class="glint ${cls}"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
-  const ballL = gx + 53 * k, ballT = gy + 47 * k, bd = f.ball;
+  cardBottom = f.card ? putCard(sx, y + f.toCard, f.card) : y;
+  // glints: one on the globe's shoulder, one at its foot
   glint('', ballL + bd * 0.1, ballT + bd * 0.1, bd * 0.105);
   glint('b', ballL + bd * 0.97, ballT + bd * 0.86, bd * 0.06);
+  }
 
   // ---- the tapes ----
   const len = Math.hypot(f.w, f.h) * 1.4;
@@ -201,15 +221,15 @@
   // ---- the tickers: both caught part way through, running off either edge ----
   if (f.tick) {
     const tk = add(`<div class="ticker"><span>${TICKER.repeat(4)}</span></div>`);
-    Object.assign(tk.style, { top: (f.top || 0) + 'px', height: f.tick + 'px', fontSize: f.tick * 0.66 + 'px', lineHeight: f.tick + 'px' });
+    Object.assign(tk.style, { height: f.tick + 'px', fontSize: f.tick * 0.66 + 'px', lineHeight: f.tick + 'px' });
     tk.firstElementChild.style.animationDelay = `${-(Number(q.get('tickAt')) || 4.4)}s`; // the still catches it part way through
   }
   const cr = add(`<div class="crawl"><span>${CRAWL.repeat(12)}</span></div>`);
-  Object.assign(cr.style, { bottom: (f.bottom || 0) + 'px', height: f.crawl + 'px', fontSize: f.crawl * 0.75 + 'px', lineHeight: f.crawl + 'px' });
+  Object.assign(cr.style, { height: f.crawl + 'px', fontSize: f.crawl * 0.75 + 'px', lineHeight: f.crawl + 'px' });
   cr.firstElementChild.style.animationDelay = `${-(Number(q.get('crawlAt')) || 2.3)}s`;
 
   // what the grid came to, for checking
-  window.report = { headSize: hs, subSize: ss, textBottom: y, cardBottom, tapeTopAtCard: tapeTop(sx + 200 * f.card), tapeTopAtColumn: tapeTop(monX), crawlTop, capTop, ball: [ballL, ballT, bd] };
+  window.report = { headSize: hs, subSize: ss, textBottom: y, cardBottom, tapeTopAtCard: tapeTop(sx + 200 * (f.stack ? f.u : f.card)), tapeTopAtColumn: tapeTop(gx + gd / 2), crawlTop, capTop, ball: [ballL, ballT, bd] };
 
   // Time: every animation is paused and set to t; the globe steps through its 60 frames (one turn in 4 s).
   const frames = Array.from({ length: 60 }, (_, i) => `${PARTS}globe-${String(i).padStart(2, '0')}.png`);
