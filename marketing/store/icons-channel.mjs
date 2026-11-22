@@ -1,5 +1,5 @@
-// Draw the extension icons in the banner's look: the studio blue, a yellow sale "%" (with "30%" at
-// the larger sizes) in the slanted heavy type with its stacked navy shadow.
+// Draw the extension icons in the banner's look: the studio blue and a yellow "30% OFF" in the
+// slanted heavy type with its stacked navy shadow (at 16 px, where two lines cannot be read, a "%").
 //   node store/icons-channel.mjs      -> ../src/icons/icon{16,32,48,128}.png, out/icons-channel/preview.png
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
@@ -15,7 +15,7 @@ const page = (size, art, text) => `<!doctype html><html><head><style>
   .a { position: relative; width: ${art}px; height: ${art}px; border-radius: ${art * 0.22}px; overflow: hidden;
        background: radial-gradient(circle at 60% 40%, #4fb6ff 0%, #2a8cff 18%, #1348ee 42%, transparent 75%), linear-gradient(#0a22d6, #070f9c);
        box-shadow: inset 0 0 0 ${Math.max(1, art * 0.03)}px rgba(255, 255, 255, 0.25); display: grid; place-items: center; }
-  .t { font: ${art * (text === '%' ? 0.74 : 0.42)}px/1 B; color: #fff035; letter-spacing: -0.05em; transform: skewX(-9deg) translate(-${art * 0.03}px, ${art * 0.02}px);
+  .t { font: ${art * (text === '%' ? 0.74 : 0.4)}px/0.86 B; color: #fff035; letter-spacing: -0.05em; text-align: center; transform: skewX(-9deg) translate(-${art * 0.02}px, ${art * 0.03}px);
        text-shadow: ${[1, 2, 3, 4].map((k) => `${k * art * 0.012}px ${k * art * 0.012}px 0 #0a0f66`).join(', ')}; }
 </style></head><body><div class="i"><div class="a"><div class="t">${text}</div></div></div></body></html>`;
 
@@ -23,7 +23,7 @@ const out = root + 'marketing/out/icons-channel/';
 fs.mkdirSync(out, { recursive: true });
 const b = await chromium.launch();
 const p = await b.newPage({ deviceScaleFactor: 1 });
-for (const [size, art, text] of [[16, 16, '%'], [32, 32, '%'], [48, 46, '30%'], [128, 96, '30%']]) {
+for (const [size, art, text] of [[16, 16, '%'], [32, 32, '30%<br>OFF'], [48, 46, '30%<br>OFF'], [128, 96, '30%<br>OFF']]) {
   await p.setViewportSize({ width: size, height: size });
   await p.setContent(page(size, art, text));
   await p.evaluate(() => document.fonts.ready);
