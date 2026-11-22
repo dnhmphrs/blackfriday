@@ -52,7 +52,7 @@
 
   const url = (path) => chrome.runtime.getURL(path);
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const GRAIN_GAIN = 0.36; // how strong the fine grain is
+  const GRAIN_GAIN = 0.24; // how strong the fine grain is
   const img = (cls, file) => `<img class="${cls}" alt="" src="${url(`images/${file}.webp`)}">`;
   const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
   const glints = `<svg viewBox="0 0 100 200" aria-hidden="true">
@@ -61,15 +61,15 @@
   // The look of a worn tape on a tube, as an SVG filter over the banner's face (.tube), after
   // marketing/vhs.py. The picture's brightness goes soft, then over-sharp, as a VCR leaves it; its
   // colour is smeared and arrives late, to the right and low; blotches of colour noise and a fine
-  // streaky grain crawl over it; the bright parts glow; black is lifted. layout() sets the
+  // streaky grain crawl over it (four changes a second); the bright parts glow; black is lifted. layout() sets the
   // distances to suit the banner's size. Faint scanlines and dark corners are added in banner.css.
   const LUMA = "0.299 0.587 0.114 0 0";
   // noise, as a shift about mid grey: of colour (two slow channels, the I and Q of a TV signal) ...
-  const tint = (i, q) => `${i * 0.31} ${q * 0.29} 0 0 ${0.5 - 0.5 * (i * 0.31 + q * 0.29)}`;
+  const tint = (i, q) => `${i * 0.22} ${q * 0.2} 0 0 ${0.5 - 0.5 * (i * 0.22 + q * 0.2)}`;
   const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
   // ... and of brightness (one fast channel)
   const GRAIN = `${`${GRAIN_GAIN} 0 0 0 ${0.5 - 0.5 * GRAIN_GAIN}  `.repeat(3)} 0 0 0 0 1`;
-  const crawl = (seeds) => (still ? "" : `<animate attributeName="seed" values="${seeds}" dur="0.6s" calcMode="discrete" repeatCount="indefinite"/>`);
+  const crawl = (seeds) => (still ? "" : `<animate attributeName="seed" values="${seeds}" dur="1.5s" calcMode="discrete" repeatCount="indefinite"/>`);
   const add = (extra = "") => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`; // a + (b - mid grey)
   const TAPE = `
     <svg class="defs" width="0" height="0" aria-hidden="true">
