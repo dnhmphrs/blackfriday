@@ -189,7 +189,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       w: 1080, tick: 84, tickFont: 56, crawl: 150, crawlFont: 112, minArt: 1800,
       type: { x: 97, y: 38, w: 895, h: 926, src: 'typeDesktop', spread: 0.5 },
       mon: { x: 516, y: 972, k: 1 },   // the globe picture's top left; k scales the whole monument
-      card: { x: 80, y: 1002, s: 1.0, r: -1.4, spread: 0 },
+      card: { x: 80, y: 1052, s: 1.0, r: -1.4, spread: 0 },
       wow: { x: 129, fromCrawl: -505, w: 276, h: 278 },
       strips: [{ id: 'sub', fromCrawl: -130, h: 68, cap: 25, dx: 0 }, { id: 'strip', fromCrawl: -232, h: 126, cap: 54, dx: 12 }],
       glow: { rx: 648, ry: 729 },
