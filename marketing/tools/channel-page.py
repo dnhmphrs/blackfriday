@@ -156,9 +156,9 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       <img id="base" alt="" src="__I_BASE__">
       <img id="globe" alt="" src="__I_GLOBE__">
       <div id="card"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
-      <img id="wow" alt="" src="__I_WOW__">
       <div class="strip" id="sub"><span>__BRAND__</span></div>
       <div class="strip" id="strip"><span>EVERY SITE 30% OFF!</span></div>
+      <img id="wow" alt="" src="__I_WOW__">
       <div class="ticker"><span>__TICKER__</span></div>
       <div class="crawl"><span>__CRAWL__</span></div>
     </div>
@@ -294,17 +294,24 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     Object.assign(card.style, { left: X(c.x, c.spread) + 'px', top: Y(c.y) + 'px', transform: `scale(${c.s * u}) rotate(${c.r}deg)` });
 
     if (!phone) {
-      // the burst and the strips stand on the crawl; in a window too short for the burst to clear the
-      // card (and its 70%), it sits this one out
-      const w = g.wow, cardBottom = Y(c.y) + (306 + 60) * c.s * u, wowTop = crawlTop + w.fromCrawl * u;
-      place($('wow'), X(w.x), wowTop, w.w * u, w.h * u);
-      $('wow').style.visibility = wowTop >= cardBottom ? '' : 'hidden';
+      // the burst and the strips stand on the crawl; in a short window the burst stays clear of the
+      // card (and its 70%) and lands on the yellow strip instead, like a sticker slapped on the tape
+      const w = g.wow, cardBottom = Y(c.y) + (306 + 50) * c.s * u, ideal = crawlTop + w.fromCrawl * u;
+      const onTape = ideal < cardBottom, ws = onTape ? 0.78 : 1; // short window: smaller, at the tape's left end
+      const wowL = onTape ? X(12) : X(w.x), wowTop = onTape ? cardBottom : ideal;
+      place($('wow'), wowL, wowTop, w.w * ws * u, w.h * ws * u);
       const cx = x0 + aw / 2, span = Math.hypot(W, H) * 1.4;
       for (const st of g.strips) {
         const el = $(st.id), h = st.h * u;
         place(el, cx - span / 2, crawlTop + st.fromCrawl * u - h / 2, span, h);
         Object.assign(el.style, { fontSize: (st.cap / 0.72) * u + 'px', paddingLeft: st.dx * 2 * u + 'px', transform: 'rotate(-6deg)' });
         if (st.id === 'strip') el.style.boxShadow = `inset 0 ${4 * u}px 0 rgba(170,158,0,0.6), inset 0 ${-4 * u}px 0 rgba(170,158,0,0.6), ${11 * u}px ${11 * u}px 0 var(--hard)`;
+      }
+      // on the tape, the burst pushes the tape's lettering along so it never covers EVERY
+      if (onTape) {
+        const text = $('strip').firstElementChild, fr = face.getBoundingClientRect();
+        const gap = wowL + w.w * ws * u * 0.92 - (text.getBoundingClientRect().left - fr.left);
+        if (gap > 0) $('strip').style.paddingLeft = (12 * 2 * u + gap * 2) + 'px';
       }
     }
   }
