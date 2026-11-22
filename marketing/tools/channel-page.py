@@ -23,7 +23,7 @@ def b64(path, mime):
 
 IMG = {k: b64(os.path.join(ASSETS, f), 'image/webp') for k, f in {
     'globe': 'globe-380.webp', 'cap': 'cap.webp', 'shaft': 'shaft.webp', 'base': 'base.webp',
-    'wow': 'wow.webp', 'typeTop': 'type-top.webp', 'typeMid': 'type-mid.webp', 'typePhone': 'type-phone.webp'}.items()}
+    'typeTop': 'type-top.webp', 'typeMid': 'type-mid.webp', 'typePhone': 'type-phone.webp'}.items()}
 FONT = {k: b64(os.path.join(FONTS, f'{k}.woff2'), 'font/woff2')
         for k in ('antonio-light', 'antonio-semibold', 'archivo-black', 'arimo-bold-italic')}
 PAGES = {k: open(os.path.join(ROOT, 'store', 'mock', f'{k}.html'), encoding='utf-8').read() for k in ('shop', 'news')}
@@ -100,7 +100,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
            font-family: "TOE Arimo", Arial, sans-serif; font-style: italic; font-weight: 700; }
   #strip { background: linear-gradient(#fffb86, #f0e11c); color: #111; box-shadow: inset 0 0.06em 0 rgba(170, 158, 0, 0.6), inset 0 -0.06em 0 rgba(170, 158, 0, 0.6); }
   #sub { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
-  body.phone #strip, body.phone #sub, body.phone #wow { display: none; }
+  body.phone #strip, body.phone #sub { display: none; }
 
   /* the price card, from v1.7; only its 70% moves */
   #card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000; box-sizing: border-box;
@@ -149,7 +149,6 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     <div class="trim"></div>
     <div class="face">
       <div id="glow"></div>
-      <img id="wow" alt="" src="__I_WOW__">
       <img id="type" alt=""><img id="type2" alt="">
       <div class="motif" id="mL"></div><div class="motif" id="mR"></div>
       <img id="shaft" alt="" src="__I_SHAFT__">
@@ -192,7 +191,6 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       type2: { x: 97, y: 615, w: 895, h: 349, src: 'typeMid', spread: 0.5 },
       mon: { x: 516, y: 972, k: 1 },   // the globe picture's top left; k scales the whole monument
       card: { x: 80, y: 1052, s: 1.0, r: -1.4, spread: 0 },
-      wow: { x: 129, fromCrawl: -505, w: 276, h: 278 },
       strips: [{ id: 'sub', fromCrawl: -130, h: 68, cap: 25, dx: 0 }, { id: 'strip', fromCrawl: -232, h: 126, cap: 54, dx: 12 }],
       glow: { rx: 648, ry: 729 },
     },
@@ -272,13 +270,13 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     Object.assign(tk.style, { left: x0 + 'px', height: g.tick * u + 'px', fontSize: g.tickFont * u + 'px', lineHeight: g.tick * u + 'px' });
     Object.assign(cr.style, { left: x0 + 'px', bottom: (H - ah) + 'px', height: g.crawl * u + 'px', fontSize: g.crawlFont * u + 'px', lineHeight: g.crawl * u + 'px' });
 
-    // A tall window (the scale set by the width) has height to spare. If that leaves the globe up in
-    // the top third, it and the card come down to the third line (two thirds of the height up), and
-    // the lettering above spreads out after them: the gaps above, between and below the headline
-    // open up in step. The rest of the spare height lengthens the column.
+    // A tall window (the scale set by the width) has height to spare. If that leaves the globe in the
+    // top half, it and the card come down to halfway (no further), and the lettering above spreads
+    // out after them: the gaps above, between and below the headline open up in step. The rest of
+    // the spare height lengthens the column.
     const m = g.mon, k = m.k * u;
     const spare = phone ? 0 : Math.max(0, ah - (g.tick + g.minArt + g.crawl) * u);
-    const drop = Math.min(spare, Math.max(0, ah / 3 - (Y(m.y) + (MON.globe / 2) * k)));
+    const drop = Math.min(spare, Math.max(0, ah / 2 - (Y(m.y) + (MON.globe / 2) * k)));
     const t = g.type, type = $('type');
     type.src = IMG[t.src];
     place(type, X(t.x, t.spread), Y(t.y) + drop * 0.25, t.w * u, t.h * u);
@@ -314,15 +312,6 @@ PAGE = r'''<title>30% Off Channel Banner</title>
         Object.assign(el.style, { fontSize: (st.cap / 0.72) * u + 'px', paddingLeft: st.dx * 2 * u + 'px', transform: 'rotate(-6deg)' });
         if (st.id === 'strip') el.style.boxShadow = `inset 0 ${4 * u}px 0 rgba(170,158,0,0.6), inset 0 ${-4 * u}px 0 rgba(170,158,0,0.6), ${11 * u}px ${11 * u}px 0 var(--hard)`;
       }
-      // the burst: centred halfway between the bottom of the 70% and the top of the yellow strip,
-      // and in a short window shrunk (to no less than 60%) to fit the room between them
-      const w = g.wow, y = g.strips.find((st) => st.id === 'strip');
-      const cardBottom = Y(c.y) + drop + (306 + 50) * c.s * u;
-      const stripTop = (x) => crawlTop + y.fromCrawl * u - (y.h * u) / 2 / Math.cos((6 * Math.PI) / 180) - (x - cx) * SLANT;
-      const wcx = X(w.x) + (w.w * u) / 2, room = stripTop(wcx) - cardBottom;
-      const k = Math.max(0.6, Math.min(1, room / (w.h * u * 0.9)));
-      const ww = w.w * u * k, wh = w.h * u * k, wcy = (cardBottom + stripTop(wcx)) / 2;
-      place($('wow'), wcx - ww / 2, wcy - wh / 2, ww, wh);
     }
   }
 
@@ -391,7 +380,6 @@ page = PAGE
 for k, v in {'__F_ANTONIO_LIGHT__': FONT['antonio-light'], '__F_ANTONIO_SEMIBOLD__': FONT['antonio-semibold'],
              '__F_ARCHIVO_BLACK__': FONT['archivo-black'], '__F_ARIMO__': FONT['arimo-bold-italic'],
              '__I_SHAFT__': IMG['shaft'], '__I_CAP__': IMG['cap'], '__I_BASE__': IMG['base'], '__I_GLOBE__': IMG['globe'],
-             '__I_WOW__': IMG['wow'],
              '__I_TYPE_TOP__': IMG['typeTop'], '__I_TYPE_MID__': IMG['typeMid'], '__I_TYPE_PHONE__': IMG['typePhone'],
              '__SHOP_SRCDOC__': html.escape(PAGES['shop'], quote=True),
              '__TICKER__': html.escape(TICKER * 4), '__BRAND__': html.escape(BRAND), '__CRAWL__': html.escape(CRAWL * 12),
