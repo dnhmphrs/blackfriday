@@ -6,22 +6,28 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-export async function launchWithExtension(extDir, { tz, viewport = { width: 1280, height: 800 } } = {}) {
+// browser: the path of another Chromium-based browser to test in (or set BF_BROWSER); by default,
+// Playwright's own Chromium.
+export async function launchWithExtension(extDir, { tz, viewport = { width: 1280, height: 800 }, deviceScaleFactor, browser = process.env.BF_BROWSER } = {}) {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bf-profile-'));
   // Developer mode on, as on the machine of anyone who loads an unpacked extension. Without
   // it Chrome turns an unpacked extension OFF when it reloads itself.
   fs.mkdirSync(path.join(userDataDir, 'Default'), { recursive: true });
   fs.writeFileSync(path.join(userDataDir, 'Default', 'Preferences'), JSON.stringify({ extensions: { ui: { developer_mode: true } } }));
+  const args = [
+    `--disable-extensions-except=${extDir}`,
+    `--load-extension=${extDir}`,
+    '--enable-unsafe-extension-debugging',
+    // branded browsers have stopped honouring --load-extension; this keeps it for a test run
+    '--disable-features=DisableLoadExtensionCommandLineSwitch',
+  ];
   const context = await chromium.launchPersistentContext(userDataDir, {
-    channel: 'chromium',
-    headless: true,
+    // another browser runs headed as far as Playwright knows, with the new headless mode asked for
+    // by hand: the old one, which Playwright would ask for, cannot run extensions
+    ...(browser ? { executablePath: browser, headless: false, args: [...args, '--headless=new'] } : { channel: 'chromium', headless: true, args }),
     viewport,
+    deviceScaleFactor,
     timezoneId: tz,
-    args: [
-      `--disable-extensions-except=${extDir}`,
-      `--load-extension=${extDir}`,
-      '--enable-unsafe-extension-debugging',
-    ],
   });
   return { context, userDataDir };
 }

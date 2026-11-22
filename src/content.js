@@ -101,11 +101,13 @@
     </svg>`;
 
   // The frame is hidden by its own style attribute, which applies at once, before the stylesheet
-  // has loaded; it is shown only when everything in it is ready (see reveal).
+  // has loaded; it is shown only when everything in it is ready (see reveal). It reads left to
+  // right and in English whatever the page does (a right-to-left page would run the tickers off
+  // the wrong way).
   function html() {
     return `
       <link rel="stylesheet" href="${url("banner.css")}">
-      <div class="frame" style="visibility: hidden" role="img" aria-label="30% off everything on the internet. Black Friday only!">
+      <div class="frame" dir="ltr" lang="en" style="visibility: hidden" role="img" aria-label="30% off everything on the internet. Black Friday only!">
         <div class="trim"></div>
         <div class="face">
           <div class="tube">
@@ -267,6 +269,36 @@
     frame.style.removeProperty("visibility");
     void frame.offsetWidth; // start the slide from where the stylesheet put it, off the edge
     frame.classList.add("in");
+    settleLook(element, shadow);
+  }
+
+  // The tape look costs next to nothing on a graphics card and a great deal without one (a remote
+  // desktop, a virtual machine, an old laptop). So once the banner is in, see how fast the page is
+  // drawing: if it is slow, take the look off; and if that made no difference, the page is slow by
+  // itself, so put it back.
+  const SLOW = 24; // frames a second
+  // Frames a second over about two seconds of the tab drawing. A gap of over a second between
+  // frames is the tab out of view, not a slow frame.
+  const frameRate = () => new Promise((resolve) => {
+    let frames = 0, drawing = 0, last = 0;
+    const tick = (now) => {
+      const gap = now - last;
+      if (last && gap < 1000) { frames++; drawing += gap; }
+      last = now;
+      if (drawing < 2000) requestAnimationFrame(tick);
+      else resolve((frames * 1000) / drawing);
+    };
+    requestAnimationFrame(tick);
+  });
+  async function settleLook(element, shadow) {
+    if (still) return; // nothing moves, so nothing is redrawn
+    const tube = shadow.querySelector(".tube");
+    await new Promise((resolve) => setTimeout(resolve, 1200)); // let the slide in, and the page's own start, pass
+    const withLook = await frameRate();
+    if (element !== host || withLook >= SLOW) return;
+    tube.style.filter = "none";
+    const without = await frameRate();
+    if (element === host && without < withLook * 1.5) tube.style.removeProperty("filter");
   }
 
   function createHost() {

@@ -85,6 +85,11 @@ const probe = () => {
     art: rect(s.querySelector('.type')),
     globe: rect(s.querySelector('.globe')),
     ticker: rect(s.querySelector('.crawl')),
+    // how much of each ticker's width has its lettering over it (1: all of it), and which way the banner reads
+    tickers: ['.ticker', '.crawl'].map((sel) => { const box = s.querySelector(sel).getBoundingClientRect(), text = s.querySelector(sel + ' span').getBoundingClientRect();
+      return Math.round((100 * Math.max(0, Math.min(box.right, text.right) - Math.max(box.left, text.left))) / box.width) / 100; }),
+    direction: getComputedStyle(s.querySelector('.tube')).direction,
+    look: getComputedStyle(s.querySelector('.tube')).filter,
     images: [...s.querySelectorAll('img')].filter((i) => getComputedStyle(i).display !== 'none').map((i) => i.naturalWidth),
     viewport: [document.documentElement.clientWidth, innerHeight],
     hitRight: document.elementFromPoint(innerWidth - 60, innerHeight / 2)?.nodeName,
@@ -223,13 +228,18 @@ console.log('\n# 4. The banner (Black Friday)');
     };
     requestAnimationFrame(look);
   });
+  const frameRate = () => page.evaluate(() => new Promise((res) => { let n = 0; const t0 = performance.now(); const tick = (t) => { n++; t - t0 < 2500 ? requestAnimationFrame(tick) : res(Math.round((n * 1000) / (t - t0))); }; requestAnimationFrame(tick); }));
+  await page.goto(url('/plain', ORDINARY)); await sleep(500);
+  const bare = await frameRate();
   await page.goto(url('/plain', BF)); await sleep(2000);
   const base = await page.evaluate(probe);
   const [vw, vh] = base.viewport;
+  check('comes in with the tape look', base.look.includes('tape'), base.look);
   check('never shows unstyled or half-loaded: hidden until ready, then slides in', base.revealed && (await page.evaluate(() => window.__flash.length)) === 0, `flashes at ${await page.evaluate(() => window.__flash.slice(0, 5).join(','))} ms`);
   check('right-hand 30%, full height', Math.abs(base.frame[2] - vw * 0.3) <= 2 && base.frame[1] === 0 && base.frame[3] === vh && base.frame[0] + base.frame[2] === vw, JSON.stringify(base.frame));
   check('under <html>, in the top layer', base.parent === 'HTML' && base.topLayer === true);
   check('stylesheet, pictures and crawl loaded', base.styled && base.images.length === 6 && base.images.every((w) => w > 0), JSON.stringify(base.images));
+  check('both tickers run across the banner, left to right', base.tickers.every((c) => c > 0.9) && base.direction === 'ltr', `${base.tickers} ${base.direction}`);
   check('the crawl sits on the bottom edge', base.ticker && Math.abs(base.ticker[1] + base.ticker[3] - (base.frame[1] + base.frame[3])) <= 1, JSON.stringify(base.ticker));
   check('blocks the right side, left side still clickable', base.hitRight === 'THIRTY-OFF-EVERYTHING' && base.hitLeft !== 'THIRTY-OFF-EVERYTHING', `${base.hitRight} / ${base.hitLeft}`);
   await page.mouse.move(400, 400); await page.mouse.wheel(0, 600); await sleep(200);
@@ -254,6 +264,11 @@ console.log('\n# 4. The banner (Black Friday)');
     check(`${w}x${h}: across the top third, full width, crawl just above its teeth`, p.frame[0] === 0 && p.frame[1] === 0 && p.frame[2] === p.viewport[0] && Math.abs(p.frame[3] - p.viewport[1] * 0.33) <= 2 && frameBottom - crawlBottom >= 0 && frameBottom - crawlBottom <= 20, `${JSON.stringify(p.frame)} crawl ends ${crawlBottom}`);
   }
   await page.setViewportSize({ width: 1280, height: 800 });
+  // Without a graphics card the tape look is slow to draw. The banner notices and takes it off,
+  // so the page under it keeps drawing at a fair rate either way.
+  await page.goto(url('/plain', BF)); await sleep(9000);
+  const rate = await frameRate(), after = await page.evaluate(probe);
+  check('the page keeps drawing under the banner (the tape look comes off where it is slow)', rate >= Math.min(24, bare * 0.5), `${rate} frames a second with the banner, ${bare} without; the look is ${after.look.includes('tape') ? 'on' : 'off'}`);
   check('no errors', errs.length === 0, errs.join(' | '));
   await context.close();
 }
@@ -271,6 +286,7 @@ console.log('\n# 5. Hostile and unusual pages (Black Friday)');
   const h = await page.evaluate(probe);
   check('hostile CSS: same geometry as on a plain page', JSON.stringify(h.frame) === JSON.stringify(base.frame) && JSON.stringify(h.art) === JSON.stringify(base.art), `${JSON.stringify(h.frame)} ${JSON.stringify(h.art)}`);
   check('hostile CSS: above a maximum z-index wall added later', h.hitRight === 'THIRTY-OFF-EVERYTHING', h.hitRight);
+  check('right-to-left page in another language: the banner still reads left to right, its tickers run', h.direction === 'ltr' && h.tickers.every((c) => c > 0.9), `${h.direction} ${h.tickers}`);
 
   await page.goto(url('/csp', BF)); await sleep(2000);
   const cdp = await context.newCDPSession(page);
