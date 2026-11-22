@@ -9,7 +9,7 @@
 // level with the message and the column's shaft grows down to the crawl (the strips go with it),
 // as in gif-plinth-e.
 // For the live banner's still artwork: ?crawl=0 (no crawl), ?only=0 (no BLACK FRIDAY ONLY!),
-// ?glints=0 (no sparkles), ?burst=0 (no starburst), ?sticker=0, ?strips=0. ?white=1: a white column and lattice.
+// ?glints=0 (no sparkles), ?burst=0 (no starburst), ?sticker=0, ?strips=0. ?white=1: a white column.
 // Everything on screen is a pure function of time:  window.comp.setTime(seconds)
 import * as THREE from 'three';
 import { createStage, materials } from '../lib/stage.js';
@@ -194,16 +194,12 @@ const { renderer, scene, camera } = createStage({ canvas: gl, width: 16, height:
 renderer.shadowMap.enabled = false;
 const pivot = new THREE.Group();
 scene.add(pivot);
-// ?white=1: the column and the globe's lattice in satin white instead of chrome (the shade lifted a
-// little, so it stays white on its dark side)
+// ?white=1: the column in satin white instead of chrome (its shade lifted a little with a pale
+// lavender, so it stays white on its dark side). The globe keeps its chrome.
 const WHITE = q.get('white') === '1';
-const white = (lift = 0.3) => new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0, roughness: 0.62, envMapIntensity: 0.3,
-  emissive: new THREE.Color(Number(q.get('shade') ? '0x' + q.get('shade') : 0xc6cbee)), emissiveIntensity: Number(q.get('lift') ?? lift) });
+const white = () => new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0, roughness: 0.62, envMapIntensity: 0.3,
+  emissive: new THREE.Color(0xc6cbee), emissiveIntensity: 0.3 });
 const globe = await buildObject('globe-core');
-if (WHITE) {
-  const lattice = white(0.42);
-  globe.traverse((o) => { if (o.isMesh && (o.geometry.type === 'TubeGeometry' || (o.geometry.type === 'SphereGeometry' && o.geometry.parameters.radius < 0.2))) o.material = lattice; });
-}
 globe.userData.slice.visible = false;
 pivot.add(globe);
 // the lettered cut faces keep their full sign yellow and red (no tone-mapping squeeze)

@@ -3,16 +3,16 @@
 
 The banner is laid out the way the extension will lay it out, from separate pieces so it can fill
 any window shape: the lettering, the spinning globe and the column (cap, shaft, base: the shaft
-stretches to whatever height there is) are pictures cut out of comps/tv-banner by
-tools/channel-parts.mjs; the tickers, the price card and the strips are HTML. The page under it
+stretches to whatever height there is) are the extension's own pictures (src/images, made by
+tools/channel-parts.mjs and tools/channel-assets.py); the tickers, the price card and the strips are HTML. The page under it
 loads first; the banner slides in once its pieces are ready.
-    node tools/channel-parts.mjs && python3 tools/channel-page.py      (run from marketing/)"""
+    python3 tools/channel-page.py      (run from marketing/)"""
 import base64, html, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OUT_DIR = os.path.join(ROOT, 'out', 'channel-page')
-ASSETS = os.path.join(OUT_DIR, 'assets')
+ASSETS = os.path.join(ROOT, '..', 'src', 'images')  # the extension's own pictures (tools/channel-assets.py)
 FONTS = os.path.join(ROOT, 'variants', 'v17', 'fonts')
 
 
@@ -22,7 +22,7 @@ def b64(path, mime):
 
 
 IMG = {k: b64(os.path.join(ASSETS, f), 'image/webp') for k, f in {
-    'globe': 'globe-380.webp', 'cap': 'cap.webp', 'shaft': 'shaft.webp', 'base': 'base.webp',
+    'globe': 'globe.webp', 'cap': 'cap.webp', 'shaft': 'shaft.webp', 'base': 'base.webp',
     'typeTop': 'type-top.webp', 'typeMid': 'type-mid.webp', 'typePhone': 'type-phone.webp'}.items()}
 FONT = {k: b64(os.path.join(FONTS, f'{k}.woff2'), 'font/woff2')
         for k in ('antonio-light', 'antonio-semibold', 'archivo-black', 'arimo-bold-italic')}

@@ -2,6 +2,8 @@
 // zones and across midnight), that it does nothing on other days, the banner's layout, and
 // pages that try hard to break it. The clock is faked; see test/helpers.mjs.
 //   npm install && npx playwright install chromium && npm test
+import fs from 'node:fs';
+import path from 'node:path';
 import { launchWithExtension, serve, makeTestCopy, reloadExtension } from './helpers.mjs';
 
 const EXT = makeTestCopy(new URL('../src', import.meta.url).pathname);
@@ -100,6 +102,23 @@ async function watchErrors(context, page) {
   cdp.on('Runtime.exceptionThrown', (e) => errs.push(e.exceptionDetails.exception?.description || e.exceptionDetails.text));
   page.on('console', (m) => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) errs.push('console.error: ' + m.text()); });
   return errs;
+}
+
+// =====================================================================================
+console.log('\n# 0. What is in the package');
+{
+  // One script, one stylesheet, pictures and typefaces: no library, no 3D or canvas code, nothing
+  // fetched or run from elsewhere. (The globe is a picture, drawn beforehand.)
+  const SRC = new URL('../src', import.meta.url).pathname;
+  const files = fs.readdirSync(SRC, { recursive: true }).filter((f) => fs.statSync(path.join(SRC, f)).isFile()).map((f) => f.split(path.sep).join('/'));
+  const odd = files.filter((f) => !/^(manifest\.json|content\.js|banner\.css|images\/[\w-]+\.webp|fonts\/[\w-]+\.woff2|fonts\/LICENSE\.txt|icons\/icon\d+\.png)$/.test(f));
+  check('only the manifest, one script, one stylesheet, pictures, typefaces and icons', odd.length === 0, odd.join(', '));
+  const manifest = JSON.parse(fs.readFileSync(path.join(SRC, 'manifest.json'), 'utf8'));
+  check('no permissions, no background script, the one content script', !manifest.permissions && !manifest.host_permissions && !manifest.background
+    && JSON.stringify(manifest.content_scripts.map((c) => c.js)) === '[["content.js"]]');
+  const code = fs.readFileSync(path.join(SRC, 'content.js'), 'utf8') + fs.readFileSync(path.join(SRC, 'banner.css'), 'utf8');
+  const found = code.match(/three|webgl|getContext|canvas|\bimport\b|require\(|eval\(|new Function|fetch\(|XMLHttpRequest|WebSocket|sendBeacon|<script|wasm|Worker\(|https?:\/\/(?!www\.w3\.org)/gi);
+  check('no 3D, canvas, network or dynamic code in it', !found, String(found));
 }
 
 // =====================================================================================
