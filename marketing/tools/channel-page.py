@@ -7,7 +7,7 @@ stretches to whatever height there is) are the extension's own pictures (src/ima
 tools/channel-parts.mjs and tools/channel-assets.py); the tickers, the price card and the strips are HTML. The page under it
 loads first; the banner slides in once its pieces are ready.
     python3 tools/channel-page.py      (run from marketing/)"""
-import base64, html, os
+import base64, html, os, re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -68,17 +68,10 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   .trim, .face { position: absolute; inset: 0; }
   .trim { background: linear-gradient(90deg, #fffb86, #f0e11c 45%, #c9b400); }
   body.phone .trim { background: linear-gradient(#c9b400, #f0e11c 55%, #fffb86); }
-  .face { overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
-  .face > * { position: absolute; display: block; max-width: none; }
+  .face { overflow: hidden; }
   #glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
 
-  /* the tube: faint scanlines and darker corners over the whole face, and a slow roll of brightness
-     down it. The picture stays sharp; nothing here is blurred. */
-  .face::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
-                 background: repeating-linear-gradient(rgba(0, 0, 30, 0.16) 0 1px, transparent 1px 3px),
-                             radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 24, 0.3) 100%); }
-  .face::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 60%; z-index: 3; pointer-events: none;
-                  background: linear-gradient(rgba(255, 255, 255, 0.07), transparent 50%); animation: roll 8s linear infinite; }
+__TUBE_CSS__
 
   /* the motif either side of 30% OFF: drawn in SVG, so it is sharp at any size */
   .motif svg { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -122,7 +115,6 @@ PAGE = r'''<title>30% Off Channel Banner</title>
                color: var(--red); letter-spacing: -0.05em; -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform-origin: 70% 80%;
                animation: jolt 1.1s ease-in-out infinite; }
 
-  @keyframes roll { from { transform: translateY(-100%); } to { transform: translateY(167%); } }
   @keyframes slide { to { transform: translateX(-50%); } }
   @keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
   @keyframes jolt {
@@ -134,7 +126,6 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   }
   @media (prefers-reduced-motion: reduce) {
     .ticker span, .crawl span, #card .big, .tw, .bob, .fan, .wob { animation: none; }
-    .face::before { display: none; }
     #frame.in, body.phone #frame.in { transition: opacity 0.3s linear; }
   }
 
@@ -158,6 +149,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   <div id="frame" role="img" aria-label="30% off everything on the internet. Black Friday only!">
     <div class="trim"></div>
     <div class="face">
+      <div class="tube">
       <div id="glow"></div>
       <img id="type" alt=""><img id="type2" alt="">
       <div class="motif" id="mL"></div><div class="motif" id="mR"></div>
@@ -170,6 +162,8 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       <div class="strip" id="strip"><span>EVERY SITE 30% OFF!</span></div>
       <div class="ticker"><span>__TICKER__</span></div>
       <div class="crawl"><span>__CRAWL__</span></div>
+      </div>
+      <div class="lines"></div>
     </div>
   </div>
 </div>
@@ -242,9 +236,12 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   const TOOTH = { period: 16, depth: 7 }, KEY = 2, TRIM = 6; // CSS px: the teeth, the black keyline, the gold trim
   const RESERVE = TOOTH.depth + KEY + TRIM + 2; // kept clear of the teeth on the page-facing edge
 
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+__TAPE_JS__
   const $ = (id) => document.getElementById(id);
   const state = { screen: 'desktop', page: 'shop', url: '' };
   const frame = $('frame'), face = frame.querySelector('.face'), trim = frame.querySelector('.trim');
+  frame.insertAdjacentHTML('beforeend', TAPE);
 
   // A zigzag along the page-facing edge, `s` px further in than the tips.
   function teeth(w, h, phone, s) {
@@ -274,6 +271,9 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     const X = (x, spread = 0) => x0 + x * u + extra * spread;
     const top = g.tick * u;                              // where the artwork hangs from
     const crawlTop = ah - g.crawl * u;                   // where it stands
+    const tape = (sel, name, value) => frame.querySelector(sel).setAttribute(name, value); // the filter's distances, as in the extension
+    tape('.soft', 'stdDeviation', `${1.25 * u} ${0.5 * u}`); tape('.halo', 'stdDeviation', `${5 * u} ${0.6 * u}`);
+    tape('.smear', 'stdDeviation', `${10 * u} ${1.6 * u}`); tape('.late', 'dx', 7 * u); tape('.late', 'dy', 1.7 * u); tape('.bloom', 'stdDeviation', 14 * u);
     const Y = (y) => top + y * u;
 
     const tk = face.querySelector('.ticker'), cr = face.querySelector('.crawl');
@@ -386,7 +386,15 @@ PAGE = r'''<title>30% Off Channel Banner</title>
 '''
 
 js = lambda s: s.replace('\\', '\\\\').replace("'", "\\'").replace('\n', '\\n').replace('</', '<\\/')
-page = PAGE
+# The tape look is the extension's own: its filter (from content.js) and its styles (from banner.css).
+SRC = os.path.join(ROOT, '..', 'src')
+content_js = open(os.path.join(SRC, 'content.js'), encoding='utf-8').read()
+banner_css = open(os.path.join(SRC, 'banner.css'), encoding='utf-8').read()
+cut = lambda text, start, end: text[text.index(start):text.index(end)]
+TAPE_JS = (re.search(r'^  const GRAIN_GAIN = .*$', content_js, re.M).group(0) + '\n'
+           + cut(content_js, '  // The look of a worn tape on a tube', '  // The frame is hidden by its own style attribute'))
+TUBE_CSS = cut(banner_css, '/* the tube:', '/* the glints either side')
+page = PAGE.replace('__TAPE_JS__', TAPE_JS.rstrip()).replace('__TUBE_CSS__', TUBE_CSS.rstrip())
 for k, v in {'__F_ANTONIO_LIGHT__': FONT['antonio-light'], '__F_ANTONIO_SEMIBOLD__': FONT['antonio-semibold'],
              '__F_ARCHIVO_BLACK__': FONT['archivo-black'], '__F_ARIMO__': FONT['arimo-bold-italic'],
              '__I_SHAFT__': IMG['shaft'], '__I_CAP__': IMG['cap'], '__I_BASE__': IMG['base'], '__I_GLOBE__': IMG['globe'],

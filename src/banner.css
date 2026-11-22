@@ -13,18 +13,18 @@
 .frame.in { opacity: 1; transform: none; transition: transform 0.55s cubic-bezier(0.2, 0.85, 0.25, 1), opacity 0.25s linear; }
 .trim, .face { position: absolute; inset: 0; }
 .trim { background: linear-gradient(90deg, #fffb86, #f0e11c 45%, #c9b400); }
-.face { overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
-.face > * { position: absolute; display: block; max-width: none; }
-.face > [hidden] { display: none; }
+.face { overflow: hidden; }
 .glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
 
-/* the tube: faint scanlines and darker corners over the whole face, and a slow roll of brightness
-   down it. The picture stays sharp; nothing here is blurred. */
-.face::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
-               background: repeating-linear-gradient(rgba(0, 0, 30, 0.16) 0 1px, transparent 1px 3px),
-                           radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 24, 0.3) 100%); }
-.face::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 60%; z-index: 3; pointer-events: none;
-                background: linear-gradient(rgba(255, 255, 255, 0.07), transparent 50%); animation: roll 8s linear infinite; }
+/* the tube: the whole face goes through the tape filter (see content.js); over it lie faint
+   scanlines and the dark corners */
+.tube { position: absolute; inset: 0; overflow: hidden; filter: url(#tape); background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
+.tube > * { position: absolute; display: block; max-width: none; }
+.tube > [hidden] { display: none; }
+.defs { position: absolute; }
+.lines { position: absolute; inset: 0; pointer-events: none;
+         background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.05) 1.5px, rgba(0, 0, 16, 0) 3px),
+                     radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
 
 /* the glints either side of 30% OFF */
 .glints svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
@@ -61,7 +61,6 @@
              color: var(--red); letter-spacing: -0.05em; -webkit-text-stroke: 11px #000; paint-order: stroke fill;
              transform: skewX(-8deg); transform-origin: 70% 80%; animation: jolt 1.1s ease-in-out infinite; }
 
-@keyframes roll { from { transform: translateY(-100%); } to { transform: translateY(167%); } }
 @keyframes slide { to { transform: translateX(-50%); } }
 @keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
 @keyframes twinkle { 0%, 100% { transform: scale(0.55) rotate(-10deg); opacity: 0.75; } 50% { transform: scale(1) rotate(12deg); opacity: 1; } }
@@ -82,6 +81,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ticker span, .crawl span, .card .big, .tw { animation: none; }
-  .face::before { display: none; }
   .frame.in { transition: opacity 0.3s linear; }
 }

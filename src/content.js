@@ -52,10 +52,53 @@
 
   const url = (path) => chrome.runtime.getURL(path);
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const GRAIN_GAIN = 0.36; // how strong the fine grain is
   const img = (cls, file) => `<img class="${cls}" alt="" src="${url(`images/${file}.webp`)}">`;
   const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
   const glints = `<svg viewBox="0 0 100 200" aria-hidden="true">
     <g transform="translate(22 62) scale(38)"><path class="tw" d="${GLINT}"/></g><g transform="translate(66 132) scale(22)"><path class="tw b" d="${GLINT}"/></g></svg>`;
+
+  // The look of a worn tape on a tube, as an SVG filter over the banner's face (.tube), after
+  // marketing/vhs.py. The picture's brightness goes soft, then over-sharp, as a VCR leaves it; its
+  // colour is smeared and arrives late, to the right and low; blotches of colour noise and a fine
+  // streaky grain crawl over it; the bright parts glow; black is lifted. layout() sets the
+  // distances to suit the banner's size. Faint scanlines and dark corners are added in banner.css.
+  const LUMA = "0.299 0.587 0.114 0 0";
+  // noise, as a shift about mid grey: of colour (two slow channels, the I and Q of a TV signal) ...
+  const tint = (i, q) => `${i * 0.31} ${q * 0.29} 0 0 ${0.5 - 0.5 * (i * 0.31 + q * 0.29)}`;
+  const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
+  // ... and of brightness (one fast channel)
+  const GRAIN = `${`${GRAIN_GAIN} 0 0 0 ${0.5 - 0.5 * GRAIN_GAIN}  `.repeat(3)} 0 0 0 0 1`;
+  const crawl = (seeds) => (still ? "" : `<animate attributeName="seed" values="${seeds}" dur="0.6s" calcMode="discrete" repeatCount="indefinite"/>`);
+  const add = (extra = "") => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`; // a + (b - mid grey)
+  const TAPE = `
+    <svg class="defs" width="0" height="0" aria-hidden="true">
+      <filter id="tape" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+        <feFlood flood-color="#0a22d6"/>
+        <feMerge result="picture"><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+
+        <feGaussianBlur class="soft" in="picture"/>
+        <feColorMatrix type="matrix" values="${LUMA} ${LUMA} ${LUMA} 0 0 0 1 0" result="luma"/>
+        <feGaussianBlur class="halo"/>
+        <feComposite in="luma" operator="arithmetic" k2="1.42" k3="-0.42" result="sharp"/>
+
+        <feGaussianBlur class="smear" in="picture"/>
+        <feOffset class="late"/>
+        <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
+        <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
+
+        <feTurbulence type="fractalNoise" baseFrequency="0.042 0.167" numOctaves="1" seed="3">${crawl("3;11;7;19;5;13")}</feTurbulence>
+        <feColorMatrix type="matrix" values="${MOTTLE}"/>
+        <feComposite in2="clean" ${add('result="mottled"')}/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.45 0.9" numOctaves="1" seed="2">${crawl("2;17;9;23;4;29")}</feTurbulence>
+        <feColorMatrix type="matrix" values="${GRAIN}"/>
+        <feComposite in2="mottled" ${add('result="taped"')}/>
+
+        <feComponentTransfer><feFuncR type="linear" intercept="-0.55"/><feFuncG type="linear" intercept="-0.55"/><feFuncB type="linear" intercept="-0.55"/></feComponentTransfer>
+        <feGaussianBlur class="bloom"/>
+        <feComposite in2="taped" operator="arithmetic" k2="0.149" k3="0.93" k4="0.037"/>
+      </filter>
+    </svg>`;
 
   // The frame is hidden by its own style attribute, which applies at once, before the stylesheet
   // has loaded; it is shown only when everything in it is ready (see reveal).
@@ -65,16 +108,20 @@
       <div class="frame" style="visibility: hidden" role="img" aria-label="30% off everything on the internet. Black Friday only!">
         <div class="trim"></div>
         <div class="face">
-          <div class="glow"></div>
-          <img class="type" alt=""><img class="type2" alt="">
-          <div class="glints left">${glints}</div><div class="glints right">${glints}</div>
-          ${img("shaft", "shaft")}${img("cap", "cap")}${img("base", "base")}${img("globe", still ? "globe-still" : "globe")}
-          <div class="card"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
-          <div class="strip sub"><span>${BRAND}</span></div>
-          <div class="strip tape"><span>EVERY SITE 30% OFF!</span></div>
-          <div class="ticker"><span>${TICKER.repeat(4)}</span></div>
-          <div class="crawl"><span>${CRAWL.repeat(12)}</span></div>
+          <div class="tube">
+            <div class="glow"></div>
+            <img class="type" alt=""><img class="type2" alt="">
+            <div class="glints left">${glints}</div><div class="glints right">${glints}</div>
+            ${img("shaft", "shaft")}${img("cap", "cap")}${img("base", "base")}${img("globe", still ? "globe-still" : "globe")}
+            <div class="card"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
+            <div class="strip sub"><span>${BRAND}</span></div>
+            <div class="strip tape"><span>EVERY SITE 30% OFF!</span></div>
+            <div class="ticker"><span>${TICKER.repeat(4)}</span></div>
+            <div class="crawl"><span>${CRAWL.repeat(12)}</span></div>
+          </div>
+          <div class="lines"></div>
         </div>
+        ${TAPE}
       </div>`;
   }
 
@@ -137,6 +184,13 @@
     const X = (x, spread = 0) => x0 + x * u + spareW * spread;
     const Y = (y) => (g.tick + y) * u;
     const crawlTop = ah - g.crawl * u;
+
+    // the tape filter's distances, in step with the banner's size
+    $(".soft").setAttribute("stdDeviation", `${1.25 * u} ${0.5 * u}`);
+    $(".halo").setAttribute("stdDeviation", `${5 * u} ${0.6 * u}`);
+    $(".smear").setAttribute("stdDeviation", `${10 * u} ${1.6 * u}`);
+    $(".late").setAttribute("dx", 7 * u); $(".late").setAttribute("dy", 1.7 * u);
+    $(".bloom").setAttribute("stdDeviation", 14 * u);
 
     Object.assign($(".ticker").style, { left: `${x0}px`, height: `${g.tick * u}px`, fontSize: `${g.tickFont * u}px`, lineHeight: `${g.tick * u}px` });
     Object.assign($(".crawl").style, { left: `${x0}px`, bottom: `${H - ah}px`, height: `${g.crawl * u}px`, fontSize: `${g.crawlFont * u}px`, lineHeight: `${g.crawl * u}px` });
