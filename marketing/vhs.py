@@ -20,8 +20,10 @@ def blur(a, sx, sy):
     return cv2.GaussianBlur(a, (0, 0), sigmaX=sx, sigmaY=max(sy, 0.01))
 
 
-def degrade(rgb, index, fps, glitch, amount=1.0):
-    """rgb: uint8 HxWx3. glitch: 0..1 strength of a tape glitch on this frame."""
+def degrade(rgb, index, fps, glitch, amount=1.0, scratches=True):
+    """rgb: uint8 HxWx3. glitch: 0..1 strength of a tape glitch on this frame.
+    scratches=False leaves out the dropout scratches (for clips whose grain is held still, where a
+    scratch would sit in one place for the whole clip)."""
     rng = np.random.default_rng(1000 + index)
     f = rgb.astype(np.float32) / 255.0
     H, W = f.shape[:2]
@@ -77,7 +79,7 @@ def degrade(rgb, index, fps, glitch, amount=1.0):
     Y[H - hs:] += (rng.standard_normal((hs, W)).astype(np.float32) * 0.25 * amount) * ramp[H - hs:, None]
 
     # dropouts: short bright scratches where the tape has shed oxide
-    for _ in range(rng.poisson(1.2 * amount + 10 * glitch)):
+    for _ in range(rng.poisson(1.2 * amount + 10 * glitch) if scratches else 0):
         y = int(rng.integers(0, H - 3)); x = int(rng.integers(0, W)); ln = int(rng.integers(20, 260) * k)
         tail = np.linspace(1, 0, min(ln, W - x), dtype=np.float32) ** 0.6
         Y[y:y + max(1, int(1.5 * k)), x:x + len(tail)] += 0.75 * tail
