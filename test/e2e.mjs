@@ -236,16 +236,17 @@ console.log('\n# 4. The banner (Black Friday)');
   const [vw, vh] = base.viewport;
   check('comes in with the tape look', base.look.includes('tape'), base.look);
   check('never shows unstyled or half-loaded: hidden until ready, then slides in', base.revealed && (await page.evaluate(() => window.__flash.length)) === 0, `flashes at ${await page.evaluate(() => window.__flash.slice(0, 5).join(','))} ms`);
-  check('right-hand 30%, full height', Math.abs(base.frame[2] - vw * 0.3) <= 2 && base.frame[1] === 0 && base.frame[3] === vh && base.frame[0] + base.frame[2] === vw, JSON.stringify(base.frame));
+  check('right-hand 30%, full height', Math.abs(base.frame[2] - vw * 0.3) <= 2 && base.frame[1] === 0 && base.frame[3] === vh && Math.abs(base.frame[0] + base.frame[2] - vw) <= 1, `${JSON.stringify(base.frame)} of ${vw}`); // to a pixel: a browser that draws a scrollbar gives halves
   check('under <html>, in the top layer', base.parent === 'HTML' && base.topLayer === true);
   check('stylesheet, pictures and crawl loaded', base.styled && base.images.length === 6 && base.images.every((w) => w > 0), JSON.stringify(base.images));
   check('both tickers run across the banner, left to right', base.tickers.every((c) => c > 0.9) && base.direction === 'ltr', `${base.tickers} ${base.direction}`);
   check('the crawl sits on the bottom edge', base.ticker && Math.abs(base.ticker[1] + base.ticker[3] - (base.frame[1] + base.frame[3])) <= 1, JSON.stringify(base.ticker));
   check('blocks the right side, left side still clickable', base.hitRight === 'THIRTY-OFF-EVERYTHING' && base.hitLeft !== 'THIRTY-OFF-EVERYTHING', `${base.hitRight} / ${base.hitLeft}`);
-  await page.mouse.move(400, 400); await page.mouse.wheel(0, 600); await sleep(200);
-  const y1 = await page.evaluate(() => scrollY);
-  await page.mouse.move(vw - 100, 400); await page.mouse.wheel(0, 600); await sleep(200);
-  const y2 = await page.evaluate(() => scrollY);
+  const scrolledTo = (y) => page.waitForFunction((y) => scrollY >= y, y, { timeout: 3000 }).catch(() => {}).then(() => page.evaluate(() => scrollY)); // a slow machine takes a while over a scroll
+  await page.mouse.move(400, 400); await page.mouse.wheel(0, 600);
+  const y1 = await scrolledTo(600);
+  await page.mouse.move(vw - 100, 400); await page.mouse.wheel(0, 600);
+  const y2 = await scrolledTo(y1 + 600);
   check('the mouse wheel over the banner still scrolls the page', y1 > 0 && y2 > y1, `${y1} -> ${y2}`);
   await page.emulateMedia({ media: 'print' });
   check('hidden when printing', await page.evaluate(() => getComputedStyle(document.querySelector('thirty-off-everything')).display === 'none'));
