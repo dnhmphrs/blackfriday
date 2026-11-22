@@ -294,25 +294,23 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     Object.assign(card.style, { left: X(c.x, c.spread) + 'px', top: Y(c.y) + 'px', transform: `scale(${c.s * u}) rotate(${c.r}deg)` });
 
     if (!phone) {
-      // the burst and the strips stand on the crawl; in a short window the burst stays clear of the
-      // card (and its 70%) and lands on the yellow strip instead, like a sticker slapped on the tape
-      const w = g.wow, cardBottom = Y(c.y) + (306 + 50) * c.s * u, ideal = crawlTop + w.fromCrawl * u;
-      const onTape = ideal < cardBottom, ws = onTape ? 0.78 : 1; // short window: smaller, at the tape's left end
-      const wowL = onTape ? X(12) : X(w.x), wowTop = onTape ? cardBottom : ideal;
-      place($('wow'), wowL, wowTop, w.w * ws * u, w.h * ws * u);
-      const cx = x0 + aw / 2, span = Math.hypot(W, H) * 1.4;
+      // the strips stand on the crawl, at a slant
+      const cx = x0 + aw / 2, span = Math.hypot(W, H) * 1.4, SLANT = Math.tan((6 * Math.PI) / 180);
       for (const st of g.strips) {
         const el = $(st.id), h = st.h * u;
         place(el, cx - span / 2, crawlTop + st.fromCrawl * u - h / 2, span, h);
         Object.assign(el.style, { fontSize: (st.cap / 0.72) * u + 'px', paddingLeft: st.dx * 2 * u + 'px', transform: 'rotate(-6deg)' });
         if (st.id === 'strip') el.style.boxShadow = `inset 0 ${4 * u}px 0 rgba(170,158,0,0.6), inset 0 ${-4 * u}px 0 rgba(170,158,0,0.6), ${11 * u}px ${11 * u}px 0 var(--hard)`;
       }
-      // on the tape, the burst pushes the tape's lettering along so it never covers EVERY
-      if (onTape) {
-        const text = $('strip').firstElementChild, fr = face.getBoundingClientRect();
-        const gap = wowL + w.w * ws * u * 0.92 - (text.getBoundingClientRect().left - fr.left);
-        if (gap > 0) $('strip').style.paddingLeft = (12 * 2 * u + gap * 2) + 'px';
-      }
+      // the burst: centred halfway between the bottom of the 70% and the top of the yellow strip,
+      // and in a short window shrunk (to no less than 60%) to fit the room between them
+      const w = g.wow, y = g.strips.find((st) => st.id === 'strip');
+      const cardBottom = Y(c.y) + (306 + 50) * c.s * u;
+      const stripTop = (x) => crawlTop + y.fromCrawl * u - (y.h * u) / 2 / Math.cos((6 * Math.PI) / 180) - (x - cx) * SLANT;
+      const wcx = X(w.x) + (w.w * u) / 2, room = stripTop(wcx) - cardBottom;
+      const k = Math.max(0.6, Math.min(1, room / (w.h * u * 0.9)));
+      const ww = w.w * u * k, wh = w.h * u * k, wcy = (cardBottom + stripTop(wcx)) / 2;
+      place($('wow'), wcx - ww / 2, wcy - wh / 2, ww, wh);
     }
   }
 
