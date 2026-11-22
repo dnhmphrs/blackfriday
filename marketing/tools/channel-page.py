@@ -190,8 +190,8 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       type: { x: 97, y: 38, w: 895, h: 926, src: 'typeDesktop', spread: 0.5 },
       mon: { x: 516, y: 972, k: 1 },   // the globe picture's top left; k scales the whole monument
       card: { x: 80, y: 1002, s: 1.0, r: -1.4, spread: 0 },
-      wow: { x: 129, fromCrawl: -565, w: 276, h: 278 },
-      strips: [{ id: 'sub', fromCrawl: -190, h: 68, cap: 25, dx: 0 }, { id: 'strip', fromCrawl: -292, h: 126, cap: 54, dx: 12 }],
+      wow: { x: 129, fromCrawl: -505, w: 276, h: 278 },
+      strips: [{ id: 'sub', fromCrawl: -130, h: 68, cap: 25, dx: 0 }, { id: 'strip', fromCrawl: -232, h: 126, cap: 54, dx: 12 }],
       glow: { rx: 648, ry: 729 },
     },
     phone: {
@@ -208,8 +208,8 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   const STAR5 = (r) => Array.from({ length: 10 }, (_, i) => { const a = (i * Math.PI) / 5 - Math.PI / 2, q = i % 2 ? r * 0.45 : r; return `${(q * Math.cos(a)).toFixed(1)},${(q * Math.sin(a)).toFixed(1)}`; }).join(' ');
   const NAVY = '#0a0f66';
   const MOTIFS = {
-    glints: `<g transform="translate(55 70) scale(40)"><path class="tw" d="${STAR4}" fill="#fff" style="filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.2px #9fd4ff)"/></g>
-             <g transform="translate(28 140) scale(22)"><path class="tw b" d="${STAR4}" fill="#fff" style="filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.25px #9fd4ff)"/></g>`,
+    glints: `<g transform="translate(22 62) scale(38)"><path class="tw" d="${STAR4}" fill="#fff" style="filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.2px #9fd4ff)"/></g>
+             <g transform="translate(66 132) scale(22)"><path class="tw b" d="${STAR4}" fill="#fff" style="filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.25px #9fd4ff)"/></g>`,
     lines: `<g class="fan">${[[28, 62], [0, 100], [-28, 138]].map(([a, y]) =>
              `<g transform="translate(92 ${y}) rotate(${a})"><line x1="0" y1="0" x2="-62" y2="0" stroke="${NAVY}" stroke-width="13" stroke-linecap="round" transform="translate(5 5)"/>
               <line x1="0" y1="0" x2="-62" y2="0" stroke="#fff035" stroke-width="13" stroke-linecap="round"/></g>`).join('')}</g>`,
@@ -275,8 +275,8 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     place(type, X(t.x, t.spread), Y(t.y), t.w * u, t.h * u);
     if (!phone) {
       const mw = 130, mh = 260, my0 = 291 - mh / 2;  // centred on the 30% OFF block, in the margins beside it
-      place($('mL'), X(198 - 18 - mw, t.spread), Y(my0), mw * u, mh * u);
-      place($('mR'), X(888 + 18, t.spread), Y(my0), mw * u, mh * u);
+      place($('mL'), X(198 - 48 - mw, t.spread), Y(my0), mw * u, mh * u);
+      place($('mR'), X(888 + 48, t.spread), Y(my0), mw * u, mh * u);
     }
 
     // the monument: globe, then the column under it, its shaft stretched down to the crawl
