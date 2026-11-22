@@ -149,6 +149,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     <div class="trim"></div>
     <div class="face">
       <div id="glow"></div>
+      <img id="wow" alt="" src="__I_WOW__">
       <img id="type" alt=""><img id="type2" alt="">
       <div class="motif" id="mL"></div><div class="motif" id="mR"></div>
       <img id="shaft" alt="" src="__I_SHAFT__">
@@ -158,7 +159,6 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       <div id="card"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
       <div class="strip" id="sub"><span>__BRAND__</span></div>
       <div class="strip" id="strip"><span>EVERY SITE 30% OFF!</span></div>
-      <img id="wow" alt="" src="__I_WOW__">
       <div class="ticker"><span>__TICKER__</span></div>
       <div class="crawl"><span>__CRAWL__</span></div>
     </div>
@@ -272,14 +272,13 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     Object.assign(tk.style, { left: x0 + 'px', height: g.tick * u + 'px', fontSize: g.tickFont * u + 'px', lineHeight: g.tick * u + 'px' });
     Object.assign(cr.style, { left: x0 + 'px', bottom: (H - ah) + 'px', height: g.crawl * u + 'px', fontSize: g.crawlFont * u + 'px', lineHeight: g.crawl * u + 'px' });
 
-    // A tall window (the scale set by the width) has height to spare. The globe and the card come
-    // down into it, but the globe no lower than two thirds of the way down the banner, and the
-    // lettering above spreads out after them: the gaps above, between and below the headline open
-    // up in step.
+    // A tall window (the scale set by the width) has height to spare. If that leaves the globe up in
+    // the top third, it and the card come down to the third line (two thirds of the height up), and
+    // the lettering above spreads out after them: the gaps above, between and below the headline
+    // open up in step. The rest of the spare height lengthens the column.
     const m = g.mon, k = m.k * u;
-    // The first 330 banner px of spare height just lengthen the column (as at 1280 x 800).
-    const spare = phone ? 0 : Math.max(0, ah - (g.tick + g.minArt + g.crawl + 330) * u);
-    const drop = Math.min(spare, Math.max(0, (2 / 3) * ah - (Y(m.y) + (MON.globe / 2) * k)));
+    const spare = phone ? 0 : Math.max(0, ah - (g.tick + g.minArt + g.crawl) * u);
+    const drop = Math.min(spare, Math.max(0, ah / 3 - (Y(m.y) + (MON.globe / 2) * k)));
     const t = g.type, type = $('type');
     type.src = IMG[t.src];
     place(type, X(t.x, t.spread), Y(t.y) + drop * 0.25, t.w * u, t.h * u);
