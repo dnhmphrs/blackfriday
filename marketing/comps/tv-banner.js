@@ -306,8 +306,8 @@ camera.setViewOffset(FULL, FULL, FULL / 2 + GX0, FULL / 2 + GY0, DW, DH);
 renderer.setSize(DW, DH, false);
 Object.assign(gl.style, { left: G.x + GX0 + 'px', top: G.y + GY0 + 'px', width: DW + 'px', height: DH + 'px' });
 
-const YAW0 = -25, TURN = 4, HOLD_T = 0.4; // three turns a loop, easing to a near-stop on the hero pose (the cut three-quarter on)
-const yawAt = (t) => { const u = (t - HOLD_T) / TURN; return (YAW0 * Math.PI) / 180 + TAU * u - 0.7 * Math.sin(TAU * u); };
+const YAW0 = -25, TURN = 4, HOLD_T = 0.4; // three turns a loop at one steady speed; the hero pose (the cut three-quarter on) at 0.4 s
+const yawAt = (t) => (YAW0 * Math.PI) / 180 + (TAU * (t - HOLD_T)) / TURN;
 function drawGlobe(t) {
   pivot.rotation.y = yawAt(t);
   pivot.position.y = bobAt(t);
