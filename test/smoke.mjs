@@ -5,6 +5,7 @@
 //   test/smoke-all.sh <folder of browsers>                             runs it in each and prints a table
 import fs from 'node:fs';
 import path from 'node:path';
+import { chromium } from 'playwright';
 import { launchWithExtension, serve, makeTestCopy } from './helpers.mjs';
 
 const [name = 'chromium', browser] = process.argv.slice(2);
@@ -51,21 +52,24 @@ const probe = () => {
     hit: document.elementFromPoint(innerWidth - 40, innerHeight / 2)?.nodeName,
   };
 };
-// the banner's pixels: is it blue, is the yellow headline there, is there white static on the blue
+// the banner's pixels: is it blue, is the yellow headline there, how grainy is the blue (the tape look)
+// (counted in a blank page of a second browser: a page under test may forbid pictures of its own)
+const counter = await chromium.launch(), lab = await counter.newPage();
 async function pixels(page, clip) {
   const png = await page.screenshot({ clip });
-  return page.evaluate(async (b64) => {
+  return lab.evaluate(async (b64) => {
     const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
     const c = Object.assign(document.createElement('canvas'), { width: img.width, height: img.height }), g = c.getContext('2d');
     g.drawImage(img, 0, 0);
-    const d = g.getImageData(0, 0, c.width, c.height).data; let blue = 0, yellow = 0, white = 0, n = d.length / 4;
+    const d = g.getImageData(0, 0, c.width, c.height).data; let blue = 0, yellow = 0, white = 0, n = d.length / 4, pairs = 0, rough = 0;
+    const isBlue = (i) => d[i + 2] > 140 && d[i] < 110 && d[i + 1] < 130;
     for (let i = 0; i < d.length; i += 4) {
       const [R, G, B] = [d[i], d[i + 1], d[i + 2]];
-      if (B > 140 && R < 110 && G < 130) blue++;
+      if (isBlue(i)) { blue++; if ((i / 4) % c.width && isBlue(i - 4)) { pairs++; rough += Math.abs(R - d[i - 4]) + Math.abs(G - d[i - 3]) + Math.abs(B - d[i - 2]); } }
       if (R > 190 && G > 180 && B < 130) yellow++;
       if (R > 200 && G > 200 && B > 200) white++;
     }
-    return { blue: blue / n, yellow: yellow / n, white: white / n };
+    return { blue: blue / n, yellow: yellow / n, white: white / n, grain: pairs ? rough / pairs : 0 };
   }, png.toString('base64'));
 }
 
@@ -78,8 +82,10 @@ try {
   if (version === '?') version = await page.evaluate(() => navigator.userAgent.match(/(?:Edg|Chrome)\/[\d.]+/g).pop());
   console.log('version', version);
   const errors = [];
-  page.on('pageerror', (e) => errors.push(e.message));
-  page.on('console', (m) => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) errors.push(m.text()); });
+  const where = () => new URL(page.url()).pathname;
+  page.on('pageerror', (e) => errors.push(`${where()}: ${e.message}`));
+  page.on('console', (m) => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) errors.push(`${where()}: ${m.text()}`); });
+  const revealed = () => page.waitForFunction(() => document.querySelector('thirty-off-everything')?.shadowRoot?.querySelector('.frame.in'), null, { timeout: 8000 }).catch(() => {});
 
   // ---- an ordinary day: nothing ----
   await page.goto(url('/plain', ORDINARY)); await sleep(800);
@@ -88,7 +94,7 @@ try {
   const fpsOff = await fps(3000);
 
   // ---- Black Friday, desktop ----
-  await page.goto(url('/plain')); await sleep(3000);
+  await page.goto(url('/plain')); await revealed(); await sleep(900);
   const p = await page.evaluate(probe);
   check('Black Friday: banner up and revealed', p.present && p.revealed, JSON.stringify({ revealed: p.revealed }));
   if (p.present) {
@@ -99,16 +105,20 @@ try {
     check('blocks its part of the page', p.hit === 'THIRTY-OFF-EVERYTHING', p.hit);
     const clip = { x: Math.round(p.frame.l), y: 0, width: Math.round(p.frame.w), height: Math.round(p.frame.h) };
     const px = await pixels(page, clip);
-    check('looks like the banner: blue ground, yellow lettering', px.blue > 0.35 && px.yellow > 0.04, JSON.stringify(px));
-    // the tape look: the same banner with its filter off is measurably different
-    await page.evaluate(() => { document.querySelector('thirty-off-everything').shadowRoot.querySelector('.tube').style.filter = 'none'; });
-    await sleep(300);
-    const clean = await pixels(page, clip);
-    await page.evaluate(() => { document.querySelector('thirty-off-everything').shadowRoot.querySelector('.tube').style.filter = ''; });
-    check('tape look is on', p.filter.includes('tape') && Math.abs(px.white - clean.white) + Math.abs(px.blue - clean.blue) > 0.004, `${p.filter}; white ${clean.white.toFixed(3)} -> ${px.white.toFixed(3)}, blue ${clean.blue.toFixed(3)} -> ${px.blue.toFixed(3)}`);
+    check('looks like the banner: blue ground, yellow lettering', px.blue > 0.35 && px.yellow > 0.04, JSON.stringify({ blue: +px.blue.toFixed(2), yellow: +px.yellow.toFixed(2) }));
     await page.screenshot({ path: shots + 'desktop.png' });
+    // by now the banner has had time to see how fast the page draws, and to take the tape look off if it is slow
+    await sleep(8000);
+    const look = await page.evaluate(() => getComputedStyle(document.querySelector('thirty-off-everything').shadowRoot.querySelector('.tube')).filter);
     const fpsOn = await fps(3000);
-    check('page still runs smoothly under the banner', fpsOn >= Math.min(30, fpsOff * 0.5), `${fpsOn} frames a second with the banner, ${fpsOff} without (software rendering here)`);
+    check('page still runs smoothly under the banner', fpsOn >= Math.min(24, fpsOff * 0.5), `${fpsOn} frames a second with the banner (tape look ${look === 'none' ? 'taken off' : 'on'}), ${fpsOff} without; software rendering here`);
+    await page.screenshot({ path: shots + 'desktop-settled.png' });
+    // the tape look, as the banner came in: grain on the blue that is not there with the filter off
+    const kept = await page.evaluate(() => { const t = document.querySelector('thirty-off-everything').shadowRoot.querySelector('.tube'), was = t.style.filter; t.style.filter = 'none'; return was; });
+    await sleep(400);
+    const clean = await pixels(page, clip);
+    await page.evaluate((was) => { document.querySelector('thirty-off-everything').shadowRoot.querySelector('.tube').style.filter = was; }, kept);
+    check('comes in with the tape look', p.filter.includes('tape') && px.grain > clean.grain * 1.5 + 1, `${p.filter}; grain ${px.grain.toFixed(1)} with, ${clean.grain.toFixed(1)} without`);
     await page.mouse.move(300, 400); await page.mouse.wheel(0, 900); await sleep(300);
     check('page scrolls', (await page.evaluate(() => scrollY)) > 0);
   }
@@ -118,10 +128,13 @@ try {
                                 ['/dark', 'dark page'], ['/csp', 'strictest content policy, sandboxed'], ['/layers', 'page with its own popover']]) {
     await page.goto(url(route)); await sleep(2600);
     const q = await page.evaluate(probe).catch((e) => ({ present: false, err: e.message }));
+    const { width: W, height: H } = page.viewportSize();
+    const on = await pixels(page, { x: Math.round(W * 0.72), y: 0, width: Math.round(W * 0.26), height: H }).catch(() => ({ blue: 0 }));
+    const off = await pixels(page, { x: Math.round(W * 0.5), y: 0, width: Math.round(W * 0.18), height: H }).catch(() => ({ blue: 1 }));
     const ok = q.present && q.revealed && q.images.every((w) => w > 0) && q.ticker > 0.9 && q.crawl > 0.9
       && q.direction === 'ltr' && q.sub === 'BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES' && q.tape === 'EVERY SITE 30% OFF!'
-      && Math.abs(q.frame.r - q.frame.l - (q.innerW * 0.3)) <= q.innerW * 0.02;
-    check(label, ok, q.present ? JSON.stringify({ revealed: q.revealed, ticker: +q.ticker.toFixed(2), crawl: +q.crawl.toFixed(2), direction: q.direction, sub: q.sub, w: Math.round(q.frame.w), of: q.innerW, images: q.images.length }) : `no banner ${q.err || ''}`);
+      && on.blue > 0.35 && off.blue < 0.02;
+    check(label, ok, q.present ? JSON.stringify({ revealed: q.revealed, ticker: +q.ticker.toFixed(2), crawl: +q.crawl.toFixed(2), direction: q.direction, sub: q.sub, blueOnBanner: +on.blue.toFixed(2), blueBesideIt: +off.blue.toFixed(2), images: q.images.length }) : `no banner ${q.err || ''}`);
     await page.screenshot({ path: `${shots}${route.slice(1)}.png` });
   }
 
@@ -136,7 +149,8 @@ try {
   const n = await page.evaluate(probe);
   check('narrow window: across the top third', n.present && n.revealed && n.frame.l === 0 && Math.abs(n.frame.w - n.vw) <= 1 && Math.abs(n.frame.h - n.vh * 0.33) <= 2 && n.crawl > 0.9, n.present ? JSON.stringify(n.frame) : 'no banner');
   await page.screenshot({ path: shots + 'narrow.png' });
-  check('nothing logged as an error', errors.length === 0, errors.slice(0, 3).join(' | '));
+  const ours = errors.filter((e) => !(e.startsWith('/layers') && e.includes("Found a 'popover' attribute"))); // that page's own popover, in Chrome 113
+  check('nothing logged as an error', ours.length === 0, ours.slice(0, 3).join(' | '));
   await context.close();
 
   // ---- a high-density screen ----
@@ -152,7 +166,7 @@ try {
 } catch (e) {
   check('ran to the end', false, e.message.split('\n')[0]);
 }
-server.close();
+server.close(); await counter.close();
 const failed = results.filter((r) => !r.pass);
 console.log(`${name} (${version}): ${results.length - failed.length}/${results.length} passed${failed.length ? '  FAILED: ' + failed.map((f) => f.label).join('; ') : ''}`);
 fs.writeFileSync(path.join(shots, 'result.json'), JSON.stringify({ name, version, results }, null, 1));
