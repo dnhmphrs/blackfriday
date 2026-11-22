@@ -6,8 +6,8 @@
 <!-- The banner's pieces composed as standalone pictures on a grid: one margin, two columns, one
      set of gaps. The message stacks down the left column, set flush left; the globe on its column
      stands in the right one; the tapes and the crawl close the bottom.
-       ?f=square|portrait             the format
-       ?bg=step|slant|wall|mono       a faint tiled ground of Gary Mustard Enterprises marks (default: none)
+       ?f=square|portrait|shot|marquee|tile   the format (the last three are the store's images)
+       ?bg=slant|step|wall|mono|none          the faint tiled ground of Gary Mustard Enterprises marks (default: slant)
      store/posts.mjs renders it, stepping window.setT(t) through a 12 s loop. -->
 <style>
   @font-face { font-family: "TOE Antonio"; font-weight: 300; src: url(../../src/fonts/antonio-light.woff2) format("woff2"); }
@@ -74,13 +74,18 @@
   const TAN6 = Math.tan((6 * Math.PI) / 180), COS6 = Math.cos((6 * Math.PI) / 180), TAN9 = Math.tan((9 * Math.PI) / 180);
 
   // ---- the formats: one margin (m), a left column for the message (col), and one set of gaps ----
-  // headTop: the cap line of "30%"; lead: the space between the headline's lines (x cap height);
-  // toSub, toCard: the gaps down the stack; subLead: between the sub lines (x cap height); card: its
-  // scale; ball: the globe's diameter, centred in what is left right of the gutter; strips: the
-  // tapes' scale.
+  // head: the headline's lines, the widest fitted to the column; headTop: its cap line; lead: the
+  // space between its lines (x cap height); toSub, toCard: the gaps down the stack; subLead: between
+  // the sub lines (x cap height); card: its scale; ball: the globe's diameter, centred in what is
+  // left right of the gutter; strips: the tapes' scale (0: none); tick 0: no ticker. split: the wide
+  // formats set the sub lines and the card in a second column beside the headline, on the same cap line.
+  const TWO = ['30%', 'OFF'];
   const F = {
-    square:   { w: 1080, h: 1080, m: 60, tick: 54, crawl: 96, col: 436, gutter: 44, headTop: 100, lead: 0.3, toSub: 42, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, toCard: 40, card: 0.62, ball: 372, strips: 0.62 },
-    portrait: { w: 1080, h: 1350, m: 60, tick: 56, crawl: 100, col: 456, gutter: 44, headTop: 110, lead: 0.3, toSub: 60, sub: ['EVERYTHING', 'ON THE', 'INTERNET.'], subLead: 0.38, toCard: 60, card: 0.8, ball: 372, strips: 0.66 },
+    square:   { w: 1080, h: 1080, m: 60, tick: 54, crawl: 96, col: 436, gutter: 44, head: TWO, headTop: 100, lead: 0.3, toSub: 42, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, toCard: 40, card: 0.62, ball: 372, strips: 0.62 },
+    portrait: { w: 1080, h: 1350, m: 60, tick: 56, crawl: 100, col: 456, gutter: 44, head: TWO, headTop: 110, lead: 0.3, toSub: 60, sub: ['EVERYTHING', 'ON THE', 'INTERNET.'], subLead: 0.38, toCard: 60, card: 0.8, ball: 372, strips: 0.66 },
+    shot:     { w: 1280, h: 800, m: 56, tick: 44, crawl: 76, col: 700, gutter: 48, head: ['30% OFF'], headTop: 96, lead: 0.3, toSub: 34, sub: ['EVERYTHING ON THE INTERNET.'], subLead: 0.4, toCard: 34, card: 0.7, ball: 300, strips: 0.5 },
+    marquee:  { w: 1400, h: 560, m: 56, tick: 40, crawl: 70, col: 552, gutter: 56, head: TWO, headTop: 80, lead: 0.3, split: { col: 264, gutter: 56 }, sub: ['EVERYTHING', 'ON THE', 'INTERNET.'], subLead: 0.38, toCard: 30, card: 0.66, ball: 260, strips: 0 },
+    tile:     { w: 880, h: 560, m: 56, tick: 0, crawl: 76, col: 400, gutter: 44, head: TWO, headTop: 64, lead: 0.3, toSub: 30, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, card: 0, ball: 270, strips: 0 },
   };
   const q = new URLSearchParams(location.search);
   const f = { ...(F[q.get('f')] || F.square) };
@@ -114,7 +119,7 @@
   const fitSub = (text, w) => w / width(text, SUB, -0.04);
 
   // ---- the grid ----
-  const L = f.m, R = f.w - f.m, colR = L + f.col, monL = colR + f.gutter, monX = (monL + R) / 2;
+  const L = f.m, R = f.w - f.m, L2 = L + f.col + (f.split ? f.split.gutter : 0), colR = f.split ? L2 + f.split.col : L + f.col, monL = colR + f.gutter, monX = (monL + R) / 2;
   const crawlTop = f.h - f.crawl;
   // the tapes: the navy one's lower left corner meets the crawl; the yellow one lies on it
   const tapeH = 126 * f.strips, byH = 68 * f.strips;
@@ -122,18 +127,18 @@
   const tapeTop = (x) => tapeC - (tapeH / 2) / COS6 - (x - f.w / 2) * TAN6;
 
   // ---- the ground ----
-  const bg = q.get('bg');
-  if (bg) {
+  const bg = q.get('bg') || 'slant';
+  if (bg !== 'none') {
     const A = (n) => MARKS + n + '.png';
     const kinds = {
       step: { marks: [['gme-primary', 190]], cell: [260, 112], angle: 0, opacity: 0.06 },    // one lockup, stepped and repeated
-      slant: { marks: [['gme-primary', 190]], cell: [260, 112], angle: -6, opacity: 0.06 },  // the same, on the tapes' slant
+      slant: { marks: [['gme-primary', 190]], cell: [260, 112], angle: -6, opacity: 0.095 },  // the same, on the tapes' slant
       wall: { marks: [['gme-primary', 170], ['family-gme-box', 104], ['family-gm-serif', 128], ['family-gme-star', 136], ['family-gm-plate', 100], ['family-orbit', 150],
                       ['family-gm-hex', 96], ['family-gme-heavy', 124], ['family-swoosh', 150], ['family-globe-box', 150]], cell: [236, 124], angle: -6, opacity: 0.065 }, // the whole family
       mono: { marks: [['wire-globe', 46], ['family-gme-outline', 84]], cell: [128, 84], angle: 0, opacity: 0.055 },   // a monogram ground
     };
-    const kind = kinds[bg] || kinds.step, t = add('<div class="tiles"></div>');
-    Object.assign(t.style, { transform: `rotate(${kind.angle}deg)`, opacity: kind.opacity });
+    const kind = kinds[bg] || kinds.slant, t = add('<div class="tiles"></div>');
+    Object.assign(t.style, { transform: `rotate(${kind.angle}deg)`, opacity: Number(q.get('tint')) || kind.opacity }); // ?tint= tries another strength
     const [cw, ch] = kind.cell, W = f.w * 1.6, H = f.h * 1.6;
     const ratio = await Promise.all(kind.marks.map(([n]) => new Promise((res) => { const i = new Image(); i.onload = () => res(i.naturalHeight / i.naturalWidth); i.src = A(n); })));
     for (let row = 0, y = 0; y < H; row++, y += ch) for (let x = row % 2 ? -cw / 2 : 0, c = 0; x < W; x += cw, c++) {
@@ -154,20 +159,22 @@
   const globe = add(`<img src="${PARTS}globe-00.png">`);
   place(globe, gx, gy, gd, gd);
 
-  // ---- the message, flush left down the column ----
-  const hs = fitHead('30%', f.col), hc = ink('30%', HEAD, -0.05).cap * hs;
-  let y = f.headTop + hc;
-  set('head', '30%', HEAD, -0.05, hs, L, y, true);
-  y += hc * f.lead + hc;
-  set('head', 'OFF', HEAD, -0.05, hs, L, y, true);
-  const widest = f.sub.reduce((a, b) => (width(a, SUB, -0.04) > width(b, SUB, -0.04) ? a : b));
-  const ss = fitSub(widest, f.col), sc = ink('H', SUB, -0.04).cap * ss;
-  y += f.toSub;
-  for (const [n, line] of f.sub.entries()) { y += sc + (n ? sc * f.subLead : 0); set('sub', line, SUB, -0.04, ss, L, y); }
-  y += f.toCard;
-  const card = add('<div class="card"><div class="hd">The Internet (All Of It)</div><div class="ln">WAS: <s>100%</s></div><div class="ln">NOW:</div><div class="big">70%</div></div>');
-  Object.assign(card.style, { left: L + 'px', top: y + 'px', transform: `scale(${f.card}) rotate(-1.4deg)` });
-  const cardBottom = y + (306 + 54) * f.card;
+  // ---- the message, flush left down the column (or two columns, in the wide formats) ----
+  const hw = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9;
+  const hs = fitHead(f.head.reduce((a, b) => (hw(a) > hw(b) ? a : b)), f.col), hc = ink('H', HEAD, -0.05).cap * hs;
+  let y = f.headTop;
+  for (const [n, line] of f.head.entries()) { y += hc + (n ? hc * f.lead : 0); set('head', line, HEAD, -0.05, hs, L, y, true); }
+  const sx = f.split ? L2 : L, sw = f.split ? f.split.col : f.col;
+  const ss = fitSub(f.sub.reduce((a, b) => (width(a, SUB, -0.04) > width(b, SUB, -0.04) ? a : b)), sw), sc = ink('H', SUB, -0.04).cap * ss;
+  y = f.split ? f.headTop : y + f.toSub;
+  for (const [n, line] of f.sub.entries()) { y += sc + (n ? sc * f.subLead : 0); set('sub', line, SUB, -0.04, ss, sx, y); }
+  let cardBottom = y;
+  if (f.card) {
+    y += f.toCard;
+    const card = add('<div class="card"><div class="hd">The Internet (All Of It)</div><div class="ln">WAS: <s>100%</s></div><div class="ln">NOW:</div><div class="big">70%</div></div>');
+    Object.assign(card.style, { left: sx + 'px', top: y + 'px', transform: `scale(${f.card}) rotate(-1.4deg)` });
+    cardBottom = y + (306 + 54) * f.card;
+  }
 
   // ---- glints: one on the globe's shoulder, one at its foot ----
   const glint = (cls, cx, cy, r) => place(add(`<div class="glint ${cls}"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
@@ -177,7 +184,7 @@
 
   // ---- the tapes ----
   const len = Math.hypot(f.w, f.h) * 1.4;
-  for (const [cls, text, c, h, cap] of [['by', BRAND, byC, byH, 25 * f.strips], ['tape', 'EVERY SITE 30% OFF!', tapeC, tapeH, 54 * f.strips]]) {
+  for (const [cls, text, c, h, cap] of f.strips ? [['by', BRAND, byC, byH, 25 * f.strips], ['tape', 'EVERY SITE 30% OFF!', tapeC, tapeH, 54 * f.strips]] : []) {
     const el = add(`<div class="strip ${cls}"><span>${text}</span></div>`);
     place(el, f.w / 2 - len / 2, c - h / 2, len, h);
     Object.assign(el.style, { fontSize: cap / 0.72 + 'px', transform: 'rotate(-6deg)' });
@@ -185,15 +192,17 @@
   }
 
   // ---- the tickers: each starts on the margin ----
-  const tk = add(`<div class="ticker"><span>${TICKER.repeat(4)}</span></div>`);
-  Object.assign(tk.style, { height: f.tick + 'px', fontSize: f.tick * 0.66 + 'px', lineHeight: f.tick + 'px' });
-  tk.firstElementChild.style.marginLeft = L + 'px';
+  if (f.tick) {
+    const tk = add(`<div class="ticker"><span>${TICKER.repeat(4)}</span></div>`);
+    Object.assign(tk.style, { height: f.tick + 'px', fontSize: f.tick * 0.66 + 'px', lineHeight: f.tick + 'px' });
+    tk.firstElementChild.style.marginLeft = L + 'px';
+  }
   const cr = add(`<div class="crawl"><span>${CRAWL.repeat(12)}</span></div>`);
   Object.assign(cr.style, { height: f.crawl + 'px', fontSize: f.crawl * 0.75 + 'px', lineHeight: f.crawl + 'px' });
   cr.firstElementChild.style.marginLeft = L + 'px';
 
   // what the grid came to, for checking
-  window.report = { headSize: hs, headCap: hc, subSize: ss, subCap: sc, cardTop: y, cardBottom, tapeTopAtCard: tapeTop(L + 200 * f.card), tapeTopAtColumn: tapeTop(monX), capTop, capBottom: capTop + 136 * k, ball: [ballL, ballT, bd] };
+  window.report = { headSize: hs, headCap: hc, subSize: ss, subCap: sc, headBottom: f.headTop + hc * (f.head.length + (f.head.length - 1) * f.lead), cardBottom, tapeTopAtCard: tapeTop(sx + 200 * f.card), tapeTopAtColumn: tapeTop(monX), capTop, capBottom: capTop + 136 * k, ball: [ballL, ballT, bd] };
 
   // Time: every animation is paused and set to t; the globe steps through its 60 frames (one turn in 4 s).
   const frames = Array.from({ length: 60 }, (_, i) => `${PARTS}globe-${String(i).padStart(2, '0')}.png`);

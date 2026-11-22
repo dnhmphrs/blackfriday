@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import fs from 'node:fs';
 const { chromium } = createRequire('/home/user/blackfriday/package.json')('playwright');
 const root = new URL('../', import.meta.url).pathname;
-const SIZE = { square: [1080, 1080], portrait: [1080, 1350] };
+const SIZE = { square: [1080, 1080], portrait: [1080, 1350], shot: [1280, 800], marquee: [1400, 560], tile: [880, 560] };
 
 const [mode = 'still', f = 'square', query = '', outArg] = process.argv.slice(2);
 const browser = await chromium.launch({ args: ['--allow-file-access-from-files'] });
