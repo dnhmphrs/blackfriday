@@ -12,7 +12,7 @@
 
   const TICKER = "But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ";
   const CRAWL = "BLACK FRIDAY ONLY! ✦ ";
-  const BRAND = "Proudly brought to you by Gary Mustard Enterprises";
+  const BRAND = "Brought to you by Gary Mustard Enterprises";
 
   // The layout, in the artwork's own pixels ("banner px"). The banner is drawn at whatever scale
   // fits the frame across; spare height lengthens the column, and in a tall frame brings the globe
@@ -25,7 +25,7 @@
       globe: { x: 516, y: 972, k: 1 },
       card: { x: 80, y: 1052, s: 1, spread: 0 },
       strip: { fromCrawl: -232, h: 126, cap: 54, dx: 12 },
-      sub: { fromCrawl: -130, h: 68, cap: 21, dx: 0 },
+      sub: { fromCrawl: -130, h: 68, cap: 25, dx: 0 },
       glow: { rx: 648, ry: 729 },
     },
     narrow: {
@@ -163,7 +163,7 @@
     const gx = X(m.x, 1), gy = Y(m.y) + drop, M = MONUMENT;
     place($(".globe"), gx, gy, M.globe * k, M.globe * k);
     const capTop = gy + M.capY * k, colX = gx + M.columnX * k, colW = M.columnW * k;
-    const baseTop = Math.max(capTop + M.capH * k + 4, ah - M.baseH * k);
+    const baseTop = Math.max(capTop + M.capH * k + 4, H - M.baseH * k); // down to the very edge, teeth and all
     place($(".cap"), colX, capTop, colW, M.capH * k);
     place($(".base"), colX, baseTop, colW, M.baseH * k);
     place($(".shaft"), colX, capTop + M.capH * k - 2, colW, baseTop - capTop - M.capH * k + 4);

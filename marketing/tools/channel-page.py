@@ -32,7 +32,7 @@ TICKER = ' ✦ '.join(['But wait… there’s less!', 'No purchase necessary!', 
                       'Every website, 30% off!', 'Works like magic!']) + ' ✦ '
 CRAWL = 'BLACK FRIDAY ONLY! ✦ '
 # the sign-off on the navy strip (desktop); Garrett may rewrite it
-BRAND = 'Proudly brought to you by Gary Mustard Enterprises'
+BRAND = 'Brought to you by Gary Mustard Enterprises'
 
 PAGE = r'''<title>30% Off Channel Banner</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -72,6 +72,14 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   .face > * { position: absolute; display: block; max-width: none; }
   #glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
 
+  /* the tube: faint scanlines and darker corners over the whole face, and a slow roll of brightness
+     down it. The picture stays sharp; nothing here is blurred. */
+  .face::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+                 background: repeating-linear-gradient(rgba(0, 0, 30, 0.16) 0 1px, transparent 1px 3px),
+                             radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 24, 0.3) 100%); }
+  .face::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 60%; z-index: 3; pointer-events: none;
+                  background: linear-gradient(rgba(255, 255, 255, 0.07), transparent 50%); animation: roll 8s linear infinite; }
+
   /* the motif either side of 30% OFF: drawn in SVG, so it is sharp at any size */
   .motif svg { display: block; width: 100%; height: 100%; overflow: visible; }
   #mR svg { transform: scaleX(-1); }
@@ -99,7 +107,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   .strip { display: flex; align-items: center; justify-content: center; white-space: nowrap; transform-origin: 50% 50%;
            font-family: "TOE Arimo", Arial, sans-serif; font-style: italic; font-weight: 700; }
   #strip { background: linear-gradient(#fffb86, #f0e11c); color: #111; box-shadow: inset 0 0.06em 0 rgba(170, 158, 0, 0.6), inset 0 -0.06em 0 rgba(170, 158, 0, 0.6); }
-  #sub { background: var(--shade); color: #fff; letter-spacing: 0.03em; text-transform: uppercase; }
+  #sub { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
   body.phone #strip, body.phone #sub { display: none; }
 
   /* the price card, from v1.7; only its 70% moves */
@@ -114,6 +122,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
                color: var(--red); letter-spacing: -0.05em; -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform-origin: 70% 80%;
                animation: jolt 1.1s ease-in-out infinite; }
 
+  @keyframes roll { from { transform: translateY(-100%); } to { transform: translateY(167%); } }
   @keyframes slide { to { transform: translateX(-50%); } }
   @keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
   @keyframes jolt {
@@ -125,6 +134,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   }
   @media (prefers-reduced-motion: reduce) {
     .ticker span, .crawl span, #card .big, .tw, .bob, .fan, .wob { animation: none; }
+    .face::before { display: none; }
     #frame.in, body.phone #frame.in { transition: opacity 0.3s linear; }
   }
 
@@ -191,7 +201,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       type2: { x: 97, y: 615, w: 895, h: 349, src: 'typeMid', spread: 0.5 },
       mon: { x: 516, y: 972, k: 1 },   // the globe picture's top left; k scales the whole monument
       card: { x: 80, y: 1052, s: 1.0, r: -1.4, spread: 0 },
-      strips: [{ id: 'sub', fromCrawl: -130, h: 68, cap: 21, dx: 0 }, { id: 'strip', fromCrawl: -232, h: 126, cap: 54, dx: 12 }],
+      strips: [{ id: 'sub', fromCrawl: -130, h: 68, cap: 25, dx: 0 }, { id: 'strip', fromCrawl: -232, h: 126, cap: 54, dx: 12 }],
       glow: { rx: 648, ry: 729 },
     },
     phone: {
@@ -294,7 +304,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     place($('globe'), mx, my, MON.globe * k, MON.globe * k);
     const capTop = my + MON.capY * k, capL = mx + MON.capX * k, colW = MON.colW * k;
     place($('cap'), capL, capTop, colW, MON.capH * k);
-    const baseTop = Math.max(capTop + MON.capH * k + 4, ah - MON.baseH * k); // it stands on the bottom edge, the crawl runs over it
+    const baseTop = Math.max(capTop + MON.capH * k + 4, H - MON.baseH * k); // down to the very edge, teeth and all; the crawl runs over it
     place($('base'), capL, baseTop, colW, MON.baseH * k);
     place($('shaft'), capL, capTop + MON.capH * k - 2, colW, baseTop - (capTop + MON.capH * k) + 4);
     const gl = g.glow, gcx = mx + (MON.globe / 2) * k, gcy = my + (MON.globe / 2) * k;
