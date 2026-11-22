@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """Build out/channel-page/channel.html: the Channel banner over a web page, one self-contained file.
 
-The banner is built the way the extension would build it: a still picture (rendered from
-comps/tv-banner with ?crawl=0&only=0&glints=0, see the stills below) with the live parts on top in
-HTML: the top ticker, the BLACK FRIDAY ONLY! crawl, and the WAS/NOW price card whose 70% pulses.
-The page under it loads first; the banner slides in once its picture and fonts are ready.
-    python3 tools/channel-page.py      (run from marketing/)"""
+The banner is laid out the way the extension will lay it out, from separate pieces so it can fill
+any window shape: the lettering, the spinning globe and the column (cap, shaft, base: the shaft
+stretches to whatever height there is) are pictures cut out of comps/tv-banner by
+tools/channel-parts.mjs; the tickers, the price card and the strips are HTML. The page under it
+loads first; the banner slides in once its pieces are ready.
+    node tools/channel-parts.mjs && python3 tools/channel-page.py      (run from marketing/)"""
 import base64, html, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OUT_DIR = os.path.join(ROOT, 'out', 'channel-page')
+ASSETS = os.path.join(OUT_DIR, 'assets')
 FONTS = os.path.join(ROOT, 'variants', 'v17', 'fonts')
 
 
@@ -19,7 +21,9 @@ def b64(path, mime):
         return f'data:{mime};base64,' + base64.b64encode(f.read()).decode()
 
 
-ART = {k: b64(os.path.join(OUT_DIR, f'art-{k}.webp'), 'image/webp') for k in ('desktop', 'phone')}
+IMG = {k: b64(os.path.join(ASSETS, f), 'image/webp') for k, f in {
+    'globe': 'globe-380.webp', 'cap': 'cap.webp', 'shaft': 'shaft.webp', 'base': 'base.webp',
+    'sticker': 'sticker.webp', 'wow': 'wow.webp', 'typeDesktop': 'type-desktop.webp', 'typePhone': 'type-phone.webp'}.items()}
 FONT = {k: b64(os.path.join(FONTS, f'{k}.woff2'), 'font/woff2')
         for k in ('antonio-light', 'antonio-semibold', 'archivo-black', 'arimo-bold-italic')}
 PAGES = {k: open(os.path.join(ROOT, 'store', 'mock', f'{k}.html'), encoding='utf-8').read() for k in ('shop', 'news')}
@@ -39,7 +43,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   /* One look on purpose: the web page is the colour; the surround is only seen around the phone. */
   :root {
     --surround: #101218; --panel: rgba(16, 18, 30, 0.92); --ink: #f1f3fb; --muted: #9ea4c0; --accent: #2f55ff;
-    --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; color-scheme: light;
+    --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; --hard: rgba(6, 8, 70, 0.9); color-scheme: light;
   }
   html, body { height: 100%; }
   body { margin: 0; background: #fff; color: var(--ink); font: 13px/1.4 "Helvetica Neue", Arial, sans-serif; overflow: hidden; }
@@ -57,52 +61,55 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   #frame { position: absolute; z-index: 2; top: 0; right: 0; width: 30%; height: 100%; background: #000; pointer-events: auto;
            user-select: none; cursor: default; opacity: 0; transform: translateX(104%); visibility: hidden; }
   body.phone #frame { left: 0; right: auto; width: 100%; height: 33%; transform: translateY(-104%); }
-  #frame.in, body.phone #frame.in { visibility: visible; opacity: 1; transform: none; transition: transform 0.55s cubic-bezier(0.2, 0.85, 0.25, 1), opacity 0.25s linear; }
+  #frame.in, body.phone #frame.in { visibility: visible; opacity: 1; transform: none;
+             transition: transform 0.55s cubic-bezier(0.2, 0.85, 0.25, 1), opacity 0.25s linear; }
   .trim, .face { position: absolute; inset: 0; }
   .trim { background: linear-gradient(90deg, #fffb86, #f0e11c 45%, #c9b400); }
   body.phone .trim { background: linear-gradient(#c9b400, #f0e11c 55%, #fffb86); }
   .face { overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
+  .face > * { position: absolute; display: block; max-width: none; }
+  #glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
 
-  /* everything inside is laid out in banner pixels on a sheet; the script zooms it to fit */
-  .tbox, .sbox { position: absolute; left: 0; right: 0; display: flex; justify-content: center; }
-  .tbox { top: 0; } .sbox { bottom: 0; }
-  .tsheet, .sheet { position: relative; flex: none; }
-
-  /* the top ticker, Garrett's lines */
-  .ticker { position: absolute; left: -1200px; right: -1200px; top: 0; overflow: hidden; white-space: nowrap;
-            font: 300 56px/84px "TOE Antonio", "Arial Narrow", Arial, sans-serif; letter-spacing: 0.035em; word-spacing: 0.3em;
-            color: #e9f0ff; text-shadow: 3px 3px 0 rgba(4, 8, 80, 0.85); }
-  .ticker span { display: inline-block; padding-left: 1200px; animation: slide 44s linear infinite; }
-  body.phone .ticker { font-size: 46px; line-height: 70px; }
-
-  .art { position: absolute; left: 0; top: 0; display: block; max-width: none; }
-
-  /* the crawl along the bottom: BLACK FRIDAY ONLY! */
-  .crawl { position: absolute; left: -1200px; right: -1200px; bottom: 0; overflow: hidden; white-space: nowrap;
-           font: 400 112px/150px "TOE Black", "Arial Black", Arial, sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
-  .crawl span { display: inline-block; padding-left: 1200px; text-shadow: 3px 3px 0 var(--shade), 6px 6px 0 var(--shade), 9px 9px 0 var(--shade);
+  /* the tickers: Garrett's lines along the top, BLACK FRIDAY ONLY! along the bottom */
+  .ticker, .crawl { left: 0; right: 0; overflow: hidden; white-space: nowrap; }
+  .ticker { top: 0; font-family: "TOE Antonio", "Arial Narrow", Arial, sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em;
+            color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); }
+  .ticker span { display: inline-block; animation: slide 44s linear infinite; }
+  .crawl { bottom: 0; font-family: "TOE Black", "Arial Black", Arial, sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
+  .crawl span { display: inline-block; text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade);
                 animation: crawl 24s linear infinite; }
-  body.phone .crawl { font-size: 66px; line-height: 90px; }
-  body.phone .crawl span { animation-duration: 18s; text-shadow: 2px 2px 0 var(--shade), 4px 4px 0 var(--shade), 6px 6px 0 var(--shade); }
+
+  /* the strips across the lower part (desktop): the yellow tape and the navy one tucked under it */
+  .strip { display: flex; align-items: center; justify-content: center; white-space: nowrap; transform-origin: 50% 50%;
+           font-family: "TOE Arimo", Arial, sans-serif; font-style: italic; font-weight: 700; }
+  #strip { background: linear-gradient(#fffb86, #f0e11c); color: #111; box-shadow: inset 0 0.06em 0 rgba(170, 158, 0, 0.6), inset 0 -0.06em 0 rgba(170, 158, 0, 0.6); }
+  #sub { background: var(--shade); color: #fff; letter-spacing: 0.14em; }
+  body.phone #strip, body.phone #sub, body.phone #wow { display: none; }
 
   /* the price card, from v1.7; only its 70% moves */
-  .price { position: absolute; width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000;
-           box-shadow: 8px 8px 0 rgba(4, 6, 60, 0.92); transform-origin: left top; font: italic 700 50px/1 "TOE Arimo", Arial, sans-serif; }
-  .price .head { background: var(--red); color: #fff46a; font: 600 41px/57px "TOE Antonio", "Arial Narrow", Arial, sans-serif; font-style: normal;
-                 padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
-  .price .line { padding: 13px 17px 0; }
-  .price s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 9px; }
-  .price s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 8px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
-  .price .big { position: absolute; right: 9px; bottom: -54px; font: 400 165px/0.9 "TOE Black", "Arial Black", Arial, sans-serif; font-style: normal;
-                color: var(--red); letter-spacing: -0.05em; -webkit-text-stroke: 11px #000; paint-order: stroke fill;
-                transform: skewX(-8deg); transform-origin: right bottom; animation: pulse 1.4s ease-in-out infinite; }
+  #card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000; box-sizing: border-box;
+          box-shadow: 8px 8px 0 rgba(4, 6, 60, 0.92); transform-origin: left top; font: italic 700 50px/1 "TOE Arimo", Arial, sans-serif; }
+  #card .head { background: var(--red); color: #fff46a; font: 600 41px/57px "TOE Antonio", "Arial Narrow", Arial, sans-serif;
+                padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
+  #card .line { padding: 13px 17px 0; }
+  #card s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 9px; }
+  #card s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 8px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+  #card .big { position: absolute; right: 9px; bottom: -54px; font: 400 165px/0.9 "TOE Black", "Arial Black", Arial, sans-serif;
+               color: var(--red); letter-spacing: -0.05em; -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform-origin: 70% 80%;
+               animation: jolt 1.1s ease-in-out infinite; }
 
   @keyframes slide { to { transform: translateX(-50%); } }
   @keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
-  @keyframes pulse { 0%, 55%, 100% { scale: 1; } 25% { scale: 1.06; } }
+  @keyframes jolt {
+    0%, 100% { transform: skewX(-8deg) scale(1) rotate(0deg); }
+    12% { transform: skewX(-8deg) scale(1.18) rotate(-5deg); }
+    26% { transform: skewX(-8deg) scale(0.96) rotate(3deg); }
+    40% { transform: skewX(-8deg) scale(1.08) rotate(-2deg); }
+    55% { transform: skewX(-8deg) scale(1) rotate(0deg); }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .ticker span, .crawl span, .price .big { animation: none; }
-    #frame.in { transition: opacity 0.3s linear; }
+    .ticker span, .crawl span, #card .big { animation: none; }
+    #frame.in, body.phone #frame.in { transition: opacity 0.3s linear; }
   }
 
   /* the controls: a small panel bottom left; H hides it */
@@ -125,12 +132,19 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   <div id="frame" role="img" aria-label="30% off everything on the internet. Black Friday only!">
     <div class="trim"></div>
     <div class="face">
-      <div class="tbox"><div class="tsheet"><div class="ticker"><span>__TICKER__</span></div></div></div>
-      <div class="sbox"><div class="sheet">
-        <img class="art" id="art" alt="" decoding="async">
-        <div class="price"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
-        <div class="crawl"><span>__CRAWL__</span></div>
-      </div></div>
+      <div id="glow"></div>
+      <img id="type" alt="">
+      <img id="shaft" alt="" src="__I_SHAFT__">
+      <img id="cap" alt="" src="__I_CAP__">
+      <img id="base" alt="" src="__I_BASE__">
+      <img id="globe" alt="" src="__I_GLOBE__">
+      <img id="sticker" alt="" src="__I_STICKER__">
+      <div id="card"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
+      <img id="wow" alt="" src="__I_WOW__">
+      <div class="strip" id="sub"><span>GARY MUSTARD ENTERPRISES</span></div>
+      <div class="strip" id="strip"><span>EVERY SITE 30% OFF!</span></div>
+      <div class="ticker"><span>__TICKER__</span></div>
+      <div class="crawl"><span>__CRAWL__</span></div>
     </div>
   </div>
 </div>
@@ -150,23 +164,39 @@ PAGE = r'''<title>30% Off Channel Banner</title>
 </div>
 
 <script>
-  // Sizes in banner pixels. Desktop: the ticker strip, then the picture whose bottom 132 px is left
-  // empty for the crawl, which is 150 tall. Phone the same, smaller. TOTAL fits the frame exactly at
-  // 1280 x 800 (and 390 x 844): other shapes get a little more blue above the headline or beside it.
+  // Positions in banner pixels (the artwork's own): u is CSS px per banner px. "top" pieces hang
+  // from the top ticker, "bottom" pieces stand on the crawl; the column's shaft stretches between
+  // its cap and its base, so the banner fills a window of any height. Extra width spreads the
+  // pieces apart (the lettering left or centred, the monument right) instead of leaving margins.
   const L = {
-    desktop: { w: 1080, tt: 84, artH: 2148, artFoot: 132, crawl: 150, card: { x: 80, y: 1002, s: 1.0, r: -1.4 } },
-    phone: { w: 1170, tt: 70, artH: 760, artFoot: 85, crawl: 90, card: { x: 584, y: 384, s: 0.56, r: -1.4 } },
+    desktop: {
+      w: 1080, tick: 84, tickFont: 56, crawl: 150, crawlFont: 112, minArt: 1800,
+      type: { x: 97, y: 38, w: 895, h: 926, src: 'typeDesktop', spread: 0.5 },
+      mon: { x: 516, y: 972, k: 1 },   // the globe picture's top left; k scales the whole monument
+      sticker: { dx: 306, dy: 6, s: 1 },
+      card: { x: 80, y: 1002, s: 1.0, r: -1.4, spread: 0 },
+      wow: { x: 129, fromCrawl: -645, w: 276, h: 278 },
+      strips: [{ id: 'sub', fromCrawl: -273, h: 68, cap: 30, dx: 18 }, { id: 'strip', fromCrawl: -375, h: 126, cap: 54, dx: 12 }],
+      glow: { rx: 648, ry: 729 },
+    },
+    phone: {
+      w: 1170, tick: 70, tickFont: 46, crawl: 90, crawlFont: 66, minArt: 560,
+      type: { x: 39, y: 27, w: 594, h: 577, src: 'typePhone', spread: 0 },
+      mon: { x: 780, y: -15, k: 320 / 384 },
+      sticker: { dx: 20, dy: 40, s: 0.8 },
+      card: { x: 584, y: 384, s: 0.56, r: -1.4, spread: 0.5 },
+      glow: { rx: 538, ry: 517 },
+    },
   };
-  const ART = { desktop: '__ART_DESKTOP__', phone: '__ART_PHONE__' };
+  const MON = { globe: 480, capX: 40, capY: 410, colW: 400, capH: 136, baseH: 144 }; // the monument's pieces, unscaled
+  const IMG = { typeDesktop: '__I_TYPE_DESKTOP__', typePhone: '__I_TYPE_PHONE__' };
   const PAGES = { shop: '__SHOP_JSON__', news: '__NEWS_JSON__' };
   const TOOTH = { period: 16, depth: 7 }, KEY = 2, TRIM = 6; // CSS px: the teeth, the black keyline, the gold trim
-  const RESERVE = TOOTH.depth + KEY + TRIM + 4; // kept clear of the teeth on the page-facing edge
+  const RESERVE = TOOTH.depth + KEY + TRIM + 2; // kept clear of the teeth on the page-facing edge
 
   const $ = (id) => document.getElementById(id);
   const state = { screen: 'desktop', page: 'shop', url: '' };
   const frame = $('frame'), face = frame.querySelector('.face'), trim = frame.querySelector('.trim');
-  const tsheet = frame.querySelector('.tsheet'), sheet = frame.querySelector('.sheet'), tbox = frame.querySelector('.tbox'), sbox = frame.querySelector('.sbox');
-  const card = frame.querySelector('.price'), art = $('art');
 
   // A zigzag along the page-facing edge, `s` px further in than the tips.
   function teeth(w, h, phone, s) {
@@ -180,25 +210,62 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     }
     return `polygon(${pts.join(', ')})`;
   }
+  const place = (el, x, y, w, h) => Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
 
-  function fit() {
+  function layout() {
     const phone = state.screen === 'phone', g = L[state.screen];
-    const w = frame.clientWidth, h = frame.clientHeight;
-    if (!w || !h) return;
-    frame.style.clipPath = teeth(w, h, phone, 0);
-    trim.style.clipPath = teeth(w, h, phone, KEY);
-    face.style.clipPath = teeth(w, h, phone, KEY + TRIM);
-    const aw = phone ? w : w - RESERVE, ah = phone ? h - RESERVE : h;
-    const sheetH = g.artH - g.artFoot + g.crawl, z = Math.min(aw / g.w, ah / (g.tt + sheetH));
-    for (const box of [tbox, sbox]) { box.style.left = phone ? '0' : RESERVE + 'px'; }
-    sbox.style.bottom = phone ? RESERVE + 'px' : '0';
-    tsheet.style.width = sheet.style.width = g.w + 'px';
-    tsheet.style.height = g.tt + 'px';
-    sheet.style.height = sheetH + 'px';
-    tsheet.style.zoom = sheet.style.zoom = z;
-    art.style.width = g.w + 'px'; art.style.height = g.artH + 'px';
-    card.style.left = g.card.x + 'px'; card.style.top = g.card.y + 'px';
-    card.style.transform = `scale(${g.card.s}) rotate(${g.card.r}deg)`;
+    const W = frame.clientWidth, H = frame.clientHeight;
+    if (!W || !H) return;
+    frame.style.clipPath = teeth(W, H, phone, 0);
+    trim.style.clipPath = teeth(W, H, phone, KEY);
+    face.style.clipPath = teeth(W, H, phone, KEY + TRIM);
+    // the room inside the teeth, and the scale: as big as fits across, or down at the least height
+    const x0 = phone ? 0 : RESERVE, aw = W - x0, ah = (phone ? H - RESERVE : H);
+    const u = Math.min(aw / g.w, ah / (g.tick + g.minArt + g.crawl));
+    const extra = aw - g.w * u;                         // spare width, shared out between the pieces
+    const X = (x, spread = 0) => x0 + x * u + extra * spread;
+    const top = g.tick * u;                              // where the artwork hangs from
+    const crawlTop = ah - g.crawl * u;                   // where it stands
+    const Y = (y) => top + y * u;
+
+    const tk = face.querySelector('.ticker'), cr = face.querySelector('.crawl');
+    Object.assign(tk.style, { left: x0 + 'px', height: g.tick * u + 'px', fontSize: g.tickFont * u + 'px', lineHeight: g.tick * u + 'px' });
+    Object.assign(cr.style, { left: x0 + 'px', bottom: (H - ah) + 'px', height: g.crawl * u + 'px', fontSize: g.crawlFont * u + 'px', lineHeight: g.crawl * u + 'px' });
+
+    const t = g.type, type = $('type');
+    type.src = IMG[t.src];
+    place(type, X(t.x, t.spread), Y(t.y), t.w * u, t.h * u);
+
+    // the monument: globe, then the column under it, its shaft stretched down to the crawl
+    const m = g.mon, k = m.k * u, mx = X(m.x, 1), my = Y(m.y);
+    place($('globe'), mx, my, MON.globe * k, MON.globe * k);
+    const capTop = my + MON.capY * k, capL = mx + MON.capX * k, colW = MON.colW * k;
+    place($('cap'), capL, capTop, colW, MON.capH * k);
+    const baseTop = Math.max(capTop + MON.capH * k + 4, crawlTop - MON.baseH * k + 2);
+    place($('base'), capL, baseTop, colW, MON.baseH * k);
+    place($('shaft'), capL, capTop + MON.capH * k - 2, colW, baseTop - (capTop + MON.capH * k) + 4);
+    const gl = g.glow, gcx = mx + (MON.globe / 2) * k, gcy = my + (MON.globe / 2) * k;
+    place($('glow'), gcx - gl.rx * u, gcy - gl.ry * u, gl.rx * 2 * u, gl.ry * 2 * u);
+    const s = g.sticker;
+    place($('sticker'), mx + s.dx * k, my + s.dy * k, 187 * s.s * k, 188 * s.s * k);
+
+    const c = g.card, card = $('card');
+    Object.assign(card.style, { left: X(c.x, c.spread) + 'px', top: Y(c.y) + 'px', transform: `scale(${c.s * u}) rotate(${c.r}deg)` });
+
+    if (!phone) {
+      // the burst and the strips stand on the crawl; in a window too short for the burst to clear the
+      // card (and its 70%), it sits this one out
+      const w = g.wow, cardBottom = Y(c.y) + (306 + 60) * c.s * u, wowTop = crawlTop + w.fromCrawl * u;
+      place($('wow'), X(w.x), wowTop, w.w * u, w.h * u);
+      $('wow').style.visibility = wowTop >= cardBottom ? '' : 'hidden';
+      const cx = x0 + aw / 2, span = Math.hypot(W, H) * 1.4;
+      for (const st of g.strips) {
+        const el = $(st.id), h = st.h * u;
+        place(el, cx - span / 2, crawlTop + st.fromCrawl * u - h / 2, span, h);
+        Object.assign(el.style, { fontSize: (st.cap / 0.72) * u + 'px', paddingLeft: st.dx * 2 * u + 'px', transform: 'rotate(-6deg)' });
+        if (st.id === 'strip') el.style.boxShadow = `inset 0 ${4 * u}px 0 rgba(170,158,0,0.6), inset 0 ${-4 * u}px 0 rgba(170,158,0,0.6), ${11 * u}px ${11 * u}px 0 var(--hard)`;
+      }
+    }
   }
 
   function fitPhone() {
@@ -206,27 +273,25 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     $('view').style.transform = state.screen === 'phone' ? `translate(-50%, -50%) scale(${s})` : '';
   }
 
-  // Show the banner only when its picture and type are ready, after the page underneath has had
+  // Show the banner only when its pieces and type are ready, after the page underneath has had
   // its turn, then slide it in.
   let showing = 0;
   async function show() {
     const ticket = ++showing;
     frame.classList.remove('in');
-    art.src = ART[state.screen];
-    const ready = Promise.all([
-      art.decode().catch(() => {}),
-      ...['300 56px "TOE Antonio"', '600 41px "TOE Antonio"', '112px "TOE Black"', 'italic 700 50px "TOE Arimo"'].map((f) => document.fonts.load(f).catch(() => {})),
-    ]);
+    layout();
+    const pics = [...face.querySelectorAll('img')].map((i) => i.decode().catch(() => {}));
+    const type = ['300 56px "TOE Antonio"', '600 41px "TOE Antonio"', '112px "TOE Black"', 'italic 700 50px "TOE Arimo"'].map((f) => document.fonts.load(f).catch(() => {}));
     const settled = new Promise((r) => {
       const f = $('site');
       let done = false; const go = () => { if (!done) { done = true; r(); } };
       if (f.contentDocument && f.contentDocument.readyState === 'complete') go(); else f.addEventListener('load', go, { once: true });
       setTimeout(go, 1500); // a slow page does not keep the banner waiting for ever
     });
-    await Promise.all([ready, settled]);
+    await Promise.all([...pics, ...type, settled]);
     await new Promise((r) => (window.requestIdleCallback ? requestIdleCallback(r, { timeout: 400 }) : setTimeout(r, 50)));
     if (ticket !== showing) return;
-    fit();
+    layout();
     void frame.offsetWidth; // start the slide from the hidden position
     frame.classList.add('in');
   }
@@ -255,7 +320,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   const toggle = () => { const p = $('panel'); p.classList.toggle('hidden'); $('toggle').textContent = p.classList.contains('hidden') ? 'Show' : 'Hide'; };
   $('toggle').addEventListener('click', toggle);
   addEventListener('keydown', (e) => { if ((e.key === 'h' || e.key === 'H') && e.target.tagName !== 'INPUT') toggle(); });
-  addEventListener('resize', () => { fitPhone(); fit(); });
+  addEventListener('resize', () => { fitPhone(); layout(); });
 
   render();
   show();
@@ -263,13 +328,16 @@ PAGE = r'''<title>30% Off Channel Banner</title>
 '''
 
 js = lambda s: s.replace('\\', '\\\\').replace("'", "\\'").replace('\n', '\\n').replace('</', '<\\/')
-page = (PAGE
-        .replace('__F_ANTONIO_LIGHT__', FONT['antonio-light']).replace('__F_ANTONIO_SEMIBOLD__', FONT['antonio-semibold'])
-        .replace('__F_ARCHIVO_BLACK__', FONT['archivo-black']).replace('__F_ARIMO__', FONT['arimo-bold-italic'])
-        .replace('__SHOP_SRCDOC__', html.escape(PAGES['shop'], quote=True))
-        .replace('__TICKER__', html.escape(TICKER * 4)).replace('__CRAWL__', html.escape(CRAWL * 12))
-        .replace('__ART_DESKTOP__', ART['desktop']).replace('__ART_PHONE__', ART['phone'])
-        .replace('__SHOP_JSON__', js(PAGES['shop'])).replace('__NEWS_JSON__', js(PAGES['news'])))
+page = PAGE
+for k, v in {'__F_ANTONIO_LIGHT__': FONT['antonio-light'], '__F_ANTONIO_SEMIBOLD__': FONT['antonio-semibold'],
+             '__F_ARCHIVO_BLACK__': FONT['archivo-black'], '__F_ARIMO__': FONT['arimo-bold-italic'],
+             '__I_SHAFT__': IMG['shaft'], '__I_CAP__': IMG['cap'], '__I_BASE__': IMG['base'], '__I_GLOBE__': IMG['globe'],
+             '__I_STICKER__': IMG['sticker'], '__I_WOW__': IMG['wow'],
+             '__I_TYPE_DESKTOP__': IMG['typeDesktop'], '__I_TYPE_PHONE__': IMG['typePhone'],
+             '__SHOP_SRCDOC__': html.escape(PAGES['shop'], quote=True),
+             '__TICKER__': html.escape(TICKER * 4), '__CRAWL__': html.escape(CRAWL * 12),
+             '__SHOP_JSON__': js(PAGES['shop']), '__NEWS_JSON__': js(PAGES['news'])}.items():
+    page = page.replace(k, v)
 
 # channel.html is the file to download and open; channel-artifact.html is the same page without
 # the document skeleton, which the artifact host adds itself.

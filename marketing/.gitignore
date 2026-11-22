@@ -20,3 +20,6 @@ out/demos/
 out/compare-page/media/
 out/overlay-page/
 out/channel-page/*.html
+out/channel-page/parts/
+out/channel-page/assets/
+out/channel-page/*.webp

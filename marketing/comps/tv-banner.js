@@ -9,7 +9,7 @@
 // level with the message and the column's shaft grows down to the crawl (the strips go with it),
 // as in gif-plinth-e.
 // For the live banner's still artwork: ?crawl=0 (no crawl), ?only=0 (no BLACK FRIDAY ONLY!),
-// ?glints=0 (no sparkles), ?burst=0 (no starburst).
+// ?glints=0 (no sparkles), ?burst=0 (no starburst), ?sticker=0, ?strips=0.
 // Everything on screen is a pure function of time:  window.comp.setTime(seconds)
 import * as THREE from 'three';
 import { createStage, materials } from '../lib/stage.js';
@@ -496,9 +496,9 @@ function setTime(t) {
   }
   blinkCtx.globalAlpha = 1;
   ox.clearRect(0, 0, W, H);
-  drawSticker(t);
+  if (q.get('sticker') !== '0') drawSticker(t);
   if (q.get('burst') !== '0') drawBurst(t);
-  drawStrips(t);
+  if (q.get('strips') !== '0') drawStrips(t);
   if (q.get('glints') !== '0') drawGlints(t);
   if (q.get('crawl') !== '0') drawCrawl(t); // ?crawl=0: the live banner runs its own tickers
 }
