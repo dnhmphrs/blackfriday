@@ -55,7 +55,7 @@
   const img = (cls, file) => `<img class="${cls}" alt="" src="${url(`images/${file}.webp`)}">`;
   const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
   const glints = `<svg viewBox="0 0 100 200" aria-hidden="true">
-    <path class="tw" d="${GLINT}" transform="translate(22 62) scale(38)"/><path class="tw b" d="${GLINT}" transform="translate(66 132) scale(22)"/></svg>`;
+    <g transform="translate(22 62) scale(38)"><path class="tw" d="${GLINT}"/></g><g transform="translate(66 132) scale(22)"><path class="tw b" d="${GLINT}"/></g></svg>`;
 
   // The frame is hidden by its own style attribute, which applies at once, before the stylesheet
   // has loaded; it is shown only when everything in it is ready (see reveal).
