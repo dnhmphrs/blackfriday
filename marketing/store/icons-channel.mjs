@@ -10,8 +10,8 @@ const here = new URL('.', import.meta.url).pathname, root = here + '../../';
 const font = 'data:font/woff2;base64,' + fs.readFileSync(root + 'src/fonts/archivo-black.woff2').toString('base64');
 
 // size: the icon; art: the artwork's box inside it (the store wants 96 of 128, with clear padding).
-// The lettering is measured and set by its ink, so that the letters and their shadow together sit
-// in the middle of the box: fill is how much of the box's width they take.
+// The lettering is drawn on a canvas, measured by its own pixels, and drawn again at the size and
+// place that put the letters and their shadow in the middle of the box, `fill` of its width across.
 const page = (size, art, lines, fill) => `<!doctype html><html><head><style>
   @font-face { font-family: B; src: url(${font}) format("woff2"); }
   html, body { margin: 0; background: transparent; }
@@ -19,30 +19,43 @@ const page = (size, art, lines, fill) => `<!doctype html><html><head><style>
   .a { position: absolute; left: ${(size - art) / 2}px; top: ${(size - art) / 2}px; width: ${art}px; height: ${art}px; border-radius: ${art * 0.22}px; overflow: hidden;
        background: radial-gradient(circle at 50% 46%, #4fb6ff 0%, #2a8cff 18%, #1348ee 42%, transparent 75%), linear-gradient(#0a22d6, #070f9c);
        box-shadow: inset 0 0 0 ${Math.max(1, art * 0.03)}px rgba(255, 255, 255, 0.25); }
-  .t { position: absolute; white-space: nowrap; line-height: 1; font-family: B; color: #fff035; letter-spacing: -0.05em; }
-</style></head><body><div class="i"><div class="a" id="a"></div></div>
+  canvas { position: absolute; left: 0; top: 0; }
+</style></head><body><div class="i"><div class="a"><canvas id="c" width="${art}" height="${art}"></canvas></div></div>
 <script type="module">
   await document.fonts.load('100px B');
-  const A = ${art}, LINES = ${JSON.stringify(lines)}, FILL = ${fill}, LS = -0.05, LEAD = 0.24, TAN = Math.tan((9 * Math.PI) / 180);
-  const STEP = Math.max(0.5, A * 0.012), STEPS = 4, SHADOW = STEP * STEPS;      // the stacked shadow, down and right
-  const c = document.createElement('canvas').getContext('2d');
-  c.font = '200px B'; c.letterSpacing = LS * 200 + 'px';
-  const ink = (t) => { const m = c.measureText(t); return { l: -m.actualBoundingBoxLeft / 200, w: (m.actualBoundingBoxLeft + m.actualBoundingBoxRight) / 200 - LS,
-                                                       asc: m.actualBoundingBoxAscent / 200, base: ((1 - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent) / 200) / 2) + m.fontBoundingBoxAscent / 200 }; };
-  const inks = LINES.map(ink), cap = Math.max(...inks.map((i) => i.asc));
-  // a slanted line is as wide as its ink plus the lean of its height
-  const size = (A * FILL - SHADOW) / Math.max(...inks.map((i) => i.w + cap * TAN));
-  const lineW = (i) => (i.w + cap * TAN) * size, blockW = Math.max(...inks.map(lineW)), capPx = cap * size;
-  const blockH = capPx * (LINES.length + (LINES.length - 1) * LEAD);
-  const left = (A - blockW - SHADOW) / 2, top = (A - blockH - SHADOW) / 2;
-  LINES.forEach((t, n) => {
-    const i = inks[n], el = document.createElement('div');
-    el.className = 't'; el.textContent = t;
-    const x = left + (blockW - lineW(i)) / 2, base = top + capPx + n * capPx * (1 + LEAD);
-    Object.assign(el.style, { fontSize: size + 'px', left: x - i.l * size + 'px', top: base - i.base * size + 'px', transformOrigin: '0 ' + i.base * size + 'px', transform: 'skewX(-9deg)',
-      textShadow: Array.from({ length: STEPS }, (_, k) => (k + 1) * STEP + 'px ' + (k + 1) * STEP + 'px 0 #0a0f66').join(', ') });
-    document.getElementById('a').append(el);
-  });
+  const A = ${art}, LINES = ${JSON.stringify(lines)}, FILL = ${fill}, LEAD = 0.2, TAN = Math.tan((9 * Math.PI) / 180);
+  const STEP = Math.max(0.5, A * 0.012), STEPS = 4;      // the stacked shadow, down and right
+  // Draw the lettering at z times its size: each line's middle on x, the first baseline on y.
+  // mids: where each line's own middle falls, so the lines sit centred on one another; only: one line.
+  function draw(g, z, px, x, y, mids, only) {
+    g.font = px + 'px B'; g.letterSpacing = -0.05 * px + 'px'; g.textBaseline = 'alphabetic';
+    const cap = g.measureText('H').actualBoundingBoxAscent;
+    const layer = (ox, oy, colour) => LINES.forEach((t, n) => {
+      if (only !== undefined && n !== only) return;
+      g.setTransform(z, 0, -TAN * z, z, (x + ox - (mids ? mids[n] : 0)) * z, (y + oy + n * cap * (1 + LEAD)) * z); // slanted about its baseline
+      g.fillStyle = colour; g.fillText(t, 0, 0);
+    });
+    for (let k = STEPS; k >= 1; k--) layer(k * STEP, k * STEP, '#0a0f66');
+    layer(0, 0, '#fff035');
+    g.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  // The box of what a drawing covers, in the box's own pixels: measured at 8 times the size, on a
+  // canvas twice the box across, with the box's middle in its middle.
+  const BIG = 8, W = A * BIG * 2;
+  const scratch = new OffscreenCanvas(W, W).getContext('2d', { willReadFrequently: true });
+  function measure(px, mids, only) {
+    scratch.clearRect(0, 0, W, W);
+    draw(scratch, BIG, px, A, A, mids, only);
+    const d = scratch.getImageData(0, 0, W, W).data; let x0 = W, x1 = -1, y0 = W, y1 = -1;
+    for (let y = 0; y < W; y++) for (let x = 0; x < W; x++) if (d[(y * W + x) * 4 + 3] > 96) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    return { w: (x1 + 1 - x0) / BIG, cx: (x0 + x1 + 1) / 2 / BIG - A, cy: (y0 + y1 + 1) / 2 / BIG - A }; // cx, cy: from the point it was drawn at
+  }
+  const at = (px) => { const mids = LINES.map((_, n) => measure(px, null, n).cx); return { mids, ...measure(px, mids) }; };
+  // the size that makes the whole thing FILL of the box across; then put its middle in the middle of the box
+  let px = A * 0.3;
+  px *= (A * FILL) / at(px).w;
+  const m = at(px);
+  draw(document.getElementById('c').getContext('2d'), 1, px, A / 2 - m.cx, A / 2 - m.cy, m.mids);
   window.ready = true;
 </script></body></html>`;
 
@@ -50,7 +63,7 @@ const out = root + 'marketing/out/icons-channel/';
 fs.mkdirSync(out, { recursive: true });
 const b = await chromium.launch();
 const p = await b.newPage({ deviceScaleFactor: 1 });
-for (const [size, art, lines, fill] of [[16, 16, ['%'], 0.74], [32, 32, ['30%', 'OFF'], 0.84], [48, 46, ['30%', 'OFF'], 0.82], [128, 96, ['30%', 'OFF'], 0.8]]) {
+for (const [size, art, lines, fill] of [[16, 16, ['%'], 0.8], [32, 32, ['30%', 'OFF'], 0.92], [48, 46, ['30%', 'OFF'], 0.92], [128, 96, ['30%', 'OFF'], 0.92]]) {
   await p.setViewportSize({ width: size, height: size });
   await p.setContent(page(size, art, lines, fill));
   await p.waitForFunction(() => window.ready);

@@ -8,7 +8,7 @@
      stands in the right one; the tapes and the crawl close the bottom.
        ?f=square|story                        the posts: 1080 x 1080, and 1080 x 1920 for stories (its
                                               message keeps clear of the app's bars, top and bottom)
-       ?f=shot|shot-only|shot-lines|shot-globe|shot-card|marquee|tile   the store's images
+       ?f=shot|marquee|tile                   the store's images
        ?bg=slant|step|wall|mono|none          the faint tiled ground of Gary Mustard Enterprises marks (default: slant)
      store/posts.mjs renders it, stepping window.setT(t) through a 12 s loop. -->
 <style>
@@ -16,7 +16,6 @@
   @font-face { font-family: "TOE Antonio"; font-weight: 600; src: url(../../src/fonts/antonio-semibold.woff2) format("woff2"); }
   @font-face { font-family: "TOE Black"; src: url(../../src/fonts/archivo-black.woff2) format("woff2"); }
   @font-face { font-family: "TOE Arimo"; font-style: italic; font-weight: 700; src: url(../../src/fonts/arimo-bold-italic.woff2) format("woff2"); }
-  @font-face { font-family: "TOE Tinos"; font-style: italic; font-weight: 700; src: url(../variants/v17/fonts/tinos-bold-italic.woff2) format("woff2"); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: #070f9c; }
   #p { position: relative; overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; }
@@ -51,13 +50,6 @@
   .tape { background: linear-gradient(#fffb86, #f0e11c); color: #111; }
   .by { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
 
-  /* the two badges of the first banner: the oval and the tag */
-  .oval { display: grid !important; place-items: center; text-align: center; border-radius: 50%; color: #151515; font: italic 700 1em/0.98 "TOE Tinos", "Times New Roman", serif;
-          background: radial-gradient(ellipse at 40% 30%, #fffc9a, #efe01c 72%); transform: rotate(-7deg);
-          box-shadow: 0.14em 0.17em 0 rgba(6, 8, 70, 0.9), inset 0 0 0 0.095em rgba(170, 158, 0, 0.5); }
-  .pill { white-space: nowrap; border-radius: 0.23em; padding: 0.08em 0.69em 0.15em 0.58em; color: #111; font: italic 700 1em/1.15 "TOE Arimo", Arial, sans-serif;
-          background: linear-gradient(#fffb86, #f0e11c); transform: skewX(-9deg) rotate(-1.5deg); transform-origin: left top;
-          box-shadow: 0.125em 0.125em 0 rgba(6, 8, 70, 0.9), inset 0 0 0 0.083em rgba(170, 158, 0, 0.6); }
   .card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000; box-shadow: 8px 8px 0 rgba(4, 6, 60, 0.92);
           transform-origin: left top; font: italic 700 50px/1 "TOE Arimo", Arial, sans-serif; }
   .card .hd { background: var(--red); color: #fff46a; font: 600 41px/57px "TOE Antonio", "Arial Narrow", sans-serif; padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
@@ -86,27 +78,18 @@
   // ---- the formats: one margin (m), a left column for the message (col), and one set of gaps ----
   // head: the headline's lines, the widest fitted to the column; headTop: its cap line; lead: the
   // space between its lines (x cap height); toSub, toCard: the gaps down the stack; sub: the lines
-  // under it, the widest fitted to subW (or the column); subLead: between them (x cap height);
-  // card: its scale (0: none); ball: the globe's diameter, centred in what is left right of the
-  // gutter; strips: the tapes' scale (0: none); tick 0: no ticker.
+  // under it; subLead: between them (x cap height); card: its scale (0: none); ball: the globe's
+  // diameter, centred in what is left right of the gutter; strips: the tapes' scale (0: none);
+  // tick 0: no ticker.
   //   split: the sub lines and the card in a second column beside the headline, on the same cap line
-  //   sides: the globe in the middle, the message parted either side of it
   //   top, bottom: bands at the top and bottom edge left to the app's own bars (stories); the
   //     ticker and the crawl move in to clear them, and the column still runs to the bottom edge
-  //   extras: the oval and the tag, placed by hand
-  const TWO = ['30%', 'OFF'], LINES = ['But wait… there’s less!', 'No purchase necessary!', 'Black Friday only!', 'Every website, 30% off!', 'Works like magic!'];
-  const SHOT = { w: 1280, h: 800, m: 56, tick: 44, crawl: 76, col: 700, gutter: 48, head: ['30% OFF'], headTop: 96, lead: 0.3, toSub: 34, sub: ['EVERYTHING ON THE INTERNET.'], subLead: 0.4, toCard: 34, card: 0.7, ball: 300, strips: 0.5 };
+  const TWO = ['30%', 'OFF'];
   const F = {
     square:   { w: 1080, h: 1080, m: 60, tick: 54, crawl: 96, col: 436, gutter: 44, head: TWO, headTop: 100, lead: 0.3, toSub: 42, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, toCard: 40, card: 0.62, ball: 372, strips: 0.62 },
     // stories: the top 250 and the bottom 420 are left to the app (Instagram's bars; TikTok's caption and buttons)
     story:    { w: 1080, h: 1920, m: 60, top: 250, bottom: 420, tick: 56, crawl: 100, col: 440, gutter: 44, head: TWO, headTop: 356, lead: 0.3, toSub: 52, sub: ['EVERYTHING', 'ON THE', 'INTERNET.'], subLead: 0.38, toCard: 52, card: 0.72, ball: 372, strips: 0.64 },
-    shot: SHOT,
-    'shot-only':  { ...SHOT, head: ['BLACK FRIDAY', 'ONLY!'], sub: ['30% OFF EVERYTHING ON THE INTERNET.'], toSub: 30, toCard: 30 },
-    'shot-lines': { ...SHOT, tick: 0, headTop: 70, toSub: 44, sub: LINES, subW: 600, subLead: 0.72, card: 0 },
-    'shot-globe': { ...SHOT, sides: true, ball: 330, headTop: 104, toSub: 30, sideSub: ['EVERYTHING ON', 'THE INTERNET.'], toCard: 40, card: 0.66,
-                    extras: [{ t: 'oval', x: 902, y: 352, w: 290, h: 126, size: 38 }] },
-    'shot-card':  { ...SHOT, head: [], sub: [], col: 760, headTop: 104, card: 1.16, toCard: 0, toSub: 0,
-                    extras: [{ t: 'oval', x: 588, y: 122, w: 300, h: 130, size: 39 }, { t: 'pill', x: 604, y: 330, size: 46, text: 'Black Friday' }] },
+    shot:     { w: 1280, h: 800, m: 56, tick: 44, crawl: 76, col: 700, gutter: 48, head: ['30% OFF'], headTop: 96, lead: 0.3, toSub: 34, sub: ['EVERYTHING ON THE INTERNET.'], subLead: 0.4, toCard: 34, card: 0.7, ball: 300, strips: 0.5 },
     marquee:  { w: 1400, h: 560, m: 56, tick: 40, crawl: 70, col: 552, gutter: 56, head: TWO, headTop: 80, lead: 0.3, split: { col: 264, gutter: 56 }, sub: ['EVERYTHING', 'ON THE', 'INTERNET.'], subLead: 0.38, toCard: 30, card: 0.66, ball: 260, strips: 0 },
     tile:     { w: 880, h: 560, m: 56, tick: 0, crawl: 76, col: 400, gutter: 44, head: TWO, headTop: 64, lead: 0.3, toSub: 30, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, card: 0, ball: 270, strips: 0 },
   };
@@ -115,7 +98,7 @@
   for (const [key, v] of q) if (key in f && typeof f[key] === 'number') f[key] = Number(v); // try a value from the address
   const p = document.getElementById('p');
   Object.assign(p.style, { width: f.w + 'px', height: f.h + 'px' });
-  await Promise.all(['100px "TOE Black"', 'italic 700 100px "TOE Arimo"', '300 50px "TOE Antonio"', '600 50px "TOE Antonio"', 'italic 700 40px "TOE Tinos"'].map((s) => document.fonts.load(s)));
+  await Promise.all(['100px "TOE Black"', 'italic 700 100px "TOE Arimo"', '300 50px "TOE Antonio"', '600 50px "TOE Antonio"'].map((s) => document.fonts.load(s)));
 
   const add = (html) => { p.insertAdjacentHTML('beforeend', html); return p.lastElementChild; };
   const place = (el, x, y, w, h) => Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
@@ -128,12 +111,10 @@
     return { l: -m.actualBoundingBoxLeft * k, r: m.actualBoundingBoxRight * k - ls, cap: mc.measureText('H').actualBoundingBoxAscent * k,
              asc: m.fontBoundingBoxAscent * k, desc: m.fontBoundingBoxDescent * k };
   }
-  // Set a line of type with its ink's left edge at x (or, with right, its right edge) and its
-  // baseline at y. skew: the headline's slant, which carries the tops of its letters to the right.
-  function set(cls, text, font, ls, size, x, y, skew, right) {
+  // Set a line of type with its ink's left edge at x and its baseline at y. skew: the headline's slant.
+  function set(cls, text, font, ls, size, x, y, skew) {
     const i = ink(text, font, ls), el = add(`<div class="t ${cls}">${text}</div>`);
     const base = (1 - (i.asc + i.desc)) / 2 + i.asc; // where the baseline sits in a line-height: 1 box
-    if (right) x -= (i.r - i.l + (skew ? i.cap * TAN9 : 0)) * size;
     Object.assign(el.style, { fontSize: size + 'px', left: x - i.l * size + 'px', top: y - base * size + 'px' });
     if (skew) Object.assign(el.style, { transformOrigin: `0 ${base * size}px`, transform: 'skewX(-9deg)' });
     return el;
@@ -144,8 +125,7 @@
   const fitSub = (text, w) => w / width(text, SUB, -0.04);
 
   // ---- the grid ----
-  const L = f.m, R = f.w - f.m, L2 = L + f.col + (f.split ? f.split.gutter : 0), colR = f.split ? L2 + f.split.col : L + f.col, monL = colR + f.gutter;
-  const monX = f.sides ? f.w / 2 : (monL + R) / 2;
+  const L = f.m, R = f.w - f.m, L2 = L + f.col + (f.split ? f.split.gutter : 0), colR = f.split ? L2 + f.split.col : L + f.col, monL = colR + f.gutter, monX = (monL + R) / 2;
   const crawlTop = f.h - (f.bottom || 0) - f.crawl;
   // the tapes: the navy one's lower left corner meets the crawl; the yellow one lies on it
   const tapeH = 126 * f.strips, byH = 68 * f.strips;
@@ -185,44 +165,22 @@
   const globe = add(`<img src="${PARTS}globe-00.png">`);
   place(globe, gx, gy, gd, gd);
 
-  // ---- the message ----
+  // ---- the message, flush left down the column (or two columns, in the wide formats) ----
   const hw = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9;
   const widest = (lines, w) => lines.reduce((a, b) => (w(a) > w(b) ? a : b));
-  const headCap = (size) => ink('H', HEAD, -0.05).cap * size, subCap = (size) => ink('H', SUB, -0.04).cap * size;
-  const putCard = (x, y, scale) => {
+  const hs = fitHead(widest(f.head, hw), f.col), hc = ink('H', HEAD, -0.05).cap * hs;
+  let y = f.headTop;
+  for (const [n, line] of f.head.entries()) { y += hc + (n ? hc * f.lead : 0); set('head', line, HEAD, -0.05, hs, L, y, true); }
+  const sx = f.split ? L2 : L;
+  const ss = fitSub(widest(f.sub, (t) => width(t, SUB, -0.04)), f.split ? f.split.col : f.col), sc = ink('H', SUB, -0.04).cap * ss;
+  y = f.split ? f.headTop : y + f.toSub;
+  for (const [n, line] of f.sub.entries()) { y += sc + (n ? sc * f.subLead : 0); set('sub', line, SUB, -0.04, ss, sx, y); }
+  let cardBottom = y;
+  if (f.card) {
+    y += f.toCard;
     const card = add('<div class="card"><div class="hd">The Internet (All Of It)</div><div class="ln">WAS: <s>100%</s></div><div class="ln">NOW:</div><div class="big">70%</div></div>');
-    Object.assign(card.style, { left: x + 'px', top: y + 'px', transform: `scale(${scale}) rotate(-1.4deg)` });
-    return y + (306 + 54) * scale;
-  };
-  let y = f.headTop, hs = 0, ss = 0, cardBottom = 0, sx = L;
-  if (f.sides) {
-    // the globe in the middle: 30% and OFF either side of it, flush to the margins, a line under each
-    const side = monX - f.ball / 2 - f.gutter - L;
-    hs = fitHead(widest(f.head[0].split(' '), hw), side);
-    const [a, b] = f.head[0].split(' '), hc = headCap(hs);
-    y += hc; set('head', a, HEAD, -0.05, hs, L, y, true); set('head', b, HEAD, -0.05, hs, R, y, true, true);
-    ss = fitSub(widest(f.sideSub, (t) => width(t, SUB, -0.04)), side);
-    y += f.toSub + subCap(ss); set('sub', f.sideSub[0], SUB, -0.04, ss, L, y); set('sub', f.sideSub[1], SUB, -0.04, ss, R, y, false, true);
-    if (f.card) cardBottom = putCard(L, y + f.toCard, f.card);
-  } else {
-    // flush left down the column (or two columns, in the wide formats)
-    if (f.head.length) {
-      hs = fitHead(widest(f.head, hw), f.col);
-      const hc = headCap(hs);
-      for (const [n, line] of f.head.entries()) { y += hc + (n ? hc * f.lead : 0); set('head', line, HEAD, -0.05, hs, L, y, true); }
-    }
-    sx = f.split ? L2 : L;
-    if (f.sub.length) {
-      ss = fitSub(widest(f.sub, (t) => width(t, SUB, -0.04)), f.subW || (f.split ? f.split.col : f.col));
-      const sc = subCap(ss);
-      y = f.split ? f.headTop : y + f.toSub;
-      for (const [n, line] of f.sub.entries()) { y += sc + (n ? sc * f.subLead : 0); set('sub', line, SUB, -0.04, ss, sx, y); }
-    }
-    cardBottom = f.card ? putCard(sx, y + f.toCard, f.card) : y;
-  }
-  for (const e of f.extras || []) {
-    const el = add(e.t === 'oval' ? '<div class="oval"><span>As Seen On<br>Every Website</span></div>' : `<div class="pill">${e.text}</div>`);
-    Object.assign(el.style, { left: e.x + 'px', top: e.y + 'px', fontSize: e.size + 'px' }, e.t === 'oval' ? { width: e.w + 'px', height: e.h + 'px' } : {});
+    Object.assign(card.style, { left: sx + 'px', top: y + 'px', transform: `scale(${f.card}) rotate(-1.4deg)` });
+    cardBottom = y + (306 + 54) * f.card;
   }
 
   // ---- glints: one on the globe's shoulder, one at its foot ----

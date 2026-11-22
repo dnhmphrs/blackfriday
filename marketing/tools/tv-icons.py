@@ -13,7 +13,7 @@ SRC = os.path.join(HERE, '..', 'out', 'icons-channel')
 DST = os.path.join(HERE, '..', '..', 'src', 'icons')
 BLUE = np.array([0x0a, 0x22, 0xd6], np.float32)
 # size: (how big the look is drawn, how strong)
-LOOK = {16: (0.08, 0.45), 32: (0.13, 0.6), 48: (0.18, 0.75), 128: (0.36, 1.0)}
+LOOK = {16: (0.08, 0.25), 32: (0.13, 0.35), 48: (0.18, 0.45), 128: (0.36, 0.6)}
 
 for size, (scale, amount) in LOOK.items():
     rgba = cv2.cvtColor(cv2.imread(os.path.join(SRC, f'clean-{size}.png'), cv2.IMREAD_UNCHANGED), cv2.COLOR_BGRA2RGBA).astype(np.float32)
