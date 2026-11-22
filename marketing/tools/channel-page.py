@@ -23,7 +23,7 @@ def b64(path, mime):
 
 IMG = {k: b64(os.path.join(ASSETS, f), 'image/webp') for k, f in {
     'globe': 'globe-380.webp', 'cap': 'cap.webp', 'shaft': 'shaft.webp', 'base': 'base.webp',
-    'sticker': 'sticker.webp', 'wow': 'wow.webp', 'typeDesktop': 'type-desktop.webp', 'typePhone': 'type-phone.webp'}.items()}
+    'wow': 'wow.webp', 'typeDesktop': 'type-desktop.webp', 'typePhone': 'type-phone.webp'}.items()}
 FONT = {k: b64(os.path.join(FONTS, f'{k}.woff2'), 'font/woff2')
         for k in ('antonio-light', 'antonio-semibold', 'archivo-black', 'arimo-bold-italic')}
 PAGES = {k: open(os.path.join(ROOT, 'store', 'mock', f'{k}.html'), encoding='utf-8').read() for k in ('shop', 'news')}
@@ -72,6 +72,20 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   .face > * { position: absolute; display: block; max-width: none; }
   #glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
 
+  /* the motif either side of 30% OFF: drawn in SVG, so it is sharp at any size */
+  .motif svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  #mR svg { transform: scaleX(-1); }
+  body.phone .motif { display: none; }
+  .tw { transform-box: fill-box; transform-origin: center; animation: twinkle 2.4s ease-in-out infinite; }
+  .tw.b { animation-delay: -1.2s; }
+  .bob { animation: bob 1.6s ease-in-out infinite; }
+  .fan { transform-box: fill-box; transform-origin: 100% 50%; animation: fan 1.1s ease-in-out infinite; }
+  .wob { transform-box: fill-box; transform-origin: center; animation: wob 2s ease-in-out infinite alternate; }
+  @keyframes twinkle { 0%, 100% { transform: scale(0.55) rotate(-10deg); opacity: 0.75; } 50% { transform: scale(1) rotate(12deg); opacity: 1; } }
+  @keyframes bob { 0%, 100% { transform: translateY(-4%); } 50% { transform: translateY(4%); } }
+  @keyframes fan { 0%, 100% { transform: scale(0.9); } 50% { transform: scale(1.08); } }
+  @keyframes wob { from { transform: rotate(-8deg) scale(0.96); } to { transform: rotate(8deg) scale(1.04); } }
+
   /* the tickers: Garrett's lines along the top, BLACK FRIDAY ONLY! along the bottom */
   .ticker, .crawl { left: 0; right: 0; overflow: hidden; white-space: nowrap; }
   .ticker { top: 0; font-family: "TOE Antonio", "Arial Narrow", Arial, sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em;
@@ -110,7 +124,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     55% { transform: skewX(-8deg) scale(1) rotate(0deg); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .ticker span, .crawl span, #card .big { animation: none; }
+    .ticker span, .crawl span, #card .big, .tw, .bob, .fan, .wob { animation: none; }
     #frame.in, body.phone #frame.in { transition: opacity 0.3s linear; }
   }
 
@@ -136,11 +150,11 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     <div class="face">
       <div id="glow"></div>
       <img id="type" alt="">
+      <div class="motif" id="mL"></div><div class="motif" id="mR"></div>
       <img id="shaft" alt="" src="__I_SHAFT__">
       <img id="cap" alt="" src="__I_CAP__">
       <img id="base" alt="" src="__I_BASE__">
       <img id="globe" alt="" src="__I_GLOBE__">
-      <img id="sticker" alt="" src="__I_STICKER__">
       <div id="card"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
       <img id="wow" alt="" src="__I_WOW__">
       <div class="strip" id="sub"><span>__BRAND__</span></div>
@@ -175,7 +189,6 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       w: 1080, tick: 84, tickFont: 56, crawl: 150, crawlFont: 112, minArt: 1800,
       type: { x: 97, y: 38, w: 895, h: 926, src: 'typeDesktop', spread: 0.5 },
       mon: { x: 516, y: 972, k: 1 },   // the globe picture's top left; k scales the whole monument
-      sticker: { dx: 306, dy: 6, s: 1 },
       card: { x: 80, y: 1002, s: 1.0, r: -1.4, spread: 0 },
       wow: { x: 129, fromCrawl: -565, w: 276, h: 278 },
       strips: [{ id: 'sub', fromCrawl: -190, h: 68, cap: 25, dx: 0 }, { id: 'strip', fromCrawl: -292, h: 126, cap: 54, dx: 12 }],
@@ -185,11 +198,34 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       w: 1170, tick: 70, tickFont: 46, crawl: 90, crawlFont: 66, minArt: 560,
       type: { x: 39, y: 27, w: 594, h: 577, src: 'typePhone', spread: 0 },
       mon: { x: 780, y: -15, k: 320 / 384 },
-      sticker: { dx: 20, dy: 40, s: 0.8 },
       card: { x: 584, y: 384, s: 0.56, r: -1.4, spread: 0.5 },
       glow: { rx: 538, ry: 517 },
     },
   };
+  // The motif, drawn for the left side in a 100 x 200 box (the right side is its mirror image).
+  // Pick one with the page address: #glints, #lines, #arrows or #stars.
+  const STAR4 = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
+  const STAR5 = (r) => Array.from({ length: 10 }, (_, i) => { const a = (i * Math.PI) / 5 - Math.PI / 2, q = i % 2 ? r * 0.45 : r; return `${(q * Math.cos(a)).toFixed(1)},${(q * Math.sin(a)).toFixed(1)}`; }).join(' ');
+  const NAVY = '#0a0f66';
+  const MOTIFS = {
+    glints: `<g transform="translate(55 70) scale(40)"><path class="tw" d="${STAR4}" fill="#fff" style="filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.2px #9fd4ff)"/></g>
+             <g transform="translate(28 140) scale(22)"><path class="tw b" d="${STAR4}" fill="#fff" style="filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.25px #9fd4ff)"/></g>`,
+    lines: `<g class="fan">${[[28, 62], [0, 100], [-28, 138]].map(([a, y]) =>
+             `<g transform="translate(92 ${y}) rotate(${a})"><line x1="0" y1="0" x2="-62" y2="0" stroke="${NAVY}" stroke-width="13" stroke-linecap="round" transform="translate(5 5)"/>
+              <line x1="0" y1="0" x2="-62" y2="0" stroke="#fff035" stroke-width="13" stroke-linecap="round"/></g>`).join('')}</g>`,
+    arrows: `<g class="bob"><g transform="translate(6 6)"><path d="M35,30 h30 v70 h22 l-37,48 l-37,-48 h22z" fill="${NAVY}"/></g>
+             <path d="M35,30 h30 v70 h22 l-37,48 l-37,-48 h22z" fill="#ff1616" stroke="#000" stroke-width="5" stroke-linejoin="round"/>
+             <path d="M41,36 h9 v66 h-9z" fill="#ff8a6e" opacity="0.7"/></g>`,
+    stars: `<g class="wob"><g transform="translate(56 78)"><polygon points="${STAR5(42)}" fill="${NAVY}" transform="translate(6 6)"/><polygon points="${STAR5(42)}" fill="#fff035" stroke="#000" stroke-width="4" stroke-linejoin="round"/></g></g>
+            <g class="wob" style="animation-delay:-1s"><g transform="translate(26 150)"><polygon points="${STAR5(22)}" fill="${NAVY}" transform="translate(4 4)"/><polygon points="${STAR5(22)}" fill="#fff035" stroke="#000" stroke-width="3" stroke-linejoin="round"/></g></g>`,
+  };
+  const motifName = () => (MOTIFS[location.hash.slice(1)] ? location.hash.slice(1) : 'glints');
+  function drawMotif() {
+    const svg = `<svg viewBox="0 0 100 200" aria-hidden="true">${MOTIFS[motifName()]}</svg>`;
+    $('mL').innerHTML = svg; $('mR').innerHTML = svg;
+  }
+  addEventListener('hashchange', drawMotif);
+
   const MON = { globe: 480, capX: 40, capY: 410, colW: 400, capH: 136, baseH: 144 }; // the monument's pieces, unscaled
   const IMG = { typeDesktop: '__I_TYPE_DESKTOP__', typePhone: '__I_TYPE_PHONE__' };
   const PAGES = { shop: '__SHOP_JSON__', news: '__NEWS_JSON__' };
@@ -237,6 +273,11 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     const t = g.type, type = $('type');
     type.src = IMG[t.src];
     place(type, X(t.x, t.spread), Y(t.y), t.w * u, t.h * u);
+    if (!phone) {
+      const mw = 130, mh = 260, my0 = 291 - mh / 2;  // centred on the 30% OFF block, in the margins beside it
+      place($('mL'), X(198 - 18 - mw, t.spread), Y(my0), mw * u, mh * u);
+      place($('mR'), X(888 + 18, t.spread), Y(my0), mw * u, mh * u);
+    }
 
     // the monument: globe, then the column under it, its shaft stretched down to the crawl
     const m = g.mon, k = m.k * u, mx = X(m.x, 1), my = Y(m.y);
@@ -248,8 +289,6 @@ PAGE = r'''<title>30% Off Channel Banner</title>
     place($('shaft'), capL, capTop + MON.capH * k - 2, colW, baseTop - (capTop + MON.capH * k) + 4);
     const gl = g.glow, gcx = mx + (MON.globe / 2) * k, gcy = my + (MON.globe / 2) * k;
     place($('glow'), gcx - gl.rx * u, gcy - gl.ry * u, gl.rx * 2 * u, gl.ry * 2 * u);
-    const s = g.sticker;
-    place($('sticker'), mx + s.dx * k, my + s.dy * k, 187 * s.s * k, 188 * s.s * k);
 
     const c = g.card, card = $('card');
     Object.assign(card.style, { left: X(c.x, c.spread) + 'px', top: Y(c.y) + 'px', transform: `scale(${c.s * u}) rotate(${c.r}deg)` });
@@ -324,6 +363,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   addEventListener('keydown', (e) => { if ((e.key === 'h' || e.key === 'H') && e.target.tagName !== 'INPUT') toggle(); });
   addEventListener('resize', () => { fitPhone(); layout(); });
 
+  drawMotif();
   render();
   show();
 </script>
@@ -334,7 +374,7 @@ page = PAGE
 for k, v in {'__F_ANTONIO_LIGHT__': FONT['antonio-light'], '__F_ANTONIO_SEMIBOLD__': FONT['antonio-semibold'],
              '__F_ARCHIVO_BLACK__': FONT['archivo-black'], '__F_ARIMO__': FONT['arimo-bold-italic'],
              '__I_SHAFT__': IMG['shaft'], '__I_CAP__': IMG['cap'], '__I_BASE__': IMG['base'], '__I_GLOBE__': IMG['globe'],
-             '__I_STICKER__': IMG['sticker'], '__I_WOW__': IMG['wow'],
+             '__I_WOW__': IMG['wow'],
              '__I_TYPE_DESKTOP__': IMG['typeDesktop'], '__I_TYPE_PHONE__': IMG['typePhone'],
              '__SHOP_SRCDOC__': html.escape(PAGES['shop'], quote=True),
              '__TICKER__': html.escape(TICKER * 4), '__BRAND__': html.escape(BRAND), '__CRAWL__': html.escape(CRAWL * 12),
