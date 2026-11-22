@@ -82,17 +82,18 @@
   // diameter, centred in what is left right of the gutter; strips: the tapes' scale (0: none);
   // tick 0: no ticker.
   //   split: the sub lines and the card in a second column beside the headline, on the same cap line
-  //   stack: the live banner's own arrangement for a tall frame, at u times its size: the lettering
-  //     centred (its top at headTop), glints either side of 30% OFF, the card and the globe in a row
-  //     under it (card: left, top; globe: centre x, top of its picture), the tapes and the crawl below
+  //   stack: the live banner's own arrangement for a tall frame: the lettering centred, at u times
+  //     its size (its top at headTop), glints either side of 30% OFF; under it the card and the globe
+  //     in a row, at `row` times their size (card: left, how far below the ball's top; globe: centre
+  //     x); the tapes and the crawl below
   const TWO = ['30%', 'OFF'];
   const F = {
     square:   { w: 1080, h: 1080, m: 60, tick: 54, crawl: 96, col: 436, gutter: 44, head: TWO, headTop: 100, lead: 0.3, toSub: 42, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, toCard: 40, card: 0.62, ball: 372, strips: 0.62 },
     // stories: the ticker and the crawl on the frame's edges; the message starts below where the apps put their own header
-    story:    { w: 1080, h: 1920, m: 60, stack: true, u: 0.86, tick: 72, crawl: 129, headTop: 190, toSub: 44, toRow: 40, card: [72, 112], globe: 756 },
+    story:    { w: 1080, h: 1920, m: 60, stack: true, u: 0.86, row: 1.1, tick: 72, crawl: 129, headTop: 124, toSub: 34, toRow: 40, card: [60, 103], globe: 790 },
     shot:     { w: 1280, h: 800, m: 56, tick: 44, crawl: 76, col: 700, gutter: 48, head: ['30% OFF'], headTop: 96, lead: 0.3, toSub: 34, sub: ['EVERYTHING ON THE INTERNET.'], subLead: 0.4, toCard: 34, card: 0.7, ball: 300, strips: 0.5 },
     marquee:  { w: 1400, h: 560, m: 56, tick: 40, crawl: 70, col: 552, gutter: 56, head: TWO, headTop: 80, lead: 0.3, split: { col: 264, gutter: 56 }, sub: ['EVERYTHING', 'ON THE', 'INTERNET.'], subLead: 0.38, toCard: 30, card: 0.66, ball: 260, strips: 0 },
-    tile:     { w: 880, h: 560, m: 56, tick: 0, crawl: 76, col: 400, gutter: 44, head: TWO, headTop: 64, lead: 0.3, toSub: 30, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, card: 0, ball: 270, strips: 0 },
+    tile:     { w: 880, h: 560, m: 56, tick: 40, crawl: 76, col: 380, gutter: 44, head: TWO, headTop: 78, lead: 0.3, toSub: 28, sub: ['EVERYTHING ON', 'THE INTERNET.'], subLead: 0.4, card: 0, ball: 262, strips: 0 },
   };
   const q = new URLSearchParams(location.search);
   const f = { ...(F[q.get('f')] || F.square) };
@@ -160,7 +161,7 @@
   // (stacked: the lettering is the banner's two pictures, 706 x 522 and 895 x 349, one under the other, centred)
   const T1 = { w: 706 * f.u, h: 522 * f.u }, T2 = { w: 895 * f.u, h: 349 * f.u };
   const t1y = f.headTop, t2y = t1y + T1.h + f.toSub, rowY = t2y + T2.h + f.toRow; // rowY: the top of the ball
-  const gd = f.stack ? 480 * f.u : f.ball / (374 / 480), k = gd / 480;       // the ball is 374 of the picture's 480
+  const gd = f.stack ? 480 * f.row : f.ball / (374 / 480), k = gd / 480;     // the ball is 374 of the picture's 480
   const gx = (f.stack ? f.globe : monX) - gd / 2, gy = f.stack ? rowY - 47 * k : f.headTop - 6 - 47 * k; // a round thing overshoots the cap line a little
   place(add('<div class="glow"></div>'), gx + gd / 2 - gd * 1.3, gy + gd * 0.487 - gd * 1.45, gd * 2.6, gd * 2.9);
   const colX = gx + 40 * k, colW = 400 * k, capTop = gy + 410 * k, baseTop = Math.max(capTop + 136 * k + 4, f.h - 144 * k);
@@ -191,7 +192,7 @@
       glint('b', out(92), t1y + 295 * u, 29 * u);
     }
     y = t2y + T2.h;
-    cardBottom = putCard(f.card[0], rowY + f.card[1] * u, u);
+    cardBottom = putCard(f.card[0], rowY + f.card[1], f.row);
     sx = f.card[0];
   } else {
   const hw = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9;
@@ -229,7 +230,7 @@
   cr.firstElementChild.style.animationDelay = `${-(Number(q.get('crawlAt')) || 2.3)}s`;
 
   // what the grid came to, for checking
-  window.report = { headSize: hs, subSize: ss, textBottom: y, cardBottom, tapeTopAtCard: tapeTop(sx + 200 * (f.stack ? f.u : f.card)), tapeTopAtColumn: tapeTop(gx + gd / 2), crawlTop, capTop, ball: [ballL, ballT, bd] };
+  window.report = { headSize: hs, subSize: ss, textBottom: y, cardBottom, tapeTopAtCard: tapeTop(sx + 200 * (f.stack ? f.row : f.card)), tapeTopAtColumn: tapeTop(gx + gd / 2), crawlTop, capTop, ball: [ballL, ballT, bd] };
 
   // Time: every animation is paused and set to t; the globe steps through its 60 frames (one turn in 4 s).
   const frames = Array.from({ length: 60 }, (_, i) => `${PARTS}globe-${String(i).padStart(2, '0')}.png`);
