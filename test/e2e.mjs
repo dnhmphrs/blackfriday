@@ -77,10 +77,12 @@ const probe = () => {
     count: document.querySelectorAll('thirty-off-everything').length,
     parent: host.parentNode?.nodeName,
     topLayer,
-    styled: frame && getComputedStyle(frame).overflow === 'hidden' && getComputedStyle(frame).backgroundColor === 'rgb(0, 51, 255)',
+    styled: !!frame && getComputedStyle(frame).backgroundColor === 'rgb(0, 0, 0)' && getComputedStyle(s.querySelector('.face')).overflow === 'hidden',
+    revealed: !!frame && frame.classList.contains('in') && getComputedStyle(frame).visibility === 'visible',
     frame: rect(frame),
-    art: rect([...s.querySelectorAll('.art')].find((i) => getComputedStyle(i).display !== 'none')),
-    ticker: rect(s.querySelector('.ticker')),
+    art: rect(s.querySelector('.type')),
+    globe: rect(s.querySelector('.globe')),
+    ticker: rect(s.querySelector('.crawl')),
     images: [...s.querySelectorAll('img')].filter((i) => getComputedStyle(i).display !== 'none').map((i) => i.naturalWidth),
     viewport: [document.documentElement.clientWidth, innerHeight],
     hitRight: document.elementFromPoint(innerWidth - 60, innerHeight / 2)?.nodeName,
@@ -189,13 +191,27 @@ console.log('\n# 4. The banner (Black Friday)');
   const { context } = await launchWithExtension(EXT, { tz: 'Europe/London' });
   const page = await context.newPage();
   const errs = await watchErrors(context, page);
-  await page.goto(url('/plain', BF)); await sleep(1200);
+  // From the first frame the page paints, record any moment the banner shows before it is ready.
+  await page.addInitScript(() => {
+    window.__flash = [];
+    const look = () => {
+      const s = document.querySelector('thirty-off-everything')?.shadowRoot, f = s?.querySelector('.frame');
+      if (f && getComputedStyle(f).visibility !== 'hidden') {
+        const ready = getComputedStyle(f).backgroundColor === 'rgb(0, 0, 0)' && [...s.querySelectorAll('img')].every((i) => i.hidden || (i.complete && i.naturalWidth > 0));
+        if (!ready) window.__flash.push(Math.round(performance.now()));
+      }
+      requestAnimationFrame(look);
+    };
+    requestAnimationFrame(look);
+  });
+  await page.goto(url('/plain', BF)); await sleep(2000);
   const base = await page.evaluate(probe);
   const [vw, vh] = base.viewport;
+  check('never shows unstyled or half-loaded: hidden until ready, then slides in', base.revealed && (await page.evaluate(() => window.__flash.length)) === 0, `flashes at ${await page.evaluate(() => window.__flash.slice(0, 5).join(','))} ms`);
   check('right-hand 30%, full height', Math.abs(base.frame[2] - vw * 0.3) <= 2 && base.frame[1] === 0 && base.frame[3] === vh && base.frame[0] + base.frame[2] === vw, JSON.stringify(base.frame));
   check('under <html>, in the top layer', base.parent === 'HTML' && base.topLayer === true);
-  check('stylesheet, artwork and ticker loaded', base.styled && base.images.length === 3 && base.images.every((w) => w > 0), JSON.stringify(base.images));
-  check('the ticker sits on the bottom edge', base.ticker && Math.abs(base.ticker[1] + base.ticker[3] - (base.frame[1] + base.frame[3])) <= 1, JSON.stringify(base.ticker));
+  check('stylesheet, pictures and crawl loaded', base.styled && base.images.length === 6 && base.images.every((w) => w > 0), JSON.stringify(base.images));
+  check('the crawl sits on the bottom edge', base.ticker && Math.abs(base.ticker[1] + base.ticker[3] - (base.frame[1] + base.frame[3])) <= 1, JSON.stringify(base.ticker));
   check('blocks the right side, left side still clickable', base.hitRight === 'THIRTY-OFF-EVERYTHING' && base.hitLeft !== 'THIRTY-OFF-EVERYTHING', `${base.hitRight} / ${base.hitLeft}`);
   await page.mouse.move(400, 400); await page.mouse.wheel(0, 600); await sleep(200);
   const y1 = await page.evaluate(() => scrollY);
@@ -208,13 +224,15 @@ console.log('\n# 4. The banner (Black Friday)');
   for (const [w, h] of [[1366, 650], [1920, 1080], [2560, 1300], [1024, 600], [960, 1050]]) {
     await page.setViewportSize({ width: w, height: h }); await sleep(400);
     const p = await page.evaluate(probe);
-    const fits = p.art && p.art[0] >= p.frame[0] - 1 && p.art[0] + p.art[2] <= p.frame[0] + p.frame[2] + 1 && p.art[1] + p.art[3] <= p.ticker[1];
-    check(`${w}x${h}: artwork inside the banner and above the ticker, ticker on the bottom edge`, fits && Math.abs(p.ticker[1] + p.ticker[3] - (p.frame[1] + p.frame[3])) <= 1, `${JSON.stringify(p.art)} ${JSON.stringify(p.ticker)}`);
+    const inside = (r) => r && r[0] >= p.frame[0] - 1 && r[0] + r[2] <= p.frame[0] + p.frame[2] + 1 && r[1] + r[3] <= p.ticker[1];
+    const fits = inside(p.art) && inside(p.globe);
+    check(`${w}x${h}: lettering and globe inside the banner and above the crawl, crawl on the bottom edge`, fits && Math.abs(p.ticker[1] + p.ticker[3] - (p.frame[1] + p.frame[3])) <= 1, `${JSON.stringify(p.art)} ${JSON.stringify(p.ticker)}`);
   }
   for (const [w, h] of [[390, 844], [700, 900]]) {
     await page.setViewportSize({ width: w, height: h }); await sleep(400);
     const p = await page.evaluate(probe);
-    check(`${w}x${h}: across the top third, full width, ticker on its bottom edge`, p.frame[0] === 0 && p.frame[1] === 0 && p.frame[2] === p.viewport[0] && Math.abs(p.frame[3] - p.viewport[1] * 0.33) <= 2 && Math.abs(p.ticker[1] + p.ticker[3] - (p.frame[1] + p.frame[3])) <= 1, JSON.stringify(p.frame));
+    const crawlBottom = p.ticker[1] + p.ticker[3], frameBottom = p.frame[1] + p.frame[3];
+    check(`${w}x${h}: across the top third, full width, crawl just above its teeth`, p.frame[0] === 0 && p.frame[1] === 0 && p.frame[2] === p.viewport[0] && Math.abs(p.frame[3] - p.viewport[1] * 0.33) <= 2 && frameBottom - crawlBottom >= 0 && frameBottom - crawlBottom <= 20, `${JSON.stringify(p.frame)} crawl ends ${crawlBottom}`);
   }
   await page.setViewportSize({ width: 1280, height: 800 });
   check('no errors', errs.length === 0, errs.join(' | '));
@@ -227,15 +245,15 @@ console.log('\n# 5. Hostile and unusual pages (Black Friday)');
   const { context } = await launchWithExtension(EXT, { tz: 'Europe/London' });
   const page = await context.newPage();
   const errs = await watchErrors(context, page);
-  await page.goto(url('/plain', BF)); await sleep(1000);
+  await page.goto(url('/plain', BF)); await sleep(2000);
   const base = await page.evaluate(probe);
 
-  await page.goto(url('/hostile', BF)); await sleep(1200);
+  await page.goto(url('/hostile', BF)); await sleep(2000);
   const h = await page.evaluate(probe);
   check('hostile CSS: same geometry as on a plain page', JSON.stringify(h.frame) === JSON.stringify(base.frame) && JSON.stringify(h.art) === JSON.stringify(base.art), `${JSON.stringify(h.frame)} ${JSON.stringify(h.art)}`);
   check('hostile CSS: above a maximum z-index wall added later', h.hitRight === 'THIRTY-OFF-EVERYTHING', h.hitRight);
 
-  await page.goto(url('/csp', BF)); await sleep(1200);
+  await page.goto(url('/csp', BF)); await sleep(2000);
   const cdp = await context.newCDPSession(page);
   const c = (await cdp.send('Runtime.evaluate', { expression: `(${probe})()`, returnByValue: true })).result.value;
   check('strict Content-Security-Policy: styled and pictures loaded', c.present && c.styled && c.images.every((w) => w > 0) && JSON.stringify(c.frame) === JSON.stringify(base.frame), JSON.stringify(c.images));
@@ -281,10 +299,16 @@ console.log('\n# 5. Hostile and unusual pages (Black Friday)');
   const { context } = await launchWithExtension(EXT, { tz: 'Europe/London' });
   const page = await context.newPage();
   const nav = page.goto(url('/slow', BF));
+  const look = () => page.evaluate(() => {
+    const f = document.querySelector('thirty-off-everything')?.shadowRoot?.querySelector('.frame');
+    return { state: document.readyState, there: !!f, visible: !!f && getComputedStyle(f).visibility === 'visible' };
+  }).catch((e) => ({ err: e.message }));
   await sleep(1100);
-  const mid = await page.evaluate(() => ({ state: document.readyState, shown: !!document.querySelector('thirty-off-everything') })).catch((e) => ({ err: e.message }));
-  check('slow page: shown while the page is still loading', mid.state === 'loading' && mid.shown === true, JSON.stringify(mid));
-  await nav;
+  const mid = await look();
+  check('slow page: waits, hidden, while the page is still loading', mid.state === 'loading' && mid.there && !mid.visible, JSON.stringify(mid));
+  await nav; await sleep(1500);
+  const after = await look();
+  check('slow page: slides in once the page is up', after.visible, JSON.stringify(after));
   await context.close();
 }
 
