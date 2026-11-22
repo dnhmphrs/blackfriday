@@ -31,6 +31,8 @@ PAGES = {k: open(os.path.join(ROOT, 'store', 'mock', f'{k}.html'), encoding='utf
 TICKER = ' ✦ '.join(['But wait… there’s less!', 'No purchase necessary!', 'Black Friday only!',
                       'Every website, 30% off!', 'Works like magic!']) + ' ✦ '
 CRAWL = 'BLACK FRIDAY ONLY! ✦ '
+# the sign-off on the navy strip (desktop); Garrett may rewrite it
+BRAND = 'Brought to you by Gary Mustard Enterprises'
 
 PAGE = r'''<title>30% Off Channel Banner</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -83,7 +85,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   .strip { display: flex; align-items: center; justify-content: center; white-space: nowrap; transform-origin: 50% 50%;
            font-family: "TOE Arimo", Arial, sans-serif; font-style: italic; font-weight: 700; }
   #strip { background: linear-gradient(#fffb86, #f0e11c); color: #111; box-shadow: inset 0 0.06em 0 rgba(170, 158, 0, 0.6), inset 0 -0.06em 0 rgba(170, 158, 0, 0.6); }
-  #sub { background: var(--shade); color: #fff; letter-spacing: 0.14em; }
+  #sub { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
   body.phone #strip, body.phone #sub, body.phone #wow { display: none; }
 
   /* the price card, from v1.7; only its 70% moves */
@@ -141,7 +143,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       <img id="sticker" alt="" src="__I_STICKER__">
       <div id="card"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
       <img id="wow" alt="" src="__I_WOW__">
-      <div class="strip" id="sub"><span>GARY MUSTARD ENTERPRISES</span></div>
+      <div class="strip" id="sub"><span>__BRAND__</span></div>
       <div class="strip" id="strip"><span>EVERY SITE 30% OFF!</span></div>
       <div class="ticker"><span>__TICKER__</span></div>
       <div class="crawl"><span>__CRAWL__</span></div>
@@ -175,8 +177,8 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       mon: { x: 516, y: 972, k: 1 },   // the globe picture's top left; k scales the whole monument
       sticker: { dx: 306, dy: 6, s: 1 },
       card: { x: 80, y: 1002, s: 1.0, r: -1.4, spread: 0 },
-      wow: { x: 129, fromCrawl: -645, w: 276, h: 278 },
-      strips: [{ id: 'sub', fromCrawl: -273, h: 68, cap: 30, dx: 18 }, { id: 'strip', fromCrawl: -375, h: 126, cap: 54, dx: 12 }],
+      wow: { x: 129, fromCrawl: -565, w: 276, h: 278 },
+      strips: [{ id: 'sub', fromCrawl: -190, h: 68, cap: 25, dx: 0 }, { id: 'strip', fromCrawl: -292, h: 126, cap: 54, dx: 12 }],
       glow: { rx: 648, ry: 729 },
     },
     phone: {
@@ -335,7 +337,7 @@ for k, v in {'__F_ANTONIO_LIGHT__': FONT['antonio-light'], '__F_ANTONIO_SEMIBOLD
              '__I_STICKER__': IMG['sticker'], '__I_WOW__': IMG['wow'],
              '__I_TYPE_DESKTOP__': IMG['typeDesktop'], '__I_TYPE_PHONE__': IMG['typePhone'],
              '__SHOP_SRCDOC__': html.escape(PAGES['shop'], quote=True),
-             '__TICKER__': html.escape(TICKER * 4), '__CRAWL__': html.escape(CRAWL * 12),
+             '__TICKER__': html.escape(TICKER * 4), '__BRAND__': html.escape(BRAND), '__CRAWL__': html.escape(CRAWL * 12),
              '__SHOP_JSON__': js(PAGES['shop']), '__NEWS_JSON__': js(PAGES['news'])}.items():
     page = page.replace(k, v)
 
