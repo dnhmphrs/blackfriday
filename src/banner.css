@@ -38,7 +38,7 @@
 .strip { display: flex; align-items: center; justify-content: center; white-space: nowrap;
          font: italic 700 1em "TOE Arimo", Arial, sans-serif; }
 .tape { background: linear-gradient(#fffb86, #f0e11c); color: #111; }
-.sub { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
+.sub { background: var(--shade); color: #fff; letter-spacing: 0.03em; text-transform: uppercase; }
 
 /* the price card; only its 70% moves */
 .card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000;

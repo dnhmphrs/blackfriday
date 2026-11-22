@@ -32,7 +32,7 @@ TICKER = ' ✦ '.join(['But wait… there’s less!', 'No purchase necessary!', 
                       'Every website, 30% off!', 'Works like magic!']) + ' ✦ '
 CRAWL = 'BLACK FRIDAY ONLY! ✦ '
 # the sign-off on the navy strip (desktop); Garrett may rewrite it
-BRAND = 'Brought to you by Gary Mustard Enterprises'
+BRAND = 'Proudly brought to you by Gary Mustard Enterprises'
 
 PAGE = r'''<title>30% Off Channel Banner</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -99,7 +99,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
   .strip { display: flex; align-items: center; justify-content: center; white-space: nowrap; transform-origin: 50% 50%;
            font-family: "TOE Arimo", Arial, sans-serif; font-style: italic; font-weight: 700; }
   #strip { background: linear-gradient(#fffb86, #f0e11c); color: #111; box-shadow: inset 0 0.06em 0 rgba(170, 158, 0, 0.6), inset 0 -0.06em 0 rgba(170, 158, 0, 0.6); }
-  #sub { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
+  #sub { background: var(--shade); color: #fff; letter-spacing: 0.03em; text-transform: uppercase; }
   body.phone #strip, body.phone #sub { display: none; }
 
   /* the price card, from v1.7; only its 70% moves */
@@ -191,7 +191,7 @@ PAGE = r'''<title>30% Off Channel Banner</title>
       type2: { x: 97, y: 615, w: 895, h: 349, src: 'typeMid', spread: 0.5 },
       mon: { x: 516, y: 972, k: 1 },   // the globe picture's top left; k scales the whole monument
       card: { x: 80, y: 1052, s: 1.0, r: -1.4, spread: 0 },
-      strips: [{ id: 'sub', fromCrawl: -130, h: 68, cap: 25, dx: 0 }, { id: 'strip', fromCrawl: -232, h: 126, cap: 54, dx: 12 }],
+      strips: [{ id: 'sub', fromCrawl: -130, h: 68, cap: 21, dx: 0 }, { id: 'strip', fromCrawl: -232, h: 126, cap: 54, dx: 12 }],
       glow: { rx: 648, ry: 729 },
     },
     phone: {
