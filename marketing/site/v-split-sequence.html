@@ -321,7 +321,7 @@ body { -webkit-font-smoothing: antialiased; }
       // ---- beat two (wide): right-aligned down from the tape, at the frame's right ----
       const R = W - m, gap = 22 * s;
       const capEl = put('<div class="caption"><div class="tab">BUT WAIT…</div><div class="say"><span>THERE’S LESS!</span></div></div>');
-      const ord = put(`<a class="order" href="${STORE}"><span class="lbl">ORDER NOW <b>✦</b> OPERATORS STANDING BY</span><span class="btn">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
+      const ord = put(`<a class="order" href="${STORE}" aria-label="Add to Chrome"><span class="lbl">ORDER NOW <b>✦</b> OPERATORS STANDING BY</span><span class="btn">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
       // natural sizes at a font size of 100px, scaled down until beat two fits between the tape and the foot
       capEl.style.fontSize = '100px'; ord.style.fontSize = '100px';
       const C = { w: capEl.offsetWidth / 100, h: capEl.offsetHeight / 100 }, O = { w: ord.offsetWidth / 100, h: ord.offsetHeight / 100 };
@@ -382,7 +382,7 @@ body { -webkit-font-smoothing: antialiased; }
 
       const R = W - m, gap = 14 * s;
       const capEl = put('<div class="caption"><div class="tab">BUT WAIT…</div><div class="say"><span>THERE’S LESS!</span></div></div>');
-      const ord = put(`<a class="order" href="${STORE}"><span class="lbl">ORDER NOW <b>✦</b> OPERATORS STANDING BY</span><span class="btn">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
+      const ord = put(`<a class="order" href="${STORE}" aria-label="Add to Chrome"><span class="lbl">ORDER NOW <b>✦</b> OPERATORS STANDING BY</span><span class="btn">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
       capEl.style.fontSize = '100px'; ord.style.fontSize = '100px';
       const C = { w: capEl.offsetWidth / 100, h: capEl.offsetHeight / 100 }, O = { w: ord.offsetWidth / 100, h: ord.offsetHeight / 100 };
       const cf = Math.min((cw * 0.84) / C.w, 44 * s), of = Math.min(cw / O.w, 40 * s);

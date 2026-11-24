@@ -396,7 +396,24 @@ body { -webkit-font-smoothing: antialiased; }
       const top = tick + (tall ? 30 : 34) * s, room = stageBot - top;
       if (tall) {
         // the card as wide as the screen, at the foot of the stage; the globe and its badge in the room over it
-        const pc = priceCard(true), k = Math.min((W - 2 * m - 10 * s) / pc.W0, (room - 70 * s) / pc.H0);
+        const pc = priceCard(true), kH = (room - 50 * s) / pc.H0;
+        if (pc.W0 * kH * 1.3 < W - 2 * m) {
+          // a squarer screen (a tablet): the card fills the height, the globe's column beside it
+          const k = Math.min(kH, (W - 2 * m) / (pc.W0 * 1.42)), cw = pc.W0 * k, ch = pc.H0 * k, side = Math.min(W - 2 * m - cw - 10 * s, cw * 0.75);
+          const left = (W - cw - side - 10 * s) / 2, ccx = left + side + 10 * s + cw / 2, ccy = stageBot - 6 * s - ch / 2, cTop = ccy - ch / 2, cBot = ccy + ch / 2;
+          const d = side * 0.9, gx = left + side * 0.5, gy = cTop + d * 0.55;
+          glow(gx, gy, d * 1.15); globe(gx, gy, d);
+          const o = oval(Math.min(d * 0.13, side / 8)); at(o, gx - o.offsetWidth / 2, gy + d * 0.46 - o.offsetHeight / 2);
+          const oBot = gy + d * 0.46 + o.offsetHeight / 2, bd = Math.min(side * 0.72, cBot - oBot - 30 * s);
+          if (bd > 60 * s) burst(gx, oBot + 16 * s + bd / 2, bd, 'Works<br>like<br>magic!');
+          p.appendChild(pc.c);
+          place(pc.c, ccx - pc.W0 / 2, ccy - pc.H0 / 2, pc.W0, pc.H0);
+          pc.c.style.transform = `scale(${k}) rotate(-1.2deg)`;
+          Object.assign(pc.tag.style, { right: '-22px', top: '-50px', transform: 'rotate(4deg)' });
+          glint('', gx - d * 0.38, gy - d * 0.38, d * 0.075);
+          return;
+        }
+        const k = Math.min((W - 2 * m - 10 * s) / pc.W0, (room - 70 * s) / pc.H0);
         const cw = pc.W0 * k, ch = pc.H0 * k, spare = room - ch - 20 * s;
         const ccx = W / 2, ccy = stageBot - 6 * s - ch / 2, cTop = ccy - ch / 2;
         const d = Math.max(70 * s, Math.min(spare * 1.05, W * 0.44)), gx = ccx - cw / 2 + d * 0.5, gy = Math.max(top + d * 0.42, cTop - spare / 2);
