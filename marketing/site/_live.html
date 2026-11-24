@@ -10,8 +10,8 @@
      exactly with nothing to scroll. Wide windows get the screenshot's arrangement; tall ones (phones)
      a stacked one. The yellow tape is the link to the store; the navy tape under it carries the
      credits. Everything goes through the same tape filter as the live banner.
-     Layout "{{layout}}": site = the page: the globe large; beside it 30% OFF EVERYTHING ON THE INTERNET.,
-                                 BLACK FRIDAY ONLY! and then BUT WAIT… THERE'S LESS!;
+     Layout "{{layout}}": site = the page: the globe large, BUT WAIT… THERE'S LESS! on its badge; beside
+                                 it 30% OFF EVERYTHING ON THE INTERNET. and BLACK FRIDAY ONLY!;
                           one, two = screenshots 1 and 2, kept for the vertical posts.
      Everything that moves (tickers, glints, the 70%, the globe, the noise) runs off one clock at 25
      frames a second, so the filter is worked out 25 times a second rather than at the screen's rate.
@@ -196,7 +196,10 @@ body { -webkit-font-smoothing: antialiased; }
     twinkle(p.lastElementChild.querySelector('path'), cls === 'b' ? 1.2 : 0);
     return el;
   };
-  const oval = (size) => { const el = put('<div class="oval" aria-hidden="true"><span>As Seen On<br>Every Website</span></div>'); el.style.fontSize = size + 'px'; return el; };
+  // the oval badge: As Seen On Every Website on the screenshots; on the site, Garrett's punchline
+  const oval = (size, words = LAYOUT === 'site' ? 'But Wait…<br>There’s Less!' : 'As Seen On<br>Every Website') => {
+    const el = put(`<div class="oval"${LAYOUT === 'site' ? '' : ' aria-hidden="true"'}><span>${words}</span></div>`); el.style.fontSize = size + 'px'; return el;
+  };
   const cards = (x, top, w) => {
     const el = put('<div class="cards" aria-hidden="true"><i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i></div>');
     Object.assign(el.style, { left: x + 'px', top: top + 'px', transform: `scale(${w / 436})` });
@@ -266,9 +269,9 @@ body { -webkit-font-smoothing: antialiased; }
 
     ({ site: tall ? siteTall : siteWide, one: tall ? oneTall : oneWide, two: tall ? twoTall : twoWide })[LAYOUT]();
 
-    // The offer, then the punchline: 30% OFF / EVERYTHING ON / THE INTERNET. / BLACK FRIDAY ONLY! /
-    // BUT WAIT… / THERE'S LESS! / the four cards (if withCards). At x (the left edge, or the centre if
-    // `centred`) in a column w wide, from y; k shrinks the lot. Returns where it ends.
+    // The offer: 30% OFF / EVERYTHING ON / THE INTERNET. / BLACK FRIDAY ONLY! / the four cards (if
+    // withCards). At x (the left edge, or the centre if `centred`) in a column w wide, from y; k shrinks
+    // the lot. Returns where it ends. (BUT WAIT… THERE'S LESS! is on the badge on the globe.)
     function offer(x, y, w, k, centred, withCards, dry = false) {
       const left = (wide) => (centred ? x - wide / 2 : x);
       const line = (cls, text, font, ls, size, measure, skew, tag) => { if (!dry) set(cls, text, font, ls, size, left(measure(text) * size), y, skew, tag); };
@@ -282,11 +285,7 @@ body { -webkit-font-smoothing: antialiased; }
       y += 28 * s * k;
       if (!dry) { const tg = put('<div class="tag">BLACK FRIDAY ONLY!</div>'); tg.style.fontSize = tf + 'px'; at(tg, left(tw), y); }
       y += tf * 1.58;
-      // BUT WAIT… THERE'S LESS!, its second line as wide as the column
-      const pl = ((w * 0.96) / headW('THERE’S LESS!')) * k, lede = (0.44 * HCAP * pl) / SCAP;
-      y += 40 * s * k + SCAP * lede; line('sub', 'BUT WAIT…', SUB, -0.04, lede, subW, false);
-      y += 12 * s * k + HCAP * pl; line('head', 'THERE’S LESS!', HEAD, -0.05, pl, headW, true, 'h2');
-      if (withCards) { const cw = w * 0.74 * k; y += 28 * s * k; if (!dry) cards(left(cw), y, cw); y += (62 * cw) / 436; }
+      if (withCards) { const cw = w * 0.74 * k; y += 40 * s * k; if (!dry) cards(left(cw), y, cw); y += (62 * cw) / 436; }
       return y;
     }
     // the offer's height in a column w wide, at k, with or without the cards
@@ -302,8 +301,8 @@ body { -webkit-font-smoothing: antialiased; }
       const k = Math.min(1, room / offerH(cw, 1, withCards));
       offer(x0, lo + (room - offerH(cw, k, withCards)) / 2, cw, k, false, withCards);
       globe(cx, cy, d);
-      const r = d / 2, o = oval(40 * s * Math.min(1, d / (570 * s)) ** 0.5);
-      at(o, cx + r * 0.4 - o.offsetWidth / 2, cy - r * 0.86 - o.offsetHeight / 2);
+      const r = d / 2, o = oval(46 * s * Math.min(1, d / (570 * s)) ** 0.5);
+      at(o, cx + r * 0.4 - o.offsetWidth / 2, cy - r * 0.84 - o.offsetHeight / 2);
       glint('', cx - r * 0.74, cy - r * 0.78, d * 0.075);
       glint('b', cx + r * 0.93, cy + r * 0.62, d * 0.045);
     }
@@ -320,8 +319,8 @@ body { -webkit-font-smoothing: antialiased; }
       const y = lo + spare * 0.4, cx = W / 2, cy = y + d / 2;
       glow(cx, cy, d * 1.28);
       globe(cx, cy, d);
-      const r = d / 2, o = oval(40 * s * k);
-      at(o, cx + r * 0.42 - o.offsetWidth / 2, cy - r * 0.86 - o.offsetHeight / 2);
+      const r = d / 2, o = oval(48 * s * Math.max(k, d / (520 * s)) ** 0.5);
+      at(o, Math.min(cx + r * 0.42 - o.offsetWidth / 2, W - m - o.offsetWidth), cy - r * 0.84 - o.offsetHeight / 2);
       glint('', cx - r * 0.78, cy - r * 0.7, d * 0.075);
       glint('b', cx + r * 0.95, cy + r * 0.55, d * 0.045);
       offer(W / 2, y + d + gap * k + spare * 0.2, cw, k, true, withCards);
