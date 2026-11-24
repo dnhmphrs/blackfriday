@@ -66,7 +66,7 @@ body { -webkit-font-smoothing: antialiased; }
 .caption .tab { display: inline-block; background: var(--yellow); color: #111; font: italic 700 0.4em/1 "Arimo", Arial, sans-serif;
                 letter-spacing: 0.02em; padding: 0.16em 0.55em 0.18em; transform: skewX(-9deg); margin-right: 0.2em;
                 box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.9); }
-.caption .say { display: block; padding: 0.05em 0.28em 0.1em 0.34em; background: linear-gradient(90deg, rgba(3, 6, 50, 0.4), rgba(3, 6, 50, 0.86));
+.caption .say { display: block; padding: 0.05em 0.28em 0.1em 0.34em; background: linear-gradient(90deg, rgba(3, 6, 50, 0.82), rgba(3, 6, 50, 0.92));
                 border-left: 0.09em solid var(--yellow); border-bottom: 0.03em solid rgba(255, 240, 53, 0.55); }
 .caption .say span { display: block; font: italic 700 1em/1.02 "Arimo", Arial, sans-serif; letter-spacing: -0.04em;
                      background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
@@ -101,7 +101,7 @@ body { -webkit-font-smoothing: antialiased; }
       background: var(--shade); color: #fff; font: italic 700 1em/1 "Arimo", Arial, sans-serif; letter-spacing: 0.08em; text-transform: uppercase;
       border-top: 0.12em solid var(--yellow); }
 .by .sep { margin: 0 0.9em; color: var(--yellow); }
-.by .item { font: 600 1em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.14em; color: var(--yellow); margin-right: 1.4em; }
+.by .item { height: 2.3em; width: auto; margin-right: 1.2em; opacity: 0.85; }
 .by a { color: #fff; text-decoration: none; border-bottom: 0.12em solid var(--yellow); padding-bottom: 0.05em; }
 .by a:hover, .by a:focus-visible { color: var(--yellow); outline: none; }
 
@@ -139,7 +139,7 @@ body { -webkit-font-smoothing: antialiased; }
   const IMG = { globe: still ? '{{img:globe_still}}' : '{{img:globe_anim}}', tile: '{{img:tile}}', logo: '{{img:logo}}' };
   const TICKER = 'No purchase necessary! ✦ Every website, 30% off! ✦ Works like magic! ✦ As Seen On Every Website ✦ 30% off the entire internet. ✦ ';
   const SEAM = 'BLACK FRIDAY ONLY! ✦ ';
-  const BAND = 'TODAY ONLY<em>✦</em>LIMITED TIME<em>✦</em>ACT NOW<em>✦</em>';
+  const BAND = 'NO PURCHASE NECESSARY!<em>✦</em>TODAY ONLY<em>✦</em>LIMITED TIME<em>✦</em>ACT NOW<em>✦</em>';
   const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
   const TAN9 = Math.tan((9 * Math.PI) / 180);
   const STAR = 'polygon(' + Array.from({ length: 32 }, (_, i) => { const a = (i / 32) * 2 * Math.PI - Math.PI / 2, r = i % 2 ? 36 : 50; return `${(50 + r * Math.cos(a)).toFixed(2)}% ${(50 + r * Math.sin(a)).toFixed(2)}%`; }).join(',') + ')';
@@ -263,10 +263,11 @@ body { -webkit-font-smoothing: antialiased; }
 
     // ---- the cut: a line from the lower left up to the right, through the frame's working height ----
     const room = footTop - tick;
-    const yL = tick + room * (tall ? 0.56 : 0.84), yR = tick + room * (tall ? 0.45 : 0.33);
+    const sq = Math.max(0, Math.min(1, (W / H - 0.46) / 0.29));         // how near a tall window is to square
+    const yL = tick + room * (tall ? 0.56 + 0.07 * sq : 0.84), yR = tick + room * (tall ? 0.45 + 0.06 * sq : 0.33);
     const a = Math.min(Math.atan((yL - yR) / W), (24 * Math.PI) / 180), TA = Math.tan(a), CA = Math.cos(a), SA = Math.sin(a);
     const cx0 = W / 2, cy0 = (yL + yR) / 2;
-    const T = (tall ? 46 : 70) * s, NB = (tall ? 20 : 28) * s;       // the yellow tape's and the navy band's widths
+    const T = (tall ? 44 : 60) * s, NB = (tall ? 19 : 25) * s;       // the yellow tape's and the navy band's widths
     const line = (x) => cy0 - (x - cx0) * TA;                         // the tape's centre line at x
     const above = (x) => line(x) - T / 2 / CA;                        // its upper edge
     const below = (x) => line(x) + (T / 2 + NB) / CA;                 // the navy band's lower edge
@@ -285,9 +286,9 @@ body { -webkit-font-smoothing: antialiased; }
     function wideBeats() {
       const top = tick + 24 * s;
       // the globe: as big as the room over the tape allows (the tape may cross its lower right)
-      let d = Math.min(0.34 * W, 480 * s);
+      let d = Math.min(0.37 * W, 500 * s);
       for (; d > 160 * s; d -= 4 * s) { const gx = m + d * 0.5, gb = top + d; if (gb <= above(gx + d * 0.32) + d * 0.2) break; }
-      const gcx = m + d * 0.5 - d * 0.02, gcy = top + d * 0.5 + 6 * s;
+      const gcx = m + d * 0.5 - d * 0.02, gcy = Math.max(top + d * 0.5 + 6 * s, above(m + d * 0.8) + d * 0.12 - d * 0.5);  // its foot tucked under the tape
       glow(gcx, gcy, d * 1.25);
       // the headline: 30% OFF / EVERYTHING ON / THE INTERNET., left-aligned beside the globe, as wide as fits over the tape
       const x0 = gcx + d * 0.5 + 34 * s, maxW = W - m - 70 * s - x0;
@@ -296,19 +297,24 @@ body { -webkit-font-smoothing: antialiased; }
       let hw = maxW;
       for (; hw > 200 * s; hw -= 4 * s) if (top + 8 * s + stack(hw).h <= above(x0 + hw) - 22 * s) break;
       const st = stack(hw);
-      const free = above(x0 + hw) - 22 * s - (top + 8 * s) - st.h;        // spare height over the tape
+      // the free cards under it, where they go over the tape
+      const fcw = hw * 0.56, fch = (62 * fcw) / 436, fcGap = 24 * s;
+      const withCards = top + 8 * s + st.h + fcGap + fch <= above(x0 + fcw) - 20 * s;
+      const free = Math.min(above(x0 + hw) - 22 * s - (top + 8 * s) - st.h, withCards ? above(x0 + fcw) - 20 * s - (top + 8 * s + st.h + fcGap + fch) : 1e9);
       let y = top + 8 * s + Math.max(0, free) * 0.45 + HCAP * st.hs;
       set('head', '30% OFF', HEAD, -0.05, st.hs, x0, y, true, 'h1');
       y += 26 * s + SCAP * st.l; set('sub', 'EVERYTHING ON', SUB, -0.04, st.l, x0, y, false, 'h2');
       y += 14 * s + SCAP * st.l; set('sub', 'THE INTERNET.', SUB, -0.04, st.l, x0, y);
+      if (withCards) cards(x0 + 4 * s, y + 0.22 * st.l + fcGap, fcw);
       globe(gcx, gcy, d);
+      // As Seen On Every Website: in the corner over the tape's high end if it fits there, else on the globe
       const r = d / 2, o = oval(30 * s * Math.min(1.2, d / (400 * s)));
-      at(o, gcx - r * 0.95 - 10 * s, gcy - r * 0.98 - o.offsetHeight * 0.2);
+      const ow = o.offsetWidth * 1.08, oh = o.offsetHeight * 1.25, cornerL = x0 + hw * 0.96 + 10 * s, cornerR = W - m * 0.6;
+      const ox = Math.max(cornerL, (cornerL + cornerR) / 2 - ow / 2), oy = tick + 22 * s;
+      if (ox + ow <= cornerR && oy + oh <= above(ox + ow) - 10 * s) at(o, ox, oy + Math.min(40 * s, (above(ox + ow) - 10 * s - oy - oh) * 0.4));
+      else at(o, gcx - r * 0.95 - 10 * s, gcy - r * 0.98 - o.offsetHeight * 0.2);
       glint('', gcx + r * 0.86, gcy - r * 0.8, d * 0.07);
       glint('b', x0 + hw * 0.98, top + 14 * s, d * 0.04);
-      // the channel's bug, top right, over the cut
-      const bw = 104 * s, bug = put(`<img class="bug" alt="" src="${IMG.logo}">`);
-      place(bug, W - m * 0.7 - bw, tick + 16 * s, bw, bw * 610 / 1142);
 
       seam();
 
@@ -320,10 +326,10 @@ body { -webkit-font-smoothing: antialiased; }
       capEl.style.fontSize = '100px'; ord.style.fontSize = '100px';
       const C = { w: capEl.offsetWidth / 100, h: capEl.offsetHeight / 100 }, O = { w: ord.offsetWidth / 100, h: ord.offsetHeight / 100 };
       const plan = (k) => {
-        const cf = 74 * s * k, of = 50 * s * k;                       // the caption's and the panel's type
+        const cf = 86 * s * k, of = 50 * s * k;                       // the caption's and the panel's type
         const cw = C.w * cf, ch = C.h * cf, ow = O.w * of, oh = O.h * of;
         const cy = below(R - cw) + gap;                                 // under the tape at the caption's left edge
-        const oy = Math.max(cy + ch + oh * 0.42, below(R - ow) + gap);
+        const oy = Math.max(cy + ch + oh * 0.7, below(R - ow) + gap);
         return { cf, of, cw, ch, ow, oh, cy, oy, bottom: oy + oh };
       };
       let k = 1.25;
@@ -334,28 +340,27 @@ body { -webkit-font-smoothing: antialiased; }
       // ACT NOW! on the panel's top right corner, pulsing
       const bd = P.oh * 1.05, bu = put('<div class="burst" aria-hidden="true"><span>ACT<br>NOW!</span></div>');
       bu.style.setProperty('--star', STAR);
-      place(bu, R - bd * 0.5, P.oy - bd * 0.5, bd, bd); bu.style.fontSize = bd * 0.24 + 'px';
+      place(bu, R - bd * 0.78, P.oy - bd * 0.64, bd, bd); bu.style.fontSize = bd * 0.24 + 'px';
       movers.push((t) => { const ph = (t * 2) % 1; bu.style.transform = `rotate(${ph < 0.5 ? 8 : -4}deg) scale(${ph < 0.5 ? 1.08 : 1})`; });
       movers.push((t) => ord.classList.toggle('lit', (t * 2.5) % 1 < 0.5));
       // the price card: beat two's picture of less, left of the panel, standing on the foot
-      const cardRight = R - P.ow - 34 * s, cardBottom = footTop - 18 * s;
-      let cs = Math.min(0.75 * s * k, (cardBottom - (P.cy + P.ch * 0.4)) / 372);
-      for (; cs > 0.25 * s; cs -= 0.01 * s) if (cardBottom - 372 * cs >= below(cardRight - 410 * cs) + gap) break;
+      // either beside the panel and under the caption, or further left, beside both: whichever lets it be bigger
+      const cardBottom = footTop - 18 * s;
+      const fitCard = (right, ceiling) => { let c = 0.8 * s;
+        for (; c > 0.25 * s; c -= 0.01 * s) if (cardBottom - 372 * c >= Math.max(ceiling, below(right - 410 * c) + gap)) break; return c; };
+      const csA = fitCard(R - P.ow - 34 * s, P.cy + P.ch + 14 * s), csB = fitCard(R - P.cw - 40 * s, 0);
+      const cs = Math.max(csA, csB), cardRight = csA >= csB ? R - P.ow - 34 * s : R - P.cw - 40 * s;
       if (cs > 0.3 * s) card(cardRight - 400 * cs, cardBottom - 360 * cs, cs, -3);
-      // the free cards and No purchase necessary! under the caption, left of the panel, if there is room
-      const nf = 26 * s * k, nw = subW('No purchase necessary!') * nf;
-      const ny = P.cy + P.ch + 10 * s;
-      if (ny + nf * 1.2 < P.oy - 4 * s) set('sub', 'No purchase necessary!', SUB, -0.04, nf, R - nw - 6 * s, ny + SCAP * nf);
-      // the left foot, under the tape: the free cards, as far as they go
+      // the left foot, under the tape: the free cards, if they were not set under the headline
       const fw = Math.min(380 * s, (cardRight - 410 * cs) - m - 30 * s), fh = 62 * fw / 436, fy = footTop - 18 * s - fh;
-      if (fw > 160 * s && fy >= below(m) + gap) cards(m, fy, fw);
+      if (!withCards && fw > 160 * s && fy >= below(m) + gap) cards(m, fy, fw);
     }
 
     // ---- tall (phones): beat one on top, left-aligned; the tape; beat two right-aligned under it ----
     function tallBeats() {
       const top = tick + 20 * s, cw = W - 2 * m;
       // the headline across the width
-      const hs = (cw * 0.97) / headW('30% OFF'), l = (cw * 0.985) / subW('EVERYTHING ON');
+      const hw = Math.min(cw, 500 * s), hs = (hw * 0.97) / headW('30% OFF'), l = (hw * 0.985) / subW('EVERYTHING ON');
       let y = top + HCAP * hs;
       const hh = HCAP * hs + 14 * s + SCAP * l + 8 * s + SCAP * l + 0.2 * l;
       // the globe in what is left over the tape, its lower part under it
@@ -386,20 +391,34 @@ body { -webkit-font-smoothing: antialiased; }
       capEl.style.fontSize = cf + 'px'; at(capEl, R - cwid, cy);
       const oy = footTop - 16 * s - oh;
       ord.style.fontSize = of + 'px'; at(ord, R - ow, oy);
-      // between the caption and the panel: the price card at the left, the free cards
-      const midTop = cy + ch + 14 * s, midBot = oy - 18 * s;
-      let cs = Math.min((midBot - midTop) / 372, (cw * 0.6) / 410);
-      if (cs > 0.22) card(m + 4 * s, midTop + 10 * s, cs, -3);
-      const cardsW = cw - 400 * cs - 20 * s;
-      const nf = 15 * s, nw = subW('No purchase necessary!') * nf;
-      if (cs > 0.22 && cardsW > 120 * s) {
-        const cx1 = m + 410 * cs + 14 * s, cwd = R - cx1;
-        // two rows of two: the cards set narrower
-        cards(cx1, midTop + 30 * s, cwd);
+      // between the caption and the panel: the price card at the left, the free cards beside it
+      // ACT NOW! goes on the card's corner when there is a card, else on the panel's
+      let bd = oh * 0.95, bx = R - bd * 0.86, by0 = oy - bd * 0.66;
+      const midTop = cy + ch + 12 * s, midBot = oy - 10 * s;
+      const cs = Math.min((midBot - midTop) / 372, (cw * 0.52) / 410, 0.9 * s);
+      // or, where the window is squarer, the card beside the caption at the left, under the tape
+      const cl = m + 4 * s, sideTop = below(cl) + gap;
+      const csB = Math.min((oy - 12 * s - sideTop) / 372, (R - cwid - 28 * s - cl) / 410, 0.9 * s);
+      if (csB > cs && csB > 0.2) {
+        const chh = 372 * csB;
+        card(cl, sideTop + (oy - 12 * s - sideTop - chh) / 2, csB, -3);
+        const cr = cl + 410 * csB, cwd = Math.min(R - (cr + 16 * s), 300 * s), fh = (62 * cwd) / 436;
+        if (cwd > 120 * s && midBot - midTop > fh + 8 * s) {
+          const fy = midBot - fh - 4 * s; cards(R - cwd, fy, cwd);
+          const room2 = R - cwd - cr;                                    // ACT NOW! between the card and the free cards
+          if (room2 > bd * 0.8) { bd = Math.min(bd * 1.1, room2 * 0.9); bx = cr + (room2 - bd) / 2; by0 = Math.min(fy + fh / 2 - bd / 2, oy - 6 * s - bd); }
+        }
+      } else if (cs > 0.2) {
+        const chh = 372 * cs, cardTop = midTop + (midBot - midTop - chh) / 2;
+        card(cl, cardTop + 6 * cs, cs, -3);
+        const cx1 = cl + 410 * cs + 16 * s, cwd = Math.min(R - cx1, 300 * s), fh = (62 * cwd) / 436;
+        const fy = cardTop + chh - fh - 14 * cs;
+        if (cwd > 120 * s) cards(R - cwd, fy, cwd);
+        bd = Math.min(bd, (fy - midTop) * 1.05, chh * 0.7); bx = R - bd * 1.05; by0 = fy - bd * 0.95;
       }
-      const bd = oh * 0.95, bu = put('<div class="burst" aria-hidden="true"><span>ACT<br>NOW!</span></div>');
+      const bu = put('<div class="burst" aria-hidden="true"><span>ACT<br>NOW!</span></div>');
       bu.style.setProperty('--star', STAR);
-      place(bu, R - bd * 0.7, oy - bd * 0.6, bd, bd); bu.style.fontSize = bd * 0.24 + 'px';
+      place(bu, bx, by0, bd, bd); bu.style.fontSize = bd * 0.24 + 'px';
       movers.push((t) => { const ph = (t * 2) % 1; bu.style.transform = `rotate(${ph < 0.5 ? 8 : -4}deg) scale(${ph < 0.5 ? 1.08 : 1})`; });
       movers.push((t) => ord.classList.toggle('lit', (t * 2.5) % 1 < 0.5));
     }
@@ -413,7 +432,7 @@ body { -webkit-font-smoothing: antialiased; }
       Object.assign(band.style, { transform: `rotate(${deg}deg)`, fontSize: NB * 0.56 + 'px' });
       const tape = put(`<div class="seam" role="img" aria-label="Black Friday only!"><span>${SEAM.repeat(24)}</span></div>`);
       place(tape, cx0 - len / 2, cy0 - T / 2, len, T);
-      Object.assign(tape.style, { transform: `rotate(${deg}deg)`, fontSize: T * 0.56 + 'px',
+      Object.assign(tape.style, { transform: `rotate(${deg}deg)`, fontSize: T * 0.5 + 'px',
                                   boxShadow: `inset 0 ${3 * s}px 0 rgba(170,158,0,0.6), inset 0 ${-3 * s}px 0 rgba(170,158,0,0.6), 0 ${-8 * s}px ${14 * s}px rgba(6,8,70,0.35)` });
       const ts = tape.firstElementChild, bs = band.firstElementChild, tRep = ts.offsetWidth / 24, bRep = bs.offsetWidth / 14;
       movers.push((t) => {
@@ -434,7 +453,7 @@ body { -webkit-font-smoothing: antialiased; }
 
     // ---- the credits along the foot ----
     const byF = footH * 0.36;
-    const by = put(`<div class="by"><span class="item">ITEM # 30-OFF</span><span class="gme">Brought to you by Gary Mustard Enterprises</span><span class="sep" aria-hidden="true">✦</span><a href="${GARRETT}">Garrett Musar</a><span class="sep" aria-hidden="true">✦</span><a href="${AUFBAU}">Aufbau</a></div>`);
+    const by = put(`<div class="by"><img class="item" alt="" src="${IMG.logo}"><span class="gme">Brought to you by Gary Mustard Enterprises</span><span class="sep" aria-hidden="true">✦</span><a href="${GARRETT}">Garrett Musar</a><span class="sep" aria-hidden="true">✦</span><a href="${AUFBAU}">Aufbau</a></div>`);
     Object.assign(by.style, { height: footH + 'px', fontSize: byF + 'px', top: 'auto', width: 'auto' });
     by.style.justifyContent = 'flex-start';
     const byW = () => by.lastElementChild.getBoundingClientRect().right;   // where the credits end, set from the left

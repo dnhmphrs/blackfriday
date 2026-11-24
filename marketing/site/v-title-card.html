@@ -45,7 +45,7 @@ body { -webkit-font-smoothing: antialiased; }
 .sash { display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 0.08em; white-space: nowrap;
         background: linear-gradient(#ff4a3a, #ff1616 50%, #c40000); color: #fff; font: italic 700 1em/1 "Arimo", Arial, sans-serif; letter-spacing: -0.02em;
         text-shadow: 0.05em 0.05em 0 #6a0004; transform: rotate(45deg); transform-origin: center; }
-.sash .a { font-size: 0.6em; letter-spacing: 0.06em; color: var(--yellow); }
+.sash .a { font-size: 0.7em; letter-spacing: 0.05em; color: var(--yellow); }
 
 /* lettering, placed by baseline and ink edge (see set()) */
 .t { white-space: nowrap; line-height: 1; }
@@ -88,7 +88,7 @@ body { -webkit-font-smoothing: antialiased; }
          box-shadow: inset 0 0.07em 0 rgba(255, 255, 255, 0.8), inset 0 -0.08em 0 rgba(150, 130, 0, 0.7); }
 .order .go { display: flex; align-items: center; gap: 0.32em; font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; }
 .order .go i { font: 900 1em/1 Arial, Helvetica, sans-serif; font-style: normal; display: inline-block; }
-.order .fine { font: italic 700 0.34em/1 "Arimo", Arial, sans-serif; letter-spacing: 0.08em; margin-top: 0.34em; color: #8a0008; }
+.order .fine { font: italic 700 0.46em/1 "Arimo", Arial, sans-serif; letter-spacing: 0.08em; margin-top: 0.34em; color: #8a0008; }
 /* hover: at once, no easing in */
 .order:hover, .order:focus-visible { outline: none; background: linear-gradient(#ff6a5a, #ff1616 50%, #c40000); color: #fff; }
 .order:hover .fine, .order:focus-visible .fine { color: var(--yellow); }
@@ -318,14 +318,14 @@ body { -webkit-font-smoothing: antialiased; }
     const sashEdge = (x) => x - (u - 2 * sash.c) + sash.h * 0.72;    // the sash's lower edge, frame-local y at frame-local x
     const headLines = ['30%', 'OFF'], hW = Math.max(...headLines.map(headW));
     const subLines = narrow ? ['EVERYTHING ON', 'THE INTERNET.'] : ['EVERYTHING ON THE INTERNET.'], sW = Math.max(...subLines.map(subW));
-    const presText = 'GARY MUSTARD ENTERPRISES PRESENTS', presW = width(presText, ANT, 0.2) + 2 * (2.4 + 0.7);
+    const presText = narrow ? 'PRESENTS' : 'GARY MUSTARD ENTERPRISES PRESENTS', presW = width(presText, ANT, 0.2) + 2 * (2.4 + 0.7);
     const gd = (narrow ? 0.17 : 0.17) * u;                                  // the bookend globes' size
     const N = {                                                       // natural sizes (k = 1), frame-local px
-      pres: Math.min((u * (narrow ? 0.88 : 0.5)) / presW, (u * 0.021) / ACAP),
+      pres: Math.min((u * (narrow ? 0.88 : 0.5)) / presW, (u * (narrow ? 0.032 : 0.021)) / ACAP), logo: u * 0.36,
       head: (u * (narrow ? 0.8 : 0.56)) / hW,
       sub: (u * (narrow ? 0.86 : 0.76)) / sW,
       tag: u * (narrow ? 0.56 : 0.42),
-      plateW: u * (narrow ? 0.8 : 0.38), plateH: u * (narrow ? 0.2 : 0.098),
+      plateW: u * (narrow ? 0.82 : 0.44), plateH: u * (narrow ? 0.21 : 0.11),
       cardsW: u * 0.8,
     };
     const tagF = (w) => w / (across('BLACK FRIDAY ONLY!', '400', 100, -0.01) / 100 + 0.84 + 0.14);
@@ -333,9 +333,15 @@ body { -webkit-font-smoothing: antialiased; }
     function stack(k, y0, gapK, dry) {
       const X = fx + u / 2, rows = []; let y = y0;
       const row = (top, hw) => rows.push([top, hw]);
+      if (narrow) {                                             // a narrow card: the company's mark, centred, over PRESENTS
+        const lw = N.logo * k, lh = (lw * 610) / 1142;
+        row(y, lw / 2);
+        if (!dry) place(put(`<img class="mark" alt="Gary Mustard Enterprises" src="${IMG.logo}">`), X - lw / 2, fy + y, lw, lh);
+        y += lh + 0.02 * u * k * gapK;
+      }
       const ps = N.pres * k, pw = presW * ps;
       row(y, pw / 2);
-      if (!dry) { const el = put(`<div class="pres"><i></i><span>GARY MUSTARD ENTERPRISES PRESENTS</span><i></i></div>`); el.style.fontSize = ps + 'px'; el.style.height = ps + 'px'; centre(el, X, fy + y); }
+      if (!dry) { const el = put(`<div class="pres"><i></i><span>${presText}</span><i></i></div>`); el.style.fontSize = ps + 'px'; el.style.height = ps + 'px'; centre(el, X, fy + y); }
       y += ps + 0.034 * u * k * gapK;
       const hs = N.head * k, headTop = y;
       headLines.forEach((t, n) => {
@@ -388,13 +394,15 @@ body { -webkit-font-smoothing: antialiased; }
     place(put('<div class="spot"></div>', frame), u / 2 - bd * 0.42, hcY - bd * 0.42, bd * 0.84, bd * 0.84);
     const ri = u * 0.02, rule = place(put('<div class="rule"></div>', frame), ri, ri, FW - 2 * ri, FH - 2 * ri);
     Object.assign(rule.style, { borderWidth: Math.max(1.5, u * 0.0028) + 'px', borderRadius: rad * 0.7 + 'px' });
-    const bh = u * (narrow ? 0.085 : 0.05), bug = place(put(`<img class="bug" alt="" src="${IMG.logo}">`, frame), u * 0.045, u * 0.04, bh * 1142 / 610, bh);
+    const bh = u * 0.05; if (!narrow) place(put(`<img class="bug" alt="" src="${IMG.logo}">`, frame), u * 0.045, u * 0.04, bh * 1142 / 610, bh);
 
     // the bookend globes: either side of 30% / OFF on a wide frame, either side of the tag on a narrow one
+    // (on a narrow card, beside OFF, which is narrower than 30%)
+    const offSide = (u - headW('OFF') * L.hs) / 2, offD = Math.min(u * 0.2, offSide - u * 0.035);
     const gk = narrow ? 1 : Math.min(1, ((L.headBot - L.headTop) * 0.95) / gd);
-    const gD = gd * gk * (narrow ? k : 1);
-    const gx = narrow ? Math.min(u * 0.13, (u - N.tag * k) / 4) : u * 0.105;
-    let gy = narrow ? L.tagTop + L.tf * 0.75 : hcY;
+    const gD = narrow ? offD : gd * gk;
+    const gx = narrow ? Math.max(gD / 2 + u * 0.03, offSide / 2) : u * 0.105;
+    let gy = narrow ? L.headBot - HCAP * L.hs * 0.5 : hcY;
     if (!narrow) gy = Math.max(gy, sashEdge(u - gx + gD * 0.35) + gD * 0.55);
     for (const side of [-1, 1]) {
       const cx = X + side * (u / 2 - gx);
@@ -472,21 +480,21 @@ body { -webkit-font-smoothing: antialiased; }
       blink(st.querySelector('.dot'), 0.8);
     }
     if (!tall) {
-      const pw = fx - g * 1.25 - bev * 2;
-      if (pw > 150 * Math.max(0.7, s)) {
+      const pw = fx - g * 0.75 + u * 0.035;
+      if (fx - g > 120 * Math.max(0.7, s)) {
         // the price card things on the left; the badge things on the right
-        const lf = Math.max(9, pw * 0.055), cs = Math.min((pw * 0.9) / 410, (zH * 0.55) / 380), cH = 360 * cs;
+        const lf = Math.max(10, pw * 0.072), cs = Math.min((pw * 0.94) / 410, (zH * 0.56) / 380), cH = 360 * cs;
         const lab = put('<div class="label"><b>ITEM #30</b><span>LIMITED TIME</span></div>'); lab.style.fontSize = lf + 'px';
         const top = zTop + (zH - cH - lf * 2.2) / 2, lx = g * 0.75 + (pw - 408 * cs) / 2;
         at(lab, lx, top); card(lx, top + lf * 2.2, cs);
-        const rx = W - g * 0.75 - pw, of = Math.min((pw * 0.88) / 7.9, zH * 0.085), oH = of * 3.6;
+        const rx = W - g * 0.75 - pw, of = Math.min((pw * 0.92) / 7.9, zH * 0.09), oH = of * 3.6;
         const sayF = Math.min(of * 0.72, (pw * 0.95) / (across('Works like magic!', 'italic 700', 100, -0.02) / 100));
         const blockH = oH + of * 0.4 + sayF * 1.5 + lf * 2, ry = zTop + (zH - blockH) / 2;
         const o = oval(of, 'As Seen On<br>Every Website'); centre(o, rx + pw / 2, ry);
         glint('b', rx + pw / 2 + o.offsetWidth * 0.45, ry + oH * 0.08, of * 0.55, 0.6);
         const sy = put('<div class="say">Works like magic!</div>'); sy.style.fontSize = sayF + 'px'; centre(sy, rx + pw / 2, ry + oH + of * 0.2);
         const st = put('<div class="label"><span class="dot"></span><span>OPERATORS STANDING BY</span></div>');
-        st.style.fontSize = Math.min(lf * 0.9, pw / 13.5) + 'px'; centre(st, rx + pw / 2, ry + oH + of * 0.2 + sayF * 1.5);
+        const outR = fx + FW + bev * 3; st.style.fontSize = Math.min(lf * 1.05, (W - outR - g * 0.5) / 12.5) + 'px'; centre(st, (outR + W - g * 0.3) / 2, ry + oH + of * 0.2 + sayF * 1.5);
         blink(st.querySelector('.dot'), 0.8);
         glint('', g * 0.75 + pw * 0.08, top - lf * 0.4, of * 0.45, 0);
       }
