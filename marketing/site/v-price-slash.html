@@ -73,6 +73,16 @@ body { -webkit-font-smoothing: antialiased; }
 .pc .rule { background: repeating-linear-gradient(#000 0 10px, transparent 10px 18px); width: 4px; }
 .pc .np { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.03em; color: #111; }
 
+/* BUT WAIT… THERE'S LESS!: the announcer's line, a black caption bubble over the NOW price */
+.pc .wait { display: flex; align-items: center; justify-content: center; white-space: nowrap; background: #111; color: var(--yellow); border: 4px solid #000;
+            font: 400 1px/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; box-shadow: 6px 6px 0 rgba(4, 6, 60, 0.55); transform: rotate(-2deg); }
+.pc .wait em { font-style: normal; color: #fff; margin-right: 0.3em; }
+.pc .wait::after { content: ''; position: absolute; left: 14%; top: 100%; border: 0.42em solid transparent; border-top: 0.5em solid #111; border-bottom: 0; }
+/* the globe's product inset, framed like a picture-in-picture */
+.inset { background: radial-gradient(circle at 50% 42%, #58c4ff 0%, #2a8cff 18%, #1348ee 40%, #0a1aa8 66%, #060c6a 100%); border: 5px solid #fff; outline: 4px solid #000;
+         box-shadow: 14px 14px 0 rgba(4, 6, 60, 0.9); }
+.inset small { position: absolute; left: 0; top: 0; background: var(--yellow); color: #111; font: 600 1em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.1em; padding: 0.25em 0.5em; }
+
 /* BLACK FRIDAY ONLY!, as a red tag stuck on the card */
 .tag { position: absolute; white-space: nowrap; background: var(--red); color: var(--yellow); border: 0.07em solid #000;
        font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; padding: 0.2em 0.42em 0.24em;
@@ -81,14 +91,14 @@ body { -webkit-font-smoothing: antialiased; }
 .oval { width: 7.6em; height: 3.31em; border-radius: 50%; display: grid !important; place-items: center; text-align: center;
         font: italic 700 1em/0.98 "Tinos", "Times New Roman", serif; background: radial-gradient(ellipse at 40% 30%, #fffc9a, #efe01c 72%); color: #151515;
         transform: rotate(-7deg); box-shadow: 0.143em 0.167em 0 rgba(6, 8, 70, 0.9), inset 0 0 0 0.095em rgba(170, 158, 0, 0.5); }
-.cards { display: flex !important; gap: 12px; width: 436px; transform-origin: left top; font: italic 700 19px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
+.cards { display: flex !important; flex-wrap: wrap; gap: 12px; width: 436px; transform-origin: left top; font: italic 700 21px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
 .cards i { flex: none; position: relative; display: block; width: 100px; height: 62px; border-radius: 7px; overflow: hidden; box-shadow: 3px 3px 0 rgba(6, 8, 70, 0.55); }
 .cards b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; }
 .cards .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; outline: 2px solid #c9cbd1; outline-offset: -2px; }
 .cards .c2 { background: radial-gradient(circle at 50% 40%, #ffb300 0 30%, transparent 31%), #fff; color: #111; outline: 2px solid #c9cbd1; outline-offset: -2px; }
 .cards .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
 .cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
-.cards .c4 b { font-size: 14.5px; }
+.cards .c4 b { font-size: 16px; }
 
 /* the starburst sticker */
 .burst { display: grid !important; place-items: center; }
@@ -131,7 +141,7 @@ body { -webkit-font-smoothing: antialiased; }
   const query = new URLSearchParams(location.search);
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const IMG = { globe: still ? '{{img:globe_still}}' : '{{img:globe_anim}}', tile: '{{img:tile}}', logo: '{{img:logo}}' };
-  const TICKER = '<b>BUT WAIT… THERE’S LESS!</b> ✦ No purchase necessary! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
+  const TICKER = '<b>30% off the entire internet.</b> ✦ No purchase necessary! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
   const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
   const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
   const TAN9 = Math.tan((9 * Math.PI) / 180);
@@ -214,10 +224,12 @@ body { -webkit-font-smoothing: antialiased; }
   const oval = (size, words = 'As Seen On<br>Every Website') => {
     const el = put(`<div class="oval"><span>${words}</span></div>`); el.style.fontSize = size + 'px'; return el;
   };
-  const cards = (parent, x, top, w) => {
+  // the four cards, in a row (cols 4, 436 x 62) or two by two (cols 2, 212 x 136), scaled to width w
+  const cards = (parent, x, top, w, cols = 4) => {
     const el = put('<div class="cards" aria-label="FREE, Gratis, $0.00, NO CHARGE"><i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i></div>', parent);
-    Object.assign(el.style, { left: x + 'px', top: top + 'px', transform: `scale(${w / 436})` });
-    return (62 * w) / 436;
+    const nw = cols === 2 ? 212 : 436, nh = cols === 2 ? 136 : 62;
+    Object.assign(el.style, { left: x + 'px', top: top + 'px', width: nw + 'px', transform: `scale(${w / nw})` });
+    return (nh * w) / nw;
   };
   // a starburst sticker, n points, its words in Tinos; it rocks a little on the clock
   const burst = (cx, cy, d, words, turn = -8) => {
@@ -276,50 +288,55 @@ body { -webkit-font-smoothing: antialiased; }
     const bandH = tall ? 66 : 62, band = put(`<div class="band"><span>The Internet (All Of It)</span><small>LIMITED TIME</small></div>`, c);
     Object.assign(band.style, { top: y + 'px', height: bandH + 'px', fontSize: (bandH - 6) * 0.72 + 'px', padding: `0 ${pad * 0.7}px` });
     y += bandH;
-    // WAS: 100% (slashed)  /  NOW: 70% (huge, jolting)
-    const lab = tall ? 40 : 42, labCap = SCAP * lab;
+    // WAS: 100% (slashed)  /  BUT WAIT… THERE'S LESS! over NOW: 70% (huge, jolting). Side by side on every screen.
+    const lab = tall ? 36 : 42, labCap = SCAP * lab;
     const slash = (x, base, w, cap) => {
       const el = put('<div class="slash" aria-hidden="true"></div>', c), h = cap * 0.2, len = w * 1.16;
       place(el, x + w / 2 - len / 2, base - cap / 2 - h / 2, len, h); el.style.transform = 'rotate(-17deg)';
     };
+    const wait = (x, top, w) => {
+      const txt = 'BUT WAIT… THERE’S LESS!', fs = (w - 36) / (run(txt, 'SIZE "Archivo Black"', 100, -0.02) / 100 + 0.3), h = fs * 1.55;
+      const el = put('<div class="wait"><em>BUT WAIT…</em>THERE’S LESS!</div>', c);
+      place(el, x, top, w, h); el.style.fontSize = fs + 'px';
+      return h;
+    };
+    const top = y, leftW = tall ? 178 : 330, divX = pad + leftW + (tall ? 18 : 30), rightX = divX + (tall ? 22 : 34), rightW = IW - pad - rightX;
+    let ry = top + (tall ? 22 : 26);
+    if (tall) ry += wait(pad - 6, ry, IW - 2 * pad + 12) + 30;      // the bubble across the card on a phone
+    else ry += wait(rightX - 14, ry, rightW + 14) + 26;               // over the NOW column on a wide screen
+    const labY = ry + labCap;
+    set('lab', 'NOW:', SUB, -0.02, lab, rightX, labY, 0, 'div', c);
+    const bigSize = rightW / headW('70%', 8), bigCap = HCAP * bigSize;
+    ry = labY + (tall ? 16 : 20) + bigCap;
+    const big = set('big', '70%', HEAD, -0.05, bigSize, rightX, ry, 0, 'div', c);
+    big.style.transformOrigin = '50% 60%'; jolt(big, 1.1, 'skewX(-8deg)');
+    const foot = ry;
+    // the left column: WAS: (level with NOW:), the slashed 100%, and on a wide screen the cards two by two at the 70%'s foot
+    const wTop = tall ? labY : top + 26 + labCap;
+    set('lab', 'WAS:', SUB, -0.02, lab, pad, wTop, 0, 'div', c);
     if (tall) {
-      const wasSize = ((IW - 2 * pad) * 0.56) / headW('100%', 0), wasCap = HCAP * wasSize;
-      y += 30 + wasCap;
-      set('lab', 'WAS:', SUB, -0.02, lab * 1.15, pad, y - wasCap / 2 + (labCap * 1.15) / 2, 0, 'div', c);
-      const wx = IW - pad - headW('100%', 0) * wasSize;
-      set('was', '100%', HEAD, -0.05, wasSize, wx, y, 0, 'div', c);
-      slash(wx, y, headW('100%', 0) * wasSize, wasCap);
-      y += 34 + labCap; set('lab', 'NOW:', SUB, -0.02, lab, pad, y, 0, 'div', c);
-      const bigSize = (IW - 2 * pad - 24) / headW('70%', 8), bigCap = HCAP * bigSize;
-      y += 22 + bigCap;
-      const big = set('big', '70%', HEAD, -0.05, bigSize, pad + 12, y, 0, 'div', c);
-      big.style.transformOrigin = '50% 60%'; jolt(big, 1.1, 'skewX(-8deg)');
-      const npS = (IW - 2 * pad) / subW('No purchase necessary!') * 0.8;
-      y += 44 + SCAP * npS; set('np', 'No purchase necessary!', SUB, -0.03, npS, pad, y, 0, 'div', c);
-      y += 20; y += cards(c, pad, y, IW - 2 * pad); y += 30;
+      const wasCap = Math.min(HCAP * leftW / headW('100%', 0), bigCap * 0.62), wasSize = wasCap / HCAP;
+      const wy = foot - (bigCap - wasCap) * 0.35;
+      set('was', '100%', HEAD, -0.05, wasSize, pad, wy, 0, 'div', c);
+      slash(pad, wy, headW('100%', 0) * wasSize, wasCap);
+      const rule = put('<div class="rule" aria-hidden="true"></div>', c); place(rule, divX, labY - labCap - 4, 4, foot - labY + labCap + 8);
+      y = foot + 34;
+      const npS = (IW - 2 * pad) / subW('No purchase necessary!') * 0.78;
+      y += SCAP * npS; set('np', 'No purchase necessary!', SUB, -0.03, npS, pad, y, 0, 'div', c);
+      y += 18; y += cards(c, pad, y, IW - 2 * pad); y += 36;
     } else {
-      const top = y, leftW = 330, divX = pad + leftW + 30, rightX = divX + 34, rightW = IW - pad - rightX;
-      // the right: NOW: 70%
-      const bigSize = rightW / headW('70%', 8), bigCap = HCAP * bigSize;
-      let ry = top + 30 + labCap; set('lab', 'NOW:', SUB, -0.02, lab, rightX, ry, 0, 'div', c);
-      ry += 22 + bigCap;
-      const big = set('big', '70%', HEAD, -0.05, bigSize, rightX, ry, 0, 'div', c);
-      big.style.transformOrigin = '50% 60%'; jolt(big, 1.1, 'skewX(-8deg)');
-      ry += 34;
-      // the left, from the bottom up: the four cards level with the 70%'s foot, WAS: 100% (slashed) over them
-      const ch = (62 * leftW) / 436, foot = ry - 34;
-      cards(c, pad, foot - ch, leftW);
-      let ly = top + 30 + labCap; set('lab', 'WAS:', SUB, -0.02, lab, pad, ly, 0, 'div', c);
-      const room = foot - ch - 44 - (ly + 22);
-      const wasCap = Math.min(HCAP * leftW / headW('100%', 0), room), wasSize = wasCap / HCAP;
-      ly = ly + 22 + (room - wasCap) * 0.4 + wasCap; set('was', '100%', HEAD, -0.05, wasSize, pad, ly, 0, 'div', c);
-      slash(pad, ly, headW('100%', 0) * wasSize, wasCap);
-      const rule = put('<div class="rule" aria-hidden="true"></div>', c); place(rule, divX, top + 26, 4, ry - top - 52);
-      y = ry + 40;
+      const wasCap0 = HCAP * leftW / headW('100%', 0), room = foot - (wTop + 24);
+      const wasCap = Math.min(wasCap0, room * 0.4), wasSize = wasCap / HCAP, wy = wTop + 24 + wasCap;
+      set('was', '100%', HEAD, -0.05, wasSize, pad, wy, 0, 'div', c);
+      slash(pad, wy, headW('100%', 0) * wasSize, wasCap);
+      const cTop = wy + 40, cw = Math.min(leftW, ((foot - cTop) * 212) / 136);
+      cards(c, pad, foot - (136 * cw) / 212, cw, 2);
+      const rule = put('<div class="rule" aria-hidden="true"></div>', c); place(rule, divX, top + 26, 4, foot - top - 26);
+      y = foot + 40;
     }
     const H0 = y + 12;
     c.style.height = H0 + 'px';
-    // BLACK FRIDAY ONLY!, stuck across the top right corner
+    // BLACK FRIDAY ONLY!, stuck across the bottom right corner
     const tg = put('<div class="tag">BLACK FRIDAY ONLY!</div>', c);
     tg.style.fontSize = (tall ? 44 : 48) + 'px';
     return { c, W0, H0, tag: tg };
@@ -330,11 +347,12 @@ body { -webkit-font-smoothing: antialiased; }
     p.textContent = ''; movers = [];
     const W = p.clientWidth, H = p.clientHeight, tall = W / H < 1;
     const s = tall ? Math.min(W / 430, H / 900) : Math.min(W / 1280, H / 800);
-    $('.soft').setAttribute('stdDeviation', `${1.25 * s} ${0.5 * s}`);
-    $('.halo').setAttribute('stdDeviation', `${5 * s} ${0.6 * s}`);
-    $('.smear').setAttribute('stdDeviation', `${10 * s} ${1.6 * s}`);
-    $('.late').setAttribute('dx', 7 * s); $('.late').setAttribute('dy', 1.7 * s);
-    $('.bloom').setAttribute('stdDeviation', 14 * s);
+    const fs = tall ? s * 0.7 : s;   // the tape's blur on a phone: lighter, as its type is smaller
+    $('.soft').setAttribute('stdDeviation', `${1.25 * fs} ${0.5 * fs}`);
+    $('.halo').setAttribute('stdDeviation', `${5 * fs} ${0.6 * fs}`);
+    $('.smear').setAttribute('stdDeviation', `${10 * fs} ${1.6 * fs}`);
+    $('.late').setAttribute('dx', 7 * fs); $('.late').setAttribute('dy', 1.7 * fs);
+    $('.bloom').setAttribute('stdDeviation', 14 * fs);
     $('.blotch').setAttribute('baseFrequency', `${0.042 / s} ${0.167 / s}`);
     $('.static').setAttribute('baseFrequency', `${0.19 / s} ${0.71 / s}`);
 
@@ -391,61 +409,71 @@ body { -webkit-font-smoothing: antialiased; }
       }
     };
 
-    // the stage: between the ticker and the order bar. The card the hero; the globe small in its corner
+    // the globe's framed product inset: a picture-in-picture box, the globe breaking out of its top
+    const inset = (x, y, w, h, turn) => {
+      const el = place(put('<div class="inset" aria-hidden="true"><small>LIVE</small></div>'), x, y, w, h);
+      el.style.transform = `rotate(${turn}deg)`; el.querySelector('small').style.fontSize = Math.max(10, w * 0.06) + 'px';
+      el.style.borderWidth = Math.max(3, w * 0.018) + 'px';
+      return el;
+    };
+    // the stage: between the ticker and the order bar. The card the hero; the globe framed beside it
     const stage = () => {
-      const top = tick + (tall ? 30 : 34) * s, room = stageBot - top;
+      const top = tick + (tall ? 26 : 34) * s, room = stageBot - top;
       if (tall) {
-        // the card as wide as the screen, at the foot of the stage; the globe and its badge in the room over it
-        const pc = priceCard(true), kH = (room - 50 * s) / pc.H0;
-        if (pc.W0 * kH * 1.3 < W - 2 * m) {
+        const pc = priceCard(true), hang = 56;   // the tag hangs 56 card px under the card
+        const kH = (room - 40 * s) / (pc.H0 + hang);
+        if (pc.W0 * kH < (W - 2 * m) * 0.85) {
           // a squarer screen (a tablet): the card fills the height, the globe's column beside it
-          const k = Math.min(kH, (W - 2 * m) / (pc.W0 * 1.42)), cw = pc.W0 * k, ch = pc.H0 * k, side = Math.min(W - 2 * m - cw - 10 * s, cw * 0.75);
-          const left = (W - cw - side - 10 * s) / 2, ccx = left + side + 10 * s + cw / 2, ccy = stageBot - 6 * s - ch / 2, cTop = ccy - ch / 2, cBot = ccy + ch / 2;
-          const d = side * 0.9, gx = left + side * 0.5, gy = cTop + d * 0.55;
-          glow(gx, gy, d * 1.15); globe(gx, gy, d);
-          const o = oval(Math.min(d * 0.13, side / 8)); at(o, gx - o.offsetWidth / 2, gy + d * 0.46 - o.offsetHeight / 2);
-          const oBot = gy + d * 0.46 + o.offsetHeight / 2, bd = Math.min(side * 0.72, cBot - oBot - 30 * s);
-          if (bd > 60 * s) burst(gx, oBot + 16 * s + bd / 2, bd, 'Works<br>like<br>magic!');
+          const k = Math.min(kH, (W - 2 * m) / (pc.W0 * 1.34)), cw = pc.W0 * k, ch = pc.H0 * k, side = Math.min(W - 2 * m - cw - 16 * s, cw * 0.75);
+          const left = (W - cw - side - 16 * s) / 2, ccx = left + side + 16 * s + cw / 2, ccy = top + (room - ch - hang * k) / 2 + ch / 2, cTop = ccy - ch / 2, cBot = ccy + ch / 2;
+          const ih = Math.min(side * 1.1, ch * 0.5), d = Math.min(side * 0.86, ih * 0.84), gx = left + side * 0.5, gy = cTop + ih * 0.52;
+          inset(left, cTop, side, ih, 1.2); globe(gx, gy, d);
+          const o = oval(Math.min(d * 0.15, side / 7.9)); at(o, gx - o.offsetWidth / 2, cTop + ih - o.offsetHeight * 0.4);
+          const oBot = cTop + ih + o.offsetHeight * 0.6, bd = Math.min(side * 0.95, cBot - oBot - 16 * s);
+          if (bd > 60 * s) burst(gx, oBot + (cBot - oBot) * 0.45, bd, 'Works<br>like<br>magic!');
           p.appendChild(pc.c);
           place(pc.c, ccx - pc.W0 / 2, ccy - pc.H0 / 2, pc.W0, pc.H0);
           pc.c.style.transform = `scale(${k}) rotate(-1.2deg)`;
-          Object.assign(pc.tag.style, { right: '-22px', top: '-50px', transform: 'rotate(4deg)' });
-          glint('', gx - d * 0.38, gy - d * 0.38, d * 0.075);
+          Object.assign(pc.tag.style, { right: '-18px', bottom: '-56px', transform: 'rotate(-4deg)' });
+          glint('', left + side * 0.08, cTop + ih * 0.12, d * 0.07);
           return;
         }
-        const k = Math.min((W - 2 * m - 10 * s) / pc.W0, (room - 70 * s) / pc.H0);
-        const cw = pc.W0 * k, ch = pc.H0 * k, spare = room - ch - 20 * s;
-        const ccx = W / 2, ccy = stageBot - 6 * s - ch / 2, cTop = ccy - ch / 2;
-        const d = Math.max(70 * s, Math.min(spare * 1.05, W * 0.44)), gx = ccx - cw / 2 + d * 0.5, gy = Math.max(top + d * 0.42, cTop - spare / 2);
-        glow(gx, gy, d * 1.1); globe(gx, gy, d);
-        const o = oval(Math.max(12, Math.min(d * 0.15, (W - gx - d * 0.45 - m) / 7.8)));
-        at(o, Math.min(gx + d * 0.42, W - m - o.offsetWidth), gy - o.offsetHeight * 0.75);
+        // a phone: the card as wide as the screen at the foot of the stage; the framed globe and its badge over it
+        const k = Math.min((W - 2 * m - 6 * s) / pc.W0, (room - 80 * s) / (pc.H0 + hang));
+        const cw = pc.W0 * k, ch = pc.H0 * k, ccx = W / 2, ccy = stageBot - hang * k - ch / 2, cTop = ccy - ch / 2;
+        const spare = cTop - top - 4 * s, ih = Math.max(60 * s, spare), iw = Math.min(ih * 1.25, cw * 0.5);
+        const ix = ccx - cw / 2, iy = cTop - ih - 2 * s, d = Math.min(iw * 0.78, ih * 0.84), gx = ix + iw / 2, gy = iy + ih * 0.54;
+        inset(ix, iy, iw, ih, -1.5); globe(gx, gy, d);
+        const ow = W - m - (ix + iw) - 4 * s, o = oval(Math.max(12, Math.min(ih * 0.17, ow / 7.6)));
+        const ox = ix + iw + (ow - o.offsetWidth) / 2 + 4 * s, oy = iy + ih * 0.3 - o.offsetHeight / 2; at(o, ox, oy);
+        const bd = Math.min(ow * 0.62, iy + ih - (oy + o.offsetHeight) - 2 * s);
+        if (bd > 54 * s) burst(ix + iw + ow * 0.55, oy + o.offsetHeight + bd / 2 - 2 * s, bd, 'Works<br>like<br>magic!', 8);
         p.appendChild(pc.c);
         place(pc.c, ccx - pc.W0 / 2, ccy - pc.H0 / 2, pc.W0, pc.H0);
         pc.c.style.transform = `scale(${k}) rotate(-1.2deg)`;
-        Object.assign(pc.tag.style, { right: '-22px', top: '-50px', transform: 'rotate(4deg)' });
-        glint('', ccx + cw * 0.44, ccy + ch * 0.14, 22 * s);
-        glint('b', gx - d * 0.45, gy + d * 0.3, 14 * s);
+        Object.assign(pc.tag.style, { right: '-14px', bottom: '-56px', transform: 'rotate(-4deg)' });
+        glint('', W - m - ow * 0.12, iy + ih * 0.12, 14 * s);
+        glint('b', ix + iw * 0.06, iy + ih * 0.9, 10 * s);
       } else {
         const pc = priceCard(false);
-        // the card most of the window; the globe's column on its left: the globe, its badge, a starburst
-        const k = Math.min((W - 2 * m) * 0.75 / pc.W0, (room - 40 * s) / (pc.H0 + 40));
+        // the card most of the window; the globe's framed inset on its left, its badge and the starburst under it
+        const k = Math.min((W - 2 * m) * (W / H < 1.45 ? 0.76 : 0.73) / pc.W0, (room - 40 * s) / (pc.H0 + 40));
         const cw = pc.W0 * k, ch = pc.H0 * k;
-        const side = Math.min(W - 2 * m - cw, cw * 0.4);
-        const left = (W - cw - side) / 2, ccx = left + side + cw / 2, ccy = top + (room - ch - 40 * k) * 0.5 + ch / 2;
+        const side = Math.min(W - 2 * m - cw - 24 * s, cw * 0.36), gapX = Math.min(28 * s, W - 2 * m - cw - side);
+        const left = (W - cw - side - gapX) / 2, ccx = left + side + gapX + cw / 2, ccy = top + (room - ch - 40 * k) * 0.5 + ch / 2;
         const cTop = ccy - ch / 2, cBot = ccy + ch / 2;
-        const d = Math.min(side * 0.92, ch * 0.6), gx = left + side * 0.48, gy = cTop + d * 0.5;
-        glow(gx, gy, d * 1.15); globe(gx, gy, d);
-        const o = oval(Math.max(12, Math.min(d * 0.13, side / 8.2)));
-        at(o, gx - o.offsetWidth / 2 + d * 0.06, gy + d * 0.44 - o.offsetHeight / 2);
-        const oBot = gy + d * 0.44 + o.offsetHeight / 2, bd = Math.min(side * 0.62, cBot - oBot - 6 * s);
-        if (bd > 70 * s) burst(left + side * 0.42, oBot + 6 * s + bd / 2, bd, 'Works<br>like<br>magic!');
+        const ih = Math.min(side * 1.08, ch * 0.62), d = Math.min(side * 0.9, ih * 0.86), gx = left + side / 2, gy = cTop + ih * 0.53;
+        inset(left, cTop, side, ih, 1.4); globe(gx, gy, d);
+        const o = oval(Math.max(12, Math.min(side * 0.14, side / 7.4)));
+        at(o, gx - o.offsetWidth / 2, cTop + ih - o.offsetHeight * 0.38);
+        const oBot = cTop + ih + o.offsetHeight * 0.62, bd = Math.min(side * 0.78, cBot - oBot + 30 * s);
+        if (bd > 60 * s) burst(left + side * 0.62, oBot + bd / 2 - 4 * s, bd, 'Works<br>like<br>magic!');
         p.appendChild(pc.c);
         place(pc.c, ccx - pc.W0 / 2, ccy - pc.H0 / 2, pc.W0, pc.H0);
         pc.c.style.transform = `scale(${k}) rotate(-1.4deg)`;
-        Object.assign(pc.tag.style, { right: '-26px', bottom: '-40px', transform: 'rotate(-4deg)' });
-        glint('', gx - d * 0.38, gy - d * 0.38, d * 0.075);
-        glint('b', ccx - cw * 0.49, cBot - ch * 0.02, 26 * s);
+        Object.assign(pc.tag.style, { right: '-26px', bottom: '-62px', transform: 'rotate(-4deg)' });
+        glint('', left + side * 0.08, cTop + ih * 0.1, d * 0.07);
+        glint('b', ccx + cw * 0.49, cTop + ch * 0.02, 22 * s);
       }
     };
 
@@ -453,7 +481,7 @@ body { -webkit-font-smoothing: antialiased; }
     stage();
 
     // ---- the voice-over ticker along the top, the crawl along the bottom ----
-    const tk = put(`<div class="ticker" aria-label="But wait… there’s less!"><div class="run" aria-hidden="true">${TICKER.repeat(8)}</div><div class="air" aria-hidden="true"><span class="dot"></span>ON AIR</div></div>`);
+    const tk = put(`<div class="ticker" aria-label="30% off the entire internet."><div class="run" aria-hidden="true">${TICKER.repeat(8)}</div><div class="air" aria-hidden="true"><span class="dot"></span>ON AIR</div></div>`);
     Object.assign(tk.style, { height: tick + 'px', fontSize: tick * 0.62 + 'px', lineHeight: tick + 'px' });
     blink(tk.querySelector('.dot'), 1.2, 0.6);
     const cr = put(`<div class="crawl" aria-hidden="true"><span>${CRAWL.repeat(20)}</span></div>`);
