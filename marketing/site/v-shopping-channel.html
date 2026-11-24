@@ -83,6 +83,11 @@ body { -webkit-font-smoothing: antialiased; }
        font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; padding: 0.2em 0.42em 0.24em;
        box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.9); transform: rotate(-2deg); transform-origin: right center; text-shadow: 0.05em 0.05em 0 #7a0006; }
 .tag.two { text-align: center; line-height: 1.02; padding: 0.26em 0.42em 0.3em; transform: rotate(-5deg); transform-origin: center; }
+/* BLACK FRIDAY ONLY!: the red strap along the bottom of the lower third, the offer's last line */
+.strap { display: flex !important; align-items: center; background: linear-gradient(#ff2a2a, #e00000 60%, #a80000); border-top: 0.1em solid #000;
+         color: var(--yellow); font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden;
+         text-shadow: 0.06em 0.06em 0 #6a0004; box-shadow: inset 0 0.08em 0 rgba(255, 255, 255, 0.3); }
+.strap i { font-style: normal; color: #fff; margin: 0 0.5em; }
 /* BUT WAIT… THERE'S LESS!: the presenter's caption, flashing between two states by the clock */
 .cap { display: flex !important; align-items: center; gap: 0.45em; white-space: nowrap; padding: 0.26em 0.6em 0.3em 0.5em;
        background: #fff; color: #0a0f66; border: 0.06em solid #000; box-shadow: 0.1em 0.1em 0 rgba(6, 8, 70, 0.85);
@@ -117,21 +122,22 @@ body { -webkit-font-smoothing: antialiased; }
 .panel s { position: relative; text-decoration: none; color: #6b6f78; }
 .panel s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 7px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
 .panel .now { margin-top: 14px; }
-.panel .big { display: inline-block; font: 400 108px/0.98 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em;
+.panel .big { display: inline-block; font: 400 90px/0.98 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em;
               -webkit-text-stroke: 9px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 30% 80%; }
-.panel .pc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; padding: 8px 16px 0; font: italic 700 17px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
+.panel .pc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; padding: 8px 16px 0; font: italic 700 19px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
 .panel .pc i { position: relative; display: block; height: 52px; border-radius: 6px; overflow: hidden; border: 2px solid #000; }
 .panel .pc b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; white-space: nowrap; }
 .panel .pc .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; }
 .panel .pc .c2 { background: radial-gradient(circle at 50% 38%, #ffb300 0 30%, transparent 31%), #f6f6f6; color: #111; }
 .panel .pc .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
-.panel .pc .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
-.panel .pc .c4 b { font-size: 12.5px; }
+.panel .pc .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffe45c; }
+.panel .pc .c4 b { font-size: 13.5px; letter-spacing: -0.01em; }
+.panel .pc .c3 b { text-shadow: 1px 1px 0 #0a3a8a; }
 .panel .np { text-align: center; padding: 12px 10px 0; font: italic 700 25px/1 "Arimo", Arial, sans-serif; letter-spacing: -0.02em; color: #0a0f66; white-space: nowrap; }
 /* the order button: the link to the store; its lights chase by the clock, hover is at once */
-.order { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 12px 12px 0; padding: 0 8px; height: 92px; text-decoration: none; cursor: pointer;
+.order { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 12px 12px 0; padding: 0 22px; height: 92px; text-decoration: none; cursor: pointer;
          background: linear-gradient(#fffb86, #f0e11c); color: #111; border: 4px solid #000; box-shadow: inset 0 0 0 5px #fff035, inset 0 0 0 7px #000, 5px 5px 0 #0a0f66;
-         font: 400 34px/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; white-space: nowrap; outline: none; }
+         font: 400 31px/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; white-space: nowrap; outline: none; }
 .order i { font: 900 34px/1 Arial, Helvetica, sans-serif; font-style: normal; display: inline-block; }
 .order.lit { box-shadow: inset 0 0 0 5px #ff1616, inset 0 0 0 7px #000, 5px 5px 0 #0a0f66; }
 .order:hover, .order:focus-visible { background: var(--red); color: #fff; box-shadow: inset 0 0 0 5px #fff, inset 0 0 0 7px #000, 5px 5px 0 #0a0f66; }
@@ -140,14 +146,18 @@ body { -webkit-font-smoothing: antialiased; }
              letter-spacing: 0.16em; color: #333; font-style: normal; white-space: nowrap; }
 .panel .sb i { width: 9px; height: 9px; border-radius: 50%; background: #1bb01b; display: block; }
 .panel .sb i.off { background: #bcd8bc; }
+/* flush: across a tall window edge to edge, like the channel's side panel */
+.panel.flush { border-left: 0; border-right: 0; box-shadow: 0 10px 0 rgba(4, 6, 60, 0.92); }
+.panel.flush .price { align-items: center; }
+.panel.flush .price .row { width: 330px; }
 /* compact: tighter, for short or narrow places */
 .panel.compact .pn { font-size: 30px; padding: 9px 14px 10px; white-space: nowrap; }
 .panel.compact .pn small { display: none; }
 .panel.compact .price { padding: 2px 16px 0; }
 .panel.compact .was { margin-top: 6px; font-size: 40px; }
-.panel.compact .big { font-size: 88px; -webkit-text-stroke: 8px #000; }
-.panel.compact .order { height: 76px; font-size: 32px; }
-.panel.compact .order i { font-size: 32px; }
+.panel.compact .big { font-size: 76px; -webkit-text-stroke: 7px #000; }
+.panel.compact .order { height: 76px; font-size: 30px; }
+.panel.compact .order i { font-size: 30px; }
 .panel.compact .np { padding-top: 10px; font-size: 22px; }
 .panel.compact .sb { padding: 9px 0 10px; }
 </style>
@@ -287,8 +297,8 @@ body { -webkit-font-smoothing: antialiased; }
 
   // The order panel, laid out 420 wide and scaled to fit w x h: whichever arrangement (tall, or compact
   // with the price side by side) comes out larger. Returns its place.
-  function panel(x, y, w, h, onlyCompact) {
-    const html = (cls) => `<div class="panel${cls}">
+  function panel(x, y, w, h, onlyCompact, fill) {
+    const html = (cls) => `<div class="panel${cls}${fill ? ' flush' : ''}">
       <div class="ph"><span>TODAY ONLY</span><small>ITEM # 030-070</small></div>
       <div class="pn"><small>NOW SHOWING</small>The Internet (All Of It)</div>
       <div class="price" role="img" aria-label="Was 100%, now 70%.">
@@ -308,7 +318,8 @@ body { -webkit-font-smoothing: antialiased; }
     }
     const el = put(html(best.cls)), k = best.k, ph = Math.min(h / k, best.nat * 1.12);
     el.style.height = ph + 'px';
-    const pw = 420 * k, top = y + (h - ph * k) / 2, left = x + (w - pw) / 2;
+    if (fill) el.style.width = w / k + 'px';
+    const pw = fill ? w : 420 * k, top = y + (h - ph * k) / 2, left = x + (w - pw) / 2;
     Object.assign(el.style, { left: left + 'px', top: top + 'px', transform: `scale(${k})` });
     jolt(el.querySelector('.big'), 1.1);
     blink(el.querySelector('.order'), 'lit', 2.5);
@@ -359,13 +370,13 @@ body { -webkit-font-smoothing: antialiased; }
       const pw = Math.min(W * (W / H < 1.5 ? 0.3 : 0.33), 470 * s), px = W - m - pw;
       pan = { x: px, y: topH + m, w: pw, h: tickTop - topH - 2 * m };
       const lw = px - m;                                             // the lower third runs from the left edge to the panel's gutter
-      lt = lower(0, lw, true, (tickTop - topH) * 0.4);
+      lt = lower(0, lw, true, (tickTop - topH) * (W / H > 1.75 ? 0.38 : 0.46));   // short, wide windows keep more for the studio
       lt.y = tickTop - m * 0.9 - lt.h;
       studio = { x: 0, y: topH, w: px - m, h: lt.y - topH };
     } else if (mid) {
       // between (a tablet): the studio and the panel side by side, the lower third across under both
       lt = lower(0, W, false, H * 0.2);
-      lt.y = tickTop - m * 0.7 - lt.hang - lt.h;
+      lt.y = tickTop - m * 0.7 - lt.h;
       const pw = W * 0.45, px = W - m - pw;
       pan = { x: px, y: topH + m, w: pw, h: lt.y - lt.capH * 0.85 - m * 0.6 - topH - m };
       studio = { x: 0, y: topH, w: px - m, h: lt.y - topH };
@@ -373,21 +384,22 @@ body { -webkit-font-smoothing: antialiased; }
       // tall: the studio, the lower third across, the panel under it
       lt = lower(0, W, false, H * 0.22);
       const panH0 = Math.min(H * 0.38, (W - 2 * m) * 0.95);
-      pan = { x: m, y: 0, w: W - 2 * m, h: panH0 };
+      pan = { x: 0, y: 0, w: W, h: panH0 };
       studio = { x: 0, y: topH, w: W, h: 0 };
     }
 
     // the panel first in a tall window, so the studio has what is left
     let P;
     if (tall && !mid) {
-      P = panel(pan.x, tickTop - m * 0.8 - pan.h, pan.w, pan.h, true);
+      P = panel(pan.x, tickTop - m * 0.8 - pan.h, pan.w, pan.h, true, true);
       const panTop = P.y;
-      lt.y = panTop - m * 0.9 - lt.hang - lt.h;
+      lt.y = panTop - m * 1.1 - lt.h;
       studio.h = lt.y - topH;
       // move the panel's element back under the studio's things: put it last again later
       P.el = p.lastElementChild; P.el.remove();
     }
 
+    let burstAfter = null;
     // ---- the studio: a beam of light onto the product on its column ----
     {
       const capRoom = topF * 2.4;                                       // the caption's tab rides above the lower third
@@ -399,15 +411,23 @@ body { -webkit-font-smoothing: antialiased; }
       place(put('<div class="beam" aria-hidden="true"></div>'), cx - d * 1.1, topH, d * 2.2, floor - topH);
       glow(cx, cy, d * 1.25);
       product(cx, cy, d, floor);
-      const r = d / 2, o = oval(Math.max(13, d * 0.075));
-      const ox = Math.min(cx + r * 0.55, studio.x + studio.w - o.offsetWidth - m * 0.5);
-      at(o, ox, cy - r * 0.95 - o.offsetHeight * 0.3);
+      const r = d / 2, gapR = studio.x + studio.w - (cx + r);
+      if (!tall && gapR > d * 0.45) {
+        // wide: the As Seen On oval fills the studio between the product and the order panel
+        const o = oval(Math.max(13, Math.min(gapR * 0.95 / 7.6, d * 0.11)));
+        at(o, cx + r + (gapR - o.offsetWidth) * 0.45, cy - o.offsetHeight * 0.75);
+      } else {
+        const o = oval(Math.max(13, d * 0.075));
+        const ox = Math.min(cx + r * 0.55, studio.x + studio.w - o.offsetWidth - m * 0.5);
+        at(o, ox, cy - r * 0.95 - o.offsetHeight * 0.3);
+      }
       // Works like magic!: a starburst stuck on beside the product, where there is room
       const right = studio.x + studio.w - (cx + r), capTop = lt.y - lt.capH;
       let bs = 0, bx = 0, by = 0;
-      if (!tall && right > d * 0.3) { bs = Math.min(right * 1.15, d * 0.52); bx = cx + r + right / 2 - bs * 0.05; by = cy + r * 0.3; }
+      if (!tall && lt.free > lt.h * 0.5) { bs = Math.min(lt.free * 1.05, lt.h * 1.05, d * 0.6); bx = lt.freeX + lt.free / 2; by = lt.y + lt.body * 0.42; burstAfter = [bx, by, bs]; bs = 0; }
+      else if (!tall && right > d * 0.3) { bs = Math.min(right * 1.15, d * 0.52); bx = cx + r + right / 2 - bs * 0.05; by = cy + r * 0.3; }
       else { bs = Math.min(d * 0.44, Math.max(cx - r, 0) * 1.6 + d * 0.2); bx = Math.max(bs * 0.5 + m * 0.4, cx - r * 0.92); by = cy + r * 0.62; }
-      by = Math.min(by, capTop - bs * 0.5 - m * 0.3);
+      if (bs) by = Math.min(by, capTop - bs * 0.5 - m * 0.3);
       if (bs > 64) burst(bx, by, bs);
       // the ON AIR bug, in the studio's top left corner
       const bug = put(`<div class="bug" aria-hidden="true"><b><i></i>ON AIR</b>${withClock ? '' : '<span class="clock"></span>'}</div>`);
@@ -419,6 +439,7 @@ body { -webkit-font-smoothing: antialiased; }
 
     // ---- the lower third, over the column ----
     lt.draw();
+    if (burstAfter && burstAfter[2] > 64) burst(...burstAfter);
     if (tall && !mid) p.append(P.el); else panel(pan.x, pan.y, pan.w, pan.h);
 
     // ---- the crawl, with ACT NOW held at its left ----
@@ -439,45 +460,38 @@ body { -webkit-font-smoothing: antialiased; }
 
     render(clock());
 
-    // The lower third, x0 to x1, at most maxH high. wide: 30% OFF beside EVERYTHING ON / THE INTERNET.;
-    // tall: 30% OFF across, EVERYTHING ON THE INTERNET. under it. The red tab and the presenter's
-    // caption ride on its top edge. Returns its height and a draw() for when y is known.
+    // The lower third, x0 to x1, at most maxH high: the offer, read in order. 30% OFF, then
+    // EVERYTHING ON THE INTERNET. under it, then the red strap BLACK FRIDAY ONLY! along its foot.
+    // The presenter's caption (BUT WAIT… THERE'S LESS!) rides on its top edge: the second voice.
+    // Returns its height, what is free at its right end (wide), and a draw() for when y is known.
     function lower(x0, x1, wide, maxH) {
       const padX = Math.max(14, (wide ? 34 : 40) * s), w = x1 - x0 - 2 * padX;
-      const tagW = (t) => across(t, '400', 100, -0.01) / 100 + 0.84 + 0.14;   // per 1px of type, padding and border included
-      // wide: 30% OFF over EVERYTHING ON THE INTERNET. (set to its width) on the left, the red sticker
-      // BLACK FRIDAY / ONLY! on the right; tall: the two lines across, the tab hanging off the bottom right
-      const share = wide ? 0.7 : 1;
-      let hs = (w * share * (wide ? 1 : 0.98)) / headW('30% OFF');
-      let l = wide ? (headW('30% OFF') * hs) / subW('EVERYTHING ON THE INTERNET.') : (w * 0.99) / subW('EVERYTHING ON THE INTERNET.');
-      let gap = HCAP * hs * 0.2, padT = HCAP * hs * 0.3, padB = HCAP * hs * 0.26;
-      let h = padT + HCAP * hs + gap + SCAP * l + padB;
-      const k = Math.min(1, maxH / h); hs *= k; l *= k; gap *= k; padT *= k; padB *= k; h *= k;
-      const o = { h, y: 0, hang: 0, capH: Math.max(13, Math.min(HCAP * hs * (wide ? 0.3 : 0.36), (x1 - x0 - padX * 1.4) / 13)) * 1.75 };
-      const tf = wide ? Math.min((w - headW('30% OFF') * hs - padX) * 0.92 / tagW('BLACK FRIDAY'), HCAP * hs * 0.62) : Math.max(13, HCAP * hs * 0.38);
-      if (!wide) o.hang = tf * 1.1;
+      const SUBT = 'EVERYTHING ON THE INTERNET.';
+      let hs = (w * (wide ? 0.78 : 0.98)) / headW('30% OFF');
+      let l = wide ? (headW('30% OFF') * hs) / subW(SUBT) : (w * 0.99) / subW(SUBT);
+      let gap = HCAP * hs * 0.2, padT = HCAP * hs * 0.34, padB = HCAP * hs * 0.3, st = HCAP * hs * (wide ? 0.42 : 0.5);
+      let h = padT + HCAP * hs + gap + SCAP * l + padB + st;
+      const k = Math.min(1, maxH / h); hs *= k; l *= k; gap *= k; padT *= k; padB *= k; st *= k; h *= k;
+      const hw = headW('30% OFF') * hs, sw = subW(SUBT) * l;
+      const cf = Math.max(14, Math.min(HCAP * hs * (wide ? 0.42 : 0.48), (x1 - x0 - padX * 1.2) / 12.5));
+      const o = { h, y: 0, body: h - st, capH: cf * 1.75, free: wide ? w - Math.max(hw, sw) - padX * 0.4 : 0, freeX: x0 + padX + Math.max(hw, sw) + padX * 0.4 };
       o.draw = () => {
         const y = o.y, bar = put('<div class="lt" aria-hidden="true"></div>');
-        place(bar, x0, y, x1 - x0, h); bar.style.fontSize = Math.max(7, HCAP * hs * 0.08) + 'px';
-        const hw = headW('30% OFF') * hs, sw = subW('EVERYTHING ON THE INTERNET.') * l;
+        place(bar, x0, y, x1 - x0, h - st); bar.style.fontSize = Math.max(7, HCAP * hs * 0.08) + 'px';
         const X = wide ? x0 + padX : x0 + padX + (w - Math.max(hw, sw)) / 2;
         let base = y + padT + HCAP * hs;
         set('head', '30% OFF', HEAD, -0.05, hs, X, base, true, 'h1');
         base += gap + SCAP * l;
-        set('sub', 'EVERYTHING ON THE INTERNET.', SUB, -0.04, l, X, base, false, 'h2');
-        let capRight = x1;
-        if (wide) {
-          // BLACK FRIDAY ONLY!: a red sticker in the space to the right, a little proud of the bar
-          const tg = put('<div class="tag two">BLACK FRIDAY<br>ONLY!</div>'); tg.style.fontSize = tf + 'px';
-          const left = X + Math.max(hw, sw), cx = (left + x1) / 2;
-          at(tg, cx - tg.offsetWidth / 2, y + h * 0.5 - tg.offsetHeight * 0.62);
-        } else {
-          const tg = put('<div class="tag">BLACK FRIDAY ONLY!</div>'); tg.style.fontSize = tf + 'px';
-          at(tg, x1 - padX * 0.5 - tg.offsetWidth, y + h - tg.offsetHeight * 0.35);
-        }
+        set('sub', SUBT, SUB, -0.04, l, X, base, false, 'h2');
+        // BLACK FRIDAY ONLY!: the red strap, the offer's last line, at broadcast scale
+        // as many whole repeats as fit across (wide), one centred (tall)
+        const sf = st * 0.6, one = across('BLACK FRIDAY ONLY!', '400', sf, -0.01), step = one + sf * 1.6;
+        const reps = wide ? Math.max(1, Math.floor((x1 - X - padX * 0.5 + sf * 1.6) / step)) : 1;
+        const sp = put(`<div class="strap" role="note"><span>BLACK FRIDAY ONLY!</span>${'<i aria-hidden="true">✦</i><span aria-hidden="true">BLACK FRIDAY ONLY!</span>'.repeat(reps - 1)}</div>`);
+        place(sp, x0, y + h - st, x1 - x0, st); Object.assign(sp.style, { fontSize: sf + 'px', paddingLeft: X - x0 - (wide ? 0 : 0) + 'px' });
+        if (!wide) { sp.style.paddingLeft = '0'; sp.style.justifyContent = 'center'; }
         // BUT WAIT… THERE'S LESS!: the presenter's caption, on the top edge at the left, flashing
-        const cf = Math.max(13, Math.min(HCAP * hs * (wide ? 0.3 : 0.36), (x1 - x0 - padX * 1.4) / 13));
-        const cp = put('<div class="cap" role="note"><i>LIVE</i><span>But wait… there’s less!</span></div>'); cp.style.fontSize = cf + 'px';
+        const cp = put('<div class="cap" role="note"><i>LIVE</i><span>But wait… THERE’S LESS!</span></div>'); cp.style.fontSize = cf + 'px';
         at(cp, x0 + padX * 0.6, y - cp.offsetHeight * 0.78);
         o.capH = cp.offsetHeight;
         blink(cp, 'flash', 1.6);

@@ -39,6 +39,10 @@ body { -webkit-font-smoothing: antialiased; }
 .burst { border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(150, 200, 255, 0.15) 0deg 6deg, rgba(150, 200, 255, 0) 6deg 15deg); }
 .spot { border-radius: 50%; background: radial-gradient(closest-side, rgba(11, 34, 204, 0) 0%, rgba(11, 34, 204, 0) 30%, rgba(8, 24, 170, 0.75) 100%); }
 .rule { border: solid rgba(255, 240, 53, 0.7); }
+/* the tube's glass over the safe area: scanlines, a darker rim and a faint sheen, so it reads as a screen */
+.glass { pointer-events: none; }
+/* the flanking bumpers: small screens of their own, with the frame's keyline, dimmer than the frame */
+.bump { background: radial-gradient(ellipse 80% 70% at 50% 40%, rgba(30, 70, 240, 0.55), rgba(5, 12, 110, 0.82)); }
 .bug { opacity: 0.5; }
 .clip { overflow: hidden; pointer-events: none; }
 .clip > * { position: absolute; display: block; }
@@ -78,6 +82,8 @@ body { -webkit-font-smoothing: antialiased; }
 .strip { display: flex !important; align-items: center; justify-content: center; white-space: nowrap; font: italic 700 1em "Arimo", Arial, sans-serif; }
 .by { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; box-shadow: 0 -0.12em 0 rgba(255, 240, 53, 0.85); }
 .by .sep { margin: 0 0.9em; color: var(--yellow); }
+.by.two { flex-direction: column; gap: 0.45em; line-height: 1; }
+.by.two .sep.first { display: none; }
 .by a { color: #fff; text-decoration: none; border-bottom: 0.12em solid var(--yellow); padding-bottom: 0.05em; }
 .by a:hover, .by a:focus-visible { color: var(--yellow); outline: none; }
 
@@ -88,7 +94,7 @@ body { -webkit-font-smoothing: antialiased; }
          box-shadow: inset 0 0.07em 0 rgba(255, 255, 255, 0.8), inset 0 -0.08em 0 rgba(150, 130, 0, 0.7); }
 .order .go { display: flex; align-items: center; gap: 0.32em; font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; }
 .order .go i { font: 900 1em/1 Arial, Helvetica, sans-serif; font-style: normal; display: inline-block; }
-.order .fine { font: italic 700 0.46em/1 "Arimo", Arial, sans-serif; letter-spacing: 0.08em; margin-top: 0.34em; color: #8a0008; }
+.order .fine { font: italic 700 0.5em/1 "Arimo", Arial, sans-serif; letter-spacing: 0.08em; margin-top: 0.34em; color: #8a0008; }
 /* hover: at once, no easing in */
 .order:hover, .order:focus-visible { outline: none; background: linear-gradient(#ff6a5a, #ff1616 50%, #c40000); color: #fff; }
 .order:hover .fine, .order:focus-visible .fine { color: var(--yellow); }
@@ -287,34 +293,43 @@ body { -webkit-font-smoothing: antialiased; }
     const byFont = Math.max(10.5, (tall ? 30 : 17) * s);
     const credit = 'BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES ✦ GARRETT MUSAR ✦ AUFBAU';
     const shortBy = across(credit, 'italic 700', byFont, 0.08) + 3.6 * byFont > W * 0.94;
-    const byH = byFont * 2.1, byTop = H - crawlH - byH;
+    const byFit = Math.min(byFont, (W * 0.92) / (across('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES', 'italic 700', 100, 0.08) / 100));
+    const byH = shortBy ? byFit * 3.4 : byFont * 2.1, byTop = H - crawlH - byH;
     const g = Math.max(14, (tall ? 44 : 26) * s);                       // the gutter
     const zTop = tick + g * 0.75, zBot = byTop - g * 0.7, zH = zBot - zTop;
 
     // ---- the frame: 4:3 in the middle on a wide window; on a tall one as wide as it can be, the extras under it ----
     let FW, FH, fx, fy, below = null;
     if (!tall) {
-      FH = zH; FW = Math.min(FH * 4 / 3, W - 2 * g); FH = Math.min(FH, FW * 0.9);
+      FH = zH; FW = Math.min(FH * 4 / 3, W - 2 * g);
+      // leave the flanking bumpers a readable width where the window is wide enough for them at all
+      const sideW = Math.max(160 * Math.max(0.75, s), W * 0.158), FWs = (W - 2 * (sideW + 1.5 * g)) / 1.09;
+      if (FWs >= FH * 1.1) FW = Math.min(FW, FWs);
+      FH = Math.min(FH, FW * 0.9);
       fx = (W - FW) / 2; fy = zTop + (zH - FH) / 2;
     } else {
       FW = W - 2 * g;
-      const cs = Math.min((FW * 0.5) / 410, 1.1 * s * 1.2), exH = 360 * cs + 0.06 * FW;  // the price card under the frame
+      const cs = Math.min((FW * 0.4) / 410, 1.1 * s), exH = 360 * cs + 0.16 * FW;  // the price card under the frame
       FH = Math.max(FW * 0.75, Math.min(FW * 1.55, zH - exH - g * 0.6));
-      if (zH - FH - g * 0.6 < exH * 0.9) FH = Math.min(FW * 1.55, zH); else below = { cs, top: zTop + FH + g * 0.6, h: zH - FH - g * 0.6 };
+      if (zH - FH - g * 0.6 < exH * 0.9) FH = Math.min(FW * 1.55, zH); else below = { cs, top: zTop + FH + g * 0.8, h: zH - FH - g * 0.8 };
       fx = g; fy = zTop;
     }
     const narrow = FH / FW > 1.02;                                     // the stack's narrow arrangement
-    const bev = Math.max(4, FW * 0.009), rad = FW * 0.035;
+    const bev = Math.max(4, FW * 0.009), rad = narrow ? '9% / 6%' : '8% / 10%'; // a tube's corners, a little barrelled
+    const out = bev * 5;                                               // the bezel and its shadow, outside the frame
+    const sw = tall ? 0 : fx - out - g * 1.5;                          // a flanking bumper's width
+    const sides = sw > 150 * Math.max(0.75, s), cardsIn = narrow || !sides;
 
     const frame = place(put('<div class="frame" aria-hidden="true"></div>'), fx, fy, FW, FH);
-    Object.assign(frame.style, { borderRadius: rad + 'px',
-      boxShadow: [`inset ${bev * 0.6}px ${bev * 0.6}px 0 rgba(160, 190, 255, 0.55)`, `inset ${-bev * 0.6}px ${-bev * 0.6}px 0 rgba(2, 6, 60, 0.6)`,
-                  `0 0 0 ${bev}px #c9d5ff`, `0 0 0 ${bev * 1.5}px #6f86e8`, `0 0 0 ${bev * 2.1}px #050a55`,
-                  `${bev * 2.6}px ${bev * 2.6}px 0 ${bev * 2.1}px rgba(3, 5, 50, 0.75)`].join(', ') });
+    const bezel = (el, b) => Object.assign(el.style, { borderRadius: rad,
+      boxShadow: [`inset ${b * 0.6}px ${b * 0.6}px 0 rgba(160, 190, 255, 0.55)`, `inset ${-b * 0.6}px ${-b * 0.6}px 0 rgba(2, 6, 60, 0.6)`,
+                  `0 0 0 ${b}px #c9d5ff`, `0 0 0 ${b * 1.5}px #6f86e8`, `0 0 0 ${b * 2.1}px #050a55`,
+                  `${b * 2.6}px ${b * 2.6}px 0 ${b * 2.1}px rgba(3, 5, 50, 0.75)`].join(', ') });
+    bezel(frame, bev);
 
     // ---- the stack, in the frame's own measure ----
     const u = FW;                                                     // everything is sized off the frame's width
-    const sash = narrow ? { c: 0.2 * u, h: 0.115 * u } : { c: 0.105 * u, h: 0.072 * u };
+    const sash = narrow ? { c: 0.2 * u, h: 0.115 * u } : { c: 0.125 * u, h: 0.086 * u };
     const sashEdge = (x) => x - (u - 2 * sash.c) + sash.h * 0.72;    // the sash's lower edge, frame-local y at frame-local x
     const headLines = ['30%', 'OFF'], hW = Math.max(...headLines.map(headW));
     const subLines = narrow ? ['EVERYTHING ON', 'THE INTERNET.'] : ['EVERYTHING ON THE INTERNET.'], sW = Math.max(...subLines.map(subW));
@@ -325,8 +340,8 @@ body { -webkit-font-smoothing: antialiased; }
       head: (u * (narrow ? 0.8 : 0.56)) / hW,
       sub: (u * (narrow ? 0.86 : 0.76)) / sW,
       tag: u * (narrow ? 0.56 : 0.42),
-      plateW: u * (narrow ? 0.82 : 0.44), plateH: u * (narrow ? 0.21 : 0.11),
-      cardsW: u * 0.8,
+      plateW: u * (narrow ? 0.82 : cardsIn ? 0.54 : 0.6), plateH: u * (narrow ? 0.21 : cardsIn ? 0.115 : 0.14),
+      cardsW: u * (narrow ? 0.8 : 0.46),
     };
     const tagF = (w) => w / (across('BLACK FRIDAY ONLY!', '400', 100, -0.01) / 100 + 0.84 + 0.14);
     // lay the stack at k from y0 (frame-local); dry: only measure. Returns the bottom and the lines' tops and half-widths.
@@ -365,7 +380,7 @@ body { -webkit-font-smoothing: antialiased; }
       const plW = N.plateW * k, plH = N.plateH * k, plTop = y;
       row(y, plW / 2);
       y += plH;
-      if (narrow) { y += 0.035 * u * k * gapK; y += (62 * N.cardsW * k) / 436; }
+      if (cardsIn) { y += 0.035 * u * k * gapK; y += (62 * N.cardsW * k) / 436; }
       return { bottom: y, rows, headTop, headBot, tagTop, tf, plW, plH, plTop, ps, hs };
     }
     // fit: shrink until it goes in under the sash, then share the spare height out among the gaps
@@ -377,7 +392,7 @@ body { -webkit-font-smoothing: antialiased; }
       k *= Math.min(1, (FH - pad - y0) / r.bottom);
     }
     {
-      const r = stack(k, 0, 1, true), gaps = (0.034 + 0.04 + 0.036 + 0.05 + (narrow ? 0.035 : 0)) * u * k;
+      const r = stack(k, 0, 1, true), gaps = (0.034 + 0.04 + 0.036 + 0.05 + (cardsIn ? 0.035 : 0)) * u * k;
       const spare = FH - pad - y0 - r.bottom;
       gapK = 1 + Math.max(0, spare * 0.7) / gaps;
       y0 += Math.max(0, spare * 0.15);
@@ -393,7 +408,7 @@ body { -webkit-font-smoothing: antialiased; }
     movers.push((t) => { burst.style.transform = `rotate(${(t * 4) % 360}deg)`; });
     place(put('<div class="spot"></div>', frame), u / 2 - bd * 0.42, hcY - bd * 0.42, bd * 0.84, bd * 0.84);
     const ri = u * 0.02, rule = place(put('<div class="rule"></div>', frame), ri, ri, FW - 2 * ri, FH - 2 * ri);
-    Object.assign(rule.style, { borderWidth: Math.max(1.5, u * 0.0028) + 'px', borderRadius: rad * 0.7 + 'px' });
+    Object.assign(rule.style, { borderWidth: Math.max(1.5, u * 0.0028) + 'px', borderRadius: rad });
     const bh = u * 0.05; if (!narrow) place(put(`<img class="bug" alt="" src="${IMG.logo}">`, frame), u * 0.045, u * 0.04, bh * 1142 / 610, bh);
 
     // the bookend globes: either side of 30% / OFF on a wide frame, either side of the tag on a narrow one
@@ -431,18 +446,19 @@ body { -webkit-font-smoothing: antialiased; }
     const pf = Math.min((L.plW * 0.84) / (across('ADD TO CHROME', '400', 100, -0.02) / 100 + 1.1 + 0.32), L.plH * 0.44);
     const order = place(put(`<a class="order" href="${STORE}"><span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span><span class="fine">NO PURCHASE NECESSARY!</span></a>`), plX, plY, L.plW, L.plH);
     Object.assign(order.style, { fontSize: pf + 'px', borderRadius: e * 0.6 + 'px' });
-    if (!narrow) {
-      const ch = L.plH * 0.86, cy = plY + (L.plH - ch) / 2 + L.plH * 0.04, room = (u - L.plW) / 2 - e - 0.05 * u;
-      const ck = Math.min(ch, (room / 212) * 62), cw = (212 * ck) / 62;
-      pair(plX - e - 0.025 * u - cw, cy + (ch - ck) / 2, ck, C[0], C[1]);
-      pair(plX + L.plW + e + 0.025 * u, cy + (ch - ck) / 2, ck, C[2], C[3]);
-    } else {
-      const cw = N.cardsW * k; cards(X - cw / 2, plY + L.plH + 0.035 * u * k * gapK, cw);
-    }
+    if (cardsIn) { const cw = N.cardsW * k; cards(X - cw / 2, plY + L.plH + 0.035 * u * k * gapK, cw); }
+
+    // the tube's glass over the whole safe area: scanlines, a darker rim, a faint sheen (clicks go through)
+    const gl = place(put('<div class="glass" aria-hidden="true"></div>'), fx, fy, FW, FH), scan = Math.max(2, 3.2 * s);
+    Object.assign(gl.style, { borderRadius: rad,
+      background: [`linear-gradient(155deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 22%, rgba(255, 255, 255, 0) 34%)`,
+                   `repeating-linear-gradient(rgba(0, 0, 30, 0) 0, rgba(0, 0, 30, 0.09) ${scan * 0.5}px, rgba(0, 0, 30, 0) ${scan}px)`,
+                   `radial-gradient(ellipse 75% 75% at 50% 48%, rgba(0, 0, 40, 0) 62%, rgba(0, 0, 40, 0.22) 88%, rgba(0, 0, 40, 0.45) 100%)`].join(', '),
+      boxShadow: `inset 0 0 0 ${Math.max(2, bev * 0.9)}px rgba(2, 5, 50, 0.55)` });
 
     // the sash across the frame's top right corner: the aside, in its own register
     const clip = place(put('<div class="clip" aria-hidden="false"></div>'), fx, fy, FW, FH);
-    clip.style.borderRadius = rad + 'px';
+    clip.style.borderRadius = rad;
     const chord = 2 * sash.c * R2 - sash.h * 1.05, sf = Math.min(sash.h * 0.52, chord / (across('THERE’S LESS!', 'italic 700', 100, -0.02) / 100));
     const sl = sash.c * 4 + sash.h * 2;
     const sa = place(put(`<div class="sash" role="text" aria-label="But wait… there’s less!"><span class="a">BUT WAIT…</span><span class="b">THERE’S LESS!</span></div>`, clip), u - sash.c - sl / 2, sash.c - sash.h / 2, sl, sash.h);
@@ -457,13 +473,14 @@ body { -webkit-font-smoothing: antialiased; }
         const top = y0 + (h - cH - lf * 1.9) / 2;
         at(lab, x0, top); card(x0, top + lf * 1.9, cs);
         const rx = x0 + lw + w * 0.04, rw = w - lw - w * 0.04, of = Math.min(rw / 8.2, h / 5.2);
-        const o = oval(of, 'As Seen On<br>Every Website'); at(o, rx + (rw - o.offsetWidth) / 2, top + lf * 0.6);
+        const ry = top + Math.max(lf * 0.6, (lf * 1.9 + cH - (of * 3.31 + of * 0.5 + of * 0.74 * 1.05 + of * 0.35 + lf * 1.2)) / 2);
+        const o = oval(of, 'As Seen On<br>Every Website'); at(o, rx + (rw - o.offsetWidth) / 2, ry);
         const sayF = Math.min(of * 0.74, (rw * 0.95) / (across('Works like magic!', 'italic 700', 100, -0.02) / 100));
-        const sy = put('<div class="say">Works like magic!</div>'); sy.style.fontSize = sayF + 'px'; centre(sy, rx + rw / 2, top + lf * 0.6 + o.offsetHeight + of * 0.5);
+        const sy = put('<div class="say">Works like magic!</div>'); sy.style.fontSize = sayF + 'px'; centre(sy, rx + rw / 2, ry + o.offsetHeight + of * 0.5);
         const st = put('<div class="label"><span class="dot"></span><span>OPERATORS STANDING BY</span></div>');
         st.style.fontSize = Math.min(lf * 0.95, rw / 13) + 'px'; centre(st, rx + rw / 2, sy.offsetTop + sy.offsetHeight + of * 0.35);
         blink(st.querySelector('.dot'), 0.8);
-        glint('b', rx + rw * 0.92, top + lf * 0.6, of * 0.5, 0.6);
+        glint('b', rx + rw * 0.92, ry, of * 0.5, 0.6);
         return;
       }
       // one column (a pillar beside the frame): the label, the card, the badge, the line
@@ -479,33 +496,56 @@ body { -webkit-font-smoothing: antialiased; }
       const st = put('<div class="label"><span class="dot"></span><span>OPERATORS STANDING BY</span></div>'); st.style.fontSize = Math.min(lf * 0.9, w / 14) + 'px'; centre(st, x0 + w / 2, y);
       blink(st.querySelector('.dot'), 0.8);
     }
-    if (!tall) {
-      const pw = fx - g * 0.75 + u * 0.035;
-      if (fx - g > 120 * Math.max(0.7, s)) {
-        // the price card things on the left; the badge things on the right
-        const lf = Math.max(10, pw * 0.072), cs = Math.min((pw * 0.94) / 410, (zH * 0.56) / 380), cH = 360 * cs;
-        const lab = put('<div class="label"><b>ITEM #30</b><span>LIMITED TIME</span></div>'); lab.style.fontSize = lf + 'px';
-        const top = zTop + (zH - cH - lf * 2.2) / 2, lx = g * 0.75 + (pw - 408 * cs) / 2;
-        at(lab, lx, top); card(lx, top + lf * 2.2, cs);
-        const rx = W - g * 0.75 - pw, of = Math.min((pw * 0.92) / 7.9, zH * 0.09), oH = of * 3.6;
-        const sayF = Math.min(of * 0.72, (pw * 0.95) / (across('Works like magic!', 'italic 700', 100, -0.02) / 100));
-        const blockH = oH + of * 0.4 + sayF * 1.5 + lf * 2, ry = zTop + (zH - blockH) / 2;
-        const o = oval(of, 'As Seen On<br>Every Website'); centre(o, rx + pw / 2, ry);
-        glint('b', rx + pw / 2 + o.offsetWidth * 0.45, ry + oH * 0.08, of * 0.55, 0.6);
-        const sy = put('<div class="say">Works like magic!</div>'); sy.style.fontSize = sayF + 'px'; centre(sy, rx + pw / 2, ry + oH + of * 0.2);
+    // a bumper: a small screen with the frame's keyline and bezel, dimmer than the frame
+    const bump = (x, y, w, h) => {
+      const el = place(put('<div class="bump" aria-hidden="true"></div>'), x, y, w, h), b = Math.max(3, bev * 0.7);
+      bezel(el, b);
+      const ri = Math.max(3, w * 0.035), rl = place(put('<div class="rule"></div>', el), ri, ri, w - 2 * ri, h - 2 * ri);
+      Object.assign(rl.style, { position: 'absolute', borderWidth: Math.max(1, b * 0.3) + 'px', borderColor: 'rgba(255, 240, 53, 0.45)', borderRadius: rad });
+      return el;
+    };
+    if (sides) {
+      // the flanking bumpers, a fixed gutter from the bezel and from the window's edge, the same height, centred on the frame
+      const lx = g * 0.9, rx = fx + FW + out + g * 0.6, ip = sw * 0.075, aw = sw - 2 * ip;
+      // left: ITEM #30 LIMITED TIME over the price card
+      const lf0 = aw / 11.5, cs0 = (aw * 0.86) / 415, leftH = lf0 * 2 + 365 * cs0;
+      // right: the badge, Works like magic!, the four cards in two pairs, OPERATORS STANDING BY
+      const of0 = (aw * 0.9) / 7.9, say0 = Math.min(of0 * 0.62, (aw * 0.98) / (across('Works like magic!', 'italic 700', 100, -0.02) / 100));
+      const ck0 = (aw * 0.86 * 62) / 212, op0 = Math.min(lf0 * 0.95, aw / 12.5);
+      const parts = [of0 * 3.31 * 1.12, of0 * 0.45, say0 * 1.1, of0 * 0.5, ck0, ck0 * 0.2, ck0, of0 * 0.5, op0];
+      const rightH = parts.reduce((a, b) => a + b, 0);
+      const ph = Math.min(Math.max(leftH, rightH) + 2 * ip, FH * 0.86), py = fy + (FH - ph) / 2;
+      bump(lx, py, sw, ph); bump(rx, py, sw, ph);
+      {
+        const f = Math.min(1, (ph - 2 * ip) / leftH), lf = lf0 * f, cs = cs0 * f, x0 = lx + ip + (aw - 408 * cs) / 2;
+        let y = py + (ph - leftH * f) / 2;
+        const lab = put('<div class="label"><b>ITEM #30</b><span>LIMITED TIME</span></div>'); lab.style.fontSize = lf + 'px'; centre(lab, lx + sw / 2, y);
+        card(x0, y + lf * 2, cs);
+      }
+      {
+        const f = Math.min(1, (ph - 2 * ip) / rightH), cx = rx + sw / 2, of = of0 * f;
+        let y = py + (ph - rightH * f) / 2 + of * 0.15;
+        const o = oval(of, 'As Seen On<br>Every Website'); centre(o, cx, y);
+        glint('b', cx + o.offsetWidth * 0.44, y + of * 0.25, of * 0.5, 0.6);
+        y += (parts[0] + parts[1]) * f;
+        const sy = put('<div class="say">Works like magic!</div>'); sy.style.fontSize = say0 * f + 'px'; centre(sy, cx, y);
+        y += (parts[2] + parts[3]) * f;
+        const ck = ck0 * f, pw = (212 * ck) / 62;
+        pair(cx - pw / 2, y, ck, C[0], C[1]); y += ck * 1.2;
+        pair(cx - pw / 2, y, ck, C[2], C[3]); y += ck + parts[7] * f;
         const st = put('<div class="label"><span class="dot"></span><span>OPERATORS STANDING BY</span></div>');
-        const outR = fx + FW + bev * 3; st.style.fontSize = Math.min(lf * 1.05, (W - outR - g * 0.5) / 12.5) + 'px'; centre(st, (outR + W - g * 0.3) / 2, ry + oH + of * 0.2 + sayF * 1.5);
+        st.style.fontSize = op0 * f + 'px'; centre(st, cx, y);
         blink(st.querySelector('.dot'), 0.8);
-        glint('', g * 0.75 + pw * 0.08, top - lf * 0.4, of * 0.45, 0);
       }
     } else if (below) {
-      extras(fx + u * 0.01, below.top, FW - u * 0.02, below.h, true);
+      const bx = fx + bev, bw = FW - 2 * bev, bt = below.top + bev * 2, bh = below.h - bev * 2;
+      bump(bx, bt, bw, bh);
+      extras(bx + bw * 0.05, bt + bh * 0.06, bw * 0.9, bh * 0.88, true);
     }
 
     // ---- the credits, level along the foot ----
-    const by = put(`<div class="strip by"><span class="gme">${shortBy ? 'Gary Mustard Enterprises' : 'Brought to you by Gary Mustard Enterprises'}</span><span class="sep" aria-hidden="true">✦</span><a href="${GARRETT}">Garrett Musar</a><span class="sep" aria-hidden="true">✦</span><a href="${AUFBAU}">Aufbau</a></div>`);
-    place(by, 0, byTop, W, byH); by.style.fontSize = byFont + 'px';
-    if (shortBy && by.scrollWidth > W * 0.96) by.querySelector('.gme').remove(), by.querySelector('.sep').remove();
+    const by = put(`<div class="strip by${shortBy ? ' two' : ''}"><span class="gme">Brought to you by Gary Mustard Enterprises</span><span class="sep first" aria-hidden="true">✦</span><span class="names"><a href="${GARRETT}">Garrett Musar</a><span class="sep" aria-hidden="true">✦</span><a href="${AUFBAU}">Aufbau</a></span></div>`);
+    place(by, 0, byTop, W, byH); by.style.fontSize = (shortBy ? byFit : byFont) + 'px';
 
     // ---- the tickers: the lines along the top, the crawl along the bottom; the bugs on the ticker's ends ----
     const tk = put(`<div class="ticker" aria-hidden="true"><span>${TICKER.repeat(6)}</span></div>`);
