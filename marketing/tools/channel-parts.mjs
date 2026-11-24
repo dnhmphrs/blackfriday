@@ -5,6 +5,8 @@
 //   sticker.png   the -30% sticker            wow.png   the WOW! starburst
 //   type-desktop.png, type-phone.png   the lettering, 30% OFF and EVERYTHING ON THE INTERNET.
 //   node tools/channel-parts.mjs            -> out/channel-page/parts/   (then tools/channel-assets.py)
+//   node tools/channel-parts.mjs big        -> globe-big.png only: the globe's first frame at twice the
+//                                              size, for the store's second screenshot
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import { startServer } from './serve.mjs';
@@ -17,8 +19,8 @@ const { server, origin } = await startServer(root);
 const browser = await chromium.launch();
 const CLEAR = 'html, body, #stage { background: transparent !important; } .bg { display: none !important; }';
 
-async function open(query, hide) {
-  const page = await browser.newPage({ viewport: { width: 1080, height: 2025 }, deviceScaleFactor: 1 });
+async function open(query, hide, scale = 1) {
+  const page = await browser.newPage({ viewport: { width: 1080, height: 2025 }, deviceScaleFactor: scale });
   page.on('pageerror', (e) => console.log('[pageerror]', e.message));
   await page.goto(`${origin}/comps/tv-banner.html?format=banner-v&white=1&crawl=0&only=0&glints=0&${query}`);
   await page.waitForFunction(() => window.ready, null, { timeout: 90000 });
@@ -27,6 +29,14 @@ async function open(query, hide) {
 }
 const shot = (page, path, clip) => page.screenshot({ path: out + path, clip, omitBackground: true });
 
+if (process.argv[2] === 'big') {
+  const page = await open('burst=0&sticker=0&strips=0', ['#type', '#blink', '#over'], 2);
+  await page.evaluate(() => { const { scene, pivot } = window.comp.three; for (const o of scene.children) if (o !== pivot && !o.isLight) o.visible = false; window.comp.setTime(0.4); });
+  await shot(page, 'globe-big.png', { x: 756 - 240, y: 1212 - 240, width: 480, height: 480 });
+  await browser.close(); server.close();
+  console.log('globe-big.png in', out);
+  process.exit(0);
+}
 // the globe alone: everything else in the 3D scene hidden
 {
   const page = await open('burst=0&sticker=0&strips=0', ['#type', '#blink', '#over']);
