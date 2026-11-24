@@ -11,7 +11,9 @@
      the stacked one. The yellow tape is the link to the store; the navy tape under it carries the
      credits. Everything goes through the same tape filter as the live banner.
      Layout "{{layout}}": one = screenshot 1 (30% OFF, the price card, the globe on its column);
-                          two = screenshot 2 (the globe large, BUT WAIT… THERE'S LESS!).
+                          two = screenshot 2 (the globe large, BUT WAIT… THERE'S LESS!);
+                          best = the two together (the site): 30% OFF, the price card and BUT WAIT…
+                          THERE'S LESS! beside it, the globe large on its column with the badge.
      ?post: the same picture for a post rather than a page: no links (the tapes read as on the store
      images), no filter (tools/tv-frames.py adds the look afterwards), and every movement held still so
      tools/site-post.mjs can step it through a 12 s loop with window.setT(t). -->
@@ -66,6 +68,8 @@ body { -webkit-font-smoothing: antialiased; }
 .tape:focus-visible .go { outline: 0.08em solid #fff; outline-offset: 0.08em; }
 .by { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
 .by .sep { margin: 0 0.9em; color: var(--yellow); }
+.by.two { flex-direction: column; gap: 0.3em; line-height: 1; }  /* a narrow screen: the credits under the sign-off */
+.by.two .sep.first { display: none; }
 .by a { color: #fff; text-decoration: none; border-bottom: 0.12em solid var(--yellow); padding-bottom: 0.05em; }
 .by a:hover, .by a:focus-visible { color: var(--yellow); outline: none; }
 
@@ -217,12 +221,92 @@ body { -webkit-font-smoothing: antialiased; }
 
     // the tapes' place: the navy one's lower left corner meets the crawl at the composition's left edge
     const strips = tall ? Math.max(0.86 * s, Math.min(0.5, W / 900)) : 0.6 * s;
-    const tapeH = 126 * strips, byH = 68 * strips;
+    const tapeFont = (54 * strips) / 0.72, byFont = (25 * strips) / 0.72;
+    // will the sign-off and the credits go on one line across the screen? if not, the navy tape takes two
+    const across = (text, font, size, ls) => { mc.font = `${font} ${size}px ${font.includes('700') ? '"Arimo"' : '"Archivo Black"'}`; mc.letterSpacing = ls * size + 'px'; return mc.measureText(text).width; };
+    const byTwo = !POST && across('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES ✦ GARRETT MUSAR ✦ AUFBAU', 'italic 700', byFont, 0.08) + 3.6 * byFont > W * 0.9;
+    const tapeH = 126 * strips, byH = 68 * strips * (byTwo ? 1.8 : 1);
     const byC = crawlTop - ((REF[0] * s) / 2) * TAN6 - byH / 2 / COS6 + (tall ? 0 : 6 * s), tapeC = byC - ((tapeH + byH) / 2 + 4 * strips) / COS6;
     const tapeTop = (x) => tapeC - tapeH / 2 / COS6 - (x - W / 2) * TAN6; // the yellow tape's top edge at x
 
-    if (LAYOUT === 'one') (tall ? oneTall : oneWide)();
-    else (tall ? twoTall : twoWide)();
+    ({ one: tall ? oneTall : oneWide, two: tall ? twoTall : twoWide, best: tall ? bestTall : bestWide })[LAYOUT]();
+
+    // the globe on its white column, standing on the bottom edge: d the ball's diameter, (cx, ballTop) its top centre
+    function monument(cx, ballTop, d) {
+      const gk = d / 374, gd = 480 * gk, gx = cx - gd / 2, gy = ballTop - 47 * gk;
+      glow(cx, gy + gd * 0.487, gd);
+      const colX = gx + 40 * gk, colW = 400 * gk, capTop = gy + 410 * gk, baseTop = Math.max(capTop + 136 * gk + 4, H - 144 * gk);
+      place(put(`<img alt="" src="${IMG.shaft}">`), colX, capTop + 136 * gk - 2, colW, baseTop - capTop - 136 * gk + 4);
+      place(put(`<img alt="" src="${IMG.cap}">`), colX, capTop, colW, 136 * gk);
+      place(put(`<img alt="" src="${IMG.base}">`), colX, baseTop, colW, 144 * gk);
+      return { cy: ballTop + d / 2, r: d / 2, colX };
+    }
+    // BUT WAIT… THERE'S LESS!, flush left at x in a column w wide from y (the top of its lede); the four
+    // cards under it if `withCards`; k shrinks the lot. Returns where it ends.
+    function punchline(x, y, w, k, withCards, dry = false) {
+      const lede = (30 * s * k) / SCAP, l1 = (w / headW('THERE’S')) * k, l2 = ((w * 0.8) / headW('LESS!')) * k;
+      y += 30 * s * k; if (!dry) set('sub', 'BUT WAIT…', SUB, -0.04, lede, x, y);
+      y += 16 * s * k + HCAP * l1; if (!dry) set('head', 'THERE’S', HEAD, -0.05, l1, x, y, true, 'h2');
+      y += 12 * s * k + HCAP * l2; if (!dry) set('head', 'LESS!', HEAD, -0.05, l2, x, y, true, 'div');
+      if (withCards) { y += 24 * s * k; const cw = w * k; y += dry ? (62 * cw) / 436 : cards(x, y, cw); }
+      return y;
+    }
+
+    // ---- the site, wide: the message down the left (30% OFF over everything on the internet; the
+    //      price card, and the punchline beside it); the globe large on its column on the right ----
+    function bestWide() {
+      const oy = Math.max(0, H - REF[1] * s) * 0.4;
+      const L = ox + m, col = 680 * s, colR = L + col, R = ox + REF[0] * s - m, gutter = 44 * s;
+      const headTop = oy + 86 * s, d = Math.min(360 * s, (R - colR - gutter) * 0.95), cx = (colR + gutter + R) / 2;
+      const { cy, r } = monument(cx, headTop - 6 * s, d);
+      globe(cx, cy, d);
+      const hs = col / headW('30% OFF'); let y = headTop + HCAP * hs;
+      set('head', '30% OFF', HEAD, -0.05, hs, L, y, true, 'h1');
+      const ss = col / subW('EVERYTHING ON THE INTERNET.'); y += 30 * s + SCAP * ss;
+      set('sub', 'EVERYTHING ON THE INTERNET.', SUB, -0.04, ss, L, y, false, 'h2');
+      const cs = 0.7 * s, top = y + 30 * s;
+      card(L, top, cs);
+      // beside the card, its top level with the card's, down to above the tape
+      const x0 = L + 400 * cs + 40 * s, w = colR - x0, room = tapeTop(colR) - 22 * s - top;
+      const withCards = punchline(x0, top - 6 * s, w, 1, true, true) - top <= room * 1.25;
+      const k = Math.min(1, room / (punchline(x0, top - 6 * s, w, 1, withCards, true) - top + 6 * s));
+      punchline(x0, top - 6 * s * k, w, k, withCards);
+      const o = oval(36 * s);
+      at(o, cx + r * 0.42 - o.offsetWidth / 2, cy - r * 0.88 - o.offsetHeight / 2);
+      glint('', cx - r * 0.8, cy - r * 0.8, d * 0.08);
+      glint('b', cx + r * 0.97, cy + r * 0.58, d * 0.05);
+    }
+
+    // ---- the site, tall: the lettering across the top; under it the price card and the punchline
+    //      down the left, the globe on its column on the right ----
+    function bestTall() {
+      const u = 0.8, Lx = ox + 60 * s, leftW = 470 * s;
+      const cs = 0.95 * s, cardH = 360 * cs, D = 400 * s;
+      const T = (k) => ({ t1: { w: 706 * u * s * k, h: 522 * u * s * k }, t2: { w: 895 * u * s * k, h: 349 * u * s * k } });
+      // how tall it all is at k, without the gaps that take up the spare room
+      const stack = (k, withCards) => { const t = T(k); return t.t1.h + 30 * s * k + t.t2.h + 36 * s * k + cardH * k + 40 * s * k + (punchline(0, 0, leftW, k, withCards, true)); };
+      const room = tapeTop(Lx + leftW) - 34 * s - tick - 30 * s;
+      let withCards = stack(1, true) <= room, k = Math.min(1, room / stack(1, withCards));
+      const spare = Math.max(0, room - stack(k, withCards));
+      const t = T(k);
+      const t1y = tick + 30 * s + spare * 0.25, t2y = t1y + t.t1.h + 30 * s * k, rowY = t2y + t.t2.h + 36 * s * k + spare * 0.35;
+      const t1x = (W - t.t1.w) / 2;
+      // the globe: its ball's top level with the card's
+      const d = D * k, gcx = Math.min(ox + 790 * s, W - m - d * 0.5);
+      const { cy, r } = monument(gcx, rowY, d);
+      globe(gcx, cy, d);
+      place(put(`<img alt="30% OFF" src="${IMG.typeTop}">`), t1x, t1y, t.t1.w, t.t1.h);
+      place(put(`<img alt="Everything on the internet." src="${IMG.typeMid}">`), (W - t.t2.w) / 2, t2y, t.t2.w, t.t2.h);
+      for (const side of [-1, 1]) {
+        const edge = side < 0 ? t1x : t1x + t.t1.w, out = (q) => edge + side * q * u * s * k;
+        glint('', out(149), t1y + 204 * u * s * k, 49 * u * s * k);
+        glint('b', out(92), t1y + 295 * u * s * k, 29 * u * s * k);
+      }
+      const foot = card(Lx, rowY, cs * k);
+      punchline(Lx, foot + 40 * s * k + spare * 0.4 - 30 * s * k * 0.4, leftW, k, withCards);
+      const o = oval(32 * s * k);
+      at(o, gcx + r * 0.36 - o.offsetWidth / 2, cy - r * 0.9 - o.offsetHeight / 2);
+    }
 
     // ---- layout one, wide: screenshot 1. The message flush left down a column; the globe on its
     //      column in the space to the right, its top level with the headline's cap line ----
@@ -342,19 +426,23 @@ body { -webkit-font-smoothing: antialiased; }
     // ---- the tapes, over everything but the tickers ----
     const len = Math.hypot(W, H) * 1.4;
     const by = put(POST ? '<div class="strip by"><span class="gme">Brought to you by Gary Mustard Enterprises</span></div>'
-                        : `<div class="strip by"><span class="gme">Brought to you by Gary Mustard Enterprises</span><span class="sep" aria-hidden="true">✦</span><a href="${GARRETT}">Garrett Musar</a><span class="sep" aria-hidden="true">✦</span><a href="${AUFBAU}">Aufbau</a></div>`);
+                        : `<div class="strip by${byTwo ? ' two' : ''}"><span class="gme">Brought to you by Gary Mustard Enterprises</span><span class="sep first" aria-hidden="true">✦</span><span class="names"><a href="${GARRETT}">Garrett Musar</a><span class="sep" aria-hidden="true">✦</span><a href="${AUFBAU}">Aufbau</a></span></div>`);
     place(by, W / 2 - len / 2, byC - byH / 2, len, byH);
-    Object.assign(by.style, { fontSize: (25 * strips) / 0.72 + 'px', transform: 'rotate(-6deg)' });
+    Object.assign(by.style, { fontSize: byFont + 'px', transform: 'rotate(-6deg)' });
+    if (byTwo && across('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES', 'italic 700', byFont, 0.08) > W * 0.9) by.querySelector('.gme').textContent = 'Gary Mustard Enterprises';
     const tape = put(POST ? '<div class="strip tape"><span>EVERY SITE 30% OFF!</span></div>'
                           : `<a class="strip tape" href="${STORE}"><span class="say">EVERY SITE 30% OFF!</span><span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
     place(tape, W / 2 - len / 2, tapeC - tapeH / 2, len, tapeH);
-    Object.assign(tape.style, { fontSize: (54 * strips) / 0.72 + 'px', transform: 'rotate(-6deg)',
+    Object.assign(tape.style, { fontSize: tapeFont + 'px', transform: 'rotate(-6deg)',
                                 boxShadow: `inset 0 ${4 * strips}px 0 rgba(170,158,0,0.6), inset 0 ${-4 * strips}px 0 rgba(170,158,0,0.6), ${11 * strips}px ${11 * strips}px 0 rgba(6,8,70,0.9)` });
-    // on a narrow screen the words go before the button does
-    const fits = (el) => [...el.children].reduce((a, c) => a + c.getBoundingClientRect().width, 0) < W * 0.92;
-    if (!POST && !fits(tape)) tape.querySelector('.say').remove();
-    if (!fits(by)) by.querySelector('.gme').textContent = 'Gary Mustard Enterprises';
-    if (!POST && !fits(by)) by.querySelector('.gme').nextElementSibling.remove(), by.querySelector('.gme').remove();
+    // on a narrow screen the words go before the button does, and the button keeps some yellow either side
+    if (!POST) {
+      const go = tape.querySelector('.go'), goW = across('ADD TO CHROME →', '400', 1, -0.01) + 1.24 + 0.4;
+      if (across('EVERY SITE 30% OFF!', 'italic 700', tapeFont, 0) + 0.7 * tapeFont + goW * tapeFont > W * 0.92) {
+        tape.querySelector('.say').remove();
+        go.style.fontSize = Math.min(tapeFont, (W * 0.66) / goW) + 'px';
+      }
+    }
 
     // ---- the tickers: Garrett's lines along the top, BLACK FRIDAY ONLY! along the bottom ----
     const tk = put(`<div class="ticker" aria-hidden="true"><span>${TICKER.repeat(6)}</span></div>`);

@@ -33,7 +33,8 @@ IMAGES = {
 }
 PARTS = f'{ROOT}/out/channel-page/parts'
 # the pages: output name -> (template in site/, its {{variables}})
-OUTPUTS = {'live-one': ('_live.html', {'layout': 'one'}), 'live-two': ('_live.html', {'layout': 'two'})}
+OUTPUTS = {'live': ('_live.html', {'layout': 'best'}),           # the site
+           'live-one': ('_live.html', {'layout': 'one'}), 'live-two': ('_live.html', {'layout': 'two'})}  # for the vertical posts
 FONTS = [('Archivo Black', 'normal', 400, f'{SRC}/fonts/archivo-black.woff2'),
          ('Antonio', 'normal', 300, f'{SRC}/fonts/antonio-light.woff2'),
          ('Antonio', 'normal', 600, f'{SRC}/fonts/antonio-semibold.woff2'),
