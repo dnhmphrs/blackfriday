@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>30% Off EVERYTHING</title>
+<meta name="description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
+<link rel="icon" href="{{img:favicon}}">
+<!-- Variant D, Gallery: a quiet white page that lets the loud pictures do the shouting. One line, one
+     button, then the store images in a row that scrolls sideways. -->
+<style>
+{{fonts}}
+:root { --ink: #0c0c0c; --muted: #5d5f66; --line: #e5e4df; --red: #ff1616; --blue: #0a22d6; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: #fbfaf7; overflow-x: clip; }
+body { min-height: 100vh; color: var(--ink); font: 300 19px/1.45 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.02em; overflow-x: hidden; }
+a { color: inherit; }
+
+.top { max-width: 1240px; margin: 0 auto; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.mark { display: flex; align-items: center; gap: 12px; text-decoration: none; font: 400 20px/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.03em; }
+.mark img { width: 36px; height: 36px; border-radius: 8px; }
+.top nav { display: flex; gap: 26px; font-size: 17px; letter-spacing: 0.1em; text-transform: uppercase; }
+.top nav a { text-decoration: none; color: var(--muted); }
+.top nav a:hover { color: var(--ink); }
+
+.hero { max-width: 1100px; margin: 0 auto; padding: 88px 28px 0; text-align: center; }
+.hero h1 { font: 400 clamp(46px, 9vw, 128px)/0.9 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.055em; }
+.hero h1 span { color: var(--blue); }
+.hero p { margin-top: 22px; font-size: clamp(20px, 2.4vw, 28px); color: var(--muted); letter-spacing: 0.04em; }
+.cta { display: inline-flex; align-items: center; gap: 16px; margin-top: 44px; padding: 24px 44px; border-radius: 999px; background: var(--ink); color: #fff; text-decoration: none;
+       font: 600 clamp(24px, 3vw, 34px)/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.08em; text-transform: uppercase;
+       box-shadow: 0 18px 40px rgba(10, 34, 214, 0.25); transition: transform 0.2s cubic-bezier(0.2, 0.85, 0.25, 1), box-shadow 0.2s; }
+.cta img { width: 34px; height: 34px; border-radius: 7px; }
+.cta:hover, .cta:focus-visible { transform: translateY(-3px); box-shadow: 0 24px 50px rgba(10, 34, 214, 0.35); outline: none; }
+.note { margin-top: 16px; font-size: 15px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* the reel: the store images side by side, scrolling sideways, the first centred under the button */
+.reel { margin-top: 84px; display: flex; gap: 28px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px max(28px, calc(50vw - 520px)) 34px; scrollbar-width: thin; }
+.reel figure { flex: none; scroll-snap-align: center; }
+.reel img { display: block; height: min(650px, 62vw); width: auto; border-radius: 14px; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06), 0 22px 50px rgba(12, 12, 40, 0.22); }
+.reel figcaption { margin-top: 14px; font-size: 15px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+.about { max-width: 760px; margin: 70px auto 0; padding: 0 28px; text-align: center; font-size: clamp(21px, 2.4vw, 26px); }
+.about b { font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; }
+
+footer { max-width: 1240px; margin: 90px auto 0; padding: 22px 28px 34px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 16px;
+         font-size: 15px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+footer nav { display: flex; gap: 26px; }
+footer a { text-decoration: none; color: var(--ink); }
+footer a:hover { color: var(--blue); }
+
+@media (max-width: 640px) {
+  .top nav { display: none; }
+  .hero { padding-top: 54px; }
+  .cta { padding: 20px 28px; }
+  .reel img { height: auto; width: 86vw; }
+  footer { flex-direction: column; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) { .cta { transition: none; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="{{link:store}}"><img src="{{img:icon}}" alt="">30% Off EVERYTHING</a>
+  <nav><a href="{{link:garrett}}">Garrett Musar</a><a href="{{link:aufbau}}">Aufbau</a></nav>
+</header>
+
+<section class="hero">
+  <h1>30% off the<br><span>entire internet.</span></h1>
+  <p>Every website. Black Friday only.</p>
+  <a class="cta" href="{{link:store}}"><img src="{{img:icon}}" alt="">Add to Chrome</a>
+  <p class="note">Free · Chrome Web Store · No purchase necessary</p>
+</section>
+
+<section class="reel" aria-label="Screenshots">
+  <figure><img src="{{img:shot1}}" alt="30% OFF everything on the internet. The Internet (All Of It): was 100%, now 70%."><figcaption>Every website, 30% off!</figcaption></figure>
+  <figure><img src="{{img:shot2}}" alt="But wait… there’s less! No purchase necessary!"><figcaption>But wait… there’s less!</figcaption></figure>
+  <figure><img src="{{img:square}}" alt="30% OFF everything on the internet."><figcaption>Works like magic!</figcaption></figure>
+</section>
+
+<p class="about"><b>A Black Friday treat for your browser.</b> On Black Friday it brings the 30% OFF sale to every website you visit, from midnight to midnight in your time zone. The rest of the year it does nothing.</p>
+
+<footer>
+  <span>A Gary Mustard Enterprises production</span>
+  <nav><a href="{{link:garrett}}">Garrett Musar</a><a href="{{link:aufbau}}">Aufbau</a></nav>
+</footer>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>30% Off EVERYTHING</title>
+<meta name="description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
+<link rel="icon" href="{{img:favicon}}">
+<!-- Variant C, Countdown: the late-night order screen. The second screenshot up top with the price
+     card stuck on its corner; under it the clock to Black Friday (midnight, the visitor's own time) and
+     the order button. -->
+<style>
+{{fonts}}
+:root { --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; --night: #03051f; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--night); overflow-x: clip; }
+body {
+  min-height: 100vh; color: #e9f0ff; font: 300 18px/1.35 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.02em; overflow-x: hidden;
+  background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(42, 140, 255, 0.35), rgba(19, 72, 238, 0) 70%), radial-gradient(ellipse 60% 40% at 50% 100%, rgba(255, 22, 22, 0.16), rgba(255, 22, 22, 0) 70%), var(--night);
+}
+a { color: inherit; }
+.page { max-width: 1120px; margin: 0 auto; padding: 28px 24px 56px; }
+
+header { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.16em; }
+header img { height: 44px; width: auto; }
+.live { display: inline-flex; align-items: center; gap: 10px; }
+.live::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--red); box-shadow: 0 0 12px var(--red); animation: blink 1.2s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0.2; } }
+
+/* the screen: the screenshot in a gold frame */
+.screen { position: relative; margin: 24px auto 0; width: min(100%, 1040px, max(560px, calc((100vh - 520px) * 1.6))); padding: 12px;
+          background: linear-gradient(90deg, #fffb86, #f0e11c 45%, #c9b400); box-shadow: 0 30px 80px rgba(10, 34, 214, 0.35); }
+.screen img { display: block; width: 100%; height: auto; border: 3px solid #000; }
+
+/* the order block: the clock, then the button */
+.order { margin: 56px auto 0; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+.clock { text-align: center; }
+.clock p { font-size: 18px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 12px; }
+.digits { display: flex; justify-content: center; gap: 10px; }
+.digits div { min-width: 78px; padding: 10px 8px 8px; background: #f3f4f6; color: var(--red); border: 4px solid #000; box-shadow: 6px 6px 0 rgba(4, 6, 60, 0.92); }
+.digits b { display: block; font: 400 44px/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.04em; -webkit-text-stroke: 2px #000; paint-order: stroke fill; }
+.digits span { display: block; margin-top: 4px; color: #0c0c0c; font: 600 13px/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.12em; text-transform: uppercase; }
+.clock.on .digits { display: none; }
+.clock .now { display: none; font: 400 46px/1 "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); text-transform: uppercase; letter-spacing: -0.03em;
+              text-shadow: 0.04em 0.04em 0 var(--shade), 0.08em 0.08em 0 var(--shade); transform: skewX(-9deg); }
+.clock.on .now { display: block; }
+
+.cta { display: block; text-align: center; text-decoration: none; white-space: nowrap; padding: 26px 56px 24px; background: var(--red); color: var(--yellow); border: 5px solid #000;
+       box-shadow: 10px 10px 0 #000, 0 0 60px rgba(255, 22, 22, 0.45); transform: rotate(-1.5deg); transition: transform 0.18s cubic-bezier(0.2, 0.85, 0.25, 1); }
+.cta b { display: block; font: 400 clamp(40px, 6vw, 80px)/0.95 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.04em; text-transform: uppercase;
+         text-shadow: 0.04em 0.04em 0 #6b0000; }
+.cta small { display: block; margin-top: 10px; color: #fff; font: italic 700 18px/1.2 "Arimo", Arial, sans-serif; }
+.cta:hover, .cta:focus-visible { transform: rotate(-1.5deg) scale(1.05); outline: none; }
+.cta:active { transform: rotate(-1.5deg) translate(6px, 6px); box-shadow: 4px 4px 0 #000; }
+
+/* the price card, as on the banner, stuck on the screen's corner; only its 70% moves */
+.card { position: absolute; right: -150px; bottom: -150px; z-index: 2; transform-origin: right bottom; width: 300px; height: 230px; background: #f3f4f6; color: #0c0c0c; border: 4px solid #000; box-shadow: 6px 6px 0 rgba(4, 6, 60, 0.92);
+        transform: rotate(3deg) scale(0.86); font: italic 700 38px/1 "Arimo", Arial, sans-serif; }
+.card .head { background: var(--red); color: #fff46a; font: 600 31px/43px "Antonio", "Arial Narrow", sans-serif; padding: 0 12px; border-bottom: 4px solid #000; white-space: nowrap; overflow: hidden; }
+.card .line { padding: 10px 13px 0; }
+.card s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 7px; }
+.card s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 6px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+.card .big { position: absolute; right: 7px; bottom: -40px; font: 400 124px/0.9 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em;
+             -webkit-text-stroke: 8px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 70% 80%; animation: jolt 1.1s ease-in-out infinite; }
+@keyframes jolt { 0%, 100% { transform: skewX(-8deg) scale(1) rotate(0); } 12% { transform: skewX(-8deg) scale(1.18) rotate(-5deg); }
+                  26% { transform: skewX(-8deg) scale(0.96) rotate(3deg); } 40% { transform: skewX(-8deg) scale(1.08) rotate(-2deg); } 55% { transform: skewX(-8deg) scale(1) rotate(0); } }
+
+.fine { margin: 64px auto 0; max-width: 700px; text-align: center; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.75; }
+footer { margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+footer .by { font: italic 700 14px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; background: var(--shade); padding: 9px 20px; }
+footer nav { display: flex; gap: 28px; font-size: 20px; letter-spacing: 0.06em; text-transform: uppercase; }
+footer a { text-decoration: none; border-bottom: 2px solid var(--red); padding-bottom: 2px; }
+footer a:hover { color: var(--yellow); border-color: var(--yellow); }
+
+@media (max-width: 1180px) { .card { right: -8px; } }
+@media (max-height: 760px) and (min-width: 761px) { .order { margin-top: 40px; } }
+@media (max-width: 760px) { .card { transform: rotate(3deg) scale(0.6); bottom: -120px; } .order { margin-top: 150px; } }
+@media (max-width: 520px) {
+  header .live { display: none; }
+  .digits { gap: 6px; } .digits div { min-width: 0; flex: 1; padding: 8px 4px 6px; } .digits b { font-size: 32px; }
+  .card { transform: rotate(3deg) scale(0.46); bottom: -96px; right: -4px; }
+  .order { margin-top: 118px; }
+  .cta { padding: 20px 26px 18px; }
+  footer nav { flex-direction: column; align-items: center; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .card .big, .live::before { animation: none; } .cta { transition: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header><img src="{{img:logo}}" alt="Gary Mustard Enterprises"><span class="live">Black Friday only</span></header>
+
+  <div class="screen"><img src="{{img:shot2}}" alt="But wait… there’s less! No purchase necessary! As seen on every website.">
+    <div class="card" aria-label="The Internet (All Of It). Was 100%, now 70%."><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
+  </div>
+
+  <section class="order">
+    <div class="clock" id="clock">
+      <p id="clock-label">Black Friday starts in</p>
+      <div class="digits"><div><b id="d">00</b><span>Days</span></div><div><b id="h">00</b><span>Hrs</span></div><div><b id="m">00</b><span>Min</span></div><div><b id="s">00</b><span>Sec</span></div></div>
+      <div class="now">On now! Today only!</div>
+    </div>
+    <a class="cta" href="{{link:store}}"><b>Get it now</b><small>Free on the Chrome Web Store</small></a>
+  </section>
+
+  <p class="fine">Every website, 30% off! From midnight to midnight in your time zone. The rest of the year it does nothing. Works like magic!</p>
+
+  <footer>
+    <div class="by">Brought to you by Gary Mustard Enterprises</div>
+    <nav><a href="{{link:garrett}}">Garrett Musar</a><a href="{{link:aufbau}}">Aufbau</a></nav>
+  </footer>
+</div>
+<script>
+  // Black Friday: the day after the fourth Thursday of November, by the visitor's own clock.
+  const blackFriday = (y) => { const first = new Date(y, 10, 1).getDay(), thursday = 1 + ((4 - first + 7) % 7) + 21; return new Date(y, 10, thursday + 1); };
+  const clock = document.getElementById('clock'), pad = (n) => String(n).padStart(2, '0');
+  function tick() {
+    const now = new Date(); let start = blackFriday(now.getFullYear()), end = new Date(start.getFullYear(), 10, start.getDate() + 1);
+    if (now >= end) { start = blackFriday(now.getFullYear() + 1); end = new Date(start.getFullYear(), 10, start.getDate() + 1); }
+    const on = now >= start && now < end;
+    clock.classList.toggle('on', on);
+    document.getElementById('clock-label').textContent = on ? 'Black Friday is' : 'Black Friday starts in';
+    if (!on) {
+      let t = Math.max(0, Math.floor((start - now) / 1000));
+      const d = Math.floor(t / 86400); t -= d * 86400; const h = Math.floor(t / 3600); t -= h * 3600; const m = Math.floor(t / 60), s = t - m * 60;
+      document.getElementById('d').textContent = pad(d); document.getElementById('h').textContent = pad(h);
+      document.getElementById('m').textContent = pad(m); document.getElementById('s').textContent = pad(s);
+    }
+  }
+  tick(); setInterval(tick, 1000);
+</script>
+</body>
+</html>
