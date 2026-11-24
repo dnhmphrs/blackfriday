@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the promo site's variants as single, self-contained HTML files: every picture and typeface
 is put inside the page as a data: URL.
-    python3 tools/site-build.py            -> out/site/<name>.html for each site/<name>.html
+    python3 tools/site-build.py            -> out/site/<name>.html for each output in OUTPUTS
 In a template, {{fonts}} becomes the @font-face rules ("Archivo Black", "Antonio" 300 and 600,
 "Arimo" bold italic, "Tinos" bold italic), {{img:NAME}} a picture from IMAGES, {{link:NAME}} a link."""
 import base64, io, os, re, sys
@@ -24,7 +24,16 @@ IMAGES = {
     'icon': (f'{KIT}/extension-store/store-icon-128.png', None, 'PNG', None),
     'favicon': (f'{SRC}/icons/icon32.png', None, 'PNG', None),
     'logo': (f'{ROOT}/assets/gme/gme-primary.png', 600, 'WEBP', 90),   # white on clear
+    'cap': (f'{SRC}/images/cap.webp', None, 'WEBP', 90),
+    'shaft': (f'{SRC}/images/shaft.webp', None, 'WEBP', 90),
+    'base': (f'{SRC}/images/base.webp', None, 'WEBP', 90),
+    'type_top': (f'{SRC}/images/type-top.webp', None, 'WEBP', 90),
+    'type_mid': (f'{SRC}/images/type-mid.webp', None, 'WEBP', 90),
+    'globe_still': (f'{ROOT}/out/channel-page/parts/globe-00.png', None, 'WEBP', 85),
 }
+PARTS = f'{ROOT}/out/channel-page/parts'
+# the pages: output name -> (template in site/, its {{variables}})
+OUTPUTS = {'live-one': ('_live.html', {'layout': 'one'}), 'live-two': ('_live.html', {'layout': 'two'})}
 FONTS = [('Archivo Black', 'normal', 400, f'{SRC}/fonts/archivo-black.woff2'),
          ('Antonio', 'normal', 300, f'{SRC}/fonts/antonio-light.woff2'),
          ('Antonio', 'normal', 600, f'{SRC}/fonts/antonio-semibold.woff2'),
@@ -43,6 +52,13 @@ def picture(name):
     im.save(buf, fmt, **({'quality': q, 'method': 6} if fmt == 'WEBP' else {'optimize': True}))
     return data(f'image/{fmt.lower()}', buf.getvalue())
 
+def globe_anim():
+    """The globe turning, from the 60 frames cut for the banner (one turn in 4 s, at 15 frames a second)."""
+    frames = [Image.open(f'{PARTS}/globe-{i:02d}.png').convert('RGBA') for i in range(60)]
+    buf = io.BytesIO()
+    frames[0].save(buf, 'WEBP', save_all=True, append_images=frames[1:], duration=67, loop=0, quality=78, method=4)
+    return data('image/webp', buf.getvalue())
+
 def tile():
     """The faint ground: the GME lockup stepped in staggered rows, as in the store images, on a clear 260 x 224 cell."""
     logo = Image.open(IMAGES['logo'][0]).convert('RGBA')
@@ -57,13 +73,14 @@ fonts = '\n'.join(f'@font-face {{ font-family: "{f}"; font-style: {s}; font-weig
                   f'src: url({data("font/woff2", open(p, "rb").read())}) format("woff2"); }}' for f, s, wt, p in FONTS)
 cache = {}
 def img(name):
-    if name not in cache: cache[name] = tile() if name == 'tile' else picture(name)
+    if name not in cache: cache[name] = {'tile': tile, 'globe_anim': globe_anim}.get(name, lambda: picture(name))()
     return cache[name]
 
 out = os.path.join(ROOT, 'out/site'); os.makedirs(out, exist_ok=True)
-names = sys.argv[1:] or sorted(f[:-5] for f in os.listdir(os.path.join(ROOT, 'site')) if f.endswith('.html'))
-for name in names:
-    t = open(os.path.join(ROOT, 'site', name + '.html'), encoding='utf-8').read()
+for name in sys.argv[1:] or OUTPUTS:
+    template, values = OUTPUTS[name]
+    t = open(os.path.join(ROOT, 'site', template), encoding='utf-8').read()
+    for k, v in values.items(): t = t.replace('{{' + k + '}}', v)
     t = t.replace('{{fonts}}', fonts)
     t = re.sub(r'\{\{img:(\w+)\}\}', lambda m: img(m.group(1)), t)
     t = re.sub(r'\{\{link:(\w+)\}\}', lambda m: LINKS[m.group(1)], t)
