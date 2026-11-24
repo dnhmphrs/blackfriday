@@ -8,14 +8,15 @@
 <link rel="icon" href="{{img:favicon}}">
 <!-- The promo site: the store screenshot's composition is the page itself, live, filling the window
      exactly with nothing to scroll. Wide windows get the screenshot's arrangement; tall ones (phones)
-     the stacked one. The yellow tape is the link to the store; the navy tape under it carries the
+     a stacked one. The yellow tape is the link to the store; the navy tape under it carries the
      credits. Everything goes through the same tape filter as the live banner.
-     Layout "{{layout}}": one = screenshot 1 (30% OFF, the price card, the globe on its column);
-                          two = screenshot 2 (the globe large, BUT WAIT… THERE'S LESS!);
-                          best = the two together (the site): 30% OFF, the price card and BUT WAIT…
-                          THERE'S LESS! beside it, the globe large on its column with the badge.
+     Layout "{{layout}}": site = the page: the globe large; beside it BUT WAIT… THERE'S LESS!, then
+                                 30% OFF EVERYTHING ON THE INTERNET. and BLACK FRIDAY ONLY!;
+                          one, two = screenshots 1 and 2, kept for the vertical posts.
+     Everything that moves (tickers, glints, the 70%, the globe, the noise) runs off one clock at 25
+     frames a second, so the filter is worked out 25 times a second rather than at the screen's rate.
      ?post: the same picture for a post rather than a page: no links (the tapes read as on the store
-     images), no filter (tools/tv-frames.py adds the look afterwards), and every movement held still so
+     images), no filter (tools/tv-frames.py adds the look afterwards), and the clock stopped, so
      tools/site-post.mjs can step it through a 12 s loop with window.setT(t). -->
 <style>
 {{fonts}}
@@ -45,24 +46,24 @@ body { -webkit-font-smoothing: antialiased; }
        filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
 
 .glint svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
-.glint path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); transform-box: fill-box; transform-origin: center; animation: twinkle 2.4s ease-in-out infinite; }
-.glint.b path { animation-delay: -1.2s; }
+.glint path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); transform-box: fill-box; transform-origin: center; }
 
 .ticker, .crawl { left: 0; right: 0; overflow: hidden; white-space: nowrap; pointer-events: none; }
 .ticker { top: 0; font-family: "Antonio", "Arial Narrow", sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em;
           color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); }
-.ticker span { display: inline-block; animation: slide linear infinite; }
+.ticker span { display: inline-block; }
 .crawl { bottom: 0; font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
-.crawl span { display: inline-block; animation: crawl linear infinite; text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade); }
+.crawl span { display: inline-block; text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade); }
 
 /* the tapes: the yellow one is the link to the store, the navy one carries the credits */
 .strip { display: flex !important; align-items: center; justify-content: center; white-space: nowrap; font: italic 700 1em "Arimo", Arial, sans-serif; transform-origin: center; }
-.tape { background: linear-gradient(#fffb86, #f0e11c); color: #111; text-decoration: none; cursor: pointer; transition: filter 0.15s, translate 0.15s; }
+.tape { background: linear-gradient(#fffb86, #f0e11c); color: #111; text-decoration: none; cursor: pointer; }
 .tape .say { margin-right: 0.7em; }
 .tape .go { display: inline-flex; align-items: center; gap: 0.4em; padding: 0.16em 0.62em 0.2em; background: #111; color: var(--yellow); font-style: normal;
-            font-family: "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; transition: background 0.15s, color 0.15s; }
-.tape .go i { font: 900 1em/1 Arial, Helvetica, sans-serif; display: inline-block; transition: transform 0.15s; }
-.tape:hover, .tape:focus-visible { outline: none; translate: 0 -0.06em; filter: brightness(1.06); }
+            font-family: "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; }
+.tape .go i { font: 900 1em/1 Arial, Helvetica, sans-serif; display: inline-block; }
+/* hover: at once, no easing in (every change has to go through the filter, so it should be one change) */
+.tape:hover, .tape:focus-visible { outline: none; background: linear-gradient(#fffdb8, #fff035); }
 .tape:hover .go, .tape:focus-visible .go { background: var(--red); color: #fff; }
 .tape:hover .go i, .tape:focus-visible .go i { transform: translateX(0.18em); }
 .tape:focus-visible .go { outline: 0.08em solid #fff; outline-offset: 0.08em; }
@@ -81,7 +82,12 @@ body { -webkit-font-smoothing: antialiased; }
 .card s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 9px; }
 .card s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 8px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
 .card .big { position: absolute; right: 9px; bottom: -54px; font: 400 165px/0.9 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em;
-             -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 70% 80%; animation: jolt 1.1s ease-in-out infinite; }
+             -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 70% 80%; }
+
+/* BLACK FRIDAY ONLY!, as a red tag */
+.tag { display: inline-block !important; white-space: nowrap; background: var(--red); color: var(--yellow); border: 0.07em solid #000;
+       font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; padding: 0.2em 0.42em 0.24em;
+       box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.9); transform: rotate(-2deg); transform-origin: left center; text-shadow: 0.05em 0.05em 0 #7a0006; }
 
 /* the As Seen On badge (its size from its type) and the four cards (laid out 436 x 62, then scaled) */
 .oval { width: 7.6em; height: 3.31em; border-radius: 50%; display: grid !important; place-items: center; text-align: center;
@@ -96,15 +102,6 @@ body { -webkit-font-smoothing: antialiased; }
 .cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
 .cards .c4 b { font-size: 14.5px; }
 
-@keyframes slide { to { transform: translateX(-50%); } }
-@keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
-@keyframes twinkle { 0%, 100% { transform: scale(0.55) rotate(-10deg); opacity: 0.75; } 50% { transform: scale(1) rotate(12deg); opacity: 1; } }
-@keyframes jolt { 0%, 100% { transform: skewX(-8deg) scale(1) rotate(0deg); } 12% { transform: skewX(-8deg) scale(1.18) rotate(-5deg); }
-                  26% { transform: skewX(-8deg) scale(0.96) rotate(3deg); } 40% { transform: skewX(-8deg) scale(1.08) rotate(-2deg); } 55% { transform: skewX(-8deg) scale(1) rotate(0deg); } }
-@media (prefers-reduced-motion: reduce) {
-  .ticker span, .crawl span, .card .big, .glint path { animation: none !important; }
-  .tape, .tape .go, .tape .go i { transition: none; }
-}
 </style>
 </head>
 <body>
@@ -114,7 +111,7 @@ body { -webkit-font-smoothing: antialiased; }
 (async () => {
   const LAYOUT = '{{layout}}';
   const STORE = '{{link:store}}', GARRETT = '{{link:garrett}}', AUFBAU = '{{link:aufbau}}';
-  const POST = new URLSearchParams(location.search).has('post');
+  const query = new URLSearchParams(location.search), POST = query.has('post');
   const still = !POST && matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (POST) { document.getElementById('p').style.filter = 'none'; document.querySelector('.lines').remove(); }
   const IMG = { globe: still ? '{{img:globe_still}}' : '{{img:globe_anim}}', cap: '{{img:cap}}', shaft: '{{img:shaft}}', base: '{{img:base}}',
@@ -123,13 +120,13 @@ body { -webkit-font-smoothing: antialiased; }
   const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
   const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
   const TAN6 = Math.tan((6 * Math.PI) / 180), COS6 = Math.cos((6 * Math.PI) / 180), TAN9 = Math.tan((9 * Math.PI) / 180);
+  const FPS = 25; // the clock everything moves by: a PAL picture's rate
 
-  // ---- the tape look: the live banner's filter (src/content.js), distances set in build() ----
+  // ---- the tape look: the live banner's filter (src/content.js), distances set in build(), the noise moved on by the clock ----
   const LUMA = '0.299 0.587 0.114 0 0';
   const tint = (i, q) => `${i * 0.22} ${q * 0.2} 0 0 ${0.5 - 0.5 * (i * 0.22 + q * 0.2)}`;
   const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
   const GRAIN = `${'0.7 0 0 0 -0.399  '.repeat(3)} 0 0 0 0 1`;
-  const crawlSeeds = (seeds, dur) => (still ? '' : `<animate attributeName="seed" values="${seeds}" dur="${dur}s" calcMode="discrete" repeatCount="indefinite"/>`);
   const add = (extra = '') => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`;
   document.body.insertAdjacentHTML('beforeend', `
     <svg class="defs" aria-hidden="true"><filter id="tape" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
@@ -139,14 +136,16 @@ body { -webkit-font-smoothing: antialiased; }
       <feGaussianBlur class="smear" in="picture"/><feOffset class="late"/>
       <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
       <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
-      <feTurbulence class="blotch" type="fractalNoise" numOctaves="1" seed="3">${crawlSeeds('3;11;7;19;5;13', 2)}</feTurbulence>
+      <feTurbulence class="blotch" type="fractalNoise" numOctaves="1" seed="3"/>
       <feColorMatrix type="matrix" values="${MOTTLE}"/><feComposite in2="clean" ${add('result="mottled"')}/>
-      <feTurbulence class="static" type="fractalNoise" numOctaves="2" seed="2">${crawlSeeds('2;17;9;23;4;29', 1)}</feTurbulence>
+      <feTurbulence class="static" type="fractalNoise" numOctaves="2" seed="2"/>
       <feColorMatrix type="matrix" values="${GRAIN}"/><feComposite in2="mottled" operator="arithmetic" k2="1" k3="1" result="taped"/>
       <feComponentTransfer><feFuncR type="linear" intercept="-0.55"/><feFuncG type="linear" intercept="-0.55"/><feFuncB type="linear" intercept="-0.55"/></feComponentTransfer>
       <feGaussianBlur class="bloom"/><feComposite in2="taped" operator="arithmetic" k2="0.149" k3="0.93" k4="0.037"/>
     </filter></svg>`);
   const $ = (sel) => document.querySelector(sel);
+  // the noise: the colour blotches change 6 times a second, the static 12 (every fourth and every other frame)
+  const BLOTCH = [3, 11, 7, 19, 5, 13], STATIC = [2, 17, 9, 23, 4, 29];
 
   await Promise.all(['100px "Archivo Black"', 'italic 700 100px "Arimo"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Tinos"'].map((f) => document.fonts.load(f)));
   const p = document.getElementById('p');
@@ -175,8 +174,28 @@ body { -webkit-font-smoothing: antialiased; }
   const headW = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9; // per 1px of type, slant included
   const subW = (t) => width(t, SUB, -0.04);
   const HCAP = ink('H', HEAD, -0.05).cap, SCAP = ink('H', SUB, -0.04).cap;
+  const across = (text, font, size, ls) => { mc.font = `${font} ${size}px ${font.includes('700') ? '"Arimo"' : '"Archivo Black"'}`; mc.letterSpacing = ls * size + 'px'; return mc.measureText(text).width; };
 
-  const glint = (cls, cx, cy, r) => place(put(`<div class="glint ${cls}" aria-hidden="true"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
+  // ---- what moves, and how, at time t (seconds) ----
+  let movers = [];
+  const ease = (q) => q * q * (3 - 2 * q);
+  const lerp = (a, b, q) => a + (b - a) * q;
+  const twinkle = (path, delay) => movers.push((t) => {
+    const ph = ((t + delay) / 2.4) % 1, q = ease(ph < 0.5 ? ph * 2 : 2 - ph * 2); // there and back, easing each way
+    path.style.transform = `scale(${lerp(0.55, 1, q)}) rotate(${lerp(-10, 12, q)}deg)`; path.style.opacity = lerp(0.75, 1, q);
+  });
+  const JOLT = [[0, 1, 0], [0.12, 1.18, -5], [0.26, 0.96, 3], [0.4, 1.08, -2], [0.55, 1, 0], [1, 1, 0]]; // when, scale, turn
+  const jolt = (el, period) => movers.push((t) => {
+    const ph = (t / period) % 1, i = JOLT.findIndex(([w], n) => ph < JOLT[n + 1]?.[0]), [w0, s0, r0] = JOLT[i], [w1, s1, r1] = JOLT[i + 1];
+    const q = ease((ph - w0) / (w1 - w0));
+    el.style.transform = `skewX(-8deg) scale(${lerp(s0, s1, q)}) rotate(${lerp(r0, r1, q)}deg)`;
+  });
+
+  const glint = (cls, cx, cy, r) => {
+    const el = place(put(`<div class="glint ${cls}" aria-hidden="true"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
+    twinkle(p.lastElementChild.querySelector('path'), cls === 'b' ? 1.2 : 0);
+    return el;
+  };
   const oval = (size) => { const el = put('<div class="oval" aria-hidden="true"><span>As Seen On<br>Every Website</span></div>'); el.style.fontSize = size + 'px'; return el; };
   const cards = (x, top, w) => {
     const el = put('<div class="cards" aria-hidden="true"><i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i></div>');
@@ -186,19 +205,30 @@ body { -webkit-font-smoothing: antialiased; }
   const card = (x, top, scale) => {
     const el = put('<div class="card" role="img" aria-label="The Internet (All Of It). Was 100%, now 70%."><div class="hd">The Internet (All Of It)</div><div class="ln">WAS: <s>100%</s></div><div class="ln">NOW:</div><div class="big">70%</div></div>');
     Object.assign(el.style, { left: x + 'px', top: top + 'px', transform: `scale(${scale}) rotate(-1.4deg)` });
+    jolt(el.querySelector('.big'), POST ? 1.2 : 1.1);
     return top + (306 + 54) * scale;
   };
-  // the globe picture: 480 square, the ball 374 of it, its top 47 down; d is the ball's diameter, (cx, cy) its centre
+  // The globe: on the page, its 60 frames drawn onto a canvas by the clock (decoded once from the
+  // moving picture), so it changes in step with everything else; until they are ready, and in a
+  // post (stepped from the frame files), a picture.
+  let globeFrames = null;
   const globe = (cx, cy, d) => {
     const k = d / 374, box = 480 * k, x = cx - 240 * k, y = cy - (47 + 187) * k;
-    const img = put(`<img class="globe" alt="" src="${IMG.globe}">`); place(img, x, y, box, box);
+    if (globeFrames && !POST) {
+      const c = put('<canvas class="globe" aria-hidden="true"></canvas>'), dpr = Math.min(2, devicePixelRatio || 1);
+      c.width = Math.round(box * dpr); c.height = Math.round(box * dpr); place(c, x, y, box, box);
+      const g = c.getContext('2d'); let shown = -1;
+      movers.push((t) => { const i = Math.floor(t * 15) % 60; if (i !== shown) { shown = i; g.clearRect(0, 0, c.width, c.height); g.drawImage(globeFrames[i], 0, 0, c.width, c.height); } });
+    } else {
+      place(put(`<img class="globe" alt="" src="${IMG.globe}">`), x, y, box, box);
+    }
     return { x, y, k };
   };
   const glow = (cx, cy, d) => place(put('<div class="glow" aria-hidden="true"></div>'), cx - d * 1.3, cy - d * 1.45, d * 2.6, d * 2.9);
 
   // ---- one layout pass, for the window as it is ----
   function build() {
-    p.textContent = '';
+    p.textContent = ''; movers = [];
     const W = p.clientWidth, H = p.clientHeight, tall = W / H < 1;
     const REF = tall ? [1080, 1920] : [1280, 800];
     const s = Math.min(W / REF[0], H / REF[1]);           // the composition's scale
@@ -223,89 +253,78 @@ body { -webkit-font-smoothing: antialiased; }
     const strips = tall ? Math.max(0.86 * s, Math.min(0.5, W / 900)) : 0.6 * s;
     const tapeFont = (54 * strips) / 0.72, byFont = (25 * strips) / 0.72;
     // will the sign-off and the credits go on one line across the screen? if not, the navy tape takes two
-    const across = (text, font, size, ls) => { mc.font = `${font} ${size}px ${font.includes('700') ? '"Arimo"' : '"Archivo Black"'}`; mc.letterSpacing = ls * size + 'px'; return mc.measureText(text).width; };
     const byTwo = !POST && across('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES ✦ GARRETT MUSAR ✦ AUFBAU', 'italic 700', byFont, 0.08) + 3.6 * byFont > W * 0.9;
     const tapeH = 126 * strips, byH = 68 * strips * (byTwo ? 1.8 : 1);
     const byC = crawlTop - ((REF[0] * s) / 2) * TAN6 - byH / 2 / COS6 + (tall ? 0 : 6 * s), tapeC = byC - ((tapeH + byH) / 2 + 4 * strips) / COS6;
     const tapeTop = (x) => tapeC - tapeH / 2 / COS6 - (x - W / 2) * TAN6; // the yellow tape's top edge at x
+    // the yellow tape's words: NO PURCHASE NECESSARY! beside the button on the site, the store images'
+    // line on a post. Where they will not go across they get a little smaller, and where that is not
+    // enough the button goes alone
+    const say = LAYOUT === 'site' ? 'NO PURCHASE NECESSARY!' : 'EVERY SITE 30% OFF!';
+    const goW = across('ADD TO CHROME →', '400', 100, -0.01) / 100 + 1.24 + 0.4, need = across(say, 'italic 700', 100, 0) / 100 + 0.7 + goW;
+    const fit = Math.min(1, (W * 0.92) / (need * tapeFont)), sayFits = POST || fit >= 0.72;
 
-    ({ one: tall ? oneTall : oneWide, two: tall ? twoTall : twoWide, best: tall ? bestTall : bestWide })[LAYOUT]();
+    ({ site: tall ? siteTall : siteWide, one: tall ? oneTall : oneWide, two: tall ? twoTall : twoWide })[LAYOUT]();
 
-    // the globe on its white column, standing on the bottom edge: d the ball's diameter, (cx, ballTop) its top centre
-    function monument(cx, ballTop, d) {
-      const gk = d / 374, gd = 480 * gk, gx = cx - gd / 2, gy = ballTop - 47 * gk;
-      glow(cx, gy + gd * 0.487, gd);
-      const colX = gx + 40 * gk, colW = 400 * gk, capTop = gy + 410 * gk, baseTop = Math.max(capTop + 136 * gk + 4, H - 144 * gk);
-      place(put(`<img alt="" src="${IMG.shaft}">`), colX, capTop + 136 * gk - 2, colW, baseTop - capTop - 136 * gk + 4);
-      place(put(`<img alt="" src="${IMG.cap}">`), colX, capTop, colW, 136 * gk);
-      place(put(`<img alt="" src="${IMG.base}">`), colX, baseTop, colW, 144 * gk);
-      return { cy: ballTop + d / 2, r: d / 2, colX };
-    }
-    // BUT WAIT… THERE'S LESS!, flush left at x in a column w wide from y (the top of its lede); the four
-    // cards under it if `withCards`; k shrinks the lot. Returns where it ends.
-    function punchline(x, y, w, k, withCards, dry = false) {
-      const lede = (30 * s * k) / SCAP, l1 = (w / headW('THERE’S')) * k, l2 = ((w * 0.8) / headW('LESS!')) * k;
-      y += 30 * s * k; if (!dry) set('sub', 'BUT WAIT…', SUB, -0.04, lede, x, y);
-      y += 16 * s * k + HCAP * l1; if (!dry) set('head', 'THERE’S', HEAD, -0.05, l1, x, y, true, 'h2');
-      y += 12 * s * k + HCAP * l2; if (!dry) set('head', 'LESS!', HEAD, -0.05, l2, x, y, true, 'div');
-      if (withCards) { y += 24 * s * k; const cw = w * k; y += dry ? (62 * cw) / 436 : cards(x, y, cw); }
+    // The punchline, then the offer: BUT WAIT… / THERE'S LESS! / 30% OFF / EVERYTHING ON / THE INTERNET. /
+    // BLACK FRIDAY ONLY! / the four cards (if withCards). At x (the left edge, or the centre if
+    // `centred`) in a column w wide, from y; k shrinks the lot. Returns where it ends.
+    function offer(x, y, w, k, centred, withCards, dry = false) {
+      const left = (wide) => (centred ? x - wide / 2 : x);
+      const line = (cls, text, font, ls, size, measure, skew, tag) => { if (!dry) set(cls, text, font, ls, size, left(measure(text) * size), y, skew, tag); };
+      // BUT WAIT… THERE'S LESS!, its second line as wide as the column
+      const pl = ((w * 0.96) / headW('THERE’S LESS!')) * k, lede = (0.44 * HCAP * pl) / SCAP;
+      y += SCAP * lede; line('sub', 'BUT WAIT…', SUB, -0.04, lede, subW, false);
+      y += 12 * s * k + HCAP * pl; line('head', 'THERE’S LESS!', HEAD, -0.05, pl, headW, true, 'h2');
+      // 30% OFF EVERYTHING ON THE INTERNET.
+      const hs = (w / headW('30% OFF')) * k, l = ((w * 0.98) / subW('EVERYTHING ON')) * k;
+      y += 40 * s * k + HCAP * hs; line('head', '30% OFF', HEAD, -0.05, hs, headW, true, 'h1');
+      y += 26 * s * k + SCAP * l; line('sub', 'EVERYTHING ON', SUB, -0.04, l, subW, false, 'h2');
+      y += 12 * s * k + SCAP * l; line('sub', 'THE INTERNET.', SUB, -0.04, l, subW, false);
+      // the tag, as wide as seven tenths of the column
+      const tw = w * 0.72 * k, tf = tw / (across('BLACK FRIDAY ONLY!', '400', 100, -0.01) / 100 + 0.84 + 0.14);
+      y += 28 * s * k;
+      if (!dry) { const tg = put('<div class="tag">BLACK FRIDAY ONLY!</div>'); tg.style.fontSize = tf + 'px'; at(tg, left(tw), y); }
+      y += tf * 1.58;
+      if (withCards) { const cw = w * 0.74 * k; y += 30 * s * k; if (!dry) cards(left(cw), y, cw); y += (62 * cw) / 436; }
       return y;
     }
+    // the offer's height in a column w wide, at k, with or without the cards
+    function offerH(w, k, withCards) { return offer(0, 0, w, k, false, withCards, true); }
 
-    // ---- the site, wide: the message down the left (30% OFF over everything on the internet; the
-    //      price card, and the punchline beside it); the globe large on its column on the right ----
-    function bestWide() {
-      const oy = Math.max(0, H - REF[1] * s) * 0.4;
-      const L = ox + m, col = 680 * s, colR = L + col, R = ox + REF[0] * s - m, gutter = 44 * s;
-      const headTop = oy + 86 * s, d = Math.min(360 * s, (R - colR - gutter) * 0.95), cx = (colR + gutter + R) / 2;
-      const { cy, r } = monument(cx, headTop - 6 * s, d);
+    // ---- the site, wide: the globe large on the left; the offer and the punchline down a column on the right ----
+    function siteWide() {
+      const L = ox + m, R = ox + REF[0] * s - m, x0 = ox + 690 * s, cw = R - x0;
+      const lo = tick + 28 * s, hi = tapeTop(R) - 22 * s, room = hi - lo;     // under the ticker, over the tape at its highest
+      const d = Math.min(570 * s, (crawlTop - tick) * 0.86, (x0 - L - 30 * s) * 0.98), cx = Math.max(L + d / 2 + 6 * s, ox + 341 * s), cy = (tick + crawlTop) / 2;
+      glow(cx, cy, d * 1.28);
+      const withCards = offerH(cw, 1, true) <= room * 1.1;                    // the cards where there is (nearly) the room
+      const k = Math.min(1, room / offerH(cw, 1, withCards));
+      offer(x0, lo + (room - offerH(cw, k, withCards)) / 2, cw, k, false, withCards);
       globe(cx, cy, d);
-      const hs = col / headW('30% OFF'); let y = headTop + HCAP * hs;
-      set('head', '30% OFF', HEAD, -0.05, hs, L, y, true, 'h1');
-      const ss = col / subW('EVERYTHING ON THE INTERNET.'); y += 30 * s + SCAP * ss;
-      set('sub', 'EVERYTHING ON THE INTERNET.', SUB, -0.04, ss, L, y, false, 'h2');
-      const cs = 0.7 * s, top = y + 30 * s;
-      card(L, top, cs);
-      // beside the card, its top level with the card's, down to above the tape
-      const x0 = L + 400 * cs + 40 * s, w = colR - x0, room = tapeTop(colR) - 22 * s - top;
-      const withCards = punchline(x0, top - 6 * s, w, 1, true, true) - top <= room * 1.25;
-      const k = Math.min(1, room / (punchline(x0, top - 6 * s, w, 1, withCards, true) - top + 6 * s));
-      punchline(x0, top - 6 * s * k, w, k, withCards);
-      const o = oval(36 * s);
-      at(o, cx + r * 0.42 - o.offsetWidth / 2, cy - r * 0.88 - o.offsetHeight / 2);
-      glint('', cx - r * 0.8, cy - r * 0.8, d * 0.08);
-      glint('b', cx + r * 0.97, cy + r * 0.58, d * 0.05);
+      const r = d / 2, o = oval(40 * s * Math.min(1, d / (570 * s)) ** 0.5);
+      at(o, cx + r * 0.4 - o.offsetWidth / 2, cy - r * 0.86 - o.offsetHeight / 2);
+      glint('', cx - r * 0.74, cy - r * 0.78, d * 0.075);
+      glint('b', cx + r * 0.93, cy + r * 0.62, d * 0.045);
     }
 
-    // ---- the site, tall: the lettering across the top; under it the price card and the punchline
-    //      down the left, the globe on its column on the right ----
-    function bestTall() {
-      const u = 0.8, Lx = ox + 60 * s, leftW = 470 * s;
-      const cs = 0.95 * s, cardH = 360 * cs, D = 400 * s;
-      const T = (k) => ({ t1: { w: 706 * u * s * k, h: 522 * u * s * k }, t2: { w: 895 * u * s * k, h: 349 * u * s * k } });
-      // how tall it all is at k, without the gaps that take up the spare room
-      const stack = (k, withCards) => { const t = T(k); return t.t1.h + 30 * s * k + t.t2.h + 36 * s * k + cardH * k + 40 * s * k + (punchline(0, 0, leftW, k, withCards, true)); };
-      const room = tapeTop(Lx + leftW) - 34 * s - tick - 30 * s;
-      let withCards = stack(1, true) <= room, k = Math.min(1, room / stack(1, withCards));
-      const spare = Math.max(0, room - stack(k, withCards));
-      const t = T(k);
-      const t1y = tick + 30 * s + spare * 0.25, t2y = t1y + t.t1.h + 30 * s * k, rowY = t2y + t.t2.h + 36 * s * k + spare * 0.35;
-      const t1x = (W - t.t1.w) / 2;
-      // the globe: its ball's top level with the card's
-      const d = D * k, gcx = Math.min(ox + 790 * s, W - m - d * 0.5);
-      const { cy, r } = monument(gcx, rowY, d);
-      globe(gcx, cy, d);
-      place(put(`<img alt="30% OFF" src="${IMG.typeTop}">`), t1x, t1y, t.t1.w, t.t1.h);
-      place(put(`<img alt="Everything on the internet." src="${IMG.typeMid}">`), (W - t.t2.w) / 2, t2y, t.t2.w, t.t2.h);
-      for (const side of [-1, 1]) {
-        const edge = side < 0 ? t1x : t1x + t.t1.w, out = (q) => edge + side * q * u * s * k;
-        glint('', out(149), t1y + 204 * u * s * k, 49 * u * s * k);
-        glint('b', out(92), t1y + 295 * u * s * k, 29 * u * s * k);
-      }
-      const foot = card(Lx, rowY, cs * k);
-      punchline(Lx, foot + 40 * s * k + spare * 0.4 - 30 * s * k * 0.4, leftW, k, withCards);
-      const o = oval(32 * s * k);
-      at(o, gcx + r * 0.36 - o.offsetWidth / 2, cy - r * 0.9 - o.offsetHeight / 2);
+    // ---- the site, tall: the globe large on top; the offer and the punchline centred under it ----
+    function siteTall() {
+      const cw = (REF[0] - 2 * 90) * s, lo = tick + 36 * s, hi = tapeTop(ox + REF[0] * s - m) - 30 * s, room = hi - lo;
+      const d0 = 520 * s, gap = 40 * s;
+      const withCards = d0 + gap + offerH(cw, 1, true) <= room * 1.1;
+      const natural = d0 + gap + offerH(cw, 1, withCards), k = Math.min(1, room / natural);
+      // spare height goes first to the globe, up to the column's width, then either side
+      let spare = room - natural * k, d = d0 * k;
+      const grow = Math.max(0, Math.min(spare * 0.6, cw * 1.02 - d)); d += grow; spare -= grow;
+      const y = lo + spare * 0.4, cx = W / 2, cy = y + d / 2;
+      glow(cx, cy, d * 1.28);
+      globe(cx, cy, d);
+      const r = d / 2, o = oval(40 * s * k);
+      at(o, cx + r * 0.42 - o.offsetWidth / 2, cy - r * 0.86 - o.offsetHeight / 2);
+      glint('', cx - r * 0.78, cy - r * 0.7, d * 0.075);
+      glint('b', cx + r * 0.95, cy + r * 0.55, d * 0.045);
+      offer(W / 2, y + d + gap * k + spare * 0.2, cw, k, true, withCards);
     }
 
     // ---- layout one, wide: screenshot 1. The message flush left down a column; the globe on its
@@ -314,7 +333,6 @@ body { -webkit-font-smoothing: antialiased; }
       const oy = Math.max(0, H - REF[1] * s) * 0.4;  // spare height: a little above, the rest below
       const L = ox + m, col = 700 * s, colR = L + col, R = ox + REF[0] * s - m, gutter = 48 * s, monX = (colR + gutter + R) / 2;
       const headTop = oy + 86 * s, bd = 300 * s;
-      // the globe and its column, standing on the bottom edge
       const gk = bd / 374, gd = 480 * gk, gx = monX - gd / 2, gy = headTop - 6 * s - 47 * gk;
       glow(monX, gy + gd * 0.487, gd);
       const colX = gx + 40 * gk, colW = 400 * gk, capTop = gy + 410 * gk, baseTop = Math.max(capTop + 136 * gk + 4, H - 144 * gk);
@@ -322,14 +340,12 @@ body { -webkit-font-smoothing: antialiased; }
       place(put(`<img alt="" src="${IMG.cap}">`), colX, capTop, colW, 136 * gk);
       place(put(`<img alt="" src="${IMG.base}">`), colX, baseTop, colW, 144 * gk);
       globe(monX, gy + (47 + 187) * gk, bd);
-      // the message
       const hs = col / headW('30% OFF'); let y = headTop + HCAP * hs;
       set('head', '30% OFF', HEAD, -0.05, hs, L, y, true, 'h1');
       const ss = col / subW('EVERYTHING ON THE INTERNET.'); y += 34 * s + SCAP * ss;
       set('sub', 'EVERYTHING ON THE INTERNET.', SUB, -0.04, ss, L, y, false, 'h2');
       const cs = 0.7 * s, top = y + 30 * s;
       card(L, top, cs);
-      // beside the card: the badge level with its top, the four cards on its foot
       const x0 = L + 400 * cs + 34 * s, o = oval(37 * s), ch = (62 * (colR - x0)) / 436;
       at(o, (x0 + colR - o.offsetWidth) / 2, top);
       cards(x0, top + 306 * cs - ch, colR - x0);
@@ -338,14 +354,13 @@ body { -webkit-font-smoothing: antialiased; }
       glint('b', ballL + bd * 0.97, ballT + bd * 0.86, bd * 0.06);
     }
 
-    // ---- layout one, tall: the banner's own stacked arrangement. The lettering centred; under it
-    //      the card and the globe in a row; the tapes and the crawl below ----
+    // ---- layout one, tall: the banner's own stacked arrangement ----
     function oneTall() {
       const u = 0.86, row = 1.1;
       const T1 = { w: 706 * u * s, h: 522 * u * s }, T2 = { w: 895 * u * s, h: 349 * u * s };
-      const rowH = 480 * row * s;                                           // the globe's picture, the tallest thing in the row
-      const used = 124 * s + T1.h + 34 * s + T2.h + 40 * s + rowH;           // from the ticker's foot to the row's
-      const room = tapeTop(ox + REF[0] * s - m) - tick;                     // down to the yellow tape at its highest
+      const rowH = 480 * row * s;
+      const used = 124 * s + T1.h + 34 * s + T2.h + 40 * s + rowH;
+      const room = tapeTop(ox + REF[0] * s - m) - tick;
       const spare = Math.max(0, room - used);
       const t1y = tick + 52 * s + spare * 0.35, t2y = t1y + T1.h + 34 * s, rowY = t2y + T2.h + 40 * s + spare * 0.2;
       const t1x = (W - T1.w) / 2;
@@ -366,7 +381,6 @@ body { -webkit-font-smoothing: antialiased; }
       const cx = ox + 60 * s, cTop = rowY + 103 * s, cs = row * s, foot = card(cx, cTop, cs);
       const r = 187 * gk, o = oval(34 * s);
       at(o, gcx + r * 0.42 - o.offsetWidth / 2, rowY + (47 + 187) * gk - r * 0.92 - o.offsetHeight / 2);
-      // the four cards under the price card, if there is the room above the tape
       const cw = 400 * cs, chH = (62 * cw) / 436, gap = tapeTop(cx + cw) - foot;
       if (gap > chH + 30 * s) cards(cx, foot + (gap - chH) / 2, cw);
     }
@@ -375,17 +389,15 @@ body { -webkit-font-smoothing: antialiased; }
     //      the right, set to its width, the four cards under them ----
     function twoWide() {
       const L = ox + m, R = ox + REF[0] * s - m, x0 = ox + 690 * s, cw = R - x0;
-      const lo = tick + 26 * s, hi = tapeTop(R) - 26 * s;                 // the room for the lines: under the ticker, over the tape
-      // the globe, as large as the left side allows, in the middle of the room between the ticker and the crawl; its light first, behind everything
+      const lo = tick + 26 * s, hi = tapeTop(R) - 26 * s;
       const d = Math.min(570 * s, (crawlTop - tick) * 0.86, (x0 - L - 30 * s) * 0.98), cx = Math.max(L + d / 2 + 6 * s, ox + 341 * s), cy = (tick + crawlTop) / 2;
       glow(cx, cy, d * 1.28);
       const lines = ['THERE’S', 'LESS!'].map((t) => ({ t, size: cw / headW(t) }));
       const ss0 = cw / subW('NO PURCHASE NECESSARY!');
       const natural = 46 * s + 34 * s + lines.reduce((a, l, n) => a + HCAP * l.size + (n ? 30 * s : 0), 0) + 38 * s + SCAP * ss0 + 34 * s + (62 * cw) / 436;
-      const k = Math.min(1, (hi - lo) / natural), w = cw * k;                 // shrink the lot to fit, if need be
+      const k = Math.min(1, (hi - lo) / natural), w = cw * k;
       let y = lo + (hi - lo - natural * k) / 2 + 46 * s * k;
-      const ledeSize = (46 * s * k) / SCAP;
-      set('sub', 'BUT WAIT…', SUB, -0.04, ledeSize, x0, y);
+      set('sub', 'BUT WAIT…', SUB, -0.04, (46 * s * k) / SCAP, x0, y);
       y += 34 * s * k;
       lines.forEach((l, n) => { y += HCAP * l.size * k + (n ? 30 * s * k : 0); set('head', l.t, HEAD, -0.05, l.size * k, x0, y, true, n ? 'div' : 'h1'); });
       y += 38 * s * k + SCAP * ss0 * k; set('sub', 'NO PURCHASE NECESSARY!', SUB, -0.04, ss0 * k, x0, y, false, 'h2');
@@ -430,19 +442,14 @@ body { -webkit-font-smoothing: antialiased; }
     place(by, W / 2 - len / 2, byC - byH / 2, len, byH);
     Object.assign(by.style, { fontSize: byFont + 'px', transform: 'rotate(-6deg)' });
     if (byTwo && across('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES', 'italic 700', byFont, 0.08) > W * 0.9) by.querySelector('.gme').textContent = 'Gary Mustard Enterprises';
-    const tape = put(POST ? '<div class="strip tape"><span>EVERY SITE 30% OFF!</span></div>'
-                          : `<a class="strip tape" href="${STORE}"><span class="say">EVERY SITE 30% OFF!</span><span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
+    const tape = put(POST ? `<div class="strip tape"><span>${say}</span></div>`
+                          : `<a class="strip tape" href="${STORE}"><span class="say">${say}</span><span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
     place(tape, W / 2 - len / 2, tapeC - tapeH / 2, len, tapeH);
     Object.assign(tape.style, { fontSize: tapeFont + 'px', transform: 'rotate(-6deg)',
                                 boxShadow: `inset 0 ${4 * strips}px 0 rgba(170,158,0,0.6), inset 0 ${-4 * strips}px 0 rgba(170,158,0,0.6), ${11 * strips}px ${11 * strips}px 0 rgba(6,8,70,0.9)` });
     // on a narrow screen the words go before the button does, and the button keeps some yellow either side
-    if (!POST) {
-      const go = tape.querySelector('.go'), goW = across('ADD TO CHROME →', '400', 1, -0.01) + 1.24 + 0.4;
-      if (across('EVERY SITE 30% OFF!', 'italic 700', tapeFont, 0) + 0.7 * tapeFont + goW * tapeFont > W * 0.92) {
-        tape.querySelector('.say').remove();
-        go.style.fontSize = Math.min(tapeFont, (W * 0.66) / goW) + 'px';
-      }
-    }
+    if (!POST && sayFits) tape.style.fontSize = tapeFont * fit + 'px';
+    if (!POST && !sayFits) { tape.querySelector('.say').remove(); tape.querySelector('.go').style.fontSize = Math.min(tapeFont, (W * 0.66) / goW) + 'px'; }
 
     // ---- the tickers: Garrett's lines along the top, BLACK FRIDAY ONLY! along the bottom ----
     const tk = put(`<div class="ticker" aria-hidden="true"><span>${TICKER.repeat(6)}</span></div>`);
@@ -451,10 +458,21 @@ body { -webkit-font-smoothing: antialiased; }
     Object.assign(cr.style, { height: crawlH + 'px', fontSize: crawlH * 0.75 + 'px', lineHeight: crawlH + 'px' });
     // the same speed whatever the size: so many of their own letters a second (for a post, whatever
     // speed makes them come round exactly in 12 s: once for the lines, twice for the crawl)
-    tk.firstElementChild.style.animationDuration = (POST ? 6 / 2 * 12 : tk.firstElementChild.offsetWidth / 2 / (tick * 1.5)) + 's';
-    cr.firstElementChild.style.animationDuration = (POST ? 16 / 2 / 2 * 12 : cr.firstElementChild.offsetWidth / 2 / (crawlH * 2.6)) + 's';
-    tk.firstElementChild.style.animationDelay = cr.firstElementChild.style.animationDelay = '-3s';
-    if (POST) p.querySelectorAll('.card .big').forEach((b) => (b.style.animationDuration = '1.2s')); // ten jolts a loop
+    const tks = tk.firstElementChild, crs = cr.firstElementChild, tkRep = tks.offsetWidth / 6, crRep = crs.offsetWidth / 16;
+    const tkV = POST ? tkRep / 12 : tick * 1.5, crV = POST ? (2 * crRep) / 12 : crawlH * 2.6;
+    movers.push((t) => {
+      tks.style.transform = `translateX(${-(((t + 3) * tkV) % tkRep)}px)`;
+      crs.style.transform = `translateX(${-(((t + 3) * crV) % crRep)}px) skewX(-9deg)`;
+    });
+    render(clock());
+  }
+
+  // ---- the clock ----
+  const t0 = performance.now(), clock = () => (still ? 0 : Math.floor(((performance.now() - t0) / 1000) * FPS) / FPS);
+  const blotch = $('.blotch'), grain = $('.static');
+  function render(t) {
+    for (const move of movers) move(t);
+    if (!POST) { const f = Math.round(t * FPS); blotch.setAttribute('seed', BLOTCH[Math.floor(f / 4) % 6]); grain.setAttribute('seed', STATIC[Math.floor(f / 2) % 6]); }
   }
 
   build();
@@ -463,7 +481,7 @@ body { -webkit-font-smoothing: antialiased; }
     const frames = Array.from({ length: 60 }, (_, i) => `../channel-page/parts/globe-${String(i).padStart(2, '0')}.png`);
     await Promise.all(frames.map((src) => { const i = new Image(); i.src = src; return i.decode().catch(() => {}); }));
     window.setT = async (t) => {
-      for (const a of document.getAnimations()) { a.pause(); a.currentTime = (t + 3) * 1000; }
+      render(t);
       for (const g of p.querySelectorAll('.globe')) { g.src = frames[Math.floor(t * 15 + 1e-6) % 60]; await g.decode(); }
     };
     window.ready = true;
@@ -471,16 +489,32 @@ body { -webkit-font-smoothing: antialiased; }
   }
   let pending = 0;
   addEventListener('resize', () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(build); });
+  if (!still) {
+    let last = -1;
+    const frame = () => { const t = clock(); if (t !== last) { last = t; render(t); } requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+    // the globe's frames, decoded once (on the side), then drawn by the clock in step with everything else
+    if ('ImageDecoder' in window) (async () => {
+      try {
+        const dec = new ImageDecoder({ data: await (await fetch(IMG.globe)).arrayBuffer(), type: 'image/webp' });
+        await dec.tracks.ready;
+        const n = dec.tracks.selectedTrack.frameCount, frames = [];
+        for (let i = 0; i < n; i++) { const { image } = await dec.decode({ frameIndex: i }); frames.push(await createImageBitmap(image)); image.close(); }
+        dec.close();
+        if (n === 60) { globeFrames = frames; build(); }
+      } catch {}
+    })();
+  }
 
-  // The tape look costs next to nothing on a graphics card and a great deal without one. As on the
-  // banner: once the page is up, see how fast it draws; if slowly, take the look off, and if that
-  // made no difference, put it back.
+  // The tape look costs little on a graphics card and a great deal without one. As on the banner:
+  // once the page is up, see how fast it draws; if slowly, take the look off, and if that made no
+  // difference, put it back.
   const frameRate = () => new Promise((resolve) => {
     let frames = 0, drawing = 0, last = 0;
     const tick = (now) => { const gap = now - last; if (last && gap < 1000) { frames++; drawing += gap; } last = now; if (drawing < 2000) requestAnimationFrame(tick); else resolve((frames * 1000) / drawing); };
     requestAnimationFrame(tick);
   });
-  if (!still && !new URLSearchParams(location.search).has('keep')) {
+  if (!still && !query.has('keep')) {
     await new Promise((r) => setTimeout(r, 1200));
     const withLook = await frameRate();
     if (withLook < 24) {
