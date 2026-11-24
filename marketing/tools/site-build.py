@@ -78,6 +78,9 @@ def img(name):
     return cache[name]
 
 out = os.path.join(ROOT, 'out/site'); os.makedirs(out, exist_ok=True)
+# any site/v-<name>.html is a variant of the site, built as out/site/v-<name>.html
+for f in sorted(os.listdir(os.path.join(ROOT, 'site'))):
+    if f.startswith('v-') and f.endswith('.html'): OUTPUTS.setdefault(f[:-5], (f, {'layout': 'site'}))
 for name in sys.argv[1:] or OUTPUTS:
     template, values = OUTPUTS[name]
     t = open(os.path.join(ROOT, 'site', template), encoding='utf-8').read()
