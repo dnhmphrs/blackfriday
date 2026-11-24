@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>30% Off EVERYTHING</title>
+<meta name="description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
+<link rel="icon" href="{{img:favicon}}">
+<!-- Variant "shopping-channel": one frame of a home-shopping channel. The product (the globe on its
+     white column) stands in the studio; the price panel down the right is the order screen (item
+     number, The Internet (All Of It), WAS 100% / NOW 70%, the ADD TO CHROME order button); the lower
+     third under the product carries the offer, 30% OFF | EVERYTHING ON THE INTERNET., with the red
+     BLACK FRIDAY ONLY! tab on it. BUT WAIT… THERE'S LESS! is only the presenter's caption, flashing on
+     the lower third's top edge: the second voice, never the headline. Channel furniture: the credits
+     bar along the top with the clock, the ON AIR bug, the ACT NOW crawl along the bottom.
+     Tall windows (phones) stack it: studio, lower third, order panel.
+     Everything that moves runs off one clock at 25 frames a second. -->
+<style>
+{{fonts}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #070f9c; }
+body { -webkit-font-smoothing: antialiased; }
+#p { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); filter: url(#tape);
+     --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; --navy: #0a0f66; user-select: none; }
+#p > * { position: absolute; display: block; max-width: none; }
+#p img { -webkit-user-drag: none; }
+.defs { position: absolute; width: 0; height: 0; }
+.lines { position: fixed; inset: 0; pointer-events: none; z-index: 2;
+         background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.05) 1.5px, rgba(0, 0, 16, 0) 3px),
+                     radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
+
+.glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+.tiles { background-repeat: repeat; opacity: 0.095; transform: rotate(-6deg); }
+/* the studio: a beam of light from above onto the product, a floor where it stands */
+.beam { clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); background: linear-gradient(rgba(190, 225, 255, 0.34), rgba(150, 200, 255, 0.05) 85%, transparent); }
+.floor { border-radius: 50%; background: radial-gradient(closest-side, rgba(170, 215, 255, 0.55), rgba(80, 150, 255, 0.2) 60%, transparent); }
+
+/* lettering, placed by baseline and ink edge (see set()) */
+.t { white-space: nowrap; line-height: 1; }
+.head { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.05em;
+        text-shadow: 0.009em 0.009em 0 var(--shade), 0.018em 0.018em 0 var(--shade), 0.027em 0.027em 0 var(--shade),
+                     0.036em 0.036em 0 var(--shade), 0.045em 0.045em 0 var(--shade), 0.054em 0.054em 0 var(--shade); }
+.sub { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.04em;
+       background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+       filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
+
+.glint svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
+.glint path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); transform-box: fill-box; transform-origin: center; }
+
+/* ---- channel furniture ---- */
+/* the credits bar along the top */
+.top { left: 0; right: 0; top: 0; display: flex !important; align-items: center; gap: 0.9em; padding: 0 1.1em; white-space: nowrap;
+       background: linear-gradient(#141b86, #0a0f66 70%, #060a4a); border-bottom: 0.12em solid var(--yellow);
+       font: 600 1em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.09em; text-transform: uppercase; color: #fff; z-index: 1; }
+.top img { height: 1.55em; width: auto; display: block; flex: none; }
+.top .cr { display: flex; align-items: center; gap: 0 0.8em; flex-wrap: wrap; }
+.top .cr.two { flex-direction: column; align-items: flex-start; gap: 0.3em; }
+.top .sep { color: var(--yellow); }
+.top a { color: #fff; text-decoration: none; border-bottom: 0.12em solid var(--yellow); padding-bottom: 0.04em; }
+.top a:hover, .top a:focus-visible { color: var(--yellow); outline: none; }
+.top .clock { margin-left: auto; font-weight: 300; letter-spacing: 0.06em; color: #e9f0ff; }
+/* the ON AIR bug */
+.bug { display: flex !important; align-items: stretch; font: 600 1em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.08em; white-space: nowrap;
+       box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.85); }
+.bug b { display: flex; align-items: center; gap: 0.35em; background: var(--red); color: #fff; padding: 0.28em 0.5em 0.3em 0.45em; font-weight: 600; border: 0.07em solid #fff; }
+.bug b i { width: 0.55em; height: 0.55em; border-radius: 50%; background: #fff; display: block; }
+.bug b i.off { background: #7a0006; }
+.bug span { display: flex; align-items: center; background: rgba(6, 10, 80, 0.85); color: #fff; padding: 0.28em 0.55em 0.3em; font-weight: 300; border: 0.07em solid #fff; border-left: 0; }
+/* the crawl along the bottom, with ACT NOW held at its left */
+.ticker { left: 0; right: 0; overflow: hidden; white-space: nowrap; pointer-events: none; background: linear-gradient(#0a0f66, #050843);
+          border-top: 0.08em solid #3a6bff; font-family: "Antonio", "Arial Narrow", sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em;
+          color: #e9f0ff; z-index: 1; }
+.ticker span { display: inline-block; }
+.act { display: flex !important; align-items: center; justify-content: center; background: var(--yellow); color: #111; z-index: 1;
+       font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: 0; white-space: nowrap; pointer-events: none;
+       clip-path: polygon(0 0, 100% 0, calc(100% - 0.7em) 100%, 0 100%); padding-right: 0.5em; }
+
+/* ---- the lower third ---- */
+.lt { background: linear-gradient(#2a46ff 0, #1630d8 9%, #0b1690 40%, #060b5c 100%); border-top: 0.5em solid var(--yellow); border-bottom: 0.25em solid #3a6bff;
+      box-shadow: 0 -0.2em 0 rgba(6, 8, 70, 0.5), inset 0 0.18em 0 rgba(255, 255, 255, 0.25), 0 0.5em 0 rgba(4, 6, 60, 0.6); }
+/* BLACK FRIDAY ONLY!, the red tab on the lower third */
+.tag { display: inline-block !important; white-space: nowrap; background: var(--red); color: var(--yellow); border: 0.07em solid #000;
+       font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; padding: 0.2em 0.42em 0.24em;
+       box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.9); transform: rotate(-2deg); transform-origin: right center; text-shadow: 0.05em 0.05em 0 #7a0006; }
+.tag.two { text-align: center; line-height: 1.02; padding: 0.26em 0.42em 0.3em; transform: rotate(-5deg); transform-origin: center; }
+/* BUT WAIT… THERE'S LESS!: the presenter's caption, flashing between two states by the clock */
+.cap { display: flex !important; align-items: center; gap: 0.45em; white-space: nowrap; padding: 0.26em 0.6em 0.3em 0.5em;
+       background: #fff; color: #0a0f66; border: 0.06em solid #000; box-shadow: 0.1em 0.1em 0 rgba(6, 8, 70, 0.85);
+       font: italic 700 1em/1 "Tinos", "Times New Roman", serif; letter-spacing: -0.01em; }
+.cap i { font: 600 0.62em/1 "Antonio", "Arial Narrow", sans-serif; font-style: normal; letter-spacing: 0.1em; background: var(--red); color: #fff; padding: 0.22em 0.4em; }
+.cap.flash { background: var(--yellow); color: #c40000; }
+.cap.flash i { background: #0a0f66; }
+
+/* the As Seen On badge */
+.burst { display: grid !important; place-items: center; }
+.burst svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.burst polygon { fill: var(--yellow); stroke: var(--red); stroke-width: 0.05; stroke-linejoin: round; }
+.burst polygon.sh { fill: rgba(6, 8, 70, 0.9); stroke: none; }
+.burst span { position: relative; text-align: center; font: italic 700 1em/0.92 "Arimo", Arial, sans-serif; letter-spacing: -0.03em; color: #c40000; text-transform: uppercase; }
+.oval { width: 7.6em; height: 3.31em; border-radius: 50%; display: grid !important; place-items: center; text-align: center;
+        font: italic 700 1em/0.98 "Tinos", "Times New Roman", serif; background: radial-gradient(ellipse at 40% 30%, #fffc9a, #efe01c 72%); color: #151515;
+        transform: rotate(-7deg); box-shadow: 0.143em 0.167em 0 rgba(6, 8, 70, 0.9), inset 0 0 0 0.095em rgba(170, 158, 0, 0.5); }
+
+/* ---- the order panel: laid out 420 wide, then scaled to its place ---- */
+.panel { width: 420px; transform-origin: left top; display: flex !important; flex-direction: column; background: #f3f4f6; color: #0c0c0c;
+         border: 5px solid #000; box-shadow: 10px 10px 0 rgba(4, 6, 60, 0.92); font: italic 700 20px/1 "Arimo", Arial, sans-serif; }
+.panel .ph { display: flex; justify-content: space-between; align-items: center; background: var(--red); color: #fff46a; border-bottom: 5px solid #000;
+             font: 600 30px/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.05em; padding: 9px 14px 10px; white-space: nowrap; }
+.panel .ph small { font: 300 21px/1 "Antonio", "Arial Narrow", sans-serif; color: #fff; letter-spacing: 0.08em; }
+.panel .pn { background: linear-gradient(#1b3cf0, #0816a8); color: #fff; padding: 12px 14px 14px; border-bottom: 5px solid #000;
+             font: italic 700 36px/1.02 "Arimo", Arial, sans-serif; letter-spacing: -0.03em; text-shadow: 2px 2px 0 rgba(6, 8, 70, 0.95); }
+.panel .pn small { display: block; font: 600 17px/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.14em; color: #b9c9ff; font-style: normal; margin-bottom: 7px; text-shadow: none; }
+.panel .price { position: relative; padding: 4px 16px 0; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+.panel .row { display: flex; align-items: baseline; gap: 12px; white-space: nowrap; }
+.panel .lb { font: 600 30px/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.06em; color: #333; font-style: normal; width: 74px; flex: none; }
+.panel .was { font: italic 700 46px/1 "Arimo", Arial, sans-serif; margin-top: 10px; }
+.panel s { position: relative; text-decoration: none; color: #6b6f78; }
+.panel s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 7px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+.panel .now { margin-top: 14px; }
+.panel .big { display: inline-block; font: 400 108px/0.98 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em;
+              -webkit-text-stroke: 9px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 30% 80%; }
+.panel .pc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; padding: 8px 16px 0; font: italic 700 17px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
+.panel .pc i { position: relative; display: block; height: 52px; border-radius: 6px; overflow: hidden; border: 2px solid #000; }
+.panel .pc b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; white-space: nowrap; }
+.panel .pc .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; }
+.panel .pc .c2 { background: radial-gradient(circle at 50% 38%, #ffb300 0 30%, transparent 31%), #f6f6f6; color: #111; }
+.panel .pc .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
+.panel .pc .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
+.panel .pc .c4 b { font-size: 12.5px; }
+.panel .np { text-align: center; padding: 12px 10px 0; font: italic 700 25px/1 "Arimo", Arial, sans-serif; letter-spacing: -0.02em; color: #0a0f66; white-space: nowrap; }
+/* the order button: the link to the store; its lights chase by the clock, hover is at once */
+.order { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 12px 12px 0; padding: 0 8px; height: 92px; text-decoration: none; cursor: pointer;
+         background: linear-gradient(#fffb86, #f0e11c); color: #111; border: 4px solid #000; box-shadow: inset 0 0 0 5px #fff035, inset 0 0 0 7px #000, 5px 5px 0 #0a0f66;
+         font: 400 34px/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; white-space: nowrap; outline: none; }
+.order i { font: 900 34px/1 Arial, Helvetica, sans-serif; font-style: normal; display: inline-block; }
+.order.lit { box-shadow: inset 0 0 0 5px #ff1616, inset 0 0 0 7px #000, 5px 5px 0 #0a0f66; }
+.order:hover, .order:focus-visible { background: var(--red); color: #fff; box-shadow: inset 0 0 0 5px #fff, inset 0 0 0 7px #000, 5px 5px 0 #0a0f66; }
+.order:hover i, .order:focus-visible i { transform: translateX(6px); }
+.panel .sb { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 10px 0 12px; font: 600 17px/1 "Antonio", "Arial Narrow", sans-serif;
+             letter-spacing: 0.16em; color: #333; font-style: normal; white-space: nowrap; }
+.panel .sb i { width: 9px; height: 9px; border-radius: 50%; background: #1bb01b; display: block; }
+.panel .sb i.off { background: #bcd8bc; }
+/* compact: tighter, for short or narrow places */
+.panel.compact .pn { font-size: 30px; padding: 9px 14px 10px; white-space: nowrap; }
+.panel.compact .pn small { display: none; }
+.panel.compact .price { padding: 2px 16px 0; }
+.panel.compact .was { margin-top: 6px; font-size: 40px; }
+.panel.compact .big { font-size: 88px; -webkit-text-stroke: 8px #000; }
+.panel.compact .order { height: 76px; font-size: 32px; }
+.panel.compact .order i { font-size: 32px; }
+.panel.compact .np { padding-top: 10px; font-size: 22px; }
+.panel.compact .sb { padding: 9px 0 10px; }
+</style>
+</head>
+<body>
+<main id="p" aria-label="30% Off EVERYTHING: 30% off every website. Black Friday only."></main>
+<div class="lines" aria-hidden="true"></div>
+<script>
+(async () => {
+  const STORE = '{{link:store}}', GARRETT = '{{link:garrett}}', AUFBAU = '{{link:aufbau}}';
+  const query = new URLSearchParams(location.search);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IMG = { globe: still ? '{{img:globe_still}}' : '{{img:globe_anim}}', cap: '{{img:cap}}', shaft: '{{img:shaft}}', base: '{{img:base}}',
+                tile: '{{img:tile}}', logo: '{{img:logo}}' };
+  const TICKER = 'No purchase necessary! ✦ Every website, 30% off! ✦ Works like magic! ✦ 30% off the entire internet. ✦ Black Friday only! ✦ As Seen On Every Website ✦ ';
+  const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
+  const TAN9 = Math.tan((9 * Math.PI) / 180);
+  const FPS = 25; // the clock everything moves by: a PAL picture's rate
+
+  // ---- the tape look: the live banner's filter (src/content.js), distances set in build(), the noise moved on by the clock ----
+  const LUMA = '0.299 0.587 0.114 0 0';
+  const tint = (i, q) => `${i * 0.22} ${q * 0.2} 0 0 ${0.5 - 0.5 * (i * 0.22 + q * 0.2)}`;
+  const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
+  const GRAIN = `${'0.7 0 0 0 -0.399  '.repeat(3)} 0 0 0 0 1`;
+  const add = (extra = '') => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`;
+  document.body.insertAdjacentHTML('beforeend', `
+    <svg class="defs" aria-hidden="true"><filter id="tape" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feFlood flood-color="#0a22d6"/><feMerge result="picture"><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      <feGaussianBlur class="soft" in="picture"/><feColorMatrix type="matrix" values="${LUMA} ${LUMA} ${LUMA} 0 0 0 1 0" result="luma"/>
+      <feGaussianBlur class="halo"/><feComposite in="luma" operator="arithmetic" k2="1.42" k3="-0.42" result="sharp"/>
+      <feGaussianBlur class="smear" in="picture"/><feOffset class="late"/>
+      <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
+      <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
+      <feTurbulence class="blotch" type="fractalNoise" numOctaves="1" seed="3"/>
+      <feColorMatrix type="matrix" values="${MOTTLE}"/><feComposite in2="clean" ${add('result="mottled"')}/>
+      <feTurbulence class="static" type="fractalNoise" numOctaves="2" seed="2"/>
+      <feColorMatrix type="matrix" values="${GRAIN}"/><feComposite in2="mottled" operator="arithmetic" k2="1" k3="1" result="taped"/>
+      <feComponentTransfer><feFuncR type="linear" intercept="-0.55"/><feFuncG type="linear" intercept="-0.55"/><feFuncB type="linear" intercept="-0.55"/></feComponentTransfer>
+      <feGaussianBlur class="bloom"/><feComposite in2="taped" operator="arithmetic" k2="0.149" k3="0.93" k4="0.037"/>
+    </filter></svg>`);
+  const $ = (sel) => document.querySelector(sel);
+  // the noise: the colour blotches change 6 times a second, the static 12 (every fourth and every other frame)
+  const BLOTCH = [3, 11, 7, 19, 5, 13], STATIC = [2, 17, 9, 23, 4, 29];
+
+  await Promise.all(['100px "Archivo Black"', 'italic 700 100px "Arimo"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Tinos"'].map((f) => document.fonts.load(f)));
+  const p = document.getElementById('p');
+  const put = (html) => { p.insertAdjacentHTML('beforeend', html); return p.lastElementChild; };
+  const place = (el, x, y, w, h) => Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+  const at = (el, x, y) => Object.assign(el.style, { left: x + 'px', top: y + 'px' });
+
+  // Lettering is measured, not guessed: the ink's edges and the cap height of a string, per 1px of type.
+  const mc = document.createElement('canvas').getContext('2d');
+  function ink(text, font, ls) {
+    mc.font = font.replace('SIZE', '200px'); mc.letterSpacing = ls * 200 + 'px';
+    const m = mc.measureText(text), k = 1 / 200;
+    return { l: -m.actualBoundingBoxLeft * k, r: m.actualBoundingBoxRight * k - ls, cap: mc.measureText('H').actualBoundingBoxAscent * k,
+             asc: m.fontBoundingBoxAscent * k, desc: m.fontBoundingBoxDescent * k };
+  }
+  // Set a line of type with its ink's left edge at x and its baseline at y. skew: the headline's slant.
+  function set(cls, text, font, ls, size, x, y, skew, tag = 'div') {
+    const i = ink(text, font, ls), el = put(`<${tag} class="t ${cls}">${text}</${tag}>`);
+    const base = (1 - (i.asc + i.desc)) / 2 + i.asc;
+    Object.assign(el.style, { fontSize: size + 'px', left: x - i.l * size + 'px', top: y - base * size + 'px' });
+    if (skew) Object.assign(el.style, { transformOrigin: `0 ${base * size}px`, transform: 'skewX(-9deg)' });
+    return el;
+  }
+  const HEAD = 'SIZE "Archivo Black"', SUB = 'italic 700 SIZE "Arimo"';
+  const width = (text, font, ls) => { const i = ink(text, font, ls); return i.r - i.l; };
+  const headW = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9; // per 1px of type, slant included
+  const subW = (t) => width(t, SUB, -0.04);
+  const HCAP = ink('H', HEAD, -0.05).cap, SCAP = ink('H', SUB, -0.04).cap;
+  const across = (text, font, size, ls) => { mc.font = `${font} ${size}px ${font.includes('700') ? '"Arimo"' : font.includes('600') || font.includes('300') ? '"Antonio"' : '"Archivo Black"'}`; mc.letterSpacing = ls * size + 'px'; return mc.measureText(text).width; };
+
+  // ---- what moves, and how, at time t (seconds) ----
+  let movers = [];
+  const ease = (q) => q * q * (3 - 2 * q);
+  const lerp = (a, b, q) => a + (b - a) * q;
+  const twinkle = (path, delay) => movers.push((t) => {
+    const ph = ((t + delay) / 2.4) % 1, q = ease(ph < 0.5 ? ph * 2 : 2 - ph * 2); // there and back, easing each way
+    path.style.transform = `scale(${lerp(0.55, 1, q)}) rotate(${lerp(-10, 12, q)}deg)`; path.style.opacity = lerp(0.75, 1, q);
+  });
+  const JOLT = [[0, 1, 0], [0.12, 1.18, -5], [0.26, 0.96, 3], [0.4, 1.08, -2], [0.55, 1, 0], [1, 1, 0]]; // when, scale, turn
+  const jolt = (el, period) => movers.push((t) => {
+    const ph = (t / period) % 1, i = JOLT.findIndex(([w], n) => ph < JOLT[n + 1]?.[0]), [w0, s0, r0] = JOLT[i], [w1, s1, r1] = JOLT[i + 1];
+    const q = ease((ph - w0) / (w1 - w0));
+    el.style.transform = `skewX(-8deg) scale(${lerp(s0, s1, q)}) rotate(${lerp(r0, r1, q)}deg)`;
+  });
+  // on and off by the clock: a class that comes and goes, n times a second
+  const blink = (el, cls, rate, duty = 0.5, offset = 0) => movers.push((t) => el.classList.toggle(cls, ((t * rate + offset) % 1) < duty));
+
+  const glint = (cls, cx, cy, r) => {
+    const el = place(put(`<div class="glint ${cls}" aria-hidden="true"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
+    twinkle(p.lastElementChild.querySelector('path'), cls === 'b' ? 1.2 : 0);
+    return el;
+  };
+  const oval = (size) => { const el = put('<div class="oval" aria-hidden="true"><span>As Seen On<br>Every Website</span></div>'); el.style.fontSize = size + 'px'; return el; };
+  // The globe: its 60 frames drawn onto a canvas by the clock (decoded once from the moving picture),
+  // so it changes in step with everything else; until they are ready, a picture.
+  let globeFrames = null;
+  const globe = (cx, cy, d) => {
+    const k = d / 374, box = 480 * k, x = cx - 240 * k, y = cy - (47 + 187) * k;
+    if (globeFrames) {
+      const c = put('<canvas class="globe" aria-hidden="true"></canvas>'), dpr = Math.min(2, devicePixelRatio || 1);
+      c.width = Math.round(box * dpr); c.height = Math.round(box * dpr); place(c, x, y, box, box);
+      const g = c.getContext('2d'); let shown = -1;
+      movers.push((t) => { const i = Math.floor(t * 15) % 60; if (i !== shown) { shown = i; g.clearRect(0, 0, c.width, c.height); g.drawImage(globeFrames[i], 0, 0, c.width, c.height); } });
+    } else {
+      place(put(`<img class="globe" alt="" src="${IMG.globe}">`), x, y, box, box);
+    }
+    return { x, y, k };
+  };
+  const glow = (cx, cy, d) => place(put('<div class="glow" aria-hidden="true"></div>'), cx - d * 1.3, cy - d * 1.45, d * 2.6, d * 2.9);
+
+  // The product: the globe (diameter d, its centre at cx, cy) on its white column, standing down to
+  // `floor` (the column's base meets the floor there; what is below is behind the lower third).
+  function product(cx, cy, d, floor) {
+    const k = d / 374, gx = cx - 240 * k, gy = cy - 234 * k;
+    const colX = gx + 40 * k, colW = 400 * k, capTop = gy + 410 * k, baseTop = Math.max(capTop + 136 * k + 4, floor - 144 * k);
+    place(put('<div class="floor" aria-hidden="true"></div>'), cx - d * 1.1, floor - d * 0.16, d * 2.2, d * 0.32);
+    place(put(`<img alt="" src="${IMG.shaft}">`), colX, capTop + 136 * k - 2, colW, baseTop - capTop - 136 * k + 4);
+    place(put(`<img alt="" src="${IMG.cap}">`), colX, capTop, colW, 136 * k);
+    place(put(`<img alt="" src="${IMG.base}">`), colX, baseTop, colW, 144 * k);
+    globe(cx, cy, d);
+    const r = d / 2;
+    glint('', cx - r * 0.78, cy - r * 0.74, d * 0.085);
+    glint('b', cx + r * 0.98, cy + r * 0.5, d * 0.05);
+  }
+
+  // a starburst sticker: Works like magic!, wobbling by the clock
+  function burst(cx, cy, size) {
+    const n = 18, pts = [];
+    for (let i = 0; i < n * 2; i++) { const a = (i / (n * 2)) * Math.PI * 2, rr = i % 2 ? 0.78 : 1; pts.push(`${(Math.cos(a) * rr).toFixed(3)},${(Math.sin(a) * rr).toFixed(3)}`); }
+    const el = put(`<div class="burst" aria-hidden="true"><svg viewBox="-1.1 -1.1 2.25 2.25"><polygon class="sh" points="${pts.join(' ')}" transform="translate(0.07 0.07)"/><polygon points="${pts.join(' ')}"/></svg><span>Works<br>like<br>magic!</span></div>`);
+    place(el, cx - size / 2, cy - size / 2, size, size); el.style.fontSize = size * 0.155 + 'px';
+    movers.push((t) => { const ph = (t / 1.6) % 1, q = ease(ph < 0.5 ? ph * 2 : 2 - ph * 2); el.style.transform = `rotate(${lerp(-12, -4, q)}deg) scale(${lerp(0.97, 1.04, q)})`; });
+  }
+
+  // The order panel, laid out 420 wide and scaled to fit w x h: whichever arrangement (tall, or compact
+  // with the price side by side) comes out larger. Returns its place.
+  function panel(x, y, w, h, onlyCompact) {
+    const html = (cls) => `<div class="panel${cls}">
+      <div class="ph"><span>TODAY ONLY</span><small>ITEM # 030-070</small></div>
+      <div class="pn"><small>NOW SHOWING</small>The Internet (All Of It)</div>
+      <div class="price" role="img" aria-label="Was 100%, now 70%.">
+        <div class="row was"><span class="lb">WAS:</span><s>100%</s></div>
+        <div class="row now"><span class="lb">NOW:</span><b class="big">70%</b></div>
+      </div>
+      <div class="pc" aria-label="Free, gratis, $0.00, no charge."><i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i></div>
+      <div class="np">No purchase necessary!</div>
+      <a class="order" href="${STORE}"><span>ADD TO CHROME</span><i aria-hidden="true">→</i></a>
+      <div class="sb" aria-hidden="true"><i></i><i></i><i></i>OPERATORS STANDING BY<i></i><i></i><i></i></div>
+    </div>`;
+    let best = null;
+    for (const cls of onlyCompact ? [' compact'] : ['', ' compact']) {
+      const el = put(html(cls)), nat = el.offsetHeight, k = Math.min(w / 420, h / nat);
+      el.remove();
+      if (!best || k > best.k * 1.04) best = { cls, k, nat };
+    }
+    const el = put(html(best.cls)), k = best.k, ph = Math.min(h / k, best.nat * 1.12);
+    el.style.height = ph + 'px';
+    const pw = 420 * k, top = y + (h - ph * k) / 2, left = x + (w - pw) / 2;
+    Object.assign(el.style, { left: left + 'px', top: top + 'px', transform: `scale(${k})` });
+    jolt(el.querySelector('.big'), 1.1);
+    blink(el.querySelector('.order'), 'lit', 2.5);
+    el.querySelectorAll('.sb i').forEach((d, n) => blink(d, 'off', 1.25, 0.5, (n % 3) / 3));
+    return { x: left, y: top, w: pw, h: ph * k };
+  }
+
+  // ---- one layout pass, for the window as it is ----
+  function build() {
+    p.textContent = ''; movers = [];
+    const W = p.clientWidth, H = p.clientHeight, tall = W / H < 0.95, mid = tall && W / H > 0.62;
+    const s = tall ? Math.min(W / 1080, H / 1920) : Math.min(W / 1280, H / 800);
+
+    // the tape filter's distances, in step with the composition's size
+    $('.soft').setAttribute('stdDeviation', `${1.25 * s} ${0.5 * s}`);
+    $('.halo').setAttribute('stdDeviation', `${5 * s} ${0.6 * s}`);
+    $('.smear').setAttribute('stdDeviation', `${10 * s} ${1.6 * s}`);
+    $('.late').setAttribute('dx', 7 * s); $('.late').setAttribute('dy', 1.7 * s);
+    $('.bloom').setAttribute('stdDeviation', 14 * s);
+    $('.blotch').setAttribute('baseFrequency', `${0.042 / s} ${0.167 / s}`);
+    $('.static').setAttribute('baseFrequency', `${0.19 / s} ${0.71 / s}`);
+
+    // the ground of marks
+    const tiles = put('<div class="tiles" aria-hidden="true"></div>');
+    place(tiles, -W * 0.3, -H * 0.3, W * 1.6, H * 1.6);
+    Object.assign(tiles.style, { backgroundImage: `url(${IMG.tile})`, backgroundSize: `${260 * s}px ${224 * s}px` });
+
+    // ---- the credits bar along the top: the sign-off and the credits, and the clock where there is room ----
+    const topF = Math.max(11, (tall ? 30 : 17) * s), CRED = 'Brought to you by Gary Mustard Enterprises', NAMES = 'Garrett Musar ✦ Aufbau';
+    const line = (t) => across(t.toUpperCase(), '600', topF, 0.09);
+    const logoW = topF * 1.55 * (1142 / 610);
+    const withClock = !tall && line(CRED + ' ✦ ' + NAMES) + logoW + topF * 12 < W;
+    const credTwo = line(CRED + ' ✦ ' + NAMES) + logoW + topF * 3.5 + (withClock ? topF * 9 : 0) > W;
+    const topH = topF * (credTwo ? 3.4 : 2.3);
+    const top = put(`<div class="top"><img src="${IMG.logo}" alt="Gary Mustard Enterprises"><div class="cr${credTwo ? ' two' : ''}"><span>${CRED}</span>${credTwo ? '' : '<span class="sep" aria-hidden="true">✦</span>'}<span><a href="${GARRETT}">Garrett Musar</a> <span class="sep" aria-hidden="true">✦</span> <a href="${AUFBAU}">Aufbau</a></span></div>${withClock ? '<span class="clock"></span>' : ''}</div>`);
+    Object.assign(top.style, { height: topH + 'px', fontSize: topF + 'px' });
+    const clocks = [];
+    if (withClock) clocks.push(top.querySelector('.clock'));
+
+    // ---- the crawl along the bottom ----
+    const tickH = Math.max(22, (tall ? 64 : 38) * s), tickTop = H - tickH;
+    const m = Math.max(10, (tall ? 34 : 22) * s);
+
+    // ---- the lower third: its size from the width it has; then the studio above it, the panel beside or below ----
+    let studio, lt, pan;
+    if (!tall) {
+      // wide: the panel down the right, full height; the studio and the lower third to its left
+      const pw = Math.min(W * (W / H < 1.5 ? 0.3 : 0.33), 470 * s), px = W - m - pw;
+      pan = { x: px, y: topH + m, w: pw, h: tickTop - topH - 2 * m };
+      const lw = px - m;                                             // the lower third runs from the left edge to the panel's gutter
+      lt = lower(0, lw, true, (tickTop - topH) * 0.4);
+      lt.y = tickTop - m * 0.9 - lt.h;
+      studio = { x: 0, y: topH, w: px - m, h: lt.y - topH };
+    } else if (mid) {
+      // between (a tablet): the studio and the panel side by side, the lower third across under both
+      lt = lower(0, W, false, H * 0.2);
+      lt.y = tickTop - m * 0.7 - lt.hang - lt.h;
+      const pw = W * 0.45, px = W - m - pw;
+      pan = { x: px, y: topH + m, w: pw, h: lt.y - lt.capH * 0.85 - m * 0.6 - topH - m };
+      studio = { x: 0, y: topH, w: px - m, h: lt.y - topH };
+    } else {
+      // tall: the studio, the lower third across, the panel under it
+      lt = lower(0, W, false, H * 0.22);
+      const panH0 = Math.min(H * 0.38, (W - 2 * m) * 0.95);
+      pan = { x: m, y: 0, w: W - 2 * m, h: panH0 };
+      studio = { x: 0, y: topH, w: W, h: 0 };
+    }
+
+    // the panel first in a tall window, so the studio has what is left
+    let P;
+    if (tall && !mid) {
+      P = panel(pan.x, tickTop - m * 0.8 - pan.h, pan.w, pan.h, true);
+      const panTop = P.y;
+      lt.y = panTop - m * 0.9 - lt.hang - lt.h;
+      studio.h = lt.y - topH;
+      // move the panel's element back under the studio's things: put it last again later
+      P.el = p.lastElementChild; P.el.remove();
+    }
+
+    // ---- the studio: a beam of light onto the product on its column ----
+    {
+      const capRoom = topF * 2.4;                                       // the caption's tab rides above the lower third
+      const avail = studio.h - capRoom * 0.4 - m;
+      const d = Math.min(avail / 1.42, studio.w * (mid ? 0.6 : tall ? 0.56 : 0.46), 560 * s * (tall ? 1.4 : 1));
+      const cx = tall && !mid ? W * 0.5 : studio.x + Math.max(d * 0.62 + m, studio.w * (mid ? 0.5 : 0.46));
+      const floor = lt.y + Math.min(d * 0.1, 30 * s);
+      const cy = Math.min(floor - d * 0.5 - (136 + 30) * (d / 374) - d * 0.12, topH + m * 0.6 + d / 2 + Math.max(0, (avail - d * 1.42) * 0.5));
+      place(put('<div class="beam" aria-hidden="true"></div>'), cx - d * 1.1, topH, d * 2.2, floor - topH);
+      glow(cx, cy, d * 1.25);
+      product(cx, cy, d, floor);
+      const r = d / 2, o = oval(Math.max(13, d * 0.075));
+      const ox = Math.min(cx + r * 0.55, studio.x + studio.w - o.offsetWidth - m * 0.5);
+      at(o, ox, cy - r * 0.95 - o.offsetHeight * 0.3);
+      // Works like magic!: a starburst stuck on beside the product, where there is room
+      const right = studio.x + studio.w - (cx + r), capTop = lt.y - lt.capH;
+      let bs = 0, bx = 0, by = 0;
+      if (!tall && right > d * 0.3) { bs = Math.min(right * 1.15, d * 0.52); bx = cx + r + right / 2 - bs * 0.05; by = cy + r * 0.3; }
+      else { bs = Math.min(d * 0.44, Math.max(cx - r, 0) * 1.6 + d * 0.2); bx = Math.max(bs * 0.5 + m * 0.4, cx - r * 0.92); by = cy + r * 0.62; }
+      by = Math.min(by, capTop - bs * 0.5 - m * 0.3);
+      if (bs > 64) burst(bx, by, bs);
+      // the ON AIR bug, in the studio's top left corner
+      const bug = put(`<div class="bug" aria-hidden="true"><b><i></i>ON AIR</b>${withClock ? '' : '<span class="clock"></span>'}</div>`);
+      bug.style.fontSize = Math.max(11, (tall ? 34 : 21) * s) + 'px';
+      at(bug, m, topH + m * 0.8);
+      blink(bug.querySelector('b i'), 'off', 1, 0.45);
+      if (!withClock) clocks.push(bug.querySelector('.clock'));
+    }
+
+    // ---- the lower third, over the column ----
+    lt.draw();
+    if (tall && !mid) p.append(P.el); else panel(pan.x, pan.y, pan.w, pan.h);
+
+    // ---- the crawl, with ACT NOW held at its left ----
+    const tk = put(`<div class="ticker" aria-hidden="true"><span>${TICKER.repeat(5)}</span></div>`);
+    Object.assign(tk.style, { top: tickTop + 'px', height: tickH + 'px', fontSize: tickH * 0.64 + 'px', lineHeight: tickH + 'px' });
+    const act = put('<div class="act" aria-hidden="true">ACT NOW</div>');
+    act.style.fontSize = tickH * 0.5 + 'px';
+    place(act, 0, tickTop, across('ACT NOW', '400', tickH * 0.5, 0) + tickH * 1.4, tickH);
+    const tks = tk.firstElementChild, tkRep = tks.offsetWidth / 5, tkV = tickH * 1.6;
+    movers.push((t) => { tks.style.transform = `translateX(${-(((t + 3) * tkV) % tkRep)}px)`; });
+
+    // the clock: the time of day, to the second
+    let shownTime = '';
+    movers.push(() => {
+      const now = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: tall ? undefined : '2-digit' });
+      if (now !== shownTime) { shownTime = now; for (const c of clocks) c.textContent = now; }
+    });
+
+    render(clock());
+
+    // The lower third, x0 to x1, at most maxH high. wide: 30% OFF beside EVERYTHING ON / THE INTERNET.;
+    // tall: 30% OFF across, EVERYTHING ON THE INTERNET. under it. The red tab and the presenter's
+    // caption ride on its top edge. Returns its height and a draw() for when y is known.
+    function lower(x0, x1, wide, maxH) {
+      const padX = Math.max(14, (wide ? 34 : 40) * s), w = x1 - x0 - 2 * padX;
+      const tagW = (t) => across(t, '400', 100, -0.01) / 100 + 0.84 + 0.14;   // per 1px of type, padding and border included
+      // wide: 30% OFF over EVERYTHING ON THE INTERNET. (set to its width) on the left, the red sticker
+      // BLACK FRIDAY / ONLY! on the right; tall: the two lines across, the tab hanging off the bottom right
+      const share = wide ? 0.7 : 1;
+      let hs = (w * share * (wide ? 1 : 0.98)) / headW('30% OFF');
+      let l = wide ? (headW('30% OFF') * hs) / subW('EVERYTHING ON THE INTERNET.') : (w * 0.99) / subW('EVERYTHING ON THE INTERNET.');
+      let gap = HCAP * hs * 0.2, padT = HCAP * hs * 0.3, padB = HCAP * hs * 0.26;
+      let h = padT + HCAP * hs + gap + SCAP * l + padB;
+      const k = Math.min(1, maxH / h); hs *= k; l *= k; gap *= k; padT *= k; padB *= k; h *= k;
+      const o = { h, y: 0, hang: 0, capH: Math.max(13, Math.min(HCAP * hs * (wide ? 0.3 : 0.36), (x1 - x0 - padX * 1.4) / 13)) * 1.75 };
+      const tf = wide ? Math.min((w - headW('30% OFF') * hs - padX) * 0.92 / tagW('BLACK FRIDAY'), HCAP * hs * 0.62) : Math.max(13, HCAP * hs * 0.38);
+      if (!wide) o.hang = tf * 1.1;
+      o.draw = () => {
+        const y = o.y, bar = put('<div class="lt" aria-hidden="true"></div>');
+        place(bar, x0, y, x1 - x0, h); bar.style.fontSize = Math.max(7, HCAP * hs * 0.08) + 'px';
+        const hw = headW('30% OFF') * hs, sw = subW('EVERYTHING ON THE INTERNET.') * l;
+        const X = wide ? x0 + padX : x0 + padX + (w - Math.max(hw, sw)) / 2;
+        let base = y + padT + HCAP * hs;
+        set('head', '30% OFF', HEAD, -0.05, hs, X, base, true, 'h1');
+        base += gap + SCAP * l;
+        set('sub', 'EVERYTHING ON THE INTERNET.', SUB, -0.04, l, X, base, false, 'h2');
+        let capRight = x1;
+        if (wide) {
+          // BLACK FRIDAY ONLY!: a red sticker in the space to the right, a little proud of the bar
+          const tg = put('<div class="tag two">BLACK FRIDAY<br>ONLY!</div>'); tg.style.fontSize = tf + 'px';
+          const left = X + Math.max(hw, sw), cx = (left + x1) / 2;
+          at(tg, cx - tg.offsetWidth / 2, y + h * 0.5 - tg.offsetHeight * 0.62);
+        } else {
+          const tg = put('<div class="tag">BLACK FRIDAY ONLY!</div>'); tg.style.fontSize = tf + 'px';
+          at(tg, x1 - padX * 0.5 - tg.offsetWidth, y + h - tg.offsetHeight * 0.35);
+        }
+        // BUT WAIT… THERE'S LESS!: the presenter's caption, on the top edge at the left, flashing
+        const cf = Math.max(13, Math.min(HCAP * hs * (wide ? 0.3 : 0.36), (x1 - x0 - padX * 1.4) / 13));
+        const cp = put('<div class="cap" role="note"><i>LIVE</i><span>But wait… there’s less!</span></div>'); cp.style.fontSize = cf + 'px';
+        at(cp, x0 + padX * 0.6, y - cp.offsetHeight * 0.78);
+        o.capH = cp.offsetHeight;
+        blink(cp, 'flash', 1.6);
+      };
+      return o;
+    }
+  }
+
+  // ---- the clock ----
+  const t0 = performance.now(), clock = () => (still ? 0 : Math.floor(((performance.now() - t0) / 1000) * FPS) / FPS);
+  const blotch = $('.blotch'), grain = $('.static');
+  function render(t) {
+    for (const move of movers) move(t);
+    const f = Math.round(t * FPS); blotch.setAttribute('seed', BLOTCH[Math.floor(f / 4) % 6]); grain.setAttribute('seed', STATIC[Math.floor(f / 2) % 6]);
+  }
+
+  build();
+  let pending = 0;
+  addEventListener('resize', () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(build); });
+  if (!still) {
+    let last = -1;
+    const frame = () => { const t = clock(); if (t !== last) { last = t; render(t); } requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+    // the globe's frames, decoded once (on the side), then drawn by the clock in step with everything else
+    if ('ImageDecoder' in window) (async () => {
+      try {
+        const dec = new ImageDecoder({ data: await (await fetch(IMG.globe)).arrayBuffer(), type: 'image/webp' });
+        await dec.tracks.ready;
+        const n = dec.tracks.selectedTrack.frameCount, frames = [];
+        for (let i = 0; i < n; i++) { const { image } = await dec.decode({ frameIndex: i }); frames.push(await createImageBitmap(image)); image.close(); }
+        dec.close();
+        if (n === 60) { globeFrames = frames; build(); }
+      } catch {}
+    })();
+  }
+
+  // The tape look costs little on a graphics card and a great deal without one. As on the banner:
+  // once the page is up, see how fast it draws; if slowly, take the look off, and if that made no
+  // difference, put it back.
+  const frameRate = () => new Promise((resolve) => {
+    let frames = 0, drawing = 0, last = 0;
+    const tick = (now) => { const gap = now - last; if (last && gap < 1000) { frames++; drawing += gap; } last = now; if (drawing < 2000) requestAnimationFrame(tick); else resolve((frames * 1000) / drawing); };
+    requestAnimationFrame(tick);
+  });
+  if (!still && !query.has('keep')) {
+    await new Promise((r) => setTimeout(r, 1200));
+    const withLook = await frameRate();
+    if (withLook < 24) {
+      p.style.filter = 'none';
+      if ((await frameRate()) < withLook * 1.5) p.style.removeProperty('filter');
+    }
+  }
+})();
+</script>
+</body>
+</html>
