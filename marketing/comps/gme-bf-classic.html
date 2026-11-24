@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Black Friday Classic</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-bf-classic.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="sky"></div>
+  <div class="haze" id="haze-blue"></div>
+  <div class="haze" id="haze-red"></div>
+  <canvas id="glow"></canvas>
+  <canvas id="type"></canvas>
+  <canvas id="sheen"></canvas>
+  <canvas id="gl"></canvas>
+  <div id="glint"></div>
+  <canvas id="burst"></canvas>
+
+  <header class="doc">
+    <div class="c1">Gary Mustard<br>Enterprises</div>
+    <div class="c2">EST2026</div>
+    <div class="c3" id="doc-c3"></div>
+  </header>
+
+  <div class="foot" id="foot">
+    <div class="words">
+      <p class="star" id="star"></p>
+      <p class="serif" id="serif"></p>
+    </div>
+    <div class="sponsor"><span id="presents"></span><i class="mark"></i></div>
+  </div>
+
+  <div class="base" id="base">
+    <div class="rules"></div>
+    <p class="fine" id="fine"></p>
+  </div>
+
+  <canvas id="dust"></canvas>
+  <div class="grain" id="grain"></div>
+  <div class="grain fine-grain" id="grain2"></div>
+  <div class="vignette"></div>
+</div>
+<script type="module" src="./gme-bf-classic.js"></script>
+</body>
+</html>

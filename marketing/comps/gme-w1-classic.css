@@ -1,0 +1,7 @@
+/* An animated GIF banner, 1997: one low-resolution canvas on a web-safe palette, blown up with
+   hard nearest-neighbour pixels. */
+html, body { margin: 0; padding: 0; background: #0033ff; }
+#stage { position: relative; overflow: hidden; background: #0033ff; }
+#stage > * { position: absolute; left: 0; top: 0; }
+#gif { image-rendering: pixelated; image-rendering: crisp-edges; }
+#gl { visibility: hidden; }

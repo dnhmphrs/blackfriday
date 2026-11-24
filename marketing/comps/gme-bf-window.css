@@ -1,0 +1,6 @@
+/* GME Black Friday: the shop-window poster, seen at night through the glass. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #05070f; }
+#stage { position: relative; overflow: hidden; background: #05070f; }
+#stage canvas { position: absolute; left: 0; top: 0; display: block; }
+#grain { mix-blend-mode: overlay; opacity: 0.36; pointer-events: none; }

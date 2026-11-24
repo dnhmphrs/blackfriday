@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Doorbuster Starburst</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-bf-starburst.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="sky"></div>
+  <div class="glow" id="glow"></div>
+  <div class="rays" id="rays"></div>
+  <div class="haze" id="haze"></div>
+
+  <header class="doc">
+    <div class="c1">Gary Mustard<br>Enterprises</div>
+    <div class="c2">EST2026</div>
+    <div class="c3" id="doc-c3"></div>
+  </header>
+
+  <canvas id="clouds"></canvas>
+  <canvas id="gl"></canvas>
+  <canvas id="halation"></canvas>
+
+  <div class="kicker" id="kicker"></div>
+  <div class="title" id="title"><div class="bloom" id="title-bloom"></div><div class="ink" id="title-ink"></div></div>
+
+  <svg class="ribbon" id="ribbon"></svg>
+  <div id="glints"></div>
+
+  <div class="under" id="under"></div>
+  <div class="side" id="side"></div>
+  <div class="lockup" id="lockup"><i class="mark"></i></div>
+  <p class="foot" id="foot"></p>
+  <div class="pins" id="pins"></div>
+  <div class="strip" id="strip"></div>
+  <p class="fine" id="fine"></p>
+
+  <canvas id="dust"></canvas>
+  <div class="grain" id="grain"></div>
+  <div class="vignette"></div>
+</div>
+<script type="module" src="./gme-bf-starburst.js"></script>
+</body>
+</html>

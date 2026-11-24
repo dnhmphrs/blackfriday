@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Black Friday: A Business Opportunity</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-training.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- The tape: luma a little soft, more so across than down; the red a hair late, like a dub of a dub. -->
+    <filter id="tape" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.85 0.2" result="soft"/>
+      <feColorMatrix in="soft" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>
+      <feGaussianBlur in="r" stdDeviation="1.6 0" result="rs"/>
+      <feOffset in="rs" dx="1.2" result="r2"/>
+      <feColorMatrix in="soft" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="gb"/>
+      <feBlend in="r2" in2="gb" mode="screen"/>
+    </filter>
+    <!-- The studio's mottled backdrop. -->
+    <filter id="mottle" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0032 0.0042" numOctaves="4" seed="27"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.62  0 0 0 0 0.74  0 0 0 0 1  2.2 0 0 0 -0.95"/>
+    </filter>
+  </defs>
+</svg>
+
+<div id="stage">
+  <div id="pic">
+    <div class="bg"></div>
+    <svg class="mottle" width="100%" height="100%"><rect width="100%" height="100%" filter="url(#mottle)"/></svg>
+    <div class="spot"></div>
+    <canvas id="gl"></canvas>
+    <div id="glints"></div>
+
+    <header class="docket">
+      <span class="l">Gary Mustard<br>Enterprises</span>
+      <span class="c">EST2026</span>
+      <span class="r">Training Video<br>VT&#8209;1127</span>
+    </header>
+
+    <div class="card">
+      <div class="mark"></div>
+      <div class="presents">Gary Mustard Enterprises presents</div>
+      <h1 class="title"><span class="t1">30% Off</span><span class="t2">Everything</span></h1>
+      <div class="sub">Black Friday: <i>A Business Opportunity</i></div>
+      <div class="date">Friday 27 November 2026</div>
+    </div>
+
+    <div class="lower">
+      <div class="tab"><i></i></div>
+      <div class="txt">
+        <div class="who">The Internet</div>
+        <div class="role"><span class="r1">Pictured at 70% of actual size</span></div>
+      </div>
+    </div>
+
+    <ol class="points">
+      <li><b>1.</b><span>Every website.</span></li>
+      <li><b>2.</b><span>Thirty percent.</span></li>
+      <li><b>3.</b><span>No purchase necessary.</span></li>
+    </ol>
+
+    <div class="banner-only">
+      <div class="bigoff"><span class="n">30% off</span><span class="w">this website.</span><span class="a">And every other one. Black Friday only.</span></div>
+      <div class="adjust">Please do not adjust your set.</div>
+    </div>
+
+    <div class="cc"><span>[SOFT CORPORATE MUSIC]</span></div>
+
+    <div class="rules"><i></i><i></i><i></i><i></i><i></i></div>
+    <footer class="foot">
+      <div class="fl"><em>Please rewind</em><br>before returning to the GME Resource Library.</div>
+      <div class="logo"></div>
+    </footer>
+  </div>
+
+  <div class="bitc"><span class="lbl">GME&nbsp;VT&#8209;1127 &middot; NOT FOR BROADCAST</span><span class="tc">01:00:00:00</span></div>
+  <div class="band"></div>
+  <canvas id="grain"></canvas>
+  <div class="wash"></div>
+</div>
+<script type="module" src="./gme-training.js"></script>
+</body>
+</html>

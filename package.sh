@@ -1,15 +1,8 @@
 #!/bin/sh
-# Builds src/black-friday.zip, the file to upload to the Chrome Web Store. Only what the
-# manifest uses goes in: of the designs in src/designs/, just the one it names.
+# Builds black-friday.zip, the file to upload to the Chrome Web Store, from src/.
 set -e
 cd "$(dirname "$0")/src"
-rm -f black-friday.zip
-files=$(node -e '
-  const m = require("./manifest.json");
-  const list = ["manifest.json", m.background.service_worker, ...m.content_scripts.flatMap((c) => c.js), ...Object.values(m.icons)];
-  console.log([...new Set(list)].join("\n"));
-')
-# shellcheck disable=SC2086
-zip -X -q black-friday.zip $files
-echo "src/black-friday.zip:"
+rm -f ../black-friday.zip
+zip -X -q -r ../black-friday.zip manifest.json content.js banner.css images fonts icons
+cd ..
 unzip -l black-friday.zip

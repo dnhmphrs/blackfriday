@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>GME Black Friday TV Spot</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-v-flash.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <canvas id="rays"></canvas>
+  <canvas id="gl"></canvas>
+  <canvas id="bloom"></canvas>
+
+  <div class="burst" id="burst">
+    <svg viewBox="-1.1 -1.1 2.2 2.2"><polygon class="shadow" id="burst-shadow"/><polygon class="edge" id="burst-edge"/><polygon class="face" id="burst-face"/></svg>
+    <div class="burst-txt" id="burst-txt"><b class="pct">30%</b><b class="off">OFF!</b></div>
+  </div>
+
+  <div class="hurry" id="hurry">
+    <svg viewBox="-1.1 -1.1 2.2 2.2"><polygon class="edge" id="hurry-edge"/><polygon class="face" id="hurry-face"/></svg>
+    <div class="hurry-txt"><b>ONE DAY</b><b>ONLY!</b></div>
+  </div>
+
+  <svg class="title" id="title"></svg>
+
+  <div class="strip" id="strip"><span>THE ENTIRE INTERNET!</span></div>
+
+  <div class="store" id="store">
+    <i class="logo"></i>
+    <div class="where"><b>Every website.</b><b class="date">Fri 27 Nov.</b></div>
+  </div>
+
+  <div class="ticker" id="ticker"><div class="track" id="track"></div></div>
+
+  <div class="door" id="door"><div class="bulbs" id="bulbs"></div><div class="door-txt"><em>HURRY!</em><b>DOORBUSTER!</b></div></div>
+
+  <canvas id="flare"></canvas>
+  <div class="sparks" id="sparks"></div>
+</div>
+<script type="module" src="./gme-v-flash.js"></script>
+</body>
+</html>

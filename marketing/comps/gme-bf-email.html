@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Black Friday Email</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-bf-email.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="sky"></div>
+  <div class="halo" id="halo"></div>
+
+  <!-- the inbox row the graphic arrived in -->
+  <header class="inbox" id="inbox">
+    <i class="avatar"><b></b></i>
+    <div class="who">
+      <div class="from"><strong>Gary Mustard Enterprises</strong><span class="time" id="time">Fri 27 Nov, 6:00&nbsp;AM</span></div>
+      <div class="subj" id="subj"></div>
+      <div class="pre" id="pre"></div>
+    </div>
+  </header>
+
+  <!-- email body: brand header and nav -->
+  <div class="masthead" id="masthead">
+    <i class="mark"></i>
+    <nav id="nav"></nav>
+  </div>
+
+  <canvas id="gl"></canvas>
+  <canvas id="bloom"></canvas>
+  <div id="glint"></div>
+
+  <div class="kicker" id="kicker"></div>
+  <h1 class="bf" id="bf"></h1>
+  <svg class="string" id="string"><path id="string-path"/></svg>
+  <div class="tag" id="tag"><i class="hole"></i><b>No code<br>needed</b><small>Discount applied<br>at every website</small></div>
+
+  <div class="burst" id="burst"><svg viewBox="-1 -1 2 2"><polygon class="back" id="burst-back"/><polygon class="front" id="burst-front"/></svg><div class="burst-txt"><small>Not just sitewide</small><b>Internet<br>wide!</b></div></div>
+
+  <div class="offer" id="offer">
+    <div class="big-wrap"><div class="big glow" id="big-glow"></div><div class="big" id="big"></div></div>
+    <div class="scope" id="scope"></div>
+  </div>
+
+  <div class="tags" id="tags"></div>
+  <div class="sparks" id="sparks"></div>
+
+  <div class="timer" id="timer">
+    <div class="ends">Ends in</div>
+    <div class="cells">
+      <div class="cell"><b id="hh">23</b><span>Hrs</span></div><em>:</em>
+      <div class="cell"><b id="mm">59</b><span>Min</span></div><em>:</em>
+      <div class="cell"><b id="ss">59</b><span>Sec</span></div>
+    </div>
+  </div>
+
+  <a class="cta" id="cta"><span id="cta-label"></span><i class="sheen" id="sheen"></i></a>
+
+  <p class="garamond" id="garamond"></p>
+
+  <footer class="unsub" id="unsub">
+    <i class="lock"></i>
+    <p id="unsub-text"></p>
+  </footer>
+
+  <canvas id="dust"></canvas>
+  <div class="grain" id="grain"></div>
+</div>
+<script type="module" src="./gme-bf-email.js"></script>
+</body>
+</html>

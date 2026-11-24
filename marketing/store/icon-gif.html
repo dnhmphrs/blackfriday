@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>GIF Banner Icon</title>
+<style>
+  /* The extension's icon in the GIF banner's pixel language: flat web blue (#0033ff) in a
+     black-keylined, bevelled 1997 button, with the banner's gold bevelled "%" (cream highlight,
+     gold lower band, hard navy extrusion; black keyline on the big one).
+     Drawn as hand-placed pixels and scaled by whole numbers only, so every size is crisp.
+       ?size=16 | 32 | 48   the 16-pixel design at 1x, 2x, 3x, filling the square
+       ?size=128            the 32-pixel design at 3x: 96 px of artwork, 16 px transparent padding
+       no size              a preview sheet of all four, actual size and enlarged */
+  html, body { margin: 0; background: transparent; }
+  body.sheet { background: #ffffff; font: 12px/1.4 system-ui, sans-serif; padding: 16px; }
+  canvas { display: block; image-rendering: pixelated; }
+  .row { display: flex; gap: 24px; align-items: flex-end; padding: 16px; }
+  .row.dark { background: #202124; color: #e8eaed; }
+  figure { margin: 0; text-align: center; }
+</style>
+</head>
+<body>
+<script>
+const C = {
+  blue: '#0033ff', navy: '#000066', deep: '#000099', black: '#000000', white: '#ffffff', sky: '#3366ff',
+  pale: '#ccccff', yellow: '#ffff00', cream: '#ffffcc', gold: '#ffcc00',
+};
+
+// The "%", drawn to the grid: n x n, two round-cornered d x d dots in opposite corners and an
+// s-pixel stair-step diagonal between them.
+function pct(n, d, s) {
+  const rows = [];
+  for (let y = 0; y < n; y++) {
+    let r = '';
+    for (let x = 0; x < n; x++) {
+      const dot = (ox, oy) => { const dx = x - ox, dy = y - oy; if (dx < 0 || dy < 0 || dx >= d || dy >= d) return false;
+        const cx = Math.min(dx, d - 1 - dx), cy = Math.min(dy, d - 1 - dy); return cx + cy >= (d >= 6 ? 2 : 1) || d < 4; };
+      const diag = x + y > n - 1 - s && x + y <= n - 1;
+      r += dot(0, 0) || dot(n - d, n - d) || diag ? '#' : '.';
+    }
+    rows.push(r);
+  }
+  return rows;
+}
+const mask = (rows, k = 1) => ({ w: rows[0].length * k, h: rows.length * k, at(x, y) { return x >= 0 && y >= 0 && x < this.w && y < this.h && rows[Math.floor(y / k)][Math.floor(x / k)] === '#'; } });
+
+// A pixel grid: g[y][x] = colour name or null.
+const grid = (n) => Array.from({ length: n }, () => Array(n).fill(null));
+
+// The button: rounded by cutting stair-step corners, black keyline, sky bevel top-left, deep blue bevel bottom-right.
+function button(n, cut) {
+  const g = grid(n);
+  // corner cut: pixels with (dx + dy) < cut from a corner are outside
+  const inside = (x, y) => {
+    if (x < 0 || y < 0 || x >= n || y >= n) return false;
+    const dx = Math.min(x, n - 1 - x), dy = Math.min(y, n - 1 - y);
+    return dx + dy >= cut;
+  };
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    if (!inside(x, y)) continue;
+    const edge = !inside(x - 1, y) || !inside(x + 1, y) || !inside(x, y - 1) || !inside(x, y + 1);
+    if (edge) { g[y][x] = 'black'; continue; }
+    const tl = !inside(x - 2, y) || !inside(x, y - 2);
+    const br = !inside(x + 2, y) || !inside(x, y + 2);
+    g[y][x] = tl && !br ? 'sky' : br && !tl ? 'deep' : 'blue';
+  }
+  return g;
+}
+
+// The banner's type treatment on a mask, stamped into the grid at (ox, oy).
+function stamp(g, m, ox, oy, line, ext) {
+  const face = (x, y) => m.at(x - line, y - line);
+  const keyed = (x, y) => { for (let dy = -line; dy <= line; dy++) for (let dx = -line; dx <= line; dx++) if (face(x + dx, y + dy)) return true; return false; };
+  const split = Math.round(m.h * 0.56);
+  const W = m.w + line * 2 + ext, H = m.h + line * 2 + ext;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    let c = null;
+    if (face(x, y)) {
+      const fx = x - line, fy = y - line;
+      c = !m.at(fx, fy - 1) || (!m.at(fx - 1, fy) && fy < split) ? 'cream' : fy >= split ? 'gold' : 'yellow';
+    } else if (line && keyed(x, y)) c = 'black';
+    else for (let i = 1; i <= ext; i++) if (keyed(x - i, y - i)) { c = 'navy'; break; }
+    if (c && g[oy + y] && oy + y >= 0 && ox + x >= 0 && ox + x < g.length) g[oy + y][ox + x] = c;
+  }
+  return { W, H };
+}
+
+// The 16-pixel design (16, 32, 48): a flat blue tile and a 12-pixel % with a one-pixel navy
+// extrusion; no keylines at this size, so the shape stays open.
+function design16() {
+  const g = grid(16);
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    const dx = Math.min(x, 15 - x), dy = Math.min(y, 15 - y);
+    if (dx + dy >= 2) g[y][x] = 'blue';
+  }
+  stamp(g, mask(pct(12, 4, 2)), 2, 2, 0, 1); // 13 x 13 -> x 2..14
+  return g;
+}
+// The 32-pixel design (128 at 3x): the bevelled button and a larger % with a keyline and deeper extrusion.
+function design32() {
+  const g = button(32, 3);
+  stamp(g, mask(pct(18, 6, 3)), 5, 5, 1, 2); // 22 x 22 -> x 5..26, y 5..26
+  return g;
+}
+
+function draw(size) {
+  const pad = size === 128 ? 16 : 0;
+  const g = size === 128 ? design32() : design16();
+  const n = g.length, k = (size - pad * 2) / n;
+  const c = document.createElement('canvas'); c.width = size; c.height = size;
+  const x = c.getContext('2d');
+  for (let y = 0; y < n; y++) for (let xx = 0; xx < n; xx++) {
+    if (!g[y][xx]) continue;
+    x.fillStyle = C[g[y][xx]];
+    x.fillRect(pad + xx * k, pad + y * k, k, k);
+  }
+  return c;
+}
+
+const sizeQ = new URLSearchParams(location.search).get('size');
+if (sizeQ) {
+  const c = draw(Number(sizeQ));
+  c.id = 'icon';
+  document.body.append(c);
+} else {
+  document.body.className = 'sheet';
+  for (const dark of [false, true]) {
+    const row = document.createElement('div'); row.className = 'row' + (dark ? ' dark' : '');
+    for (const s of [16, 32, 48, 128]) {
+      const f = document.createElement('figure'); f.append(draw(s));
+      const cap = document.createElement('figcaption'); cap.textContent = s; f.append(cap); row.append(f);
+    }
+    for (const s of [16, 48, 128]) {
+      const f = document.createElement('figure'), c = draw(s);
+      c.style.width = c.style.height = (s === 128 ? 256 : 192) + 'px';
+      f.append(c);
+      const cap = document.createElement('figcaption'); cap.textContent = s + ' enlarged'; f.append(cap); row.append(f);
+    }
+    document.body.append(row);
+  }
+}
+window.ready = true;
+</script>
+</body>
+</html>

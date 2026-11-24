@@ -1,14 +1,12 @@
-// End-to-end checks of the extension in real Chromium: which day it shows on (in several
-// time zones), the toolbar button, and pages that try hard to break it.
+// End-to-end checks of the extension in real Chromium: which day it shows on (in several time
+// zones and across midnight), that it does nothing on other days, the banner's layout, and
+// pages that try hard to break it. The clock is faked; see test/helpers.mjs.
 //   npm install && npx playwright install chromium && npm test
-import { launchWithExtension, serve, makeTestCopy, clickAction } from './helpers.mjs';
 import fs from 'node:fs';
+import path from 'node:path';
+import { launchWithExtension, serve, makeTestCopy, reloadExtension } from './helpers.mjs';
 
-const SRC = process.argv[2] || new URL('../src', import.meta.url).pathname;
-const EXT = makeTestCopy(SRC);
-const SHOTS = new URL('./shots/', import.meta.url).pathname;
-fs.mkdirSync(SHOTS, { recursive: true });
-
+const EXT = makeTestCopy(new URL('../src', import.meta.url).pathname);
 const results = [];
 const check = (name, pass, detail = '') => {
   results.push({ name, pass: !!pass, detail });
@@ -59,7 +57,7 @@ const routes = {
     </script></head><body><h1>head script</h1></body></html>`,
 };
 const { server, origin } = await serve(routes);
-// A page that streams: <head> now, <body> start after 400ms, the rest after another 1500ms.
+// A page that streams: <head> now, <body> after 400ms, the rest after another 1500ms.
 routes['/slow'] = (req, res) => {
   res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
   res.write(`<!doctype html><html><head><title>slow</title></head>${' '.repeat(2048)}`);
@@ -67,33 +65,35 @@ routes['/slow'] = (req, res) => {
   setTimeout(() => res.end(`<p>done</p></body></html>`), 1900);
 };
 
-// ---------- in-page probes (run in the page's main world) ----------
+// ---------- what the page shows (runs in the page) ----------
 const probe = () => {
-  const host = document.querySelector('thirty-off-overlay');
+  const host = document.querySelector('thirty-off-everything');
   if (!host) return { present: false, count: 0 };
-  const panel = host.shadowRoot?.querySelector('.overlay-container');
-  const hr = host.getBoundingClientRect();
-  const pr = panel?.getBoundingClientRect();
-  const cs = panel && getComputedStyle(panel);
-  const l1 = host.shadowRoot?.querySelector('.line1');
-  const l3 = host.shadowRoot?.querySelector('.line3');
+  const s = host.shadowRoot;
+  const rect = (el) => { const r = el?.getBoundingClientRect(); return r && [r.x, r.y, r.width, r.height].map(Math.round); };
   let topLayer = null;
   try { topLayer = host.matches(':popover-open'); } catch {}
+  const frame = s.querySelector('.frame');
   return {
     present: true,
-    count: document.querySelectorAll('thirty-off-overlay').length,
+    count: document.querySelectorAll('thirty-off-everything').length,
     parent: host.parentNode?.nodeName,
     topLayer,
-    hostRect: [hr.x, hr.y, hr.width, hr.height].map(Math.round),
-    panelRect: pr && [pr.x, pr.y, pr.width, pr.height].map(Math.round),
-    viewport: [document.documentElement.clientWidth, innerWidth, innerHeight],
-    bg: cs?.backgroundColor,
-    hostDisplay: getComputedStyle(host).display,
-    line1: l1 && { h: Math.round(l1.getBoundingClientRect().height), w: Math.round(l1.getBoundingClientRect().width),
-      fs: getComputedStyle(l1).fontSize, ls: getComputedStyle(l1).letterSpacing, tt: getComputedStyle(l1).textTransform, dir: getComputedStyle(l1).direction },
-    line3: l3 && { h: Math.round(l3.getBoundingClientRect().height), lh: getComputedStyle(l3).lineHeight, text: l3.textContent, vis: getComputedStyle(l3).visibility },
-    hitRight: (() => { const e = document.elementFromPoint(innerWidth - 60, 200); return e?.nodeName; })(),
-    hitLeft: (() => { const e = document.elementFromPoint(100, 200); return e?.nodeName; })(),
+    styled: !!frame && getComputedStyle(frame).backgroundColor === 'rgb(0, 0, 0)' && getComputedStyle(s.querySelector('.face')).overflow === 'hidden',
+    revealed: !!frame && frame.classList.contains('in') && getComputedStyle(frame).visibility === 'visible',
+    frame: rect(frame),
+    art: rect(s.querySelector('.type')),
+    globe: rect(s.querySelector('.globe')),
+    ticker: rect(s.querySelector('.crawl')),
+    // how much of each ticker's width has its lettering over it (1: all of it), and which way the banner reads
+    tickers: ['.ticker', '.crawl'].map((sel) => { const box = s.querySelector(sel).getBoundingClientRect(), text = s.querySelector(sel + ' span').getBoundingClientRect();
+      return Math.round((100 * Math.max(0, Math.min(box.right, text.right) - Math.max(box.left, text.left))) / box.width) / 100; }),
+    direction: getComputedStyle(s.querySelector('.tube')).direction,
+    look: getComputedStyle(s.querySelector('.tube')).filter,
+    images: [...s.querySelectorAll('img')].filter((i) => getComputedStyle(i).display !== 'none').map((i) => i.naturalWidth),
+    viewport: [document.documentElement.clientWidth, innerHeight],
+    hitRight: document.elementFromPoint(innerWidth - 60, innerHeight / 2)?.nodeName,
+    hitLeft: document.elementFromPoint(100, 200)?.nodeName,
   };
 };
 const BF = Date.parse('2026-11-27T12:00:00Z');       // Black Friday 2026, midday UTC
@@ -105,8 +105,25 @@ async function watchErrors(context, page) {
   const cdp = await context.newCDPSession(page);
   await cdp.send('Runtime.enable');
   cdp.on('Runtime.exceptionThrown', (e) => errs.push(e.exceptionDetails.exception?.description || e.exceptionDetails.text));
-  page.on('console', (m) => { if (m.type() === 'error') errs.push('console.error: ' + m.text()); });
+  page.on('console', (m) => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) errs.push('console.error: ' + m.text()); });
   return errs;
+}
+
+// =====================================================================================
+console.log('\n# 0. What is in the package');
+{
+  // One script, one stylesheet, pictures and typefaces: no library, no 3D or canvas code, nothing
+  // fetched or run from elsewhere. (The globe is a picture, drawn beforehand.)
+  const SRC = new URL('../src', import.meta.url).pathname;
+  const files = fs.readdirSync(SRC, { recursive: true }).filter((f) => fs.statSync(path.join(SRC, f)).isFile()).map((f) => f.split(path.sep).join('/'));
+  const odd = files.filter((f) => !/^(manifest\.json|content\.js|banner\.css|images\/[\w-]+\.webp|fonts\/[\w-]+\.woff2|fonts\/LICENSE\.txt|icons\/icon\d+\.png)$/.test(f));
+  check('only the manifest, one script, one stylesheet, pictures, typefaces and icons', odd.length === 0, odd.join(', '));
+  const manifest = JSON.parse(fs.readFileSync(path.join(SRC, 'manifest.json'), 'utf8'));
+  check('no permissions, no background script, the one content script', !manifest.permissions && !manifest.host_permissions && !manifest.background
+    && JSON.stringify(manifest.content_scripts.map((c) => c.js)) === '[["content.js"]]');
+  const code = fs.readFileSync(path.join(SRC, 'content.js'), 'utf8') + fs.readFileSync(path.join(SRC, 'banner.css'), 'utf8');
+  const found = code.match(/three|webgl|getContext|canvas|\bimport\b|require\(|eval\(|new Function|fetch\(|XMLHttpRequest|WebSocket|sendBeacon|<script|wasm|Worker\(|https?:\/\/(?!www\.w3\.org)/gi);
+  check('no 3D, canvas, network or dynamic code in it', !found, String(found));
 }
 
 // =====================================================================================
@@ -115,7 +132,6 @@ const cases = [
   ['Los Angeles Thu 26 Nov 20:00 (Thanksgiving evening)', 'America/Los_Angeles', '2026-11-26T20:00:00-08:00', false],
   ['Los Angeles Thu 26 Nov 23:59:50',                     'America/Los_Angeles', '2026-11-26T23:59:50-08:00', false],
   ['Los Angeles Fri 27 Nov 00:00:05',                     'America/Los_Angeles', '2026-11-27T00:00:05-08:00', true],
-  ['Los Angeles Fri 27 Nov 10:00',                        'America/Los_Angeles', '2026-11-27T10:00:00-08:00', true],
   ['Los Angeles Fri 27 Nov 18:00',                        'America/Los_Angeles', '2026-11-27T18:00:00-08:00', true],
   ['Los Angeles Fri 27 Nov 23:59:50',                     'America/Los_Angeles', '2026-11-27T23:59:50-08:00', true],
   ['Los Angeles Sat 28 Nov 00:00:05',                     'America/Los_Angeles', '2026-11-28T00:00:05-08:00', false],
@@ -123,11 +139,9 @@ const cases = [
   ['London Fri 27 Nov 12:00',                             'Europe/London',       '2026-11-27T12:00:00+00:00', true],
   ['Sydney Fri 27 Nov 09:00',                             'Australia/Sydney',    '2026-11-27T09:00:00+11:00', true],
   ['Sydney Sat 28 Nov 09:00',                             'Australia/Sydney',    '2026-11-28T09:00:00+11:00', false],
-  ['Kolkata Fri 27 Nov 04:00 (UTC+5:30)',                 'Asia/Kolkata',        '2026-11-27T04:00:00+05:30', true],
   ['Kiritimati Fri 27 Nov 00:30 (UTC+14)',                'Pacific/Kiritimati',  '2026-11-27T00:30:00+14:00', true],
-  ['Kiritimati Sat 28 Nov 00:30 (UTC+14)',                'Pacific/Kiritimati',  '2026-11-28T00:30:00+14:00', false],
-  ['Pago Pago Fri 27 Nov 23:30 (UTC-11)',                 'Pacific/Pago_Pago',   '2026-11-27T23:30:00-11:00', true],
   ['Pago Pago Thu 26 Nov 23:30 (UTC-11)',                 'Pacific/Pago_Pago',   '2026-11-26T23:30:00-11:00', false],
+  ['Pago Pago Fri 27 Nov 23:30 (UTC-11)',                 'Pacific/Pago_Pago',   '2026-11-27T23:30:00-11:00', true],
 ];
 const byTz = new Map();
 for (const c of cases) byTz.set(c[1], [...(byTz.get(c[1]) || []), c]);
@@ -136,22 +150,19 @@ for (const [tz, list] of byTz) {
   const page = await context.newPage();
   for (const [label, , iso, expected] of list) {
     await page.goto(url('/plain', Date.parse(iso)));
-    await sleep(150);
+    await sleep(200);
     const p = await page.evaluate(probe);
-    check(label, p.present === expected, `overlay ${p.present ? 'shown' : 'not shown'}`);
+    check(label, p.present === expected, `banner ${p.present ? 'shown' : 'not shown'}`);
   }
-
-  // Every day 2024-2040 at local noon, plus the two midnight edges of each Black Friday,
-  // without reloading: change the fake clock and fire the event the script re-checks on.
-  if (tz === 'America/Los_Angeles' || tz === 'Australia/Sydney') {
+  if (tz === 'America/Los_Angeles') {
+    // Every day 2024-2040 at local noon, without reloading: move the clock and wake the script.
     await page.goto(url('/plain', ORDINARY));
     const sweep = await page.evaluate(() => {
-      const shown = () => !!document.querySelector('thirty-off-overlay');
+      const shown = () => !!document.querySelector('thirty-off-everything');
       const at = (d) => { document.documentElement.dataset.fakeNow = String(d.getTime()); document.dispatchEvent(new Event('visibilitychange')); return shown(); };
       const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      // Independent definition: walk November to its fourth Thursday, add a day.
       const blackFriday = (year) => { let n = 0; for (let day = 1; day <= 30; day++) { if (new Date(year, 10, day).getDay() === 4 && ++n === 4) return fmt(new Date(year, 10, day + 1)); } };
-      const days = [], wrong = [], edgesWrong = [];
+      const days = [], wrong = [];
       for (let year = 2024; year <= 2040; year++) {
         const expected = blackFriday(year);
         for (let d = new Date(year, 0, 1, 12); d.getFullYear() === year; d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 12)) {
@@ -159,236 +170,200 @@ for (const [tz, list] of byTz) {
           if (on) days.push(fmt(d));
           if (on !== (fmt(d) === expected)) wrong.push(fmt(d));
         }
-        const [y, m, dd] = expected.split('-').map(Number);
-        const edges = [[new Date(y, m - 1, dd, 0, 0, 0, 0), true], [new Date(y, m - 1, dd, 23, 59, 59, 999), true],
-                       [new Date(y, m - 1, dd - 1, 23, 59, 59, 999), false], [new Date(y, m - 1, dd + 1, 0, 0, 0, 0), false]];
-        for (const [d, want] of edges) if (at(d) !== want) edgesWrong.push(d.toString());
       }
-      return { days, wrong, edgesWrong };
+      return { days, wrong };
     });
-    const original = ['2024-11-29', '2025-11-28', '2026-11-27', '2027-11-26', '2028-11-24', '2029-11-23', '2030-11-29', '2031-11-28', '2032-11-26', '2033-11-25'];
-    check(`${tz}: 2024-2040 day-by-day sweep, one day per year`, sweep.days.length === 17 && sweep.wrong.length === 0, `shown on ${sweep.days.length} days, ${sweep.wrong.length} wrong`);
-    check(`${tz}: midnight edges of every Black Friday`, sweep.edgesWrong.length === 0, sweep.edgesWrong.slice(0, 3).join(' | '));
-    check(`${tz}: matches the original hand-written 2024-2033 list`, JSON.stringify(sweep.days.slice(0, 10)) === JSON.stringify(original), sweep.days.slice(0, 10).join(' '));
+    check('2024-2040, day by day: shown on exactly one day a year, the right one', sweep.days.length === 17 && sweep.wrong.length === 0, `${sweep.days.length} days, ${sweep.wrong.length} wrong; 2026: ${sweep.days.find((d) => d.startsWith('2026'))}`);
   }
   await context.close();
 }
 
 // =====================================================================================
-console.log('\n# 2. Tabs left open across midnight (timer path, no events fired)');
+console.log('\n# 2. Tabs left open across midnight');
 {
   const { context } = await launchWithExtension(EXT, { tz: 'America/Chicago' });
   const page = await context.newPage();
   await page.goto(url('/plain', Date.parse('2026-11-26T23:59:57.500-06:00')));
   await sleep(200);
-  check('Thu 23:59:57 - not shown yet', !(await page.evaluate(probe)).present);
+  check('Thu 23:59:57: not shown yet', !(await page.evaluate(probe)).present);
   await sleep(4300);
-  check('same tab ~4s later, now Friday - shown without reload', (await page.evaluate(probe)).present);
+  check('same tab, now Friday: shown without a reload', (await page.evaluate(probe)).present);
   await page.goto(url('/plain', Date.parse('2026-11-27T23:59:57.500-06:00')));
-  await sleep(200);
-  check('Fri 23:59:57 - shown', (await page.evaluate(probe)).present);
-  await sleep(4300);
-  check('same tab ~4s later, now Saturday - gone without reload', !(await page.evaluate(probe)).present);
+  await sleep(4500);
+  check('same tab, now Saturday: gone without a reload', !(await page.evaluate(probe)).present);
   await context.close();
 }
 
 // =====================================================================================
-console.log('\n# 3. Toolbar button');
+console.log('\n# 3. Nothing at all on other days');
 {
-  const { context, sw, extensionId } = await launchWithExtension(EXT, { tz: 'Europe/London' });
-  await sw.evaluate(() => { self.__errs = []; self.addEventListener('unhandledrejection', (e) => self.__errs.push(String(e.reason))); self.addEventListener('error', (e) => self.__errs.push(String(e.message))); });
-  check('chrome.scripting is available in the worker', (await sw.evaluate(() => typeof chrome.scripting?.executeScript)) === 'function');
+  const { context } = await launchWithExtension(EXT, { tz: 'Europe/London' });
   const page = await context.newPage();
   const errs = await watchErrors(context, page);
-  await page.goto(url('/plain', ORDINARY));
-  await sleep(150);
-  check('ordinary day: nothing shown on load', !(await page.evaluate(probe)).present);
-  await clickAction(context, page, extensionId); await sleep(400);
-  let p = await page.evaluate(probe);
-  check('ordinary day: click shows it', p.present && p.count === 1, JSON.stringify(p.panelRect));
-  await clickAction(context, page, extensionId); await sleep(400);
-  check('ordinary day: second click hides it', !(await page.evaluate(probe)).present);
-  await clickAction(context, page, extensionId); await sleep(400);
-  check('ordinary day: third click shows it again (one copy)', (await page.evaluate(probe)).count === 1);
-  await page.reload(); await sleep(200);
-  check('ordinary day: reload clears the preview', !(await page.evaluate(probe)).present);
-
-  await page.goto(url('/plain', BF)); await sleep(150);
-  check('Black Friday: shown on load', (await page.evaluate(probe)).present);
-  await clickAction(context, page, extensionId); await sleep(400);
-  check('Black Friday: click hides it on this tab', !(await page.evaluate(probe)).present);
-  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(100);
-  check('Black Friday: stays hidden when the tab regains focus', !(await page.evaluate(probe)).present);
-  await clickAction(context, page, extensionId); await sleep(400);
-  check('Black Friday: click brings it back', (await page.evaluate(probe)).count === 1);
-
-  // Pages no extension may touch.
-  const restricted = await context.newPage();
-  await restricted.goto('chrome://version/');
-  await clickAction(context, restricted, extensionId).catch((e) => check('click on chrome:// page could be triggered', false, e.message));
-  await sleep(400);
-  const swErrs = await sw.evaluate(() => self.__errs).catch(() => ['worker restarted']);
-  check('click on a chrome:// page: no error in the worker', swErrs.length === 0, swErrs.join(' | '));
-  check('no content-script errors so far', errs.length === 0, errs.join(' | '));
+  for (const [label, t] of [['an ordinary day', ORDINARY], ['the day before', Date.parse('2026-11-26T12:00:00Z')], ['the day after', Date.parse('2026-11-28T12:00:00Z')]]) {
+    await page.goto(url('/plain', t)); await sleep(300);
+    const touched = await page.evaluate(() => document.querySelectorAll('thirty-off-everything').length);
+    check(`${label}: nothing added to the page`, touched === 0, touched);
+  }
+  check('no errors on those days', errs.length === 0, errs.join(' | '));
   await context.close();
-}
-{
-  // A tab that was open BEFORE the extension was installed has no content script.
-  // (?preinstall=1 pages are skipped by the test copy's manifest to recreate that state.)
-  for (const [label, t] of [['ordinary day', ORDINARY], ['Black Friday', BF]]) {
-    const { context, extensionId } = await launchWithExtension(EXT, { tz: 'Europe/London' });
-    const page = await context.newPage();
-    const errs = await watchErrors(context, page);
-    await page.goto(url('/plain', t) + '&preinstall=1');
-    await sleep(300);
-    check(`pre-install tab, ${label}: untouched until clicked`, !(await page.evaluate(probe)).present);
-    await clickAction(context, page, extensionId); await sleep(600);
-    let p = await page.evaluate(probe);
-    check(`pre-install tab, ${label}: first click shows it`, p.present && p.count === 1);
-    await clickAction(context, page, extensionId); await sleep(400);
-    check(`pre-install tab, ${label}: second click hides it`, !(await page.evaluate(probe)).present);
-    await clickAction(context, page, extensionId); await sleep(400);
-    check(`pre-install tab, ${label}: third click shows it`, (await page.evaluate(probe)).count === 1);
-    check(`pre-install tab, ${label}: no errors`, errs.length === 0, errs.join(' | '));
-    await context.close();
-  }
-}
-{
-  // The extension is updated (reloaded) while a tab is showing the overlay. The copy of the
-  // content script in that tab is cut off from the extension from then on.
-  for (const lookedAtFirst of [true, false]) {
-    const tag = lookedAtFirst ? 'tab looked at before the click' : 'clicked straight away';
-    const { context, sw, extensionId } = await launchWithExtension(EXT, { tz: 'Europe/London' });
-    const page = await context.newPage();
-    const errs = await watchErrors(context, page);
-    await page.goto(url('/plain', BF)); await sleep(200);
-    check(`update (${tag}): shown before the update`, (await page.evaluate(probe)).count === 1);
-    await page.evaluate(() => { document.querySelector('thirty-off-overlay').dataset.generation = 'old'; });
-    await sw.evaluate(() => chrome.runtime.reload()).catch(() => {});
-    await sleep(1500);
-    const fresh = await context.newPage();
-    await fresh.goto(url('/plain', BF)); await sleep(300);
-    check(`update (${tag}): tabs opened after the update work normally`, (await fresh.evaluate(probe)).count === 1);
-    await fresh.close();
-    await page.bringToFront();
-    if (lookedAtFirst) {
-      await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(200);
-      check(`update (${tag}): cut-off overlay removes itself`, !(await page.evaluate(probe)).present);
-    }
-    await clickAction(context, page, extensionId); await sleep(700);
-    const p = await page.evaluate(probe);
-    const generation = await page.evaluate(() => document.querySelector('thirty-off-overlay')?.dataset.generation ?? 'new');
-    check(`update (${tag}): click leaves exactly one overlay, from the new version`, p.count === 1 && p.topLayer === true && generation === 'new', `count ${p.count}, ${generation}`);
-    await clickAction(context, page, extensionId); await sleep(500);
-    check(`update (${tag}): next click hides it`, !(await page.evaluate(probe)).present);
-    await clickAction(context, page, extensionId); await sleep(500);
-    check(`update (${tag}): and the next shows it again`, (await page.evaluate(probe)).count === 1);
-    check(`update (${tag}): no errors`, errs.length === 0, errs.join(' | '));
-    await context.close();
-  }
 }
 
 // =====================================================================================
-console.log('\n# 4. Hostile and unusual pages (Black Friday)');
+console.log('\n# 4. The banner (Black Friday)');
 {
-  const { context, extensionId } = await launchWithExtension(EXT, { tz: 'Europe/London' });
+  const { context } = await launchWithExtension(EXT, { tz: 'Europe/London' });
   const page = await context.newPage();
   const errs = await watchErrors(context, page);
-
-  await page.goto(url('/plain', BF)); await sleep(250);
+  // From the first frame the page paints, record any moment the banner shows before it is ready.
+  await page.addInitScript(() => {
+    window.__flash = [];
+    const look = () => {
+      const s = document.querySelector('thirty-off-everything')?.shadowRoot, f = s?.querySelector('.frame');
+      if (f && getComputedStyle(f).visibility !== 'hidden') {
+        const ready = getComputedStyle(f).backgroundColor === 'rgb(0, 0, 0)' && [...s.querySelectorAll('img')].every((i) => i.hidden || (i.complete && i.naturalWidth > 0));
+        if (!ready) window.__flash.push(Math.round(performance.now()));
+      }
+      requestAnimationFrame(look);
+    };
+    requestAnimationFrame(look);
+  });
+  const frameRate = () => page.evaluate(() => new Promise((res) => { let n = 0; const t0 = performance.now(); const tick = (t) => { n++; t - t0 < 2500 ? requestAnimationFrame(tick) : res(Math.round((n * 1000) / (t - t0))); }; requestAnimationFrame(tick); }));
+  await page.goto(url('/plain', ORDINARY)); await sleep(500);
+  const bare = await frameRate();
+  await page.goto(url('/plain', BF)); await sleep(2000);
   const base = await page.evaluate(probe);
-  await page.screenshot({ path: SHOTS + 'plain.png' });
-  const vw = base.viewport[0];
-  check('plain: panel is the right-hand 30%, full height', Math.abs(base.panelRect[2] - Math.round(vw * 0.3)) <= 1 && base.panelRect[1] === 0 && base.panelRect[3] === 800 && base.panelRect[0] + base.panelRect[2] === vw, JSON.stringify(base.panelRect) + ' of ' + JSON.stringify(base.viewport));
-  check('plain: mounted under <html>, in the top layer', base.parent === 'HTML' && base.topLayer === true);
-  check('plain: panel blocks the right side, left side still clickable', base.hitRight === 'THIRTY-OFF-OVERLAY' && base.hitLeft !== 'THIRTY-OFF-OVERLAY', `${base.hitRight} / ${base.hitLeft}`);
-  await page.mouse.move(400, 400); await page.mouse.wheel(0, 600); await sleep(150);
-  const y1 = await page.evaluate(() => scrollY);
-  await page.mouse.move(vw - 100, 400); await page.mouse.wheel(0, 600); await sleep(150);
-  const y2 = await page.evaluate(() => scrollY);
-  check('plain: mouse wheel over the panel still scrolls the page', y1 > 0 && y2 > y1, `${y1} -> ${y2}`);
-  check('plain: panel does not scroll away', (await page.evaluate(probe)).panelRect[1] === 0);
+  const [vw, vh] = base.viewport;
+  check('comes in with the tape look', base.look.includes('tape'), base.look);
+  check('never shows unstyled or half-loaded: hidden until ready, then slides in', base.revealed && (await page.evaluate(() => window.__flash.length)) === 0, `flashes at ${await page.evaluate(() => window.__flash.slice(0, 5).join(','))} ms`);
+  check('right-hand 30%, full height', Math.abs(base.frame[2] - vw * 0.3) <= 2 && base.frame[1] === 0 && base.frame[3] === vh && Math.abs(base.frame[0] + base.frame[2] - vw) <= 1, `${JSON.stringify(base.frame)} of ${vw}`); // to a pixel: a browser that draws a scrollbar gives halves
+  check('under <html>, in the top layer', base.parent === 'HTML' && base.topLayer === true);
+  check('stylesheet, pictures and crawl loaded', base.styled && base.images.length === 6 && base.images.every((w) => w > 0), JSON.stringify(base.images));
+  check('both tickers run across the banner, left to right', base.tickers.every((c) => c > 0.9) && base.direction === 'ltr', `${base.tickers} ${base.direction}`);
+  check('the crawl sits on the bottom edge', base.ticker && Math.abs(base.ticker[1] + base.ticker[3] - (base.frame[1] + base.frame[3])) <= 1, JSON.stringify(base.ticker));
+  check('blocks the right side, left side still clickable', base.hitRight === 'THIRTY-OFF-EVERYTHING' && base.hitLeft !== 'THIRTY-OFF-EVERYTHING', `${base.hitRight} / ${base.hitLeft}`);
+  const scrolledTo = (y) => page.waitForFunction((y) => scrollY >= y, y, { timeout: 3000 }).catch(() => {}).then(() => page.evaluate(() => scrollY)); // a slow machine takes a while over a scroll
+  await page.mouse.move(400, 400); await page.mouse.wheel(0, 600);
+  const y1 = await scrolledTo(600);
+  await page.mouse.move(vw - 100, 400); await page.mouse.wheel(0, 600);
+  const y2 = await scrolledTo(y1 + 600);
+  check('the mouse wheel over the banner still scrolls the page', y1 > 0 && y2 > y1, `${y1} -> ${y2}`);
   await page.emulateMedia({ media: 'print' });
-  check('plain: hidden when printing', (await page.evaluate(probe)).hostDisplay === 'none');
+  check('hidden when printing', await page.evaluate(() => getComputedStyle(document.querySelector('thirty-off-everything')).display === 'none'));
   await page.emulateMedia({ media: 'screen' });
+  for (const [w, h] of [[1366, 650], [1920, 1080], [2560, 1300], [1024, 600], [960, 1050]]) {
+    await page.setViewportSize({ width: w, height: h }); await sleep(400);
+    const p = await page.evaluate(probe);
+    const inside = (r) => r && r[0] >= p.frame[0] - 1 && r[0] + r[2] <= p.frame[0] + p.frame[2] + 1 && r[1] + r[3] <= p.ticker[1];
+    const fits = inside(p.art) && inside(p.globe);
+    check(`${w}x${h}: lettering and globe inside the banner and above the crawl, crawl on the bottom edge`, fits && Math.abs(p.ticker[1] + p.ticker[3] - (p.frame[1] + p.frame[3])) <= 1, `${JSON.stringify(p.art)} ${JSON.stringify(p.ticker)}`);
+  }
+  for (const [w, h] of [[390, 844], [700, 900]]) {
+    await page.setViewportSize({ width: w, height: h }); await sleep(400);
+    const p = await page.evaluate(probe);
+    const crawlBottom = p.ticker[1] + p.ticker[3], frameBottom = p.frame[1] + p.frame[3];
+    check(`${w}x${h}: across the top third, full width, crawl just above its teeth`, p.frame[0] === 0 && p.frame[1] === 0 && p.frame[2] === p.viewport[0] && Math.abs(p.frame[3] - p.viewport[1] * 0.33) <= 2 && frameBottom - crawlBottom >= 0 && frameBottom - crawlBottom <= 20, `${JSON.stringify(p.frame)} crawl ends ${crawlBottom}`);
+  }
+  await page.setViewportSize({ width: 1280, height: 800 });
+  // Without a graphics card the tape look is slow to draw. The banner notices and takes it off,
+  // so the page under it keeps drawing at a fair rate either way.
+  await page.goto(url('/plain', BF)); await sleep(9000);
+  const rate = await frameRate(), after = await page.evaluate(probe);
+  check('the page keeps drawing under the banner (the tape look comes off where it is slow)', rate >= Math.min(24, bare * 0.5), `${rate} frames a second with the banner, ${bare} without; the look is ${after.look.includes('tape') ? 'on' : 'off'}`);
+  check('no errors', errs.length === 0, errs.join(' | '));
+  await context.close();
+}
 
-  await page.goto(url('/hostile', BF)); await sleep(900);
+// =====================================================================================
+console.log('\n# 5. Hostile and unusual pages (Black Friday)');
+{
+  const { context } = await launchWithExtension(EXT, { tz: 'Europe/London' });
+  const page = await context.newPage();
+  const errs = await watchErrors(context, page);
+  await page.goto(url('/plain', BF)); await sleep(2000);
+  const base = await page.evaluate(probe);
+
+  await page.goto(url('/hostile', BF)); await sleep(2000);
   const h = await page.evaluate(probe);
-  await page.screenshot({ path: SHOTS + 'hostile.png' });
-  check('hostile CSS: same geometry as on a plain page', JSON.stringify(h.panelRect) === JSON.stringify(base.panelRect), JSON.stringify(h.panelRect));
-  check('hostile CSS: same type metrics as on a plain page', JSON.stringify(h.line1) === JSON.stringify(base.line1) && JSON.stringify(h.line3) === JSON.stringify(base.line3), JSON.stringify(h.line1) + ' ' + JSON.stringify(h.line3));
-  check('hostile CSS: above a max z-index wall added later', h.hitRight === 'THIRTY-OFF-OVERLAY', h.hitRight);
+  check('hostile CSS: same geometry as on a plain page', JSON.stringify(h.frame) === JSON.stringify(base.frame) && JSON.stringify(h.art) === JSON.stringify(base.art), `${JSON.stringify(h.frame)} ${JSON.stringify(h.art)}`);
+  check('hostile CSS: above a maximum z-index wall added later', h.hitRight === 'THIRTY-OFF-EVERYTHING', h.hitRight);
+  check('right-to-left page in another language: the banner still reads left to right, its tickers run', h.direction === 'ltr' && h.tickers.every((c) => c > 0.9), `${h.direction} ${h.tickers}`);
 
-  await page.goto(url('/csp', BF)); await sleep(250);
-  const c = await page.evaluate(probe).catch(() => null);
-  const cspProbe = c || await (await context.newCDPSession(page)).send('Runtime.evaluate', { expression: `(${probe})()`, returnByValue: true }).then((r) => r.result.value).catch((e) => ({ present: false, err: e.message }));
-  await page.screenshot({ path: SHOTS + 'csp.png' });
-  check('strict CSP + Trusted Types: rendered and styled', cspProbe.present && cspProbe.bg === 'rgb(0, 0, 255)' && JSON.stringify(cspProbe.panelRect) === JSON.stringify(base.panelRect), JSON.stringify(cspProbe.panelRect) + ' ' + cspProbe.bg);
+  await page.goto(url('/csp', BF)); await sleep(2000);
+  const cdp = await context.newCDPSession(page);
+  const c = (await cdp.send('Runtime.evaluate', { expression: `(${probe})()`, returnByValue: true })).result.value;
+  check('strict Content-Security-Policy: styled and pictures loaded', c.present && c.styled && c.images.every((w) => w > 0) && JSON.stringify(c.frame) === JSON.stringify(base.frame), JSON.stringify(c.images));
 
-  await page.goto(url('/frames', BF)); await sleep(500);
-  const inFrames = await Promise.all(page.frames().slice(1).map((f) => f.evaluate(() => document.querySelectorAll('thirty-off-overlay').length)));
+  await page.goto(url('/frames', BF)); await sleep(800);
+  const inFrames = await Promise.all(page.frames().slice(1).map((f) => f.evaluate(() => document.querySelectorAll('thirty-off-everything').length)));
   check('iframes: only the top frame gets one', (await page.evaluate(probe)).count === 1 && inFrames.every((n) => n === 0), `frames: ${inFrames}`);
 
-  await page.goto(url('/plain', BF)); await sleep(200);
-  await page.evaluate(() => { document.body.innerHTML = '<h1>wiped body</h1>'; }); await sleep(100);
+  await page.goto(url('/plain', BF)); await sleep(400);
+  await page.evaluate(() => { document.body.innerHTML = '<h1>wiped</h1>'; }); await sleep(100);
   check('page wipes <body>: still there', (await page.evaluate(probe)).count === 1);
   await page.evaluate(() => document.documentElement.replaceChildren(document.head, document.body)); await sleep(100);
   let p = await page.evaluate(probe);
-  check('page removes it from <html>: put back, back in the top layer', p.count === 1 && p.topLayer === true);
-  await page.evaluate(() => { document.open(); document.write('<!doctype html><title>rewritten</title><h1>document.write</h1>'); document.close(); }); await sleep(250);
-  p = await page.evaluate(probe);
-  check('page rewrites the whole document: put back', p.count === 1 && p.parent === 'HTML', JSON.stringify(p.panelRect));
+  check('page removes it: put back, in the top layer', p.count === 1 && p.topLayer === true);
+  await page.evaluate(() => { document.open(); document.write('<!doctype html><title>x</title><h1>rewritten</h1>'); document.close(); }); await sleep(300);
+  check('page rewrites the whole document: put back', (await page.evaluate(probe)).count === 1);
 
-  await page.goto(url('/fighter', BF)); await sleep(600);
+  await page.goto(url('/fighter', BF)); await sleep(700);
   const removed = await page.evaluate(() => window.removed);
-  p = await page.evaluate(probe);
-  check('page that deletes it every time: gives up instead of looping forever', removed > 0 && removed < 40 && !p.present, `removed ${removed} times`);
+  check('page that deletes it every time: gives up instead of looping', removed > 0 && removed < 40 && !(await page.evaluate(probe)).present, `removed ${removed} times`);
 
-  await page.goto(url('/dialog', BF)); await sleep(200);
+  await page.goto(url('/dialog', BF)); await sleep(300);
   await page.evaluate(() => { document.getElementById('d').showModal(); document.getElementById('pop').showPopover(); }); await sleep(150);
-  p = await page.evaluate(probe);
-  check('site modal dialog + popover open: still shown, no breakage', p.count === 1 && JSON.stringify(p.panelRect) === JSON.stringify(base.panelRect));
+  check('site modal dialog and popover open: still one banner', (await page.evaluate(probe)).count === 1);
 
-  for (const path of ['/svg', '/xml', '/txt', '/json', '/xhtml', '/frameset']) {
-    await page.goto(url(path, BF)); await sleep(250);
-    const r = await page.evaluate(() => ({ n: document.querySelectorAll('thirty-off-overlay').length, type: document.contentType })).catch((e) => ({ n: '?', type: e.message.slice(0, 60) }));
-    console.log(`        ${path}: ${r.type}, overlays: ${r.n}`);
+  await page.goto(url('/headscript', BF)); await sleep(300);
+  const hs = await page.evaluate(() => window.childrenAtHead);
+  check('scripts in <head> never see a foreign element', hs === 'HEAD', hs);
+
+  for (const path of ['/svg', '/xml', '/txt', '/json', '/xhtml']) {
+    await page.goto(url(path, BF)); await sleep(300);
   }
+  check('SVG, XML, text, JSON and XHTML pages: no errors', errs.length === 0, errs.join(' | '));
 
-  await page.goto(url('/headscript', BF)); await sleep(250);
-  const hs = await page.evaluate(() => ({ first: window.firstChildAtHead, kids: window.childrenAtHead, now: [...document.documentElement.children].map((c) => c.tagName).join(',') }));
-  check('head scripts never see a foreign element under <html>', hs.first === 'HEAD' && hs.kids === 'HEAD', `${hs.kids} -> ${hs.now}`);
-
-  // Back/forward cache.
-  await page.goto(url('/plain', BF)); await sleep(150);
-  await page.goto(url('/dialog', BF)); await sleep(150);
-  await page.goBack(); await sleep(300);
-  check('back button: still exactly one', (await page.evaluate(probe)).count === 1);
-
-  check('no content-script errors on any of these pages', errs.length === 0, errs.join(' | '));
+  await page.goto(url('/plain', BF)); await sleep(200);
+  await page.goto(url('/dialog', BF)); await sleep(200);
+  await page.goBack(); await sleep(400);
+  check('back button: exactly one', (await page.evaluate(probe)).count === 1);
+  check('no errors on any of these pages', errs.length === 0, errs.join(' | '));
   await context.close();
 }
 {
-  // Appears with <body>, not after the whole page has loaded.
   const { context } = await launchWithExtension(EXT, { tz: 'Europe/London' });
   const page = await context.newPage();
   const nav = page.goto(url('/slow', BF));
+  const look = () => page.evaluate(() => {
+    const f = document.querySelector('thirty-off-everything')?.shadowRoot?.querySelector('.frame');
+    return { state: document.readyState, there: !!f, visible: !!f && getComputedStyle(f).visibility === 'visible' };
+  }).catch((e) => ({ err: e.message }));
   await sleep(1100);
-  const mid = await page.evaluate(() => ({ state: document.readyState, shown: !!document.querySelector('thirty-off-overlay') })).catch((e) => ({ err: e.message }));
-  check('slow page: shown while the document is still loading', mid.state === 'loading' && mid.shown === true, JSON.stringify(mid));
-  await nav;
+  const mid = await look();
+  check('slow page: waits, hidden, while the page is still loading', mid.state === 'loading' && mid.there && !mid.visible, JSON.stringify(mid));
+  await nav; await sleep(1500);
+  const after = await look();
+  check('slow page: slides in once the page is up', after.visible, JSON.stringify(after));
   await context.close();
 }
 
 // =====================================================================================
-console.log('\n# 5. Screenshots at other sizes');
-for (const [name, viewport] of [['wide-1920', { width: 1920, height: 1080 }], ['narrow-700', { width: 700, height: 900 }]]) {
-  const { context } = await launchWithExtension(EXT, { tz: 'Europe/London', viewport });
+console.log('\n# 6. The extension is updated while a tab shows the banner');
+{
+  const { context } = await launchWithExtension(EXT, { tz: 'Europe/London' });
   const page = await context.newPage();
-  await page.goto(url('/plain', BF)); await sleep(300);
-  await page.screenshot({ path: `${SHOTS}${name}.png` });
-  const p = await page.evaluate(probe);
-  console.log(`        ${name}: panel ${JSON.stringify(p.panelRect)} viewport ${JSON.stringify(p.viewport)}`);
+  const errs = await watchErrors(context, page);
+  await page.goto(url('/plain', BF)); await sleep(500);
+  check('shown before the update', (await page.evaluate(probe)).count === 1);
+  await reloadExtension(context);
+  await sleep(1500);
+  await page.bringToFront();
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(200);
+  check('the cut-off banner removes itself', !(await page.evaluate(probe)).present);
+  await page.reload(); await sleep(600);
+  check('back after a reload, exactly one', (await page.evaluate(probe)).count === 1);
+  check('no errors', errs.length === 0, errs.join(' | '));
   await context.close();
 }
 

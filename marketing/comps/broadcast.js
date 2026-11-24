@@ -17,6 +17,10 @@ const FORMATS = {
   // (crawl: on the banner the lower crawl cannot say "install", the viewer already has)
   'banner-v': { w: 1080, h: 2025, hero: { x: 822, y: 1010, d: 430 }, sign: { across: 1.3, drop: 0.56 }, crawl: 'BLACK FRIDAY ONLY ! \u2726 ' },
   'banner-h': { w: 1170, h: 834, hero: { x: 962, y: 372, d: 300 }, sign: { across: 1.25, drop: 0.5 } },
+  // Chrome Web Store screenshots that sell the offer without showing how it is delivered (1280x800)
+  'shot-a': { w: 1280, h: 800, hero: { x: 1050, y: 300, d: 270 }, sign: { across: 1.25, drop: 0.5 } },
+  'shot-b': { w: 1280, h: 800, hero: { x: 1050, y: 300, d: 270 }, sign: { across: 1.25, drop: 0.5 } },
+  'shot-c': { w: 1280, h: 800, hero: { x: 1050, y: 300, d: 270 }, sign: { across: 1.25, drop: 0.5 } },
   // Chrome Web Store promo images (the small tile is drawn at 2x and scaled down afterwards)
   marquee: { w: 1400, h: 560, hero: { x: 1080, y: 236, d: 330 } },
   tile: { w: 880, h: 560, hero: { x: 668, y: 232, d: 300 } },
@@ -28,6 +32,7 @@ const DURATION = 12, FPS = 30, TURN = 6;
 
 const stage = document.getElementById('stage');
 stage.classList.add('f-' + format);
+if (format.startsWith('shot-')) stage.classList.add('f-shot');
 if (q.get('theme')) stage.classList.add('t-' + q.get('theme')); // colourways: see the end of broadcast.css
 stage.style.width = F.w + 'px';
 stage.style.height = F.h + 'px';

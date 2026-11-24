@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>GME Shopping Channel</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-v-tv.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<svg class="defs" width="0" height="0"><defs id="defs"></defs></svg>
+<div id="stage">
+  <!-- the studio set: a lit cyclorama, a few set lights, the floor -->
+  <div class="cyc" id="cyc"></div>
+  <div class="bokeh" id="bokeh"></div>
+  <div class="beams" id="beams"></div>
+
+  <!-- the product on its turntable (three.js), and the glow the camera puts round bright things -->
+  <canvas id="gl"></canvas>
+  <canvas id="bloom"></canvas>
+  <div class="flare" id="flare"></div>
+  <div class="glints" id="glints"></div>
+
+  <!-- on-screen graphics, keyed over the camera feed -->
+  <div class="gfx title" id="title"></div>
+  <div class="gfx burst" id="burst"></div>
+  <div class="gfx sticker" id="sticker"></div>
+
+  <div class="l3" id="l3">
+    <div class="l3-tabs"><div class="l3-tab"><span>Doorbuster</span></div><div class="l3-date"><span>ONE DAY ONLY</span><span class="dot"></span><span>FRI 27 NOV</span></div></div>
+    <div class="l3-name"><span>The Internet (All Of It)</span></div>
+    <div class="l3-offer"><b>EVERY WEBSITE</b><i>30% OFF!</i></div>
+  </div>
+
+  <div class="bug" id="bug"><i></i></div>
+
+  <div class="foot" id="foot"><span>As seen on every website</span><b>LIMITED TIME</b><span>The Entire Internet!</span></div>
+
+  <div class="ticker" id="ticker">
+    <div class="tk-label"><span>HURRY!</span></div>
+    <div class="tk-lane"><div class="tk-run" id="run"></div></div>
+  </div>
+</div>
+<script type="module" src="./gme-v-tv.js"></script>
+</body>
+</html>

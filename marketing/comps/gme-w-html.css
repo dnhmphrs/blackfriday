@@ -1,0 +1,33 @@
+/* RAW HTML, 1996. <body bgcolor="#1040FF" text="#FFFFFF" link="#FFFF00">: a heading, a rule,
+   a spinning globe, one link and a <marquee>. Nothing else. */
+html, body { margin: 0; padding: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: var(--blue); color: #fff;
+  --blue: #1040ff; --link: #ffff00; --hrHi: #7f9cff; --hrLo: #001c9c; }
+#stage > * { position: absolute; }
+.bg { inset: 0; }
+#gl { left: 0; top: 0; }
+
+/* every text block is placed by the script; inside it is plain flow, like a page */
+.page { inset: 0; }
+.blk { position: absolute; white-space: nowrap; margin: 0; }
+
+/* <h1><i>: Times bold italic, which is what an <h1> looked like in a 1996 browser with italics on */
+.h1 { font: italic 700 100px/0.92 "Tinos", serif; letter-spacing: -0.012em; }
+.h1 .ln { display: block; }
+
+/* <hr size=4>: the default shaded rule, two tones of the page's own blue */
+.hr { height: 0; border-top: var(--hrW, 3px) solid var(--hrLo); border-bottom: var(--hrW, 3px) solid var(--hrHi); }
+
+/* <a href>: yellow, underlined */
+.a { font: italic 700 40px/1.1 "Tinos", serif; color: var(--link);
+  text-decoration: underline; text-decoration-thickness: 0.07em; text-underline-offset: 0.12em; }
+
+/* <marquee><tt> */
+.marquee { left: 0; right: 0; overflow: hidden; }
+.marquee .run { position: absolute; left: 0; top: 0; white-space: pre; font: 400 40px/1 "Cousine", monospace; color: #fff; will-change: transform; }
+
+/* the Gary Mustard Enterprises lockup, white */
+.logo { display: block;
+  -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat;
+  mask: url(/assets/gme/gme-primary.png) center / contain no-repeat;
+  background: #fff; }

@@ -1,0 +1,74 @@
+/* In-store Black Friday signage, photographed on a phone: GME's own end-cap. */
+:root {
+  --red: #e5001c;
+  --red-deep: #a8000f;
+  --yellow: #ffe600;
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --blue: #0b3cf0;
+  --cond: "Anton", "Oswald", sans-serif;
+  --heavy: "Archivo Black", "Inter", sans-serif;
+}
+html, body { margin: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: #2a2b2a; }
+#stage * { box-sizing: border-box; }
+#photo { position: absolute; left: 0; top: 0; transform-origin: 50% 50%; }
+#photo > * { position: absolute; }
+#store, #gl, #bloom { left: 0; top: 0; }
+#bloom { mix-blend-mode: screen; opacity: 0.55; pointer-events: none; }
+
+/* ---------- the header card ---------- */
+.card { overflow: hidden; background: var(--red); border: 9px solid #cfd2d4; outline: 3px solid #6d7275;
+  box-shadow: 0 26px 40px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.4); }
+.card > * { position: absolute; }
+.card .rays { left: -60%; top: -60%; width: 220%; height: 220%;
+  background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(255, 70, 40, 0.0) 0deg 6deg, rgba(110, 0, 10, 0.32) 6deg 12deg); }
+.card .body { left: 0; right: 0; top: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.card .line { white-space: nowrap; line-height: 0.86; text-transform: uppercase; }
+.card .bf { font-family: var(--cond); color: var(--white); -webkit-text-stroke: 0.035em var(--black); paint-order: stroke fill; letter-spacing: 0.005em; }
+.card .off { font-family: var(--heavy); color: var(--yellow); -webkit-text-stroke: 0.045em var(--black); paint-order: stroke fill; transform: skewX(-9deg); letter-spacing: -0.02em; }
+.card .off .pc { font-size: 0.8em; vertical-align: 0.13em; }
+.card .scope { font-family: var(--cond); color: var(--yellow); background: var(--black); padding: 0.08em 0.35em 0.06em; transform: skewX(-10deg) rotate(-1.5deg); line-height: 1; }
+.card .band { left: 0; right: 0; background: var(--yellow); color: var(--black); font-family: var(--cond); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 0.5em; white-space: nowrap; border-top: 4px solid var(--black); }
+.card .band .s { font-size: 0.8em; color: var(--red); }
+.card .logo-band { left: 0; right: 0; bottom: 0; background: var(--blue); display: flex; align-items: center; justify-content: center; border-top: 4px solid var(--black); }
+.card .logo { display: block; background: #fff; -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+/* fluorescent light falls from above; the laminate catches a tube */
+.card .shade { inset: 0; background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.16) 100%); }
+.card .glare { left: 0; top: 0; width: 100%; height: 100%; mix-blend-mode: screen; opacity: 0.5; pointer-events: none; }
+.clip { width: 34px; height: 46px; border-radius: 4px; background: linear-gradient(90deg, #8b9093, #eef0f0 40%, #9da2a4 70%, #6e7376); box-shadow: 0 6px 8px rgba(0, 0, 0, 0.45); }
+
+/* ---------- LED sign ---------- */
+.led { background: linear-gradient(180deg, #2e3032, #111213 18%, #0a0a0b 82%, #26282a); border-radius: 8px; box-shadow: 0 18px 30px rgba(0, 0, 0, 0.55), inset 0 2px 1px rgba(255, 255, 255, 0.25); }
+.led .face { position: absolute; overflow: hidden; background: #060303; border-radius: 3px; box-shadow: inset 0 0 0 2px #000; }
+.led canvas { position: absolute; left: 0; top: 0; }
+.led .acrylic { position: absolute; inset: 0; background: linear-gradient(172deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 26%, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0) 82%, rgba(255, 255, 255, 0.05) 100%); }
+.led .screw { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f2f2f2, #777 60%, #333); top: 50%; margin-top: -6px; }
+.led .screw.a { left: 8px; } .led .screw.b { right: 8px; }
+
+/* ---------- strips (shelf-edge price channels) ---------- */
+#strips { left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+#strips > * { position: absolute; }
+.strip { background: linear-gradient(180deg, #f2f4f4 0%, #c9cdcf 10%, #e3e6e7 18%, #d4d8d9 82%, #8d9295 100%); box-shadow: 0 10px 14px rgba(0, 0, 0, 0.35); }
+.label { background: #fff; color: #111; font-family: "Libre Franklin", sans-serif; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: center; padding: 0 0.6em; line-height: 1; overflow: hidden; }
+.label .n { font-weight: 800; font-size: 0.3em; text-transform: uppercase; letter-spacing: 0; white-space: nowrap; }
+.label .p { font-family: var(--heavy); color: var(--red); font-size: 0.86em; margin-top: 0.04em; white-space: nowrap; }
+.label .bc { height: 0.22em; margin-top: 0.06em; flex: none; }
+.dot { border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--heavy); color: #111; line-height: 0.9; text-align: center; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.4), inset 0 -2px 3px rgba(0, 0, 0, 0.12); }
+
+/* ---------- the hanging starburst ---------- */
+#burst { transform-origin: 50% 0; }
+#burst svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+#hshade { pointer-events: none; mix-blend-mode: multiply; background: linear-gradient(180deg, rgba(40,40,40,0.55), rgba(90,90,90,0.25) 40%, rgba(255,255,255,0)); }
+#burst .edge { fill: var(--red); stroke: var(--black); stroke-width: 0.012; stroke-linejoin: round; }
+#burst .face { fill: var(--yellow); }
+#burst .words { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--cond); color: var(--red); text-transform: uppercase; line-height: 0.88; transform: rotate(-8deg); }
+#burst .words b { font-weight: 400; -webkit-text-stroke: 0.03em var(--black); paint-order: stroke fill; }
+#burst .words small { font-family: var(--heavy); color: var(--black); font-size: 0.42em; margin-bottom: 0.15em; }
+#lines { left: 0; top: 0; overflow: visible; }
+#lines path { fill: none; stroke: rgba(235, 240, 240, 0.55); stroke-width: 1.4; }
+
+#sticker { pointer-events: none; }
+
+/* ---------- the phone photo ---------- */
+#fx { position: absolute; inset: 0; pointer-events: none; }

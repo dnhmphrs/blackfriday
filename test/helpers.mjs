@@ -6,30 +6,30 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-export async function launchWithExtension(extDir, { tz, viewport = { width: 1280, height: 800 } } = {}) {
+// browser: the path of another Chromium-based browser to test in (or set BF_BROWSER); by default,
+// Playwright's own Chromium.
+export async function launchWithExtension(extDir, { tz, viewport = { width: 1280, height: 800 }, deviceScaleFactor, browser = process.env.BF_BROWSER } = {}) {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bf-profile-'));
   // Developer mode on, as on the machine of anyone who loads an unpacked extension. Without
   // it Chrome turns an unpacked extension OFF when it reloads itself.
   fs.mkdirSync(path.join(userDataDir, 'Default'), { recursive: true });
   fs.writeFileSync(path.join(userDataDir, 'Default', 'Preferences'), JSON.stringify({ extensions: { ui: { developer_mode: true } } }));
+  const args = [
+    `--disable-extensions-except=${extDir}`,
+    `--load-extension=${extDir}`,
+    '--enable-unsafe-extension-debugging',
+    // branded browsers have stopped honouring --load-extension; this keeps it for a test run
+    '--disable-features=DisableLoadExtensionCommandLineSwitch',
+  ];
   const context = await chromium.launchPersistentContext(userDataDir, {
-    channel: 'chromium',
-    headless: true,
+    // another browser runs headed as far as Playwright knows, with the new headless mode asked for
+    // by hand: the old one, which Playwright would ask for, cannot run extensions
+    ...(browser ? { executablePath: browser, headless: false, args: [...args, '--headless=new'] } : { channel: 'chromium', headless: true, args }),
     viewport,
+    deviceScaleFactor,
     timezoneId: tz,
-    args: [
-      `--disable-extensions-except=${extDir}`,
-      `--load-extension=${extDir}`,
-      '--enable-unsafe-extension-debugging',
-    ],
   });
-  let [sw] = context.serviceWorkers();
-  if (!sw) sw = await context.waitForEvent('serviceworker', { timeout: 15000 });
-  // Wait until the worker has actually run. On a busy machine a simulated toolbar click can
-  // otherwise arrive before the worker has registered its click listener, and is lost.
-  await sw.evaluate(() => chrome.runtime.id);
-  const extensionId = new URL(sw.url()).host;
-  return { context, sw, extensionId, userDataDir };
+  return { context, userDataDir };
 }
 
 // A tiny static server with per-path response headers (for CSP tests).
@@ -75,33 +75,26 @@ const PRELUDE = `(() => {
 })();`;
 export function makeTestCopy(srcDir) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bf-ext-'));
-  fs.cpSync(srcDir, dir, { recursive: true, filter: (f) => !f.endsWith('.zip') });
+  fs.cpSync(srcDir, dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'test-clock.js'), PRELUDE);
   const mf = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
   for (const cs of mf.content_scripts) {
     cs.js.unshift('test-clock.js');
-    // Pages with ?preinstall=1 get no automatic content script, which is the state of any
-    // tab that was already open when the extension was installed or updated.
+    // Pages with ?preinstall=1 get no content script, which is the state of any tab that was
+    // already open when the extension was installed or updated.
     cs.exclude_globs = ['*preinstall=1*'];
   }
   fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify(mf, null, 2));
   return dir;
 }
 
-// Real toolbar click (grants activeTab exactly like a user click does).
-export async function clickAction(context, page, extensionId) {
-  const browser = context.browser();
-  if (!browser) throw new Error('no browser-level CDP session available');
-  const bcdp = await browser.newBrowserCDPSession();
-  // triggerAction wants the *tab* target that hosts this page, not the page target itself.
-  const marker = `bf-${Math.random().toString(36).slice(2)}`;
-  const oldTitle = await page.title();
-  await page.evaluate((m) => { document.title = m; }, marker);
-  const { targetInfos } = await bcdp.send('Target.getTargets', { filter: [{ type: 'tab' }] });
-  await page.evaluate((t) => { document.title = t; }, oldTitle);
-  const tab = targetInfos.find((t) => t.title === marker) ||
-    targetInfos.find((t) => t.url === page.url());
-  if (!tab) throw new Error('tab target not found: ' + JSON.stringify(targetInfos));
-  await bcdp.send('Extensions.triggerAction', { id: extensionId, targetId: tab.targetId });
-  await bcdp.detach();
+// Reload the extension, as an update from the store would, using the chrome://extensions page.
+export async function reloadExtension(context) {
+  const page = await context.newPage();
+  await page.goto('chrome://extensions/');
+  await page.evaluate(async () => {
+    const [ext] = await chrome.developerPrivate.getExtensionsInfo();
+    await chrome.developerPrivate.reload(ext.id, { failQuietly: true });
+  });
+  await page.close();
 }

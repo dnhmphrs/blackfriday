@@ -1,0 +1,65 @@
+/* The Swing Tag: a Black Friday sale tag, hung from the internet. */
+:root {
+  --black: #050507;
+  --ink: #08091a;
+  --navy: #0b1638;
+  --red: #e5121b;
+  --yellow: #ffd31a;
+  --white: #f6f3ea;
+  --serif: "EB Garamond", "Cormorant Garamond", serif;
+  --sans: "Libre Franklin", "Inter", sans-serif;
+  --sale: "Anton", "Oswald", sans-serif;
+}
+html, body { margin: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: var(--black); color: var(--white); font-family: var(--sans); }
+#stage > * { position: absolute; }
+
+/* the room: store-window black, a navy undertone, a grey-blue haze on the floor like the brand sheet */
+.room { inset: 0; background: linear-gradient(180deg, #030306 0%, #050510 40%, #0a1230 70%, #1b2b5a 87%, #4f5d80 96%, #6f7a93 100%); }
+/* light from the tag itself, falling on the wall behind it */
+.glow { inset: 0; pointer-events: none; }
+#gl, #view, #bloom { left: 0; top: 0; }
+/* the WebGL canvas is drawn into #view each frame (a plain 2D canvas composites reliably in screenshots) */
+#gl { visibility: hidden; }
+/* a store-window spotlight from above: a soft cone of haze */
+.beam { pointer-events: none; mix-blend-mode: screen; filter: blur(34px); }
+#bloom { mix-blend-mode: screen; opacity: 0.42; filter: blur(var(--bloomBlur, 18px)) contrast(1.6) brightness(0.85) saturate(1.3); pointer-events: none; }
+.haze { inset: 0; pointer-events: none; mix-blend-mode: screen; }
+#dust, .grain { inset: 0; pointer-events: none; }
+#dust { width: 100%; height: 100%; }
+.grain { mix-blend-mode: overlay; opacity: 0.5; background-size: 384px 384px; }
+
+/* brand-sheet corner labels */
+.doc { left: var(--gut); right: var(--gut); top: var(--docTop); display: flex; justify-content: space-between; font: 500 var(--docSize)/1.16 var(--sans); color: rgba(246, 243, 234, 0.86); }
+.doc .c2 { position: absolute; left: 50%; transform: translateX(-50%); }
+.doc .c3 { text-align: right; }
+
+/* BLACK FRIDAY: the sign. white, condensed, as big as it goes, with a little film halation */
+.head { margin: 0; left: 0; right: 0; font: 400 100px/0.86 var(--sale); text-transform: uppercase; color: var(--white); white-space: nowrap;
+  text-shadow: 0 0 2px rgba(255, 240, 225, 0.55), 0 0 22px rgba(255, 70, 40, 0.42), 0 0 70px rgba(255, 40, 30, 0.28); }
+.head span { display: block; }
+.head .fri { color: var(--white); }
+
+/* starburst sticker */
+.burst { width: var(--burstD); height: var(--burstD); }
+.burst svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.burst .txt { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--red); font: 400 var(--burstSize)/0.9 var(--sale); text-transform: uppercase; }
+.burst .txt small { font: 800 calc(var(--burstSize) * 0.36)/1.1 var(--sans); letter-spacing: 0.08em; color: #111; }
+
+/* the one Garamond line */
+.garamond { margin: 0; font: italic 400 var(--gSize)/1.12 var(--serif); color: rgba(246, 243, 234, 0.92); }
+
+/* call to action: the yellow bar every sale sign ends on */
+.cta { left: var(--gut); right: var(--gut); display: flex; align-items: stretch; height: var(--ctaH); }
+.cta .go { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.35em; background: var(--yellow); color: #0a0a0a; font: 400 var(--ctaSize)/1 var(--sale); text-transform: uppercase; letter-spacing: 0.02em; }
+.cta .go .tri { display: block; height: 0.62em; width: 0.52em; background: var(--red); clip-path: polygon(0 0, 100% 50%, 0 100%); margin: 0 0.06em; }
+.cta .side { display: flex; flex-direction: column; justify-content: center; padding: 0 0.9em; background: var(--red); color: var(--white); font: 800 var(--ctaSmall)/1.12 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; }
+
+.foot { left: var(--gut); right: var(--gut); display: flex; align-items: flex-end; justify-content: space-between; }
+.lockup { position: relative; width: var(--lockW); aspect-ratio: 1142 / 610; }
+.lockup .mark { position: absolute; inset: 0; background: var(--white); -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+.fine { margin: 0; text-align: right; font: 600 var(--fineSize)/1.5 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(246, 243, 234, 0.82); }
+.fine em { display: block; font: italic 400 calc(var(--fineSize) * 1.55)/1.2 var(--serif); letter-spacing: 0; text-transform: none; }
+
+#glint { left: 0; top: 0; width: 1px; height: 1px; }
+#glint svg { position: absolute; overflow: visible; }

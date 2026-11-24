@@ -1,0 +1,9 @@
+/* The approved banner layout (gif-plinth-e) in the look of our old ad, the 30% OFF Channel
+   (broadcast.css): the same blue studio backdrop, slanted heavy sale type with hard navy shadows,
+   the chrome globe, yellow and red. Clean, full resolution. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #070f9c; }
+#stage { position: relative; overflow: hidden; background: #070f9c; }
+#stage > * { position: absolute; left: 0; top: 0; }
+/* the backdrop is broadcast.css's .bg; tv-banner.js centres the light on the globe */
+.bg { inset: 0; width: 100%; height: 100%; }

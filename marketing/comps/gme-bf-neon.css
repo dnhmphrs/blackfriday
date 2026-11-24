@@ -1,0 +1,62 @@
+/* The Neon Sale Sign: a buzzing Black Friday sign in a dark GME shop window, on a wet night. */
+:root {
+  --navy: #070d24;
+  --paper: #efeadf;
+  --gold1: #f3d898;
+  --gold2: #b8862e;
+  --ink: #0b1433;
+  --red: #e4202f;
+  --serif: "EB Garamond", "Cormorant Garamond", serif;
+  --sans: "Libre Franklin", "Inter", sans-serif;
+}
+html, body { margin: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: #03050c; color: var(--paper); }
+#stage > * { position: absolute; }
+#room, #ledge { left: 0; top: 0; }
+.glass { inset: 0; pointer-events: none; }
+.glass > * { position: absolute; }
+
+/* gold leaf lettering on the inside of the glass, like any old shopfront */
+.leaf { text-align: center; }
+.leaf .mark { display: block; margin: 0 auto; background: linear-gradient(180deg, var(--gold1) 0%, #d9ad55 38%, var(--gold2) 52%, #f0d08a 70%, #9c6d22 100%);
+  -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5)); opacity: 0.92; }
+.leaf p { margin: 0; font: 600 var(--leafSize, 20px)/1 var(--sans); letter-spacing: 0.32em; text-transform: uppercase; color: #d8b468; opacity: 0.85; white-space: nowrap; }
+
+/* a long soft reflection across the glass */
+.sheen { inset: 0; background:
+  linear-gradient(112deg, rgba(255,255,255,0) 30%, rgba(190,210,255,0.045) 38%, rgba(255,255,255,0.0) 47%, rgba(255,255,255,0) 60%, rgba(190,210,255,0.035) 64%, rgba(255,255,255,0) 69%); }
+
+/* the vinyl sticker in the corner of the glass */
+.sticker { background: #f1ede2; color: var(--ink); padding: var(--stPad); box-sizing: border-box; border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.4) inset, 0 2px 14px rgba(0,0,0,0.35);
+  background-image: linear-gradient(160deg, rgba(255,255,255,0.5), rgba(255,255,255,0) 40%), linear-gradient(0deg, rgba(10,20,60,0.06), rgba(10,20,60,0)); }
+.sticker::after { /* the corner lifting off the glass */
+  content: ""; position: absolute; right: 0; bottom: 0; width: var(--curl); height: var(--curl);
+  background: linear-gradient(315deg, rgba(0,0,0,0) 50%, #d9d3c4 50%, #fbf8f0 80%); box-shadow: -2px -2px 6px rgba(0,0,0,0.18); }
+.sticker .mark { display: block; height: var(--stMark); background: var(--ink);
+  -webkit-mask: url(/assets/gme/gme-primary.png) left center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) left center / contain no-repeat; }
+.sticker .s1 { margin: var(--stGap) 0 0; font: italic 500 var(--stSize)/1.06 var(--serif); letter-spacing: -0.005em; font-feature-settings: "liga" 1, "dlig" 1; }
+.sticker .s2 { margin: calc(var(--stGap) * 0.7) 0 0; font: 600 calc(var(--stSize) * 0.36)/1.3 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.8; }
+
+/* the printed card propped on the sill */
+.card { background: #ffdc2e; color: #111; box-sizing: border-box; padding: var(--cdPad); text-align: center; transform-origin: 50% 100%;
+  box-shadow: 0 -1px 0 rgba(255,255,255,0.5) inset, 0 6px 18px rgba(0,0,0,0.5);
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 30%, rgba(60,0,40,0.14)); }
+.card .k1 { margin: 0; font: 400 var(--cdBig)/0.92 "Anton", sans-serif; color: #e3121f; letter-spacing: 0.01em; text-transform: uppercase; white-space: nowrap; }
+.card .k2 { margin: calc(var(--cdBig) * 0.12) 0 0; padding: calc(var(--cdBig) * 0.07) 0; background: #111; color: #fff; font: 800 calc(var(--cdBig) * 0.24)/1.15 "Inter", sans-serif; letter-spacing: 0.06em; text-transform: uppercase; }
+.card .k3 { margin: calc(var(--cdBig) * 0.12) 0 0; font: italic 500 calc(var(--cdBig) * 0.34)/1.05 var(--serif); color: #141a33; }
+
+/* the starburst on the glass: yellow rim, red fill, lit pink from behind by the tubes */
+.burst { filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45)); text-align: center; }
+.burst > * { position: absolute; }
+.burst .rim { inset: 0; background: #ffd21f; }
+.burst .fill { inset: calc(var(--bR) * 0.07); background: radial-gradient(circle at 38% 30%, #ff3a3a 0%, #e0121e 55%, #a80a1c 100%); }
+.burst .fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(200deg, rgba(255,120,200,0.28), rgba(255,120,200,0) 45%); }
+.burst .b1 { left: 0; right: 0; top: 27%; margin: 0; font: 400 calc(var(--bR) * 0.42)/0.9 "Anton", sans-serif; color: #ffe14a; text-transform: uppercase; letter-spacing: 0.01em; text-shadow: 0 2px 0 rgba(90,0,10,0.55); }
+.burst .b2 { left: 0; right: 0; top: 67%; margin: 0; font: 800 calc(var(--bR) * 0.13)/1 "Inter", sans-serif; color: #fff; text-transform: uppercase; letter-spacing: 0.12em; }
+
+/* small print on the front edge of the sill */
+.lip { margin: 0; font: italic 400 var(--lipSize)/1.2 var(--serif); color: rgba(220, 226, 240, 0.66); text-align: center; white-space: nowrap; }
+
+.grain { inset: 0; pointer-events: none; mix-blend-mode: overlay; opacity: 0.5; background-size: 384px 384px; }

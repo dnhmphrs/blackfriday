@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>The World, On Sale</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-x-midpoint.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="sky"></div>
+  <div class="halo" id="halo"></div>
+
+  <!-- A4: the document header, as on the brand sheet -->
+  <header class="doc" id="doc">
+    <div class="c1">Gary Mustard<br>Enterprises</div>
+    <div class="c2">EST2026</div>
+    <div class="c3" id="doc-c3"></div>
+  </header>
+
+  <!-- B6: the notification it arrived in -->
+  <div class="notif" id="notif">
+    <i class="avatar"><b></b></i>
+    <div class="who">
+      <div class="from"><strong>Gary Mustard Enterprises</strong><span class="time">Fri 27 Nov, 6:00&nbsp;AM</span></div>
+      <div class="subj" id="subj"></div>
+      <div class="pre" id="pre"></div>
+    </div>
+  </div>
+
+  <!-- B6: the sale words, at full volume -->
+  <h1 class="bf" id="bf"></h1>
+
+  <!-- A4: the specimen -->
+  <canvas id="gl"></canvas>
+  <div id="glint"></div>
+  <svg class="leaders" id="leaders"></svg>
+  <div class="label" id="lab-core"></div>
+  <div class="label" id="lab-cut"></div>
+  <div class="label fig" id="lab-fig"></div>
+
+  <div class="price" id="price">
+    <div class="big" id="big"></div>
+    <p class="scope" id="scope"></p>
+  </div>
+
+  <div class="act" id="act">
+    <div class="timer" id="timer">
+      <div class="ends">Ends<br>in</div>
+      <div class="cells">
+        <div class="cell"><b id="hh">23</b><span>Hrs</span></div><em>:</em>
+        <div class="cell"><b id="mm">59</b><span>Min</span></div><em>:</em>
+        <div class="cell"><b id="ss">59</b><span>Sec</span></div>
+      </div>
+    </div>
+    <a class="cta" id="cta"><span id="cta-label"></span><i class="sheen" id="sheen"></i></a>
+  </div>
+
+  <!-- the scroll: a GME paper band, like SYNERGY on the sheet -->
+  <div class="band" id="band">
+    <div class="pin top"></div>
+    <div class="paper">
+      <div class="track"><div class="run" id="run"></div></div>
+      <i class="cap"><b></b></i>
+    </div>
+    <div class="pin bot"></div>
+  </div>
+
+  <div class="foot" id="foot">
+    <p class="note" id="note"></p>
+    <p class="fine" id="fine"></p>
+  </div>
+
+  <div class="lockup" id="lockup"><i class="mark"></i></div>
+
+  <canvas id="dust"></canvas>
+  <div class="grain" id="grain"></div>
+</div>
+<script type="module" src="./gme-x-midpoint.js"></script>
+</body>
+</html>

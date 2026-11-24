@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>GME Black Friday Web Banner</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-v-web.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="bg" id="bg"></div>
+  <div class="rays" id="rays"></div>
+  <div class="floor" id="floor"></div>
+  <div class="halo" id="halo"></div>
+  <i class="logo" id="logo"></i>
+  <h1 class="bf" id="bf"></h1>
+
+  <canvas id="refl"></canvas>
+  <div class="contact" id="contact"></div>
+  <canvas id="gl"></canvas>
+  <div id="glint"></div>
+  <div class="sub" id="sub"></div>
+
+  <div class="burst" id="burst">
+    <svg viewBox="-1.05 -1.05 2.1 2.1">
+      <defs>
+        <radialGradient id="g-red" cx="0.45" cy="0.4" r="0.7"><stop offset="0" stop-color="#ff4a2a"/><stop offset="0.6" stop-color="#e3000f"/><stop offset="1" stop-color="#9d0008"/></radialGradient>
+        <radialGradient id="g-yel" cx="0.42" cy="0.35" r="0.75"><stop offset="0" stop-color="#fffbd0"/><stop offset="0.35" stop-color="#ffec3a"/><stop offset="1" stop-color="#ffb400"/></radialGradient>
+      </defs>
+      <polygon class="b-shadow" id="burst-shadow"/>
+      <polygon class="b-outer" id="burst-outer"/>
+      <polygon class="b-inner" id="burst-inner"/>
+    </svg>
+    <div class="burst-txt" id="burst-txt"></div>
+  </div>
+
+  <div class="sticker" id="sticker">
+    <svg viewBox="-1 -1 2 2">
+      <defs>
+        <radialGradient id="g-day" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fbff9a"/><stop offset="0.45" stop-color="#eeff1f"/><stop offset="1" stop-color="#c8e000"/></radialGradient>
+        <linearGradient id="g-back" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f4f4ee"/><stop offset="0.6" stop-color="#d9d9cf"/><stop offset="1" stop-color="#b7b7ad"/></linearGradient>
+        <filter id="f-stk" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0.03" dy="0.06" stdDeviation="0.035" flood-color="#000" flood-opacity="0.55"/></filter>
+        <filter id="f-flap" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="-0.06" dy="0.1" stdDeviation="0.07" flood-color="#000" flood-opacity="0.5"/></filter>
+      </defs>
+      <g id="stk-rot">
+        <path id="stk-body" fill="url(#g-day)" filter="url(#f-stk)"/>
+        <path id="stk-flap" fill="url(#g-back)" filter="url(#f-flap)"/>
+      </g>
+    </svg>
+    <div class="stk-txt" id="stk-txt"><small>Every website</small><b>30%</b><b class="off">OFF</b></div>
+  </div>
+
+  <div class="info" id="info"></div>
+  <a class="cta" id="cta"><span class="gel"></span><span class="lbl" id="cta-label"></span><i class="sheen" id="sheen"></i></a>
+
+  <div class="ticker" id="ticker"><div class="track" id="track"></div></div>
+  <div class="sparks" id="sparks"></div>
+</div>
+<script type="module" src="./gme-v-web.js"></script>
+</body>
+</html>

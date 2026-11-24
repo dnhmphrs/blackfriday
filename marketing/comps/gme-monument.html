@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>GME Monument</title>
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./gme-monument.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <div class="photo">
+    <div class="sky"></div>
+    <canvas id="clouds"></canvas>
+    <canvas id="gl"></canvas>
+    <svg id="marks" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="topshade"></div>
+  </div>
+
+  <header class="hdr">
+    <div class="l">Gary Mustard<br>Enterprises</div>
+    <div class="c">EST2026</div>
+    <div class="r">SAVINGS<br>&amp; STUFF</div>
+  </header>
+
+  <p class="line"><span class="a">But wait&#8230;</span><span class="b">there&#8217;s less.</span></p>
+
+  <section class="paper">
+    <div class="rules top"></div>
+    <div class="band">
+      <i class="globe"></i>
+      <div class="steps">
+        <div class="row"></div>
+        <div class="row"></div>
+        <div class="row"></div>
+      </div>
+    </div>
+    <div class="rules mid"></div>
+    <div class="foot">
+      <p class="cap"><b>Fig. 30</b> &mdash; Head office signage, revised for Black Friday. The remaining 70% is in good order.</p>
+      <p class="date"><span>Every website.</span> <span>Friday 27 November 2026.</span></p>
+      <p class="date short"><span>Black Friday only.</span><span>Fri 27 Nov 2026</span></p>
+      <i class="mark"></i>
+    </div>
+    <p class="fine">No purchase necessary. Offer applies to the right-hand 30% of every web page, Friday 27 November 2026 only, and is non-transferable. Savings are delivered as an absence. The internet remains the property of its respective owners. Gary Mustard Enterprises is Bull-ish on business.</p>
+    <div class="rules bottom"></div>
+  </section>
+
+  <canvas id="grain"></canvas>
+</div>
+<script type="module" src="./gme-monument.js"></script>
+</body>
+</html>

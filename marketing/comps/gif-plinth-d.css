@@ -1,0 +1,14 @@
+/* An animated GIF banner, 1997: one low-resolution canvas on a web-safe palette, blown up with
+   hard nearest-neighbour pixels. */
+html, body { margin: 0; padding: 0; background: #0033ff; }
+#stage { position: relative; overflow: hidden; background: #0033ff; }
+#stage > * { position: absolute; left: 0; top: 0; }
+#gif { image-rendering: pixelated; image-rendering: crisp-edges; }
+#gl { visibility: hidden; }
+
+/* the credit line: clean full-resolution type over the pixel canvas */
+#credit {
+  top: auto !important; left: 0; right: 0; text-align: center; color: #ffffff;
+  font: 600 30px/1.2 Inter, Arial, sans-serif; letter-spacing: 0.01em;
+}
+#credit.left { text-align: left; padding-left: 40px; }

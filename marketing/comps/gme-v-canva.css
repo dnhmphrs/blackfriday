@@ -1,0 +1,73 @@
+/* The Black Friday post the in-house team made in a template tool: black, huge white type,
+   a red-and-yellow 30% OFF, a sticker, a burst, a ticker band and the product with a glow. */
+:root {
+  --red: #ff1a1a;
+  --red-deep: #c80000;
+  --yellow: #ffe500;
+  --amber: #ffb000;
+  --blue: #1a5cff;
+  --chunky: "Archivo Black", "Inter", sans-serif;
+  --cond: "Anton", "Bebas Neue", sans-serif;
+  --heavy: "Libre Franklin", "Inter", sans-serif;
+  --narrow: "Oswald", sans-serif;
+}
+html, body { margin: 0; background: #000; }
+#stage { position: relative; overflow: hidden; background: #000; color: #fff; font-family: var(--heavy); }
+#stage > * { position: absolute; }
+
+.bg { inset: 0; }
+.rays, .halo { pointer-events: none; }
+#gl { left: 0; top: 0; }
+
+/* the store's logo */
+.logo { background: #fff; -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
+
+/* BLACK FRIDAY */
+.bf { margin: 0; font: 400 100px/1 var(--chunky); text-transform: uppercase; white-space: nowrap; text-align: center; }
+.bf .l { display: block; width: max-content; margin: 0 auto; line-height: 0.88;
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 45%, #d7d7d7 52%, #ffffff 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.35)); }
+
+/* 30% OFF: white outline, red outline, yellow gradient face */
+.off { white-space: nowrap; font: 400 100px/1 var(--cond); text-transform: uppercase; letter-spacing: 0.01em; }
+.off span { position: absolute; left: 0; top: 0; display: block; white-space: nowrap; transform: skewX(-9deg); }
+.off .o0 { position: relative; color: #fff; -webkit-text-stroke: var(--sw0) #fff; paint-order: stroke fill; filter: drop-shadow(0 0 var(--glow) rgba(255, 40, 0, 0.75)) drop-shadow(var(--ex) var(--ex) 0 #8a0000); }
+.off .o1 { color: var(--red); -webkit-text-stroke: var(--sw1) var(--red); paint-order: stroke fill; }
+.off .o2 { background: linear-gradient(180deg, #fffbd0 0%, #fff200 30%, #ffd000 62%, #ff9a00 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* THE ENTIRE INTERNET */
+.scope { display: flex; justify-content: center; }
+.scope span { display: inline-block; font: 400 var(--scope)/1 var(--chunky); text-transform: uppercase; white-space: nowrap; color: #fff;
+  background: linear-gradient(180deg, #ff3b2f, #d00000); padding: 0.22em 0.6em 0.2em; transform: skewX(-9deg); box-shadow: 0 0 30px rgba(255, 30, 0, 0.5); }
+
+/* ticker band */
+.ticker { overflow: hidden; background: linear-gradient(180deg, #fff35a 0%, #ffe500 45%, #ffcc00 100%); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65), 0 0 0 4px #000; display: flex; align-items: center; }
+.ticker .run { white-space: nowrap; font: italic 900 var(--tk)/1 var(--heavy); color: #000; will-change: transform; }
+.ticker .run i { font-style: normal; color: var(--red); margin: 0 0.55em; display: inline-block; transform: translateY(-0.04em); }
+
+/* the burst */
+.burst svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.6)); }
+.burst .b0 { fill: #000; }
+.burst .b1 { fill: var(--red); }
+.burst .b2 { fill: var(--yellow); }
+.burst-txt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 400 var(--bt)/1 var(--chunky); color: var(--red); transform: rotate(-6deg);
+  -webkit-text-stroke: calc(var(--bt) * 0.07) #000; paint-order: stroke fill; text-shadow: calc(var(--bt) * 0.05) calc(var(--bt) * 0.05) 0 #000; }
+
+/* the sticker */
+.sticker svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(4px 10px 9px rgba(0, 0, 0, 0.7)); }
+#flap { filter: drop-shadow(-3px -2px 2px rgba(0, 0, 0, 0.35)); }
+.sticker-txt { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--chunky); line-height: 0.9; text-align: center; color: #fff; padding-bottom: 18%; padding-right: 13%; box-sizing: border-box; }
+.sticker-txt b { font-weight: 400; font-size: calc(var(--sz) * 0.25); color: var(--yellow); text-shadow: 0 0.04em 0 #001a80, 0 0 0.25em rgba(0, 0, 40, 0.5); letter-spacing: -0.02em; }
+.sticker-txt i { font-style: normal; font-size: calc(var(--sz) * 0.17); text-shadow: 0 0.04em 0 #001a80; }
+.sticker-txt small { font: italic 900 calc(var(--sz) * 0.062)/1 var(--heavy); margin-top: 0.4em; letter-spacing: 0.01em; }
+
+/* sparkles */
+.sparks { inset: 0; pointer-events: none; }
+.sparks svg { position: absolute; overflow: visible; }
+
+/* foot */
+.foot { display: flex; flex-direction: column; align-items: center; gap: var(--fgap); text-align: center; }
+.foot .when { font: 700 var(--fs)/1 var(--narrow); text-transform: uppercase; letter-spacing: 0.04em; color: #fff; white-space: nowrap; }
+.foot .when em { font-style: normal; color: var(--yellow); }
+.foot .pill { font: 900 var(--ps)/1 var(--heavy); text-transform: uppercase; color: #000; background: #fff; border-radius: 999px; padding: 0.5em 1.3em; white-space: nowrap; box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); }
+.foot .fine { font: 600 var(--fine)/1.2 var(--heavy); color: rgba(255, 255, 255, 0.75); white-space: nowrap; }

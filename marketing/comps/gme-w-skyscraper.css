@@ -1,0 +1,62 @@
+/* THE SKYSCRAPER: a 1999 160x600 web ad, blown up to the size of the space it now occupies.
+   Web-safe blue, web-safe yellow, white. One 1px border, one ADVERTISEMENT label, one button. */
+:root { --blue: #0a3cff; --blue-hi: #3f6bff; --yellow: #ffff00; --white: #ffffff; --ink: #00157a; }
+html, body { margin: 0; padding: 0; background: var(--blue); }
+#stage { position: relative; overflow: hidden; background: var(--blue); color: var(--white); }
+#stage > * { position: absolute; }
+#gl { left: 0; top: 0; pointer-events: none; }
+#gl.pix { image-rendering: pixelated; }
+.glow { inset: 0; }
+
+/* the label above the ad, drawn as a dimension line: it says how wide the ad is */
+.dim { display: flex; align-items: center; gap: var(--dimGap); height: var(--dimH);
+  font: 700 var(--dimSize)/1 "Arimo", sans-serif; letter-spacing: var(--dimTrack, 0.14em); text-transform: uppercase; color: var(--white); }
+.dim b { white-space: nowrap; font-weight: 700; }
+.dim .rule { flex: 1; height: var(--line); background: var(--white); }
+.dim .end { position: relative; width: var(--arrow); height: var(--dimH); flex: none; }
+.dim .end::before { content: ""; position: absolute; top: 0; bottom: 0; width: var(--line); background: var(--white); }
+.dim .end::after { content: ""; position: absolute; top: 50%; width: 0; height: 0; transform: translateY(-50%);
+  border-top: calc(var(--arrow) * 0.55) solid transparent; border-bottom: calc(var(--arrow) * 0.55) solid transparent; }
+.dim .end.l::before { left: 0; }
+.dim .end.l::after { left: var(--line); border-right: var(--arrow) solid var(--white); }
+.dim .end.r::before { right: 0; }
+.dim .end.r::after { right: var(--line); border-left: var(--arrow) solid var(--white); }
+/* the same, standing up (the phone banner is 30% of the height, not the width) */
+.dim.vert { flex-direction: column; }
+.dim.vert .rule { flex: 1; width: var(--line); height: auto; }
+.dim.vert .end { width: var(--dimH); height: var(--arrow); }
+.dim.vert .end::before { top: auto; bottom: auto; left: 0; right: 0; width: auto; height: var(--line); }
+.dim.vert .end::after { top: auto; left: 50%; transform: translateX(-50%); border: 0;
+  border-left: calc(var(--arrow) * 0.55) solid transparent; border-right: calc(var(--arrow) * 0.55) solid transparent; }
+.dim.vert .end.l::before { top: 0; }
+.dim.vert .end.l::after { top: var(--line); border-bottom: var(--arrow) solid var(--white); }
+.dim.vert .end.r::before { bottom: 0; }
+.dim.vert .end.r::after { bottom: var(--line); border-top: var(--arrow) solid var(--white); }
+.adlabel { font: 700 var(--adSize)/1 "Arimo", sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: var(--white); white-space: nowrap; }
+
+/* the ad's own 1px border */
+.frame { box-sizing: border-box; border: var(--line) solid var(--white); display: flex; flex-direction: column; align-items: center; }
+.side { display: flex; flex-direction: column; justify-content: center; }
+
+/* the message: Arial Black and Arial, the faces every banner was set in */
+.msg { display: flex; flex-direction: column; align-items: center; flex: none; }
+.side .msg { align-items: flex-start; }
+.ln { display: block; white-space: nowrap; line-height: 0.86; text-transform: uppercase; font-family: "Archivo Black", sans-serif; letter-spacing: -0.01em; }
+.ln.y { color: var(--yellow); }
+.ln.a { font-family: "Arimo", sans-serif; font-weight: 700; letter-spacing: 0; line-height: 1; }
+.hole { flex: 1 1 auto; align-self: stretch; }
+.msg.lit .ln { color: var(--yellow); }
+
+/* CLICK HERE!: a chunky bevelled GIF button */
+.cta { position: relative; flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+  background: var(--yellow); color: var(--blue);
+  border-style: solid; border-width: var(--bev); border-color: #ffffb8 #a89c00 #a89c00 #ffffb8;
+  box-shadow: 0 0 0 var(--line) var(--ink);
+  font: 400 var(--ctaSize)/1 "Archivo Black", sans-serif; text-transform: uppercase; letter-spacing: 0.02em; white-space: nowrap; }
+.cta.down { border-color: #a89c00 #ffffb8 #ffffb8 #a89c00; }
+.cta.down span { transform: translate(var(--line), var(--line)); }
+.cta span { display: block; }
+
+/* Gary Mustard Enterprises, white, small, at the edge */
+.mark { display: block; background: var(--white);
+  -webkit-mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; mask: url(/assets/gme/gme-primary.png) center / contain no-repeat; }
