@@ -26,7 +26,7 @@
                      radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
 
 /* the ground: the maker's mark, faint and tiled; rays turning round the badge; a glow behind it */
-.tiles { background: url(images/tile.webp) repeat; opacity: 0.07; transform: rotate(-6deg); }
+.tiles { background: url(images/tile.webp) repeat; opacity: 0.095; transform: rotate(-6deg); }
 .rays { background: repeating-conic-gradient(rgba(120, 200, 255, 0.11) 0deg 6deg, rgba(120, 200, 255, 0) 6deg 15deg); animation: turn 180s linear infinite; }
 .glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
 
