@@ -1,10 +1,13 @@
 # 30% Off EVERYTHING: the countdown site
 
 A one-screen Black Friday countdown for the Chrome extension **30% Off EVERYTHING** (brought to you by
-Gary Mustard Enterprises). It is the "Limited Time" spot as a real web page: a red BLACK FRIDAY ONLY!
-marquee with chasing bulbs, a split-flap clock, the turning globe, 30% OFF / EVERYTHING ON THE INTERNET.,
-the ticker along the top and the crawl along the bottom, all through a VHS tube. One link: ADD TO
-CHROME, to the Chrome Web Store.
+Gary Mustard Enterprises), in the same look as the extension's banner and the store images and posts
+("Globe Badge", see `socials/templates/v-starburst-post.html` and `extension/src/content.js`). The
+badge (the red and yellow starbursts, the globe, 30% OFF on its sash, BUT WAIT… THERE'S LESS! stamped on
+its shoulder) beside a split-flap clock; EVERYTHING ON THE INTERNET. and the red BLACK FRIDAY ONLY! tag;
+the yellow tape; the navy credit; the ticker along the top and the crawl along the bottom; all on the
+royal-blue tube with its rays and faint marks, through the banner's VHS tape filter. One link: the
+yellow tape, ADD TO CHROME, to the Chrome Web Store.
 
 Plain JavaScript and WebGL 1, no frameworks or rendering libraries, bundled with Rollup.
 
@@ -51,28 +54,32 @@ browser's dev tools.
 - `src/main.js` lays the page out (design px times a scale from the window: 1280 x 800 for wide windows,
   430 x 900 for tall ones), fits each piece of lettering to its box, runs the split-flap digits, and
   checks the time every frame. When the moment passes, the page switches mode live.
-- WebGL, two full-window canvases:
-  - `src/gl/bg.glsl`, under the page: the royal-blue tube gradient, the starburst of rays turning
-    around the globe, the glow behind it, and the company lockup tiled faintly across it. On Black
-    Friday the rays speed up, twist and pulse, and the palette flips blue/red on the beat.
-  - `src/gl/fx.glsl`, over the page with `mix-blend-mode: hard-light`: scanlines, the tube's vignette,
-    colour-blotch chroma noise, white static, a rolling tracking band, and on the day the beat's rim
-    flash and a glow round the clock on each tick.
-  - The softness and chroma smear come from an SVG filter (`#tape`) on the page itself. If the page
-    then draws under 24 frames a second, the filter is taken off.
-  - Without WebGL the page still works. It falls back to a CSS gradient and CSS scanlines.
-- Black Friday mode: strobing bulbs, the marquee and background flipping colour, a shaking 30% OFF, a
-  spinning TODAY ONLY! burst, fast rays, and an IT'S HAPPENING! / TODAY ONLY! tape that slams across
-  the screen every 9 seconds. All the large flips run on one 0.25 s beat, in step. That is at most
-  4 changes, so 2 flashes, a second, under WCAG 2.3.1's limit of 3.
-- With `prefers-reduced-motion` nothing moves: a still globe, still rays, still static, no flashing
-  and no takeover. The clock still counts.
+- The layout is a CSS grid (`.stage`): wide, the badge at the left and the clock over the words at the
+  right; tall, the badge, then the clock, then the words. The bands (ticker, tape, credit, crawl) are
+  rows of a flex column. The badge is plain HTML and SVG in `index.html` and sizes itself to its grid
+  cell with container query units: inside `.badge`, 1em is the badge's radius, and every part (bursts,
+  plate, globe, sash, stamp, glints) is placed in em, with the banner's own proportions.
+- `src/gl/bg.glsl` draws the background under the page with WebGL: the royal-blue tube gradient, the
+  maker's mark tiled at 9.5% (`src/images/tile.png`, as the banner's), 24 pale rays turning round the
+  badge, and the glow behind it.
+- The tape look is the banner's own SVG filter (`#tape`, in `index.html`) on the whole picture, plus
+  CSS scanlines and dark corners (`.lines`). If the page then draws under 24 frames a second, the filter
+  is taken off (and put back if that made no difference).
+- Without WebGL the page still works: a CSS gradient and a CSS glow behind the badge.
+- Black Friday mode, in the same colours: the bursts and rays spin fast, 30% OFF pumps, the stamp thuds
+  every 2 s, the tag jolts, the clock glows, the crawl adds TODAY ONLY!, and a yellow TODAY ONLY! tape
+  slams across the screen every 9 seconds. On every other 0.25 s beat, all in step, the sash and the
+  tag flip red/yellow, the clock's header and glow flare, the rays flash yellow and the screen's rim
+  red: 2 flashes a second, under WCAG 2.3.1's limit of 3.
+- With `prefers-reduced-motion` nothing moves: a still globe, still bursts and rays, still tape noise,
+  no flashing and no takeover. The clock still counts.
 
 ## Checking
 
 `npm run check` (after a build) opens `dist/` in headless Chromium at 1440x900, 1280x800, 1366x650,
-1920x1080, 390x844 @2x, 844x390 @2x and 768x1024. It covers each mode and reduced motion, the live
-switches, and a browser without WebGL. On each run it checks that the page does not scroll, that there
+1920x1080, 390x844 @2x, 844x390 @2x and 768x1024. It covers each size before the day, on it (two frames,
+either side of the beat) and with reduced motion, plus the day after, the live switches, and a browser
+without WebGL. On each run it checks that the page does not scroll, that there
 are no console errors, no failed or outside requests, that WebGL is on, and that the clock's digits
 are right. Screenshots go to `screenshots/`. Playwright is a dev dependency (`npm install`); on a new machine also run
 `npx playwright install chromium`.
@@ -109,13 +116,13 @@ URLs.
 ## Files
 
 ```
-src/index.html      the page (head, markup, the #tape SVG filter); the build inlines style.css into it
-src/style.css       layout and the look; Black Friday mode under .bf
+src/index.html      the page (head, markup, the badge's SVG, the #tape filter); the build inlines style.css into it
+src/style.css       layout and the look; Black Friday mode under .bf, its flashes under .bf.beat
 src/main.js         layout, fitting, the clock, the beat, the WebGL drawing
 src/clock.js        Black Friday date maths and ?now=
-src/gl/             the WebGL helper and the shaders
+src/gl/             the WebGL helper and the background shader
 src/images/tile.png the faint lockup tile (inlined into the script as a texture)
-public/             copied into dist/ as-is: fonts (OFL, LICENSE.txt), the globe, favicon, og.png
+public/             copied into dist/ as-is: fonts (OFL, LICENSE.txt), the globe, favicon (the extension's icon), og.png
 scripts/            serve.mjs (static server), check.mjs (screenshots + checks), og.mjs (share image)
 screenshots/        the last check's screenshots
 ```

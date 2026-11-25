@@ -7,14 +7,14 @@ import { layer } from './gl/gl.js';
 import BG from './gl/bg.glsl';
 import TILE from './images/tile.png?inline';
 
-const BEAT = 0.25;   // s. On the day the big flips (background, marquee, bulbs) happen only on this beat, in step:
-                     // at most 4 changes a second, 2 flashes, under the 3 a second of WCAG 2.3.1
-const CHASE = 0.2;   // s. The bulbs' chase and the ON AIR light, before the day
+const BEAT = 0.25;   // s. On the day the big flips (sash, tag, clock, rays, the red rim) happen only on every other
+                     // beat, all in step: 2 flashes a second, under the 3 a second of WCAG 2.3.1
+const BLINK = 0.5;   // s. The ON AIR light, before the day (on the day it blinks on the beat)
 
 const TICKER = 'But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
-const CRAWL = 'BLACK FRIDAY ONLY! <b>✦</b> ';
-const CRAWL_BF = 'TODAY ONLY! <b>✦</b> BLACK FRIDAY ONLY! <b>✦</b> ';
-const TAKEOVER = 'IT’S HAPPENING! <b>✦</b> TODAY ONLY! <b>✦</b> ';
+const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
+const CRAWL_BF = 'TODAY ONLY! ✦ BLACK FRIDAY ONLY! ✦ ';
+const TAKEOVER = 'TODAY ONLY! <b>✦</b> ACT NOW! <b>✦</b> ';
 
 const Q = new URLSearchParams(location.search);
 const FORCED = parseNow(Q.get('now'));
@@ -47,10 +47,14 @@ if (bg) {
   img.src = TILE;
 }
 
-// ---- the starburst on the clock: 18 points ----
+// ---- the badge's bursts, as on the banner (a radius of 100 in a box 224 across): red 16 points, yellow 30 ----
 {
-  const pts = Array.from({ length: 36 }, (_, i) => { const a = (i / 36) * Math.PI * 2, r = i % 2 ? 0.8 : 1; return `${(Math.cos(a) * r).toFixed(3)},${(Math.sin(a) * r).toFixed(3)}`; }).join(' ');
-  for (const p of document.querySelectorAll('.burst polygon')) p.setAttribute('points', pts);
+  const star = (n, outer, inner, turn = 0) => Array.from({ length: n * 2 }, (_, i) => {
+    const a = ((i + turn) * Math.PI) / n - Math.PI / 2, r = i % 2 ? inner : outer;
+    return `${(r * Math.cos(a)).toFixed(2)},${(r * Math.sin(a)).toFixed(2)}`;
+  }).join(' ');
+  const pts = { 'red-pts': star(16, 108, 80, 0.5), 'yellow-pts': star(30, 97, 86) };
+  for (const [cls, p] of Object.entries(pts)) for (const el of document.querySelectorAll(`.${cls}`)) el.setAttribute('points', p);
 }
 
 // ---- the clock ----
@@ -125,21 +129,17 @@ function run(r, bandH) {
   r.el.style.setProperty('--dur', `${unitW / (bandH * r.speed)}s`);
 }
 
-let geo = { W: 1, H: 1, s: 1, cx: 0, cy: 0, r: 100, clock: [0, 0, 0, 0] };
+let geo = { W: 1, H: 1, s: 1, tall: false, cx: 0, cy: 0, r: 100 };
 function layout() {
   const W = tv.clientWidth, H = tv.clientHeight, tall = W / H < 0.85;
-  set('tall', tall); set('wide', !tall); set('tab', tall && W / H > 0.62);
+  set('tall', tall); set('wide', !tall);
   const s = tall ? Math.min(W / 430, H / 900) : Math.min(W / 1280, H / 800);
   root.style.setProperty('--s', `${s}px`);
 
-  fit($('.band .fit'), { w: 0.92, h: tall ? 0.9 : 0.84 });
-  fit(clock, tall ? { w: 0.8, h: 0.96 } : { w: 0.86, h: 1.02 });
-  fit($('.offer'), { w: tall ? 0.94 : 0.92, h: tall ? 0.98 : 0.9 });
-  set('narrow', tall);
-  const order = $('.order .fit');
-  if (!tall && fit(order, { w: 0.94, h: 0.62 }) < $('.order').clientHeight * 0.36) set('narrow', true);
-  fit(order, { w: 0.9, h: root.classList.contains('narrow') ? 0.6 : 0.62 });
-  fit($('.by .fit'), { w: 0.94, h: 0.46 });
+  fit($('.timer'), tall ? { w: 0.9, h: 0.94 } : { w: 0.9, h: 0.96 });
+  fit($('.words'), tall ? { w: 0.94, h: 0.94 } : { w: 0.9, h: 0.8 });
+  fit($('.order .fit'), tall ? { w: 0.9, h: 0.72 } : { w: 0.9, h: 0.46 });
+  fit($('.by .fit'), { w: 0.92, h: 0.42 });
 
   const tk = Math.min(H * 0.2, W * (tall ? 0.2 : 0.11));
   $('.takeover').style.setProperty('--tk', `${tk}px`);
@@ -156,10 +156,9 @@ function layout() {
   attr('#tape .late', 'dx', 6 * fs); attr('#tape .late', 'dy', 1.5 * fs);
   attr('#tape .bloom', 'stdDeviation', 14 * fs);
 
-  // the rays turn around the globe; the clock glows on the tick
-  const g = $('.globe').getBoundingClientRect(), c = clock.getBoundingClientRect();
-  geo = { W, H, s, cx: g.left + g.width / 2, cy: g.top + g.height / 2, r: g.width * 0.4,
-          clock: [c.left, H - c.bottom, c.width, c.height] };
+  // the rays turn around the badge, and its glow sits behind it
+  const b = $('.badge').getBoundingClientRect();
+  geo = { W, H, s, tall, cx: b.left, cy: b.top, r: parseFloat(getComputedStyle($('.badge')).fontSize) };
   if (bg) {
     const px = Math.min(1, devicePixelRatio || 1);
     bg.size(W, H, px);
@@ -176,9 +175,8 @@ function draw(t, force = false) {
   const beatN = Math.floor(t / BEAT), onBeat = bf && MOVING && beatN % 2 === 1;
   if (MOVING) {
     set('beat', onBeat);
-    set('alt', !bf && Math.floor(t / CHASE) % 2 === 1);
-    set('lit', bf ? beatN % 2 === 0 : Math.floor(t / 0.4) % 2 === 0);
-    ang += dt * (bf ? 0.9 : 0.07);
+    set('blink', bf ? onBeat : Math.floor(t / BLINK) % 2 === 1);
+    ang += dt * (bf ? 0.6 : (2 * Math.PI) / 180); // the banner's rays go round in 3 minutes
   }
   if (!bg) return;
   const px = geo.px || 1, H = geo.H;
@@ -186,7 +184,7 @@ function draw(t, force = false) {
   bg.draw({
     uRes: [bg.gl.drawingBufferWidth, bg.gl.drawingBufferHeight], uPx: px,
     uC: [geo.cx * px, (H - geo.cy) * px], uR: geo.r * px, uAng: FREEZE ? 0.3 : ang,
-    uBF: bf ? 1 : 0, uFlip: onBeat ? 1 : 0, uPulse: pulse, uTime: t % 3600, uK: geo.s * (geo.W / geo.H < 0.85 ? 0.7 : 1),
+    uBF: bf ? 1 : 0, uFlip: onBeat ? 1 : 0, uPulse: pulse, uK: geo.s * (geo.tall ? 0.7 : 1),
     uTile: { tex: 0 },
   });
 }
@@ -194,7 +192,7 @@ function draw(t, force = false) {
 // ---- start ----
 window.__bf = { gl: !!bg, mode: '', tape: false, now };
 async function start() {
-  const faces = ['400 50px "Archivo Black"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Arimo"'];
+  const faces = ['400 50px "Archivo Black"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Arimo"', 'italic 700 50px "Tinos"'];
   await Promise.race([Promise.all(faces.map((f) => document.fonts.load(f))), new Promise((r) => setTimeout(r, 3000))]);
   set('moving', MOVING); set('freeze', FREEZE);
   if (!MOVING || FREEZE) $('svg.defs').pauseAnimations(); // the tape's noise holds still too

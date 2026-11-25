@@ -17,77 +17,89 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="BLACK FRIDAY ONLY! 30% OFF EVERYTHING ON THE INTERNET.">
+<meta property="og:image:alt" content="30% OFF EVERYTHING ON THE INTERNET. BLACK FRIDAY ONLY!">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="30% Off EVERYTHING">
 <meta name="twitter:description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
 <meta name="twitter:image" content="%SITE%og.png">
 <link rel="preload" href="fonts/archivo-black.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/arimo-bold-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="images/globe-still.webp" as="image">
 <style>/*STYLE*/</style>
-<noscript><style>.loading .fit { visibility: visible; }</style></noscript>
+<noscript><style>.loading #p > * { visibility: visible !important; }</style></noscript>
 </head>
 <body>
-<!-- The page is one screen. #p holds the picture (the WebGL background and the page itself) and carries
-     the tape filter; .lines adds the scanlines and dark corners, as on the banner. -->
+<!-- The page is one screen, in the look of the extension's banner ("Globe Badge"). #p holds the picture
+     (the WebGL background and the page itself) and carries the tape filter; .lines adds the scanlines and
+     dark corners, as on the banner. Read in order: 1. the badge with 30% OFF, and the clock; 2. EVERYTHING
+     ON THE INTERNET. and BLACK FRIDAY ONLY!; 3. the yellow tape, ADD TO CHROME; then the furniture. -->
 <div id="tv">
   <div id="p">
     <canvas id="bg" aria-hidden="true"></canvas>
 
-    <div class="ticker" aria-hidden="true">
-      <div class="onair"><i></i>ON AIR</div>
-      <div class="run"><span>But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ </span></div>
-    </div>
+    <div class="ticker" aria-hidden="true"><div class="run"><span></span></div></div>
 
-    <div class="band">
-      <div class="bulbs top" aria-hidden="true"></div>
-      <div class="bulbs bot" aria-hidden="true"></div>
-      <div class="fit"><p class="head bf"><span>BLACK FRIDAY</span> <span>ONLY!</span></p></div>
-    </div>
+    <main class="stage">
+      <p class="osd" aria-hidden="true"><b>●</b> ON AIR</p>
 
-    <main class="mid">
-      <div class="globe-box" aria-hidden="true">
-        <div class="glow"></div>
-        <img class="globe" src="images/globe-still.webp" alt="" width="340" height="340" decoding="async" draggable="false">
-        <svg class="glint g1" viewBox="-1 -1 2 2"><path d="M0,-1C.06,-.22 .22,-.06 1,0C.22,.06 .06,.22 0,1C-.06,.22 -.22,.06 -1,0C-.22,-.06 -.06,-.22 0,-1Z"/></svg>
-        <svg class="glint g2" viewBox="-1 -1 2 2"><path d="M0,-1C.06,-.22 .22,-.06 1,0C.22,.06 .06,.22 0,1C-.06,.22 -.22,.06 -1,0C-.22,-.06 -.06,-.22 0,-1Z"/></svg>
-        <svg class="glint g3" viewBox="-1 -1 2 2"><path d="M0,-1C.06,-.22 .22,-.06 1,0C.22,.06 .06,.22 0,1C-.06,.22 -.22,.06 -1,0C-.22,-.06 -.06,-.22 0,-1Z"/></svg>
+      <!-- the badge: everything in it is sized in em, 1em being the badge's radius (see .badge) -->
+      <div class="badge-box">
+        <div class="badge">
+          <div class="glow" aria-hidden="true"></div>
+          <svg class="burst red shadow" viewBox="-112 -112 224 224" aria-hidden="true"><polygon class="red-pts" fill="#0a0f66" opacity="0.92"/></svg>
+          <svg class="burst red" viewBox="-112 -112 224 224" aria-hidden="true"><polygon class="red-pts" fill="#ff1616" stroke="#000" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          <svg class="burst yellow shadow" viewBox="-112 -112 224 224" aria-hidden="true"><polygon class="yellow-pts" fill="#0a0f66" opacity="0.7"/></svg>
+          <svg class="burst yellow" viewBox="-112 -112 224 224" aria-hidden="true">
+            <defs>
+              <radialGradient id="gold" r="0.9"><stop offset="0.6" stop-color="#fffb86"/><stop offset="1" stop-color="#f6d80c"/></radialGradient>
+              <path id="rim" d="M -73.5 0 A 73.5 73.5 0 1 1 73.5 0 A 73.5 73.5 0 1 1 -73.5 0"/>
+            </defs>
+            <polygon class="yellow-pts" fill="url(#gold)" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/>
+            <!-- three times round, stretched to close the circle exactly -->
+            <text font-size="10.4" textLength="455" lengthAdjust="spacing"><textPath href="#rim">EVERY SITE 30% OFF! ✦ EVERY SITE 30% OFF! ✦ EVERY SITE 30% OFF! ✦</textPath></text>
+          </svg>
+          <svg class="burst plate" viewBox="-112 -112 224 224" aria-hidden="true">
+            <radialGradient id="plate" cx="0.42" cy="0.36" r="0.75"><stop offset="0" stop-color="#3aa6ff"/><stop offset="0.45" stop-color="#1550ee"/><stop offset="1" stop-color="#071090"/></radialGradient>
+            <circle r="68.5" fill="#000"/><circle r="67.2" fill="#fff"/><circle r="64.8" fill="url(#plate)"/>
+          </svg>
+          <img class="globe" src="images/globe-still.webp" alt="" width="340" height="340" decoding="async" draggable="false">
+          <svg class="glint g1" viewBox="-1 -1 2 2" aria-hidden="true"><path d="M0,-1C.06,-.22 .22,-.06 1,0C.22,.06 .06,.22 0,1C-.06,.22 -.22,.06 -1,0C-.22,-.06 -.06,-.22 0,-1Z"/></svg>
+          <svg class="glint g2" viewBox="-1 -1 2 2" aria-hidden="true"><path d="M0,-1C.06,-.22 .22,-.06 1,0C.22,.06 .06,.22 0,1C-.06,.22 -.22,.06 -1,0C-.22,-.06 -.06,-.22 0,-1Z"/></svg>
+          <div class="sticker"><h1 class="head">30% OFF</h1></div>
+          <p class="stamp"><span class="a">But wait…</span> <span class="b">THERE’S LESS!</span></p>
+        </div>
       </div>
-      <div class="right">
-        <div class="clock-box">
-          <div class="fit clock" role="timer" aria-live="off" aria-label="Black Friday starts in">
-            <div class="ch"><span class="dot"></span><span class="lbl">STARTS IN</span><span class="dot"></span></div>
+
+      <!-- the clock: the split-flap digits in their case, under the LIMITED TIME label -->
+      <div class="clock-box">
+        <div class="fit timer">
+          <p class="label" aria-hidden="true"><span class="lt">LIMITED TIME</span><span class="to">TODAY ONLY</span> ✦ ACT NOW</p>
+          <div class="clock" role="timer" aria-live="off" aria-label="Black Friday starts in">
+            <div class="ch"><span class="lbl">STARTS IN</span></div>
             <div class="row"></div>
-            <div class="burst" aria-hidden="true">
-              <svg viewBox="-1.1 -1.1 2.2 2.2"><polygon class="sh"/><polygon class="st"/><circle r=".66"/></svg>
-              <span class="b1">ACT<br>NOW!</span><span class="b2">TODAY<br>ONLY!</span>
-            </div>
           </div>
         </div>
-        <div class="offer-box">
-          <div class="fit offer">
-            <h1 class="head">30% OFF</h1>
-            <h2 class="sub"><span>EVERYTHING ON</span> <span>THE INTERNET.</span></h2>
-            <p class="tag">A Black Friday treat for your browser.</p>
-          </div>
+      </div>
+
+      <div class="words-box">
+        <div class="fit words">
+          <h2 class="sub"><span>EVERYTHING ON</span> <span>THE INTERNET.</span></h2>
+          <p class="tag">BLACK FRIDAY ONLY!</p>
         </div>
       </div>
     </main>
 
-    <a class="order" href="https://chromewebstore.google.com/detail/henmcmipcaepmamandofeafnkijmeddn" target="_blank" rel="noopener" aria-label="ADD TO CHROME: 30% off the entire internet.">
-      <span class="fit">
-        <span class="side lead"><span class="op">LIMITED TIME</span><span class="np">No purchase necessary!</span></span>
-        <span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span>
-        <span class="side item"><span class="op">ACT NOW</span><span class="np">Works like magic!</span></span>
-      </span>
+    <!-- the yellow tape is the one link: to the store -->
+    <a class="order" href="https://chromewebstore.google.com/detail/henmcmipcaepmamandofeafnkijmeddn" target="_blank" rel="noopener" aria-label="ADD TO CHROME: 30% off the entire internet. No purchase necessary!">
+      <span class="fit"><span class="np">No purchase necessary!</span><b class="sep" aria-hidden="true">✦</b><span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span></span>
     </a>
 
     <footer class="by"><span class="fit">Brought to you by Gary Mustard Enterprises</span></footer>
 
-    <div class="crawl" aria-hidden="true"><div class="run"><span>BLACK FRIDAY ONLY! <b>✦</b> </span></div></div>
+    <div class="crawl" aria-hidden="true"><div class="run"><span></span></div></div>
 
     <div class="takeover" aria-hidden="true">
-      <div class="tape"><div class="run"><span>IT’S HAPPENING! <b>✦</b> TODAY ONLY! <b>✦</b> </span></div></div>
+      <div class="slam"><div class="run"><span></span></div></div>
     </div>
     <p class="sr">30% off the entire internet.</p>
   </div>
