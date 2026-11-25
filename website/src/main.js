@@ -18,6 +18,8 @@ const TAKEOVER = 'TODAY ONLY! <b>✦</b> ACT NOW! <b>✦</b> ';
 const Q = new URLSearchParams(location.search);
 const FORCED = parseNow(Q.get('now'));
 const FREEZE = Q.has('freeze');
+// The VHS tape look (filter and scanlines): off by default; true turns it on, ?tape turns it on for one visit
+const TAPE = false || Q.has('tape');
 const KEEP = Q.has('keep');
 const STILL = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MOVING = !STILL;
@@ -224,7 +226,7 @@ async function start() {
   tick(false);
   layout();
   set('loading', false);
-  set('tape-on', true); window.__bf.tape = true;
+  set('tape-on', TAPE); set('lines-on', TAPE); window.__bf.tape = TAPE;
 
   let pending = 0;
   addEventListener('resize', () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(layout); });
@@ -242,7 +244,7 @@ async function start() {
   window.__bf.ready = true;
 
   // a slow machine: if the page draws slowly with the tape filter, take it off (and put it back if that made no difference)
-  if (MOVING && !FREEZE && !KEEP) {
+  if (TAPE && MOVING && !FREEZE && !KEEP) {
     const rate = () => new Promise((ok) => {
       let frames = 0, spent = 0, last = 0;
       const step = (ts) => { const gap = ts - last; if (last && gap < 1000) { frames++; spent += gap; } last = ts; if (spent < 2000) requestAnimationFrame(step); else ok((frames * 1000) / spent); };

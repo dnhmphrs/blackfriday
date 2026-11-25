@@ -42,6 +42,8 @@ date-time with an offset (`2026-11-27T14:00Z`; write `+` as `%2B`), or milliseco
 runs on from that moment. Two more switches:
 
 - `?freeze` stops the clock and all motion (for screenshots).
+- `?tape` shows the VHS tape look (the filter and scanlines), which is off by default; set `TAPE` in
+  `src/main.js` to turn it on for everyone.
 - `?keep` keeps the tape filter on even on a slow machine (see below).
 
 To see the calm version, turn on "reduce motion" in the OS, or emulate `prefers-reduced-motion` in the
