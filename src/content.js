@@ -42,26 +42,26 @@
   const GRAIN_GAIN = 0.7; // how bright the specks of static are
   const GLINT = '<svg viewBox="-1 -1 2 2" aria-hidden="true"><path d="M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z"/></svg>';
 
-  // The badge, each layer drawn in a box 2.24 of its radius across: a red 16-point burst behind a
+  // The badge, each layer drawn in a box 224 across for a radius of 100: a red 16-point burst behind a
   // yellow 30-point one, each over a navy shadow of itself, turning opposite ways (banner.css); the
   // words round the yellow one's rim, a hair short of once round (see reveal); the plate the globe
   // sits on.
   const star = (n, outer, inner, turn = 0) => Array.from({ length: n * 2 }, (_, i) => {
     const a = ((i + turn) * Math.PI) / n - Math.PI / 2, r = i % 2 ? inner : outer;
-    return `${(r * Math.cos(a)).toFixed(4)},${(r * Math.sin(a)).toFixed(4)}`;
+    return `${(r * Math.cos(a)).toFixed(2)},${(r * Math.sin(a)).toFixed(2)}`;
   }).join(" ");
-  const RED = star(16, 1.08, 0.8, 0.5), YELLOW = star(30, 0.97, 0.86), RIM = 0.735;
-  const layer = (cls, inside) => `<svg class="burst ${cls}" viewBox="-1.12 -1.12 2.24 2.24" aria-hidden="true">${inside}</svg>`;
+  const RED = star(16, 108, 80, 0.5), YELLOW = star(30, 97, 86), RIM = 73.5;
+  const layer = (cls, inside) => `<svg class="burst ${cls}" viewBox="-112 -112 224 224" aria-hidden="true">${inside}</svg>`;
   const BADGE = [
     layer("red shadow", `<polygon points="${RED}" fill="#0a0f66" opacity="0.92"/>`),
-    layer("red", `<polygon points="${RED}" fill="#ff1616" stroke="#000" stroke-width="0.014" stroke-linejoin="round"/>`),
+    layer("red", `<polygon points="${RED}" fill="#ff1616" stroke="#000" stroke-width="1.4" stroke-linejoin="round"/>`),
     layer("yellow shadow", `<polygon points="${YELLOW}" fill="#0a0f66" opacity="0.7"/>`),
     layer("yellow", `<defs><radialGradient id="gold" r="0.9"><stop offset="0.6" stop-color="#fffb86"/><stop offset="1" stop-color="#f6d80c"/></radialGradient>
       <path id="rim" d="M ${-RIM} 0 A ${RIM} ${RIM} 0 1 1 ${RIM} 0 A ${RIM} ${RIM} 0 1 1 ${-RIM} 0"/></defs>
-      <polygon points="${YELLOW}" fill="url(#gold)" stroke="#000" stroke-width="0.012" stroke-linejoin="round"/>
-      <text font-size="0.095"><textPath href="#rim">${RING}</textPath></text>`),
+      <polygon points="${YELLOW}" fill="url(#gold)" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/>
+      <text font-size="9.5"><textPath href="#rim">${RING}</textPath></text>`),
     layer("plate", `<radialGradient id="plate" cx="0.42" cy="0.36" r="0.75"><stop offset="0" stop-color="#3aa6ff"/><stop offset="0.45" stop-color="#1550ee"/><stop offset="1" stop-color="#071090"/></radialGradient>
-      <circle r="0.685" fill="#000"/><circle r="0.672" fill="#fff"/><circle r="0.648" fill="url(#plate)"/>`),
+      <circle r="68.5" fill="#000"/><circle r="67.2" fill="#fff"/><circle r="64.8" fill="url(#plate)"/>`),
   ].join("");
 
   // The look of a worn tape on a tube, as an SVG filter over the banner's face (.tube), after
@@ -346,7 +346,7 @@
     // The last ✦ round the badge's rim is drawn in whatever face the computer has for it; if that
     // runs it off the end of the circle, set the words a little smaller.
     const ring = shadow.querySelector(".burst text"), on = () => { try { return ring.getExtentOfChar(RING.length - 2).width > 0; } catch { return true; } };
-    for (let i = 1; i < 12 && !on(); i++) ring.setAttribute("font-size", 0.095 * 0.975 ** i);
+    for (let i = 1; i < 12 && !on(); i++) ring.setAttribute("font-size", 9.5 * 0.975 ** i);
     frame.style.removeProperty("visibility");
     void frame.offsetWidth; // start the slide from where the stylesheet put it, off the edge
     frame.classList.add("in");
