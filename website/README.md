@@ -96,6 +96,9 @@ SITE_URL=https://example.com/ npm run build
 That fills in `og:url` and makes `og:image` / `twitter:image` absolute. Without it they stay relative,
 and some previewers ignore relative URLs.
 
+Vercel: set the project's Root Directory to `website`. `vercel.json` tells it to run `npm run build`
+and serve `dist/`, and the build picks up the production domain itself for the share-image links.
+
 GitHub Pages, for example, can use a workflow that runs `npm ci && SITE_URL=https://<user>.github.io/<repo>/ npm run build`
 in `website/` and publishes `website/dist` with `actions/upload-pages-artifact` and `actions/deploy-pages`.
 
