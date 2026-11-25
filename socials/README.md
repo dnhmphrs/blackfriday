@@ -31,7 +31,8 @@ The videos are 12 s loops at 25 frames a second; the stills are the frame at 10.
 
 It builds the template, renders every still and video (frames go to a temporary folder, deleted
 once each video is encoded), runs `../extension/package.sh`, and writes `out/kit-<version>/` and
-`out/30-off-everything-<version>.zip`. `out/` is not committed.
+`out/30-off-everything-<version>.zip`. `out/` is not committed. It also writes the website's share
+image, `../website/public/og.jpg` (the small promo tile at 1200 x 630).
 
 ## Edit the design
 

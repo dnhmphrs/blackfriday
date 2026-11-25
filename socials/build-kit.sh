@@ -46,6 +46,10 @@ still shot2 1280 800 extension-store/screenshot-2-1280x800.png
 still shot3 1280 800 extension-store/screenshot-3-1280x800.png
 EOF
 cp ../extension/src/icons/icon128.png "$KIT/extension-store/store-icon-128.png"
+# the website's share image: the small promo tile, drawn at share size
+node tools/render.mjs small 1200 630 still "$FRAMES/og.png" "$T" >/dev/null &&
+  python3 -c "import sys; from PIL import Image; Image.open(sys.argv[1]).convert('RGB').save(sys.argv[2], quality=86, optimize=True, progressive=True)" \
+    "$FRAMES/og.png" ../website/public/og.jpg && echo '  ../website/public/og.jpg'
 if [ "$1" = '--no-video' ]; then echo "stills only: $KIT"; exit 0; fi
 
 echo 'videos'

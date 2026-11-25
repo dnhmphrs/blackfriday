@@ -7,8 +7,7 @@
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "serve": "node scripts/serve.mjs dist 5173",
-    "check": "node scripts/check.mjs",
-    "og": "node scripts/og.mjs"
+    "check": "node scripts/check.mjs"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^1.0.2",

@@ -16,7 +16,7 @@ Plain JavaScript and WebGL 1, no frameworks or rendering libraries, bundled with
 ```sh
 cd website
 npm install
-npm run build        # -> dist/: index.html (CSS inlined), assets/main-*.js, fonts/, images/, og.png, favicon.png
+npm run build        # -> dist/: index.html (CSS inlined), assets/main-*.js, fonts/, images/, og.jpg, favicon.png
 npm run dev          # rebuilds on change and serves dist/ at http://127.0.0.1:5173/
 npm run serve        # serves an existing dist/ at http://127.0.0.1:5173/
 ```
@@ -89,9 +89,8 @@ are no console errors, no failed or outside requests, that WebGL is on, and that
 are right. Screenshots go to `screenshots/`. Playwright is a dev dependency (`npm install`); on a new machine also run
 `npx playwright install chromium`.
 
-`npm run og` re-renders the share image `public/og.png` (1200 x 630) from the built page. Run
-`npm run build` again afterwards. If python3 with Pillow is available, the script cuts the image to
-256 colours.
+The share image, `public/og.jpg` (1200 x 630), is the store's small promo tile drawn at share size.
+It is made with the rest of the kit: `cd ../socials && ./build-kit.sh` writes it here.
 
 ## Deploy
 
@@ -127,7 +126,7 @@ src/main.js         layout, fitting, the clock, the beat, the WebGL drawing
 src/clock.js        Black Friday date maths and ?now=
 src/gl/             the WebGL helper and the background shader
 src/images/tile.png the faint lockup tile (inlined into the script as a texture)
-public/             copied into dist/ as-is: fonts (OFL, LICENSE.txt), the globe, favicon (the extension's icon), og.png
-scripts/            serve.mjs (static server), check.mjs (screenshots + checks), og.mjs (share image)
+public/             copied into dist/ as-is: fonts (OFL, LICENSE.txt), the globe, favicon (the extension's icon), og.jpg (from ../socials)
+scripts/            serve.mjs (static server), check.mjs (screenshots + checks)
 screenshots/        the last check's screenshots
 ```
