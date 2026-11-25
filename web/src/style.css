@@ -1,0 +1,227 @@
+/* 30% Off EVERYTHING: the Black Friday countdown. One screen, never scrolls.
+   Sizes are in design px times --s (set by main.js from the window: 1280 x 800 wide, 430 x 900 tall).
+   Lettering sits in .fit boxes that main.js scales to fit the room they are given. */
+@font-face { font-family: "Archivo Black"; font-weight: 400; font-display: block; src: url(fonts/archivo-black.woff2) format("woff2"); }
+@font-face { font-family: "Antonio"; font-weight: 300; font-display: block; src: url(fonts/antonio-light.woff2) format("woff2"); }
+@font-face { font-family: "Antonio"; font-weight: 600; font-display: block; src: url(fonts/antonio-semibold.woff2) format("woff2"); }
+@font-face { font-family: "Arimo"; font-style: italic; font-weight: 700; font-display: block; src: url(fonts/arimo-bold-italic.woff2) format("woff2"); }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #070f9c; overscroll-behavior: none; }
+body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+:root { --s: 1px; --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; --ox: #4a0004;
+        --tick: 38; --bandT: 8; --band: 150; --bulb: 15; --order: 92; --by: 30; --crawl: 54; }
+.tall { --tick: 26; --bandT: 4; --band: 148; --bulb: 9; --order: 76; --by: 26; --crawl: 42; }
+.short { --tick: 44; --band: 140; --order: 104; --by: 40; --crawl: 58; }
+
+#tv { position: fixed; inset: 0; overflow: hidden; isolation: isolate; user-select: none; -webkit-user-select: none; }
+#p { position: absolute; inset: 0; overflow: hidden; display: flex; flex-direction: column;
+     background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); }
+.tape-on #p { filter: url(#tape); }
+#bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+#fx { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; mix-blend-mode: hard-light; }
+.nogl #bg, .nogl #fx { display: none; }
+.lines { display: none; position: absolute; inset: 0; z-index: 10; pointer-events: none;
+         background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.07) 1.5px, rgba(0, 0, 16, 0) 3px),
+                     radial-gradient(farthest-corner, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.12) 75%, rgba(0, 0, 0, 0.3) 100%); }
+.nogl .lines { display: block; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.defs { position: absolute; width: 0; height: 0; }
+
+#p > :not(#bg) { position: relative; z-index: 1; flex: none; }
+.mid { z-index: auto !important; } /* no stacking context: the globe goes under the marquee, the clock over it */
+.fit { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: max-content; white-space: nowrap; line-height: 1; font-size: 40px; }
+.loading .fit { visibility: hidden; }
+
+/* ---- lettering ---- */
+.head { font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.05em; transform: skewX(-9deg);
+        text-shadow: 0.009em 0.009em 0 var(--shade), 0.018em 0.018em 0 var(--shade), 0.027em 0.027em 0 var(--shade),
+                     0.036em 0.036em 0 var(--shade), 0.045em 0.045em 0 var(--shade), 0.054em 0.054em 0 var(--shade); }
+.head.bf { --shade: var(--ox); }
+.sub { font: italic 700 0.4em/1.04 "Arimo", Arial, sans-serif; letter-spacing: -0.04em; color: #fff;
+       background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+       filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
+
+/* ---- the ticker along the top: an ON AIR tab, then the lines running ---- */
+.ticker { height: calc(var(--tick) * var(--s)); background: rgba(4, 8, 70, 0.72); display: flex; overflow: hidden; z-index: 4 !important; }
+.onair { flex: none; display: flex; align-items: center; gap: 0.4em; background: var(--red); color: #fff; padding: 0 0.7em 0 0.6em;
+         font: 600 calc(var(--tick) * var(--s) * 0.5)/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.14em; box-shadow: 0.25em 0 0 #000; position: relative; z-index: 1; }
+.onair i { width: 0.5em; height: 0.5em; border-radius: 50%; background: #fff; }
+.alt .onair i { background: #8a0a0a; }
+.run { white-space: nowrap; overflow: hidden; flex: 1; min-width: 0; }
+.run > span { display: inline-block; will-change: transform; }
+.moving .run > span { animation: run var(--dur, 20s) linear infinite; }
+@keyframes run { to { transform: translateX(calc(-1px * var(--rep))); } }
+.ticker .run { font: 300 calc(var(--tick) * var(--s) * 0.66)/calc(var(--tick) * var(--s)) "Antonio", "Arial Narrow", sans-serif;
+               letter-spacing: 0.035em; word-spacing: 0.3em; color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); padding-left: 0.4em; }
+
+/* ---- the marquee: red, a row of chasing bulbs along each edge ---- */
+.band { --b: calc(var(--bulb) * var(--s)); margin-top: calc(var(--bandT) * var(--s)); height: calc(var(--band) * var(--s)); z-index: 3 !important;
+        background: linear-gradient(#ff3b2e, #ec0d0d 55%, #b30007); box-shadow: 0 0 0 calc(var(--b) * 0.25) #000, 0 calc(var(--b) * 1.1) 0 rgba(6, 8, 70, 0.85); }
+.band .fit { top: 52%; }
+.band .head > span { display: inline-block; }
+.tall .band .head { text-align: center; line-height: 0.98; }
+.tall .band .head > span { display: block; }
+.tall .band .head > span + span { font-size: 1.3em; }
+.bulbs { position: absolute; left: 0; right: 0; height: var(--b); background-repeat: repeat-x; background-size: calc(var(--b) * 3) var(--b);
+         background-image: radial-gradient(circle at calc(var(--b) * 0.75) 50%, #fffbd0 0 calc(var(--b) * 0.16), #ffd400 calc(var(--b) * 0.3), rgba(255, 212, 0, 0.5) calc(var(--b) * 0.38), rgba(255, 212, 0, 0) calc(var(--b) * 0.5)),
+                           radial-gradient(circle at calc(var(--b) * 2.25) 50%, #b54a00 0 calc(var(--b) * 0.26), rgba(90, 10, 0, 0) calc(var(--b) * 0.34)); }
+.bulbs.top { top: calc(var(--b) * 0.35); }
+.bulbs.bot { bottom: calc(var(--b) * 0.35); }
+.alt .bulbs { background-position: calc(var(--b) * 1.5) 0; }
+
+/* ---- the middle: the globe, the clock and the offer ---- */
+.mid { flex: 1 1 0 !important; min-height: 0; width: 100%; max-width: calc(1360 * var(--s)); margin: 0 auto; display: grid;
+       grid-template-columns: 44fr 56fr; padding: 0 calc(40 * var(--s)); }
+.right { display: grid; grid-template-rows: 36fr 64fr; min-height: 0; position: relative; z-index: 4; }
+.clock-box, .offer-box { position: relative; min-width: 0; min-height: 0; }
+.globe-box { position: relative; z-index: 1; container-type: size; min-height: 0; margin: calc(-34 * var(--s)) 0 calc(4 * var(--s)); }
+.globe { position: absolute; left: 50%; top: 50%; width: 112cqmin; height: 112cqmin; transform: translate(-50%, -50%); -webkit-user-drag: none; }
+.glow { display: none; position: absolute; left: 50%; top: 50%; width: 300cqmin; height: 300cqmin; transform: translate(-50%, -50%); border-radius: 50%;
+        background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+.nogl .glow { display: block; }
+.glint { position: absolute; width: 9cqmin; height: 9cqmin; fill: #fff; overflow: visible; filter: drop-shadow(0 0 0.3cqmin #9fd4ff); }
+.glint.g1 { left: 12%; top: 8%; }
+.glint.g2 { right: 10%; top: 44%; width: 6cqmin; height: 6cqmin; }
+.glint.g3 { left: 18%; bottom: 10%; width: 5cqmin; height: 5cqmin; }
+.glint path { transform-box: fill-box; transform-origin: center; }
+.moving .glint path { animation: twinkle 2.4s ease-in-out infinite; }
+.moving .glint.g2 path { animation-delay: -1.2s; }
+.moving .glint.g3 path { animation-delay: -0.6s; }
+@keyframes twinkle { 0%, 100% { transform: scale(0.55) rotate(-10deg); opacity: 0.75; } 50% { transform: scale(1) rotate(12deg); opacity: 1; } }
+
+.tall .mid { grid-template-columns: 100%; grid-template-rows: 86fr 300fr 150fr; padding: 0 calc(14 * var(--s)); }
+.tab .mid { grid-template-rows: 118fr 300fr 215fr; }
+.tall .right { display: contents; }
+.tall .clock-box { grid-row: 1; z-index: 4; }
+.tall .globe-box { grid-row: 2; margin: calc(2 * var(--s)) 0; }
+.tall .offer-box { grid-row: 3; }
+.tall .globe { width: 104cqmin; height: 104cqmin; }
+
+/* ---- the countdown clock: split-flap digits in a black case, hanging from the marquee ---- */
+.clock { display: flex; flex-direction: column; align-items: stretch; background: linear-gradient(#1b1b26, #07070c); color: var(--yellow);
+         border: 0.07em solid var(--yellow); box-shadow: 0 0 0 0.05em #000, 0.16em 0.16em 0 rgba(6, 8, 70, 0.9); }
+.wide .clock { top: calc(-10 * var(--s)); transform: translate(-50%, 0); }
+.clock .ch { display: flex; align-items: center; justify-content: center; gap: 0.5em; background: var(--yellow); color: #0b0b12;
+             font: 600 0.34em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.16em; padding: 0.22em 0.6em 0.24em; }
+.clock .ch .dot { width: 0.62em; height: 0.62em; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 0.12em #0b0b12; }
+.alt .clock .ch .dot { background: #5a1010; }
+.clock .row { display: flex; align-items: flex-start; justify-content: center; padding: 0.16em 0.22em 0.12em; }
+.clock .u { display: flex; flex-direction: column; align-items: center; }
+.clock .dd { display: flex; gap: 0.05em; }
+.clock .u > i { font: 600 0.2em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.2em; color: #fff; margin-top: 0.3em; font-style: normal; }
+.clock .colon { font: 400 0.7em/1.45 "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); padding: 0 0.06em; }
+.clock .u.sec em { color: #ff4a3a; }
+/* one split-flap digit: top half, bottom half, and the two flaps that turn over when it changes */
+.clock em { position: relative; display: block; width: 0.8em; height: 1.08em; font: normal 400 1em/1.08em "Archivo Black", "Arial Black", sans-serif;
+            color: var(--yellow); perspective: 3em; }
+.clock em > b { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; font-weight: 400; backface-visibility: hidden; }
+.clock em > b > b { position: absolute; left: 0; right: 0; height: 1.08em; text-align: center; font-weight: 400; }
+.clock em > .up, .clock em > .fa { top: 0; border-radius: 0.07em 0.07em 0 0; background: linear-gradient(#34343f, #26262f); transform-origin: 50% 100%; }
+.clock em > .dn, .clock em > .fb { bottom: 0; border-radius: 0 0 0.07em 0.07em; background: linear-gradient(#1f1f28, #17171e); transform-origin: 50% 0;
+                                    border-top: 0.025em solid #000; }
+.clock em > .dn > b, .clock em > .fb > b { top: calc(-0.54em - 0.025em); }
+.clock em > .fa, .clock em > .fb { z-index: 1; }
+.clock em > .fa { transform: rotateX(90deg); }
+
+/* the starburst on the clock: ACT NOW! before the day, TODAY ONLY! on it */
+.burst { position: absolute; width: 1.9em; height: 1.9em; left: -1.62em; top: 0.3em; display: grid; place-items: center; transform: rotate(-12deg); }
+.tall .burst { left: auto; right: -0.7em; top: -0.75em; width: 1.45em; height: 1.45em; transform: rotate(14deg); }
+.burst svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.burst .sh { fill: rgba(6, 8, 70, 0.9); transform: translate(0.06px, 0.07px); }
+.burst .st { fill: var(--yellow); stroke: #000; stroke-width: 0.05; stroke-linejoin: round; }
+.burst circle { fill: none; stroke: var(--red); stroke-width: 0.035; }
+.burst span { position: relative; font: 400 0.36em/0.9 "Archivo Black", "Arial Black", sans-serif; color: var(--red); text-align: center; letter-spacing: -0.03em;
+              text-shadow: 0.04em 0.04em 0 var(--ox); }
+.burst .b2, .bf .burst .b1 { display: none; }
+.bf .burst .b2 { display: block; font-size: 0.3em; }
+.moving .burst svg, .moving .burst span { animation: thump 0.8s ease-in-out infinite; }
+@keyframes thump { 0%, 40%, 100% { transform: scale(1); } 20% { transform: scale(1.08); } }
+
+/* ---- the offer ---- */
+.offer { text-align: center; }
+.offer .head { display: block; }
+.offer .sub { margin-top: 0.06em; }
+.tall .offer .sub > span { display: block; }
+.offer .tag { font: italic 700 0.155em/1 "Arimo", Arial, sans-serif; color: #dfe8ff; letter-spacing: 0.02em; margin-top: 0.5em;
+              text-shadow: 0.08em 0.08em 0 rgba(6, 8, 70, 0.9); }
+.tall .offer .tag { font-size: 0.12em; margin-top: 0.4em; }
+
+/* ---- the order bar: the one link, to the store ---- */
+.order { display: block; height: calc(var(--order) * var(--s)); text-decoration: none; cursor: pointer; color: #111; z-index: 4 !important;
+         background: linear-gradient(#fffb86, #f0e11c); box-shadow: inset 0 0.25em 0 rgba(170, 158, 0, 0.6), inset 0 -0.25em 0 rgba(170, 158, 0, 0.6); }
+.order .fit { display: flex; align-items: center; gap: 0.9em; }
+.order .side { display: flex; flex-direction: column; gap: 0.16em; }
+.order .lead { align-items: flex-end; }
+.order .item { align-items: flex-start; }
+.order .op { font: 600 0.42em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.2em; color: #1a1a1a; }
+.order .np { font: italic 700 0.62em/1 "Arimo", Arial, sans-serif; letter-spacing: -0.02em; }
+.order .go { display: inline-flex; align-items: center; gap: 0.36em; padding: 0.2em 0.62em 0.24em; background: #111; color: var(--yellow);
+             font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; box-shadow: 0.1em 0.1em 0 rgba(6, 8, 70, 0.9); }
+.lit .order .go { background: var(--red); }
+.order .go i { font: 900 1em/1 Arial, Helvetica, sans-serif; font-style: normal; display: inline-block; transition: transform 0.15s; }
+.order:hover, .order:focus-visible { outline: none; background: linear-gradient(#fffdb8, #fff035); }
+.order:hover .go, .order:focus-visible .go { background: #fff !important; color: var(--red); outline: 0.08em solid #111; }
+.order:hover .go i, .order:focus-visible .go i { transform: translateX(0.18em); }
+.order:active .go { transform: translate(0.05em, 0.05em); box-shadow: 0.05em 0.05em 0 rgba(6, 8, 70, 0.9); }
+.narrow .order .side { display: none; }
+
+/* ---- the credit line and the crawl ---- */
+.by { height: calc(var(--by) * var(--s)); background: var(--shade); color: #fff; z-index: 4 !important; }
+.by .fit { font: italic 700 40px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+.crawl { height: calc(var(--crawl) * var(--s)); background: #05050c; overflow: hidden; z-index: 4 !important; display: flex; }
+.crawl .run { font: 400 calc(var(--crawl) * var(--s) * 0.64)/calc(var(--crawl) * var(--s)) "Archivo Black", "Arial Black", sans-serif;
+              color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
+.crawl .run > span { text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade); }
+.crawl b, .takeover b { font-weight: 400; color: var(--red); }
+.crawl .run { transform: skewX(-9deg); margin-left: -1em; }
+
+/* ---- the takeover: on the day, a tape slams across the screen every few seconds ---- */
+.takeover { position: absolute !important; left: -10%; right: -10%; top: 50%; height: 0; z-index: 6 !important; pointer-events: none; display: none; }
+.bf.moving .takeover { display: block; }
+.takeover .tape { position: absolute; left: 0; right: 0; top: calc(var(--tk, 120px) * -0.5); height: var(--tk, 120px); display: flex; align-items: center;
+                  background: linear-gradient(#fffb86, #f0e11c); border-block: calc(var(--tk, 120px) * 0.06) solid #111;
+                  box-shadow: 0 calc(var(--tk, 120px) * 0.12) 0 rgba(6, 8, 70, 0.85); transform: rotate(-7deg) translateX(130%);
+                  animation: slam 9s cubic-bezier(.2, .9, .25, 1) infinite; }
+.takeover .run { font: 400 calc(var(--tk, 120px) * 0.62)/1 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.03em;
+                 text-shadow: 0.03em 0.03em 0 var(--ox), 0.06em 0.06em 0 var(--ox); transform: skewX(-9deg); }
+@keyframes slam {
+  0% { transform: rotate(-7deg) translateX(130%) scale(1.4); }
+  5% { transform: rotate(-7deg) translateX(0) scale(1); }
+  6.5% { transform: rotate(-7deg) translateX(1.5%) scale(1.04); }
+  8%, 24% { transform: rotate(-7deg) translateX(0) scale(1); }
+  30%, 100% { transform: rotate(-7deg) translateX(-130%) scale(1); }
+}
+
+/* ---- Black Friday itself: everything at once (big flips only on the beat, at most 2 a second) ---- */
+.bf .ch { background: var(--red); color: #fff; }
+.bf .clock .ch .dot { background: var(--yellow); }
+.bf.beat .clock { border-color: var(--red); }
+.bf.beat .clock .ch { background: var(--yellow); color: #0b0b12; }
+.bf.beat .band { background: linear-gradient(#fffb86, #ffe31a 55%, #f0c400); }
+.bf.beat .band .head { color: var(--red); --shade: #3a0003; }
+.bf .bulbs { background-position: 0 0 !important; }
+.bf .bulbs { background-image: radial-gradient(circle at calc(var(--b) * 0.75) 50%, #fff 0 calc(var(--b) * 0.2), #ffd400 calc(var(--b) * 0.32), rgba(255, 212, 0, 0) calc(var(--b) * 0.5)),
+                               radial-gradient(circle at calc(var(--b) * 2.25) 50%, #fff 0 calc(var(--b) * 0.2), #ffd400 calc(var(--b) * 0.32), rgba(255, 212, 0, 0) calc(var(--b) * 0.5)); }
+.bf.beat .bulbs { background-image: radial-gradient(circle at calc(var(--b) * 0.75) 50%, #8a2a00 0 calc(var(--b) * 0.26), rgba(90, 10, 0, 0) calc(var(--b) * 0.34)),
+                                    radial-gradient(circle at calc(var(--b) * 2.25) 50%, #8a2a00 0 calc(var(--b) * 0.26), rgba(90, 10, 0, 0) calc(var(--b) * 0.34)); }
+.bf.moving .offer .head { animation: shake 0.5s linear infinite; }
+@keyframes shake {
+  0% { transform: skewX(-9deg) scale(1) rotate(0); }
+  15% { transform: skewX(-9deg) scale(1.12) rotate(-3deg) translate(-0.01em, 0.01em); }
+  30% { transform: skewX(-9deg) scale(0.97) rotate(2.5deg) translate(0.012em, -0.01em); }
+  45% { transform: skewX(-9deg) scale(1.06) rotate(-1.5deg); }
+  60%, 100% { transform: skewX(-9deg) scale(1) rotate(0); }
+}
+.bf.moving .burst svg, .bf.moving .burst span { animation: thump 0.5s ease-in-out infinite; }
+.bf.moving .burst { animation: spin 3s linear infinite; }
+@keyframes spin { from { transform: rotate(-12deg); } to { transform: rotate(348deg); } }
+.bf.moving.tall .burst { animation-name: spinT; }
+@keyframes spinT { from { transform: rotate(14deg); } to { transform: rotate(374deg); } }
+
+/* the still frame for screenshots (?freeze) */
+.freeze *, .freeze *::before, .freeze *::after { animation-play-state: paused !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
