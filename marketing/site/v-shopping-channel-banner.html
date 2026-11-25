@@ -132,9 +132,11 @@ body { -webkit-font-smoothing: antialiased; }
 .panel.flush.compact .big { font-size: 68px; -webkit-text-stroke: 6.5px #000; }
 /* side: WAS and NOW side by side */
 .panel.side { width: max-content; }
-.panel.side .price { flex-direction: row; align-items: baseline; justify-content: center; gap: 30px; padding: 12px 18px 14px; }
+.panel.side .price { flex-direction: row; align-items: baseline; justify-content: center; gap: 26px; padding: 12px 30px 14px 18px; }
 .panel.side .price .row { width: auto; margin-top: 0; }
 .panel.side .lb { width: auto; }
+.panel.side .was { font-size: 38px; }
+.panel.side .big { font-size: 66px; -webkit-text-stroke: 6.5px #000; }
 /* row: a short wide panel, the header and the item side by side over the price (the strip) */
 .panel.rowp { width: max-content; }
 .panel.rowp .hdr { display: flex; border-bottom: 5px solid #000; }
@@ -403,7 +405,7 @@ body { -webkit-font-smoothing: antialiased; }
       // Stacked (studio, lower third, panel): the first that leaves the product a fair size, the lower
       // third as large as goes, then the richest panel. Otherwise the studio and the panel side by side.
       const VARIANTS = [['flush'], ['flush', 'compact'], ['flush', 'compact', 'nosb'], ['flush', 'compact', 'side', 'nosb']];
-      const dMin = FW * 0.36;
+      const dMin = FW * 0.4;
       let plan = null;
       const nats = VARIANTS.map((v) => measure('col', v));
       search: for (const sc of [1, 0.92, 0.85]) {
@@ -473,7 +475,7 @@ body { -webkit-font-smoothing: antialiased; }
       const bugF = Math.max(9, 30 * u), bugH = bugF * 1.72;
       const long = FW / mid > 2.5;
       // the product's column at the left: the globe as large as stands under the bug
-      const d = Math.min((mid - bugH - m * 1.2) / (PRODUCT + 0.04), FW * (long ? 0.235 : 0.27));
+      const d = Math.min((mid - bugH - m * 1.2) / (PRODUCT + 0.04), FW * (long ? 0.19 : 0.27));
       const sw = d * 1.22 + m;                                   // the studio's width
       // its base stands behind the crawl, its foot above the crawl's foot
       const pcx = X0 + m * 0.3 + sw / 2, floor = bot + crawlH * 0.7;
@@ -484,7 +486,7 @@ body { -webkit-font-smoothing: antialiased; }
       if (long) {
         // the lower third in the middle, the panel down the right
         const v0 = ['compact', 'nosb'], v1 = ['compact'];
-        const pw = FW * 0.27;
+        const pw = FW * 0.26;
         let v = v1, nat = measure('col', v), pk = Math.min(pw / nat.w, (mid - m * 1.4) / nat.h);
         if (pk < (pw / nat.w) * 0.85) { v = v0; nat = measure('col', v); pk = Math.min(pw / nat.w, (mid - m * 1.4) / nat.h); }
         const px = X1 - m * 0.7 - nat.w * pk, py = top + (mid - nat.h * pk) / 2 - m * 0.1;
