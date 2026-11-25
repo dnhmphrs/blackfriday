@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banner in place</title>
+<!-- A banner design shown where the extension puts it: a mock web page fills the window, and over it
+     the banner's frame, exactly as src/content.js and src/banner.css place it (the right 30% of the
+     window, full height; at 768px and narrower the top 33%, full width), with the same coupon edge
+     (teeth period 16 depth 7, a 2px black keyline, a 6px gold trim). The design is a built page in an
+     iframe the size of the frame, told which edge faces the page and how much to keep clear of it.
+       ?page=shop|news (default: shop when wide, news when narrow)
+       &banner=<path of the built banner page, relative to this file>  -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: #fff; }
+  #page { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  .host { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+  .frame { position: absolute; top: 0; right: 0; width: 30%; height: 100%; background: #000; pointer-events: auto; }
+  .trim, .face { position: absolute; inset: 0; }
+  .trim { background: linear-gradient(90deg, #fffb86, #f0e11c 45%, #c9b400); }
+  .face { overflow: hidden; background: #0a22d6; }
+  .face iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  @media (max-width: 768px) {
+    .frame { width: 100%; height: 33%; }
+    .trim { background: linear-gradient(#c9b400, #f0e11c 55%, #fffb86); }
+  }
+</style>
+</head>
+<body>
+<iframe id="page" title="page"></iframe>
+<div class="host"><div class="frame"><div class="trim"></div><div class="face"><iframe id="banner" title="banner" scrolling="no"></iframe></div></div></div>
+<script>
+  // the coupon edge, as in src/content.js
+  const TOOTH = { period: 16, depth: 7 }, KEYLINE = 2, TRIM = 6, CLEAR = TOOTH.depth + KEYLINE + TRIM + 2;
+  function teeth(w, h, narrow, inset) {
+    const { period: p, depth: d } = TOOTH, points = [];
+    if (narrow) {
+      points.push('0 0', `${w}px 0`);
+      for (let x = w; x > -p; x -= p) points.push(`${x}px ${h - inset}px`, `${x - p / 2}px ${h - inset - d}px`);
+    } else {
+      points.push(`${w}px 0`, `${w}px ${h}px`);
+      for (let y = h; y > -p; y -= p) points.push(`${inset}px ${y}px`, `${inset + d}px ${y - p / 2}px`);
+    }
+    return `polygon(${points.join(', ')})`;
+  }
+  const q = new URLSearchParams(location.search);
+  const narrow = matchMedia('(max-width: 768px)').matches;
+  document.getElementById('page').src = `../store/mock/${q.get('page') || (narrow ? 'news' : 'shop')}.html`;
+  const frame = document.querySelector('.frame'), W = frame.clientWidth, H = frame.clientHeight;
+  frame.style.clipPath = teeth(W, H, narrow, 0);
+  document.querySelector('.trim').style.clipPath = teeth(W, H, narrow, KEYLINE);
+  document.querySelector('.face').style.clipPath = teeth(W, H, narrow, KEYLINE + TRIM);
+  document.getElementById('banner').src = `${q.get('banner') || '../out/site/v-starburst-banner.html'}?keep&edge=${narrow ? 'bottom' : 'left'}&clear=${CLEAR}`;
+</script>
+</body>
+</html>

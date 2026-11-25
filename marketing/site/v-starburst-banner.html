@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>30% Off EVERYTHING</title>
+<link rel="icon" href="{{img:favicon}}">
+<!-- Variant "starburst-banner": "The Globe Badge" (v-starburst-globe) redrawn as the extension's sale
+     banner itself. It is a picture, not a page: no links, no buttons, no credits. It lays itself out
+     for the banner's two shapes:
+       a tall column (about 0.42-0.6 wide:tall; the side banner on a desktop window), and
+       a short wide strip (the banner across the top of a phone or narrow window).
+     Read in order:
+       1. the turning globe on its starburst, 30% OFF slapped across it   (the hero, in both shapes)
+       2. EVERYTHING ON THE INTERNET. and the red BLACK FRIDAY ONLY! tag
+       3. BUT WAIT… THERE'S LESS!, the rubber stamp aside
+     then the furniture: the ticker along the top, the crawl along the bottom; in the column the
+     slanted yellow tape EVERY SITE 30% OFF! with the navy tape under it, as on the live banner; the
+     four cards only where there is room; in a long strip, the price card.
+     ?edge=left|bottom&clear=N keeps N px of the face clear along the coupon edge (the harness that
+     shows it in place passes them); ?keep keeps the tape look on however slow the machine.
+     Everything that moves runs off one clock at 25 frames a second; nothing is animated in CSS. -->
+<style>
+{{fonts}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #070f9c; }
+body { -webkit-font-smoothing: antialiased; }
+#p { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); filter: url(#tape);
+     --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; user-select: none; pointer-events: none; }
+#p > * { position: absolute; display: block; max-width: none; }
+.defs { position: absolute; width: 0; height: 0; }
+.lines { position: fixed; inset: 0; pointer-events: none; z-index: 2;
+         background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.05) 1.5px, rgba(0, 0, 16, 0) 3px),
+                     radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
+
+.glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+.tiles { background-repeat: repeat; opacity: 0.07; transform: rotate(-6deg); }
+
+.t { white-space: nowrap; line-height: 1; }
+.head { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.05em;
+        text-shadow: 0.009em 0.009em 0 var(--shade), 0.018em 0.018em 0 var(--shade), 0.027em 0.027em 0 var(--shade),
+                     0.036em 0.036em 0 var(--shade), 0.045em 0.045em 0 var(--shade), 0.054em 0.054em 0 var(--shade); }
+.sub { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.04em;
+       background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+       filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
+
+.glint svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
+.glint path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); transform-box: fill-box; transform-origin: center; }
+
+/* the burst: an SVG, turning by the clock */
+.burst { overflow: visible; }
+.burst text { font-family: "Archivo Black", "Arial Black", sans-serif; fill: var(--shade); letter-spacing: 0.01em; }
+
+/* 1. the sticker: 30% OFF on a red panel with a yellow keyline, across the globe */
+.sticker { background: linear-gradient(#ff3a2a, #e00a0a 60%, #c80000); border: 0.05em solid #000; border-radius: 0.08em;
+           box-shadow: inset 0 0 0 0.035em #e00a0a, inset 0 0 0 0.065em var(--yellow), 0.1em 0.1em 0 rgba(6, 8, 70, 0.92); transform-origin: center; }
+.sticker .t { position: absolute; }
+
+/* 2. BLACK FRIDAY ONLY!, as a red tag */
+.tag { display: inline-block !important; white-space: nowrap; background: var(--red); color: var(--yellow); border: 0.07em solid #000;
+       font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; padding: 0.2em 0.42em 0.24em;
+       box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.9); transform: rotate(-2deg); transform-origin: center; text-shadow: 0.05em 0.05em 0 #7a0006; }
+
+/* 3. the aside: BUT WAIT… THERE'S LESS! as a rubber stamp on a white card */
+.stamp { display: block; text-align: center; white-space: nowrap; background: #fbfbf4; color: var(--red); padding: 0.32em 0.6em 0.36em;
+         border: 0.13em solid var(--red); border-radius: 0.18em; box-shadow: inset 0 0 0 0.09em #fbfbf4, inset 0 0 0 0.15em var(--red), 0.14em 0.16em 0 rgba(6, 8, 70, 0.9);
+         transform-origin: center; }
+.stamp .a { display: block; font: italic 700 0.62em/1 "Tinos", "Times New Roman", serif; color: #111; letter-spacing: 0.01em; margin-bottom: 0.14em; }
+.stamp .b { display: block; font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; }
+
+.ticker, .crawl { overflow: hidden; white-space: nowrap; }
+.ticker { top: 0; font-family: "Antonio", "Arial Narrow", sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em;
+          color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); background: rgba(4, 8, 90, 0.35); }
+.ticker span { display: inline-block; }
+.crawl { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; background: rgba(4, 8, 90, 0.25); }
+.crawl span { display: inline-block; text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade); }
+
+/* the tapes, at the live banner's slant: the yellow one, and the navy one under it (column only) */
+.strip { display: flex !important; align-items: center; justify-content: center; white-space: nowrap; font: italic 700 1em "Arimo", Arial, sans-serif; }
+.tape { background: linear-gradient(#fffb86, #f0e11c); color: #111; }
+.by { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* the price card; only its 70% moves */
+.card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000; box-shadow: 8px 8px 0 rgba(4, 6, 60, 0.92);
+        transform-origin: left top; font: italic 700 50px/1 "Arimo", Arial, sans-serif; }
+.card .hd { background: var(--red); color: #fff46a; font: 600 41px/57px "Antonio", "Arial Narrow", sans-serif; padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
+.card .ln { padding: 13px 17px 0; }
+.card s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 9px; }
+.card s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 8px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+.card .big { position: absolute; right: 9px; bottom: -54px; font: 400 165px/0.9 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em;
+             -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 70% 80%; }
+
+.cards { display: flex !important; flex-wrap: wrap; gap: 12px; width: 436px; transform-origin: left top; font: italic 700 19px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
+.cards i { flex: none; position: relative; display: block; width: 100px; height: 62px; border-radius: 7px; overflow: hidden; box-shadow: 3px 3px 0 rgba(6, 8, 70, 0.85); }
+.cards b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; }
+.cards .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; }
+.cards .c2 { background: radial-gradient(circle at 50% 40%, #ffb300 0 30%, transparent 31%), #f6f6f6; color: #111; }
+.cards .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
+.cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
+.cards .c4 b { font-size: 14.5px; }
+</style>
+</head>
+<body>
+<main id="p" role="img" aria-label="30% off everything on the internet. Black Friday only!"></main>
+<div class="lines" aria-hidden="true"></div>
+<script>
+(async () => {
+  const query = new URLSearchParams(location.search);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IMG = { globe: still ? '{{img:globe_still}}' : '{{img:globe_anim}}', tile: '{{img:tile}}' };
+  const TICKER = 'But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
+  const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
+  const RING = 'EVERY SITE 30% OFF! ✦ WORKS LIKE MAGIC! ✦ NO PURCHASE NECESSARY! ✦ ';
+  const BRAND = 'Brought to you by Gary Mustard Enterprises';
+  const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
+  const TAN9 = Math.tan((9 * Math.PI) / 180), SLANT = -6, TAN6 = Math.tan((6 * Math.PI) / 180);
+  const FPS = 25;
+  // the coupon edge: which side faces the page, and how many px along it to keep clear of the teeth
+  const EDGE = query.get('edge') || '', CLEAR = EDGE ? Number(query.get('clear') || 17) : 0;
+
+  // ---- the tape look: the live banner's filter, distances set in build(), the noise moved on by the clock ----
+  const LUMA = '0.299 0.587 0.114 0 0';
+  const tint = (i, q) => `${i * 0.22} ${q * 0.2} 0 0 ${0.5 - 0.5 * (i * 0.22 + q * 0.2)}`;
+  const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
+  const GRAIN = `${'0.7 0 0 0 -0.399  '.repeat(3)} 0 0 0 0 1`;
+  const add = (extra = '') => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`;
+  document.body.insertAdjacentHTML('beforeend', `
+    <svg class="defs" aria-hidden="true"><filter id="tape" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feFlood flood-color="#0a22d6"/><feMerge result="picture"><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      <feGaussianBlur class="soft" in="picture"/><feColorMatrix type="matrix" values="${LUMA} ${LUMA} ${LUMA} 0 0 0 1 0" result="luma"/>
+      <feGaussianBlur class="halo"/><feComposite in="luma" operator="arithmetic" k2="1.42" k3="-0.42" result="sharp"/>
+      <feGaussianBlur class="smear" in="picture"/><feOffset class="late"/>
+      <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
+      <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
+      <feTurbulence class="blotch" type="fractalNoise" numOctaves="1" seed="3"/>
+      <feColorMatrix type="matrix" values="${MOTTLE}"/><feComposite in2="clean" ${add('result="mottled"')}/>
+      <feTurbulence class="static" type="fractalNoise" numOctaves="2" seed="2"/>
+      <feColorMatrix type="matrix" values="${GRAIN}"/><feComposite in2="mottled" operator="arithmetic" k2="1" k3="1" result="taped"/>
+      <feComponentTransfer><feFuncR type="linear" intercept="-0.55"/><feFuncG type="linear" intercept="-0.55"/><feFuncB type="linear" intercept="-0.55"/></feComponentTransfer>
+      <feGaussianBlur class="bloom"/><feComposite in2="taped" operator="arithmetic" k2="0.149" k3="0.93" k4="0.037"/>
+    </filter></svg>`);
+  const $ = (sel) => document.querySelector(sel);
+  const BLOTCH = [3, 11, 7, 19, 5, 13], STATIC = [2, 17, 9, 23, 4, 29];
+
+  await Promise.all(['100px "Archivo Black"', 'italic 700 100px "Arimo"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Tinos"'].map((f) => document.fonts.load(f)));
+  const p = document.getElementById('p');
+  const put = (html) => { p.insertAdjacentHTML('beforeend', html); return p.lastElementChild; };
+  const place = (el, x, y, w, h) => { Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); return el; };
+  const at = (el, x, y) => { Object.assign(el.style, { left: x + 'px', top: y + 'px' }); return el; };
+
+  // Lettering is measured, not guessed: the ink's edges and the cap height of a string, per 1px of type.
+  const mc = document.createElement('canvas').getContext('2d');
+  function ink(text, font, ls) {
+    mc.font = font.replace('SIZE', '200px'); mc.letterSpacing = ls * 200 + 'px';
+    const m = mc.measureText(text), k = 1 / 200;
+    return { l: -m.actualBoundingBoxLeft * k, r: m.actualBoundingBoxRight * k - ls, cap: mc.measureText('H').actualBoundingBoxAscent * k,
+             asc: m.fontBoundingBoxAscent * k, desc: m.fontBoundingBoxDescent * k };
+  }
+  // Set a line of type with its ink's left edge at x and its baseline at y (in `into`, default the page).
+  function set(cls, text, font, ls, size, x, y, skew, tag = 'div', into = null) {
+    const i = ink(text, font, ls);
+    let el;
+    if (into) { into.insertAdjacentHTML('beforeend', `<${tag} class="t ${cls}">${text}</${tag}>`); el = into.lastElementChild; } else el = put(`<${tag} class="t ${cls}">${text}</${tag}>`);
+    const base = (1 - (i.asc + i.desc)) / 2 + i.asc;
+    Object.assign(el.style, { fontSize: size + 'px', left: x - i.l * size + 'px', top: y - base * size + 'px' });
+    if (skew) Object.assign(el.style, { transformOrigin: `0 ${base * size}px`, transform: 'skewX(-9deg)' });
+    return el;
+  }
+  const HEAD = 'SIZE "Archivo Black"', SUB = 'italic 700 SIZE "Arimo"';
+  const width = (text, font, ls) => { const i = ink(text, font, ls); return i.r - i.l; };
+  const headW = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9;
+  const subW = (t) => width(t, SUB, -0.04);
+  const HCAP = ink('H', HEAD, -0.05).cap, SCAP = ink('H', SUB, -0.04).cap;
+  const across = (text, font, size, ls) => { mc.font = `${font} ${size}px ${font.includes('700') ? '"Arimo"' : '"Archivo Black"'}`; mc.letterSpacing = ls * size + 'px'; return mc.measureText(text).width; };
+  const TAGW = across('BLACK FRIDAY ONLY!', '400', 100, -0.01) / 100 + 0.98; // the tag's width, per 1px of its type
+  const TAGH = 1.58;                                                           // and its height
+
+  // ---- what moves, and how, at time t (seconds) ----
+  let movers = [];
+  const ease = (q) => q * q * (3 - 2 * q);
+  const lerp = (a, b, q) => a + (b - a) * q;
+  const twinkle = (path, delay) => movers.push((t) => {
+    const ph = ((t + delay) / 2.4) % 1, q = ease(ph < 0.5 ? ph * 2 : 2 - ph * 2);
+    path.style.transform = `scale(${lerp(0.55, 1, q)}) rotate(${lerp(-10, 12, q)}deg)`; path.style.opacity = lerp(0.75, 1, q);
+  });
+  const JOLT = [[0, 1, 0], [0.12, 1.18, -5], [0.26, 0.96, 3], [0.4, 1.08, -2], [0.55, 1, 0], [1, 1, 0]];
+  const keyed = (keys, ph) => { const i = keys.findIndex(([w], n) => ph < keys[n + 1]?.[0]), a = keys[i], b = keys[i + 1]; const q = ease((ph - a[0]) / (b[0] - a[0])); return a.slice(1).map((v, n) => lerp(v, b[n + 1], q)); };
+  const jolt = (el, period) => movers.push((t) => {
+    const [sc, r] = keyed(JOLT, (t / period) % 1);
+    el.style.transform = `skewX(-8deg) scale(${sc}) rotate(${r}deg)`;
+  });
+
+  const glint = (cls, cx, cy, r) => {
+    const el = place(put(`<div class="glint ${cls}" aria-hidden="true"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
+    twinkle(el.querySelector('path'), cls === 'b' ? 1.2 : 0);
+    return el;
+  };
+  // the four cards in a row, 436 x 62, scaled to w across
+  const cards = (x, top, w) => {
+    const el = put('<div class="cards" aria-hidden="true"><i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i></div>');
+    Object.assign(el.style, { left: x + 'px', top: top + 'px', transform: `scale(${w / 436})` });
+  };
+  // the price card, 400 x 306 at scale 1 (its 70% hangs 54 below, and it leans)
+  const card = (x, top, scale) => {
+    const el = put('<div class="card" aria-hidden="true"><div class="hd">The Internet (All Of It)</div><div class="ln">WAS: <s>100%</s></div><div class="ln">NOW:</div><div class="big">70%</div></div>');
+    Object.assign(el.style, { left: x + 'px', top: top + 'px', transform: `scale(${scale}) rotate(-2.4deg)` });
+    jolt(el.querySelector('.big'), 1.1);
+  };
+  // the globe, its 60 frames drawn by the clock onto a canvas once decoded; a picture until then
+  let globeFrames = null;
+  const globe = (cx, cy, d) => {
+    const k = d / 374, box = 480 * k, x = cx - 240 * k, y = cy - (47 + 187) * k;
+    if (globeFrames) {
+      const c = put('<canvas class="globe" aria-hidden="true"></canvas>'), dpr = Math.min(2, devicePixelRatio || 1);
+      c.width = Math.round(box * dpr); c.height = Math.round(box * dpr); place(c, x, y, box, box);
+      const g = c.getContext('2d'); let shown = -1;
+      movers.push((t) => { const i = Math.floor(t * 15) % 60; if (i !== shown) { shown = i; g.clearRect(0, 0, c.width, c.height); g.drawImage(globeFrames[i], 0, 0, c.width, c.height); } });
+    } else place(put(`<img class="globe" alt="" src="${IMG.globe}">`), x, y, box, box);
+  };
+  const glow = (cx, cy, d) => place(put('<div class="glow" aria-hidden="true"></div>'), cx - d / 2, cy - d / 2, d, d);
+
+  // ---- the badge: a starburst (red behind, yellow in front) of radius R round (cx, cy), the ring of words
+  //      round its rim, the navy plate the globe sits on; all of it turning slowly ----
+  const star = (n, outer, inner, turn = 0) => Array.from({ length: n * 2 }, (_, i) => {
+    const a = ((i + turn) * Math.PI) / n - Math.PI / 2, r = i % 2 ? inner : outer;
+    return `${(r * Math.cos(a)).toFixed(4)},${(r * Math.sin(a)).toFixed(4)}`;
+  }).join(' ');
+  function badge(cx, cy, R) {
+    const rb = 0.735, circ = 2 * Math.PI * rb;
+    const fs = Math.min(0.105, (circ * 0.985) / (across(RING, '400', 100, 0.01) / 100));
+    const el = put(`<svg class="burst" viewBox="-1.12 -1.12 2.24 2.24" aria-hidden="true">
+      <defs><radialGradient id="bY" r="0.9"><stop offset="0.6" stop-color="#fffb86"/><stop offset="1" stop-color="#f6d80c"/></radialGradient>
+        <radialGradient id="plate" cx="0.42" cy="0.36" r="0.75"><stop offset="0" stop-color="#3aa6ff"/><stop offset="0.45" stop-color="#1550ee"/><stop offset="1" stop-color="#071090"/></radialGradient>
+        <path id="ring" d="M ${-rb} 0 A ${rb} ${rb} 0 1 1 ${rb} 0 A ${rb} ${rb} 0 1 1 ${-rb} 0"/></defs>
+      <g transform="translate(0.05 0.06)"><g class="spinA"><polygon points="${star(16, 1.08, 0.8, 0.5)}" fill="#0a0f66" opacity="0.92"/></g></g>
+      <g class="spinA"><polygon points="${star(16, 1.08, 0.8, 0.5)}" fill="#ff1616" stroke="#000" stroke-width="0.014" stroke-linejoin="round"/></g>
+      <g transform="translate(0.03 0.035)"><g class="spinB"><polygon points="${star(30, 0.97, 0.86)}" fill="#0a0f66" opacity="0.7"/></g></g>
+      <g class="spinB"><polygon points="${star(30, 0.97, 0.86)}" fill="url(#bY)" stroke="#000" stroke-width="0.012" stroke-linejoin="round"/>
+        <text font-size="${fs}"><textPath href="#ring">${RING}</textPath></text></g>
+      <circle r="0.685" fill="#000"/><circle r="0.672" fill="#fff"/><circle r="0.648" fill="url(#plate)"/>
+    </svg>`);
+    place(el, cx - 1.12 * R, cy - 1.12 * R, 2.24 * R, 2.24 * R);
+    // the browser's own measure of the ring's words: a hair short of once round, so none drop off its end
+    // (its own sum can come up short of what it lays out, so look for the last mark on the path, the ✦, and shrink till it is on)
+    const ring = el.querySelector('text'), last = ring.getNumberOfChars() - 2;
+    const on = () => { try { return ring.getExtentOfChar(last).width > 0; } catch { return true; } };
+    for (let f = fs, i = 0; i < 12 && !on(); i++) ring.setAttribute('font-size', (f *= 0.975));
+    const a = el.querySelectorAll('.spinA'), b = el.querySelectorAll('.spinB');
+    movers.push((t) => { for (const g of a) g.setAttribute('transform', `rotate(${(-t * 3) % 360})`); for (const g of b) g.setAttribute('transform', `rotate(${(t * 7.5) % 360})`); });
+    globe(cx, cy, R * 1.26);
+  }
+
+  // 1. 30% OFF on a red sticker w across, centred at (cx, cy); it pops every so often
+  function sticker(cx, cy, w, turn) {
+    const hs = (w * 0.84) / headW('30% OFF'), pad = HCAP * hs * 0.3, h = HCAP * hs + 2 * pad;
+    const el = put('<div class="sticker"></div>');
+    el.style.fontSize = hs + 'px';
+    place(el, cx - w / 2, cy - h / 2, w, h);
+    set('head', '30% OFF', HEAD, -0.05, hs, (w - headW('30% OFF') * hs) / 2 - hs * 0.05, pad + HCAP * hs, true, 'div', el);
+    const POP = [[0, 1], [0.05, 1.07], [0.1, 0.98], [0.15, 1.02], [0.2, 1], [1, 1]];
+    movers.push((t) => { const [sc] = keyed(POP, ((t + 0.6) / 3.2) % 1); el.style.transform = `rotate(${turn}deg) scale(${sc})`; });
+    return h;
+  }
+  // 3. the aside: BUT WAIT… THERE'S LESS! stamped on, every six seconds. Placed by its centre.
+  function stamp(f, turn) {
+    const el = put('<div class="stamp"><span class="a">But wait…</span><span class="b">THERE’S LESS!</span></div>');
+    el.style.fontSize = f + 'px';
+    const THUD = [[0, 1.9, 0], [0.04, 0.94, 1], [0.065, 1.03, 1], [0.09, 1, 1], [1, 1, 1]];
+    movers.push((t) => { const [sc, o] = keyed(THUD, ((t + 4.6) / 6) % 1); el.style.transform = `rotate(${turn}deg) scale(${sc})`; el.style.opacity = o; });
+    return { el, w: el.offsetWidth, h: el.offsetHeight, centre: (cx, cy) => at(el, cx - el.offsetWidth / 2, cy - el.offsetHeight / 2) };
+  }
+  // 2. the caption, on one line or two, its ink centred on cx, the first cap line's top at y; returns its bottom
+  function caption(lines, ss, cx, y, lead) {
+    lines.forEach((line, i) => {
+      if (i) y += lead;
+      y += SCAP * ss;
+      set('sub', line, SUB, -0.04, ss, cx - (subW(line) * ss) / 2, y, false);
+    });
+    return y;
+  }
+  function tag(tf, cx, y) {
+    const tg = put('<div class="tag">BLACK FRIDAY ONLY!</div>'); tg.style.fontSize = tf + 'px';
+    return at(tg, cx - tg.offsetWidth / 2, y);
+  }
+  // the bands: the ticker along the top of (x, w), the crawl with its foot at y1
+  function bands(x, w, tick, crawlH, y1) {
+    const tk = put(`<div class="ticker" aria-hidden="true"><span>${TICKER.repeat(6)}</span></div>`);
+    Object.assign(tk.style, { left: x + 'px', width: w + 'px', height: tick + 'px', fontSize: tick * 0.66 + 'px', lineHeight: tick + 'px' });
+    const cr = put(`<div class="crawl" aria-hidden="true"><span>${CRAWL.repeat(16)}</span></div>`);
+    Object.assign(cr.style, { left: x + 'px', width: w + 'px', top: y1 - crawlH + 'px', height: crawlH + 'px', fontSize: crawlH * 0.75 + 'px', lineHeight: crawlH + 'px' });
+    const tks = tk.firstElementChild, crs = cr.firstElementChild, tkRep = tks.offsetWidth / 6, crRep = crs.offsetWidth / 16;
+    const tkV = tick * 1.5, crV = crawlH * 2.6;
+    movers.push((t) => {
+      tks.style.transform = `translateX(${-(((t + 3) * tkV) % tkRep)}px)`;
+      crs.style.transform = `translateX(${-(((t + 3) * crV) % crRep)}px) skewX(-9deg)`;
+    });
+  }
+  function look(s) {
+    $('.soft').setAttribute('stdDeviation', `${1.25 * s} ${0.5 * s}`);
+    $('.halo').setAttribute('stdDeviation', `${5 * s} ${0.6 * s}`);
+    $('.smear').setAttribute('stdDeviation', `${10 * s} ${1.6 * s}`);
+    $('.late').setAttribute('dx', 7 * s); $('.late').setAttribute('dy', 1.7 * s);
+    $('.bloom').setAttribute('stdDeviation', 14 * s);
+    // the noise at the live banner's grain: in px, not scaled with the art
+    $('.blotch').setAttribute('baseFrequency', '0.042 0.167');
+    $('.static').setAttribute('baseFrequency', '0.19 0.71');
+  }
+
+  // ---- one layout pass, for the box as it is ----
+  function build() {
+    p.textContent = ''; movers = [];
+    const W = p.clientWidth, H = p.clientHeight;
+    if (!W || !H) return;
+    // the face: all of the box but the strip kept clear along the coupon edge
+    const X0 = EDGE === 'left' ? CLEAR : 0, X1 = EDGE === 'right' ? W - CLEAR : W;
+    const Y0 = EDGE === 'top' ? CLEAR : 0, Y1 = EDGE === 'bottom' ? H - CLEAR : H;
+    const FW = X1 - X0, FH = Y1 - Y0;
+    const column = FW / FH < 1;
+
+    const tiles = put('<div class="tiles" aria-hidden="true"></div>');
+    place(tiles, -W * 0.3, -H * 0.3, W * 1.6, H * 1.6);
+    const rays = place(put('<div class="rays" aria-hidden="true"></div>'), 0, 0, W, H);
+    let cx, cy;
+
+    if (column) {
+      // ---- the column: the live banner's measures (1080 banner px across), the badge as large as goes ----
+      const u = Math.min(FW / 1080, FH / 1900);
+      look(u * 1.1);
+      Object.assign(tiles.style, { backgroundImage: `url(${IMG.tile})`, backgroundSize: `${260 * u * 1.4}px ${224 * u * 1.4}px` });
+      const tick = 84 * u, crawlH = 150 * u, crawlTop = Y1 - crawlH;
+      // the tapes, as on the live banner: centre lines 232 and 130 banner px over the crawl, at a slant
+      const tapeH = 126 * u, byH = 68 * u, tapeC = crawlTop - 232 * u, byC = crawlTop - 130 * u;
+      const m = Math.max(8, 40 * u);                       // side margin
+      cx = X0 + FW / 2;
+      const top = Y0 + tick + 18 * u;
+      const floor = (half) => tapeC - tapeH / 2 - half * TAN6 - 22 * u; // the lowest a thing half wide may come, over the tape
+      const gap = 34 * u;
+      // the words, at full size: caption in two lines, filling the width; the tag under it
+      const L2 = ['EVERYTHING ON', 'THE INTERNET.'];
+      const ss0 = (FW - 2 * m) * 0.95 / Math.max(subW(L2[0]), subW(L2[1])), tf0 = (FW - 2 * m) * 0.66 / TAGW;
+      const words = (k) => SCAP * ss0 * k * 2 + 0.34 * SCAP * ss0 * k + 26 * u * k + tf0 * TAGH * k;
+      const cardsW = (FW - 2 * m) * 0.9, cardsH = (62 * cardsW) / 436;
+      // the badge: from 1.1R above its centre (the stamp, the rays) to 0.86R below (the caption tucks into the rays' tips)
+      const avail = (k, withCards) => floor(withCards ? cardsW / 2 : (tf0 * k * TAGW) / 2) - top - words(k) - gap - (withCards ? cardsH + 2 * gap : 0);
+      const Rmax = (FW - 2 * m * 0.4) / 2.2;
+      let k = 1, withCards = true, R = avail(1, true) / 1.96;
+      if (R < Rmax * 0.97) { withCards = false; R = avail(1, false) / 1.96; }
+      for (const kk of [0.9, 0.8, 0.72]) if (R < Rmax * 0.82) { k = kk; R = avail(k, false) / 1.96; }
+      R = Math.min(R, Rmax);
+      const ss = ss0 * k, tf = tf0 * k;
+      const bottom = floor(withCards ? cardsW / 2 : (tf * TAGW) / 2);
+      const used = R * 1.96 + gap + words(k) + (withCards ? cardsH + 2 * gap : 0), spare = Math.max(0, bottom - top - used);
+      cy = top + spare * 0.3 + R * 1.1;
+      glow(cx, cy, R * 3);
+      badge(cx, cy, R);
+      glint('', cx - R * 0.98, cy - R * 0.74, R * 0.15);
+      glint('b', cx + R * 1.0, cy + R * 0.7, R * 0.09);
+      sticker(cx, cy + R * 0.06, Math.min(R * 2.12, FW - m * 0.5), -6);
+      const st = stamp(R * 0.125, 11);
+      st.centre(Math.min(cx + R * 0.8, X1 - m * 0.4 - st.w * 0.52), cy - R * 0.86);
+      let y = cy + R * 0.86 + gap + spare * 0.3;
+      y = caption(L2, ss, cx, y, 0.34 * SCAP * ss);
+      tag(tf, cx, y + 26 * u * k);
+      y += 26 * u * k + tf * TAGH;
+      if (withCards) cards(cx - cardsW / 2, y + gap + spare * 0.2, cardsW);
+
+      // the yellow tape and the navy one under it, the live banner's slant and wording
+      const length = Math.hypot(W, H) * 1.4;
+      const by = put(`<div class="strip by" aria-hidden="true"><span>${BRAND}</span></div>`);
+      let byFont = (25 / 0.72) * u;
+      const byNeed = across(BRAND.toUpperCase(), 'italic 700', byFont, 0.08);
+      if (byNeed > (FW - m) / Math.cos(0.105)) byFont *= (FW - m) / byNeed;
+      place(by, cx - length / 2, byC - byH / 2, length, byH);
+      Object.assign(by.style, { fontSize: byFont + 'px', transform: `rotate(${SLANT}deg)` });
+      const tape = put('<div class="strip tape" aria-hidden="true"><span>EVERY SITE 30% OFF!</span></div>');
+      place(tape, cx - length / 2, tapeC - tapeH / 2, length, tapeH);
+      Object.assign(tape.style, { fontSize: (54 / 0.72) * u + 'px', paddingLeft: 24 * u + 'px', transform: `rotate(${SLANT}deg)`,
+        boxShadow: `inset 0 ${4 * u}px 0 rgba(170, 158, 0, 0.6), inset 0 ${-4 * u}px 0 rgba(170, 158, 0, 0.6), ${11 * u}px ${11 * u}px 0 rgba(6, 8, 70, 0.9)` });
+      bands(X0, FW, tick, crawlH, Y1);
+    } else {
+      // ---- the strip: the badge at the left, as tall as goes; the words beside it; in a long strip the price card at the right ----
+      const u = Math.min(FW / 1170, FH / 720);
+      look(u * 1.1);
+      Object.assign(tiles.style, { backgroundImage: `url(${IMG.tile})`, backgroundSize: `${260 * u * 1.4}px ${224 * u * 1.4}px` });
+      const tick = 70 * u, crawlH = 90 * u;
+      const top = Y0 + tick, bot = Y1 - crawlH, mid = bot - top;
+      const m = Math.max(8, 36 * u);
+      // the badge: its rays may run under the bands a little, the burst itself not
+      const R = Math.min(mid / 2.06, FW * 0.27);
+      cx = X0 + m * 0.6 + R * 1.1; cy = top + mid / 2 + R * 0.02;
+      glow(cx, cy, R * 3);
+      badge(cx, cy, R);
+      glint('b', cx + R * 1.02, cy + R * 0.7, R * 0.11);
+      sticker(cx, cy + R * 0.04, R * 2.2, -6);
+      // what is left at the right: the price card, if there is room for it and the words
+      let right = X1 - m;
+      const left = cx + R * 1.12 + m * 0.5;
+      const cs = Math.min((mid * 0.8) / 360, 0.7), cardW = 420 * cs;
+      if (right - left - cardW - m > 1.35 * mid) {
+        card(right - cardW + 6 * cs, top + (mid - 360 * cs) / 2 + 10 * cs, cs);
+        right -= cardW + m;
+      }
+      // the words: stamp, caption in two lines, tag; as large as fits the column, centred in it
+      const colW = right - left, ccx = (left + right) / 2;
+      // in two lines, or in three where that sets it larger and still fits the height
+      const fitW = (lines) => (colW * 0.96) / Math.max(...lines.map(subW));
+      let L2 = ['EVERYTHING ON', 'THE INTERNET.'], ss = fitW(L2);
+      const L3 = ['EVERYTHING', 'ON THE', 'INTERNET.'];
+      const probe = stamp(100, 7), PW = probe.w / 100, PH = probe.h / 100; probe.el.remove(); movers.pop();
+      const parts = (ss) => { const fs = Math.min(ss * 0.72, (colW * 0.86) / PW), tf = Math.min(ss * 0.66, (colW * 0.92) / TAGW);
+        return { fs, tf, h: PH * fs + ss * 0.42 + SCAP * ss * (L2.length * 1.34 - 0.34) + ss * 0.5 + tf * TAGH }; };
+      let q = parts(ss);
+      if (fitW(L3) > ss * 1.15) {
+        const two = { L2, ss };
+        L2 = L3; ss = fitW(L3); q = parts(ss);
+        if (q.h > mid * 0.94) ss *= (mid * 0.94) / q.h;
+        if (ss < two.ss * 1.12) ({ L2, ss } = two);
+        q = parts(ss);
+      }
+      if (q.h > mid * 0.94) { ss *= (mid * 0.94) / q.h; q = parts(ss); }
+      const spare = mid - q.h;
+      let y = top + spare * 0.5;
+      const st = stamp(q.fs, 5);
+      st.centre(ccx + colW * 0.06, y + (PH * q.fs) / 2);
+      y += PH * q.fs + ss * 0.42;
+      y = caption(L2, ss, ccx, y, 0.34 * SCAP * ss);
+      tag(q.tf, ccx, y + ss * 0.5);
+      bands(X0, FW, tick, crawlH, Y1);
+    }
+    // the rays: from the badge's centre across the whole box, turning slowly
+    movers.push((t) => { rays.style.background = `repeating-conic-gradient(from ${(t * 2) % 360}deg at ${cx}px ${cy}px, rgba(120, 200, 255, 0.11) 0deg 6deg, rgba(120, 200, 255, 0) 6deg 15deg)`; });
+    render(clock());
+  }
+
+  // ---- the clock ----
+  const t0 = performance.now(), clock = () => (still ? 0 : Math.floor(((performance.now() - t0) / 1000) * FPS) / FPS);
+  const blotch = $('.blotch'), grain = $('.static');
+  function render(t) {
+    for (const move of movers) move(t);
+    const f = Math.round(t * FPS); blotch.setAttribute('seed', BLOTCH[Math.floor(f / 4) % 6]); grain.setAttribute('seed', STATIC[Math.floor(f / 2) % 6]);
+  }
+
+  build();
+  let pending = 0;
+  addEventListener('resize', () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(build); });
+  if (!still) {
+    let last = -1;
+    const frame = () => { const t = clock(); if (t !== last) { last = t; render(t); } requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+    if ('ImageDecoder' in window) (async () => {
+      try {
+        const dec = new ImageDecoder({ data: await (await fetch(IMG.globe)).arrayBuffer(), type: 'image/webp' });
+        await dec.tracks.ready;
+        const n = dec.tracks.selectedTrack.frameCount, frames = [];
+        for (let i = 0; i < n; i++) { const { image } = await dec.decode({ frameIndex: i }); frames.push(await createImageBitmap(image)); image.close(); }
+        dec.close();
+        if (n === 60) { globeFrames = frames; build(); }
+      } catch {}
+    })();
+  }
+
+  // the slow-machine fallback: if the look makes drawing slow, take it off (and put it back if that did not help)
+  const frameRate = () => new Promise((resolve) => {
+    let frames = 0, drawing = 0, last = 0;
+    const tick = (now) => { const gap = now - last; if (last && gap < 1000) { frames++; drawing += gap; } last = now; if (drawing < 2000) requestAnimationFrame(tick); else resolve((frames * 1000) / drawing); };
+    requestAnimationFrame(tick);
+  });
+  if (!still && !query.has('keep')) {
+    await new Promise((r) => setTimeout(r, 1200));
+    const withLook = await frameRate();
+    if (withLook < 24) {
+      p.style.filter = 'none';
+      if ((await frameRate()) < withLook * 1.5) p.style.removeProperty('filter');
+    }
+  }
+})();
+</script>
+</body>
+</html>
