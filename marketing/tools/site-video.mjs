@@ -26,7 +26,7 @@ const rafs = () => page.evaluate(() => new Promise((r) => requestAnimationFrame(
 for (let i = 0; i < n; i++) {
   await page.evaluate((t) => { window.__t = t; }, i / fps);
   await rafs();
-  await page.screenshot({ path: `${out}/${String(i).padStart(4, '0')}.png` });
+  await page.screenshot({ path: `${out}/${String(i).padStart(4, '0')}.jpg`, type: 'jpeg', quality: 92 }); // JPEG: a 12 s clip of PNGs is a gigabyte
 }
 await browser.close();
 console.log(name, n, 'frames ->', out);
