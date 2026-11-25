@@ -60,7 +60,16 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 .stage { flex: 1 1 0 !important; min-height: 0; width: 100%; max-width: calc(1440 * var(--s)); margin: 0 auto; display: grid;
          grid-template: "badge clock" 33fr "badge words" 67fr / 52fr 48fr; column-gap: calc(56 * var(--s));
          padding: calc(16 * var(--s)) calc(48 * var(--s)) calc(20 * var(--s)); }
-.tall .stage { grid-template: "badge" 380fr "clock" 128fr "words" 220fr / 100%; padding: calc(10 * var(--s)) calc(14 * var(--s)) calc(14 * var(--s)); }
+/* tall windows read down from the badge: 30% OFF, EVERYTHING ON THE INTERNET., BLACK FRIDAY ONLY!, then the
+   clock. Three arrangements (?m=a|b|c): the cards under the clock, the cards over it, or no cards */
+.tall .stage { grid-template: "badge" 380fr "words" 170fr "clock" 132fr "cards" 78fr / 100%; padding: calc(10 * var(--s)) calc(14 * var(--s)) calc(14 * var(--s)); }
+.tall.m-b .stage { grid-template: "badge" 380fr "words" 236fr "clock" 132fr / 100%; }
+.tall.m-c .stage { grid-template: "badge" 420fr "words" 176fr "clock" 150fr / 100%; }
+.cards-box { grid-area: cards; position: relative; min-width: 0; min-height: 0; display: none; }
+.tall.m-a .cards-box { display: block; }
+.cards-box .cards { margin-top: 0; }
+.tall.m-b .words .cards { margin-top: 0.9em; margin-bottom: 0.7em; }
+.tall.m-c .cards { display: none; }
 .badge-box { grid-area: badge; position: relative; min-height: 0; container-type: size; }
 .clock-box { grid-area: clock; position: relative; min-width: 0; min-height: 0; z-index: 2; }
 .words-box { grid-area: words; position: relative; min-width: 0; min-height: 0; z-index: 1; }
