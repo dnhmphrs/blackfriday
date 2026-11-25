@@ -1,0 +1,12 @@
+{
+  "name": "thirty-off-socials",
+  "private": true,
+  "type": "module",
+  "description": "Renders the social posts and the Chrome Web Store images for 30% Off EVERYTHING",
+  "scripts": {
+    "build": "./build-kit.sh"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

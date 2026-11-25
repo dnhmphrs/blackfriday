@@ -1,29 +1,27 @@
-# BlackFriday
- 30% Off everything on the internet, one day a year!
+# 30% Off EVERYTHING
 
-## Working on it (spoilers)
+"30% Off EVERYTHING" is a joke Chrome extension by Gary Mustard Enterprises: on Black Friday, every
+website you visit gets a big 30% OFF sale banner. On every other day it does nothing.
 
-On Black Friday, by the visitor's own calendar, the extension covers the right-hand 30% of
-every page with a sale banner (the top third on narrow screens). On every other day it does
-nothing.
+| Folder | What it is |
+| --- | --- |
+| [`extension/`](extension/) | The Chrome extension itself, its tests, and the script that packages it for the Chrome Web Store. |
+| [`socials/`](socials/) | The kit: renders the social posts and the Chrome Web Store images, and zips them with the extension. |
+| [`website/`](website/) | The one-page countdown site that counts down to Black Friday and links to the store. |
 
-```
-src/
-  manifest.json   no permissions; one content script on http and https pages
-  content.js      the date check, and puts the banner on the page
-  banner.css      the banner's layout
-  images/         the banner artwork (animated WebP) and the marquee strips
-  icons/
-```
+Each folder has its own README, `package.json` and `node_modules`; there is nothing to install at the top.
 
-- **Try it:** `chrome://extensions` → Developer mode → Load unpacked → pick `src/`, set the
-  computer's date to Friday 27 November 2026 and open any page.
-- **Test:** `npm install && npx playwright install chromium && npm test` drives the real
-  extension in Chromium: the right day in several time zones, nothing on other days, the
-  banner's layout at several window sizes, and pages that try to break it.
-- **Package:** `./package.sh` writes `black-friday.zip`, the file to upload to the Chrome Web
-  Store. Raise `version` in the manifest first.
+## Next Black Friday
 
-`marketing/` renders the adverts, the banner artwork, the store images and the icons. The design
-is `marketing/comps/gif-banner.*`; `cd marketing && npm install && node tools/banner-export.mjs`
-writes `src/images/` from it.
+1. The date logic is automatic: the extension and the website both work out Black Friday (the Friday
+   after US Thanksgiving) from the visitor's own calendar. Nothing to change for a new year.
+2. Update or redesign if wanted: the banner is `extension/src/`, the posts and store images are
+   `socials/templates/v-starburst-post.html`.
+3. Bump `version` in `extension/src/manifest.json` (it must be higher than the last version uploaded).
+4. `cd extension && npm install && npm test && ./package.sh`
+5. `cd socials && npm install && ./build-kit.sh` (the zip lands in `socials/out/`).
+6. Upload `extension/black-friday.zip` to the Chrome Web Store (and any new images) about a week ahead,
+   with "Publish automatically after review" on, so it is live in good time.
+7. `cd website && npm install && SITE_URL=https://<where it lives>/ npm run build`, then deploy `website/dist/`.
+
+On a new machine Playwright also needs its browser once: `npx playwright install chromium` in each folder.

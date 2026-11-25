@@ -1,0 +1,54 @@
+30% Off EVERYTHING: Chrome Web Store
+====================================
+
+UPLOAD (Package tab)
+  black-friday.zip   version {{version}}
+
+IMAGES (Store listing tab)
+  store-icon-128.png                 Store icon
+  screenshot-1-1280x800.png          Screenshot 1
+  screenshot-2-1280x800.png          Screenshot 2
+  screenshot-3-1280x800.png          Screenshot 3
+  small-promo-440x280.png            Small promo tile
+  marquee-promo-1400x560.png         Marquee promo tile
+
+CATEGORY   Fun
+LANGUAGE   English
+
+---------------------------------------------------------------------------------------------
+DESCRIPTION  (public)
+---------------------------------------------------------------------------------------------
+30% off the entire internet.
+Every website. Black Friday only.
+
+A Black Friday treat for your browser. On Black Friday it brings the 30% OFF sale to every website you visit, from midnight to midnight in your time zone. The rest of the year it does nothing.
+
+A Gary Mustard Enterprises production.
+
+---------------------------------------------------------------------------------------------
+PRIVACY PRACTICES TAB  (seen by the reviewer only)
+---------------------------------------------------------------------------------------------
+Single purpose
+Displays a decorative sale banner on web pages on Black Friday only.
+
+Host permission justification
+The content script runs on all http and https pages because the banner appears on every page on Black Friday. On any other day it checks the date and stops. It does not read page content, store data or make network requests.
+
+Remote code
+No, I am not using remote code.
+
+Data usage
+Tick nothing. Tick the three certifications.
+
+Privacy policy URL
+Leave blank.
+
+---------------------------------------------------------------------------------------------
+TEST INSTRUCTIONS TAB  (seen by the reviewer only)
+---------------------------------------------------------------------------------------------
+The extension is active on Black Friday only. To test: set the computer's date to Black Friday (the day after US Thanksgiving; in 2026, Friday 27 November), then open any website. A banner covers the right-hand 30% of the page (the top third on windows narrower than 769px). On any other date the extension does nothing.
+
+---------------------------------------------------------------------------------------------
+SUBMITTING
+---------------------------------------------------------------------------------------------
+Leave "Publish automatically after review" ticked. The version already live stays up until this one passes review.
