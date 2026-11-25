@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-"""One self-contained page that shows the current banner and the Globe Badge banner on the mock
+"""One self-contained page that shows the current banner and the banner designs (DESIGNS) on the mock
 pages, with buttons to switch between them and between a desktop and a phone screen.
     python3 tools/banner-compare.py          -> out/banner-compare.html
 The current banner is the real extension: src/content.js run on the mock page, with chrome.runtime
 stood in for (its files handed over as data: URLs) and the date set to Black Friday. The Globe Badge
-is the built site/v-starburst-banner.html in the frame the extension uses (tools/banner-in-place.html).
-Builds the Globe Badge page first (tools/site-build.py)."""
+designs are built site/v-*-banner.html pages in the frame the extension uses (tools/banner-in-place.html),
+each told the same Black Friday date. Builds them first (tools/site-build.py); a design not yet made is left out."""
 import base64, json, os, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(os.path.dirname(ROOT), 'src')
-subprocess.run(['python3', os.path.join(ROOT, 'tools/site-build.py'), 'v-starburst-banner'], check=True, stdout=subprocess.DEVNULL)
+# button label -> template name (site/<name>.html)
+DESIGNS = [('Globe Badge', 'v-starburst-banner'), ('Limited Time', 'v-countdown-banner'), ('Shopping Channel', 'v-shopping-channel-banner')]
+DESIGNS = [(label, name) for label, name in DESIGNS if os.path.exists(os.path.join(ROOT, 'site', name + '.html'))]
+subprocess.run(['python3', os.path.join(ROOT, 'tools/site-build.py'), *[n for _, n in DESIGNS]], check=True, stdout=subprocess.DEVNULL)
 
 def data(path, mime):
     return f'data:{mime};base64,' + base64.b64encode(open(path, 'rb').read()).decode()
@@ -23,7 +26,7 @@ bundle = {
     'files': files,
     'content': read(f'{SRC}/content.js'),
     'mock': {'shop': read(f'{ROOT}/store/mock/shop.html'), 'news': read(f'{ROOT}/store/mock/news.html')},
-    'globe': read(f'{ROOT}/out/site/v-starburst-banner.html'),
+    'designs': [{'label': label, 'html': read(f'{ROOT}/out/site/{name}.html')} for label, name in DESIGNS],
 }
 # safe inside a <script>: no "</" can close it
 payload = json.dumps(bundle).replace('</', '<\\/')
@@ -51,13 +54,12 @@ page = r'''<!doctype html>
 <header>
   <div class="group" role="group" aria-label="Banner">
     <button data-banner="current" aria-pressed="true">Current (2.1)</button>
-    <button data-banner="globe" aria-pressed="false">Globe Badge</button>
   </div>
   <div class="group" role="group" aria-label="Screen">
     <button data-screen="desktop" aria-pressed="true">Desktop</button>
     <button data-screen="phone" aria-pressed="false">Phone</button>
   </div>
-  <span class="note">Shown as on Black Friday. Keys: 1 / 2 switch banner, D / P switch screen.</span>
+  <span class="note">Shown as on Black Friday, 2pm. Keys: 1–9 switch banner, D / P switch screen.</span>
 </header>
 <div id="stage"><iframe id="screen" title="A web page on Black Friday"></iframe></div>
 <script>
@@ -69,22 +71,27 @@ const screen = document.getElementById('screen'), stage = document.getElementByI
 // the mock page, with something added to the end of its <body>
 const withExtra = (html, extra) => html.replace(/<\/body>/i, extra + '</body>');
 const esc = (s) => s.replace(/<\//g, '<\\/');
+// Black Friday, 2pm local, then running on
+const DATE = `<script>(() => { const R = Date, t0 = new R(2026, 10, 27, 14).getTime(), s = R.now();
+  class D extends R { constructor(...a) { a.length ? super(...a) : super(t0 + R.now() - s); } static now() { return t0 + R.now() - s; } }
+  window.Date = D; })();<\/script>`;
+// the design buttons, after Current
+const group = document.querySelector('[aria-label="Banner"]');
+B.designs.forEach((d, i) => group.insertAdjacentHTML('beforeend', `<button data-banner="${i}" aria-pressed="false">${d.label}</button>`));
 
 // The current banner: the extension's own script, given what it asks Chrome for.
 function current(mock) {
   const shim = `<script>
     window.chrome = { runtime: { id: 'demo', getURL: (p) => (${esc(JSON.stringify(B.files))})[p] || p } };
-    (() => { const R = Date, t0 = new R(2026, 10, 27, 14).getTime(), s = R.now();
-      class D extends R { constructor(...a) { a.length ? super(...a) : super(t0 + R.now() - s); } static now() { return t0 + R.now() - s; } }
-      window.Date = D; })();
-  <\/script><script>${esc(B.content)}<\/script>`;
+  <\/script>${DATE}<script>${esc(B.content)}<\/script>`;
   return withExtra(mock, shim);
 }
-// The Globe Badge: the built banner page in the extension's frame, its options set in place of the
-// query string it would otherwise read.
-function globe(mock, narrow) {
+// A design: the built banner page in the extension's frame, its options set in place of the query
+// string it would otherwise read, and given the same date.
+function design(i, mock, narrow) {
   const opts = `keep&edge=${narrow ? 'bottom' : 'left'}&clear=17`;
-  const inner = B.globe.replace('new URLSearchParams(location.search)', `new URLSearchParams(${JSON.stringify(opts)})`);
+  const inner = B.designs[i].html.split('new URLSearchParams(location.search)').join(`new URLSearchParams(${JSON.stringify(opts)})`)
+    .replace(/<head>/i, '<head>' + DATE);
   const frame = `<style>
     .bf-host { position: fixed; inset: 0; pointer-events: none; z-index: 2147483647; }
     .bf-frame { position: absolute; top: 0; right: 0; width: 30%; height: 100%; background: #000; pointer-events: auto; }
@@ -120,11 +127,12 @@ function fit() {
   Object.assign(screen.style, { width: w + 'px', height: h + 'px', left: (innerWidth - w * k) / 2 + 'px', top: Math.max(0, (innerHeight - top - h * k) / 2) + 'px', transform: `scale(${k})` });
 }
 function show() {
-  for (const b of document.querySelectorAll('[data-banner]')) b.setAttribute('aria-pressed', b.dataset.banner === state.banner);
+  for (const b of document.querySelectorAll('[data-banner]')) b.setAttribute('aria-pressed', b.dataset.banner === String(state.banner));
   for (const b of document.querySelectorAll('[data-screen]')) b.setAttribute('aria-pressed', b.dataset.screen === state.screen);
   fit();
   const narrow = state.screen === 'phone', mock = B.mock[narrow ? 'news' : 'shop'];
-  screen.srcdoc = state.banner === 'current' ? current(mock) : globe(mock, narrow);
+  if (state.banner !== 'current' && !B.designs[state.banner]) state.banner = 'current';
+  screen.srcdoc = state.banner === 'current' ? current(mock) : design(+state.banner, mock, narrow);
   try { localStorage.setItem('bf-compare', JSON.stringify(state)); } catch {}
 }
 // the globe page reads its frame from the parent of its parent: give the screen a way to reach it
@@ -138,7 +146,8 @@ document.addEventListener('click', (e) => {
   show();
 });
 addEventListener('keydown', (e) => {
-  const k = e.key.toLowerCase(), m = { '1': ['banner', 'current'], '2': ['banner', 'globe'], d: ['screen', 'desktop'], p: ['screen', 'phone'] }[k];
+  const k = e.key.toLowerCase(), n = Number(k) - 2;
+  const m = k === '1' ? ['banner', 'current'] : n >= 0 && n < B.designs.length ? ['banner', String(n)] : { d: ['screen', 'desktop'], p: ['screen', 'phone'] }[k];
   if (m && state[m[0]] !== m[1]) { state[m[0]] = m[1]; show(); }
 });
 addEventListener('resize', fit);
