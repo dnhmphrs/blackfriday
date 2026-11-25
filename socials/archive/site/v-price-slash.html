@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>30% Off EVERYTHING</title>
+<meta name="description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
+<link rel="icon" href="{{img:favicon}}">
+<!-- Variant "price-slash": THE PRICE IS THE HERO. One frame of a home-shopping spot: a gigantic price
+     card fills the screen. Its yellow header strip says 30% OFF EVERYTHING ON THE INTERNET.; under it
+     The Internet (All Of It), WAS 100% struck through with a red slash, and NOW 70%, huge, red, jolting.
+     BLACK FRIDAY ONLY! is a tag stuck on the card's corner (and the crawl along the bottom); the globe
+     sits small in the corner with As Seen On Every Website. BUT WAIT… THERE'S LESS! is said once, in
+     another register: the voice-over ticker along the top. The lower third is the order bar: the item
+     number, ADD TO CHROME (the store link) and the credits.
+     Everything that moves runs off one clock at 25 frames a second, so the tape filter is worked out
+     25 times a second rather than at the screen's rate. -->
+<style>
+{{fonts}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #070f9c; }
+body { -webkit-font-smoothing: antialiased; }
+#p { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); filter: url(#tape);
+     --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; user-select: none; }
+#p > * { position: absolute; display: block; max-width: none; }
+#p img { -webkit-user-drag: none; }
+.defs { position: absolute; width: 0; height: 0; }
+.lines { position: fixed; inset: 0; pointer-events: none; z-index: 2;
+         background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.05) 1.5px, rgba(0, 0, 16, 0) 3px),
+                     radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
+
+.glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+.tiles { background-repeat: repeat; opacity: 0.095; transform: rotate(-6deg); }
+
+.t { white-space: nowrap; line-height: 1; position: absolute; }
+.head { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.05em;
+        text-shadow: 0.009em 0.009em 0 var(--shade), 0.018em 0.018em 0 var(--shade), 0.027em 0.027em 0 var(--shade),
+                     0.036em 0.036em 0 var(--shade), 0.045em 0.045em 0 var(--shade), 0.054em 0.054em 0 var(--shade); }
+.sub { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.04em;
+       background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+       filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
+
+.glint svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
+.glint path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); transform-box: fill-box; transform-origin: center; }
+
+/* the voice-over ticker along the top (with its ON AIR bug) and the crawl along the bottom */
+.ticker, .crawl { left: 0; right: 0; overflow: hidden; white-space: nowrap; pointer-events: none; }
+.ticker { top: 0; background: linear-gradient(#061078, #0a0f66); border-bottom: 0.06em solid var(--yellow);
+          font-family: "Antonio", "Arial Narrow", sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em; color: #e9f0ff; }
+.ticker .run { position: absolute; top: 0; display: inline-block; }
+.ticker b { font-weight: 600; color: var(--yellow); letter-spacing: 0.05em; }
+.ticker .air { position: absolute; left: 0; top: 0; bottom: 0; z-index: 1; display: flex; align-items: center; gap: 0.35em; padding: 0 0.6em 0 0.5em;
+               background: var(--red); color: #fff; font-weight: 600; letter-spacing: 0.08em; box-shadow: 0.25em 0 0 #0a0f66; }
+.ticker .dot { width: 0.42em; height: 0.42em; border-radius: 50%; background: #fff; }
+.crawl { bottom: 0; background: linear-gradient(#c8000a, #8a0006); border-top: 0.05em solid #000;
+         font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
+.crawl span { display: inline-block; text-shadow: 0.04em 0.04em 0 #3a0003, 0.08em 0.08em 0 #3a0003; }
+
+/* THE PRICE CARD: laid out in its own pixels (see priceCard()), then scaled to the screen */
+.pc { position: absolute; background: #f3f4f6; color: #0c0c0c; border: 6px solid #000; box-shadow: 16px 16px 0 rgba(4, 6, 60, 0.92); transform-origin: center; }
+.pc > * { position: absolute; }
+.pc .strip { left: 0; right: 0; top: 0; background: linear-gradient(#fffb86, #f0e11c 70%, #e4d40c); border-bottom: 6px solid #000; }
+.pc .band { left: 0; right: 0; background: var(--red); border-bottom: 6px solid #000; color: #fff46a; display: flex; align-items: center; justify-content: space-between;
+            font: 600 1px/1 "Antonio", "Arial Narrow", sans-serif; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.pc .band small { font-size: 0.62em; font-weight: 300; color: #fff; letter-spacing: 0.1em; }
+.pc .st { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--shade); letter-spacing: -0.05em; text-shadow: 0.03em 0.03em 0 #fffdc9; }
+.pc .sb { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.04em; color: #111; }
+.pc .lab { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.02em; color: #111; }
+.pc .was { font-family: "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.05em; color: #7a7e88; }
+.pc .slash { background: var(--red); border: 4px solid #000; box-shadow: 5px 5px 0 rgba(4, 6, 60, 0.6); transform-origin: center; }
+.pc .big { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em; -webkit-text-stroke: 14px #000; paint-order: stroke fill;
+           text-shadow: 0.05em 0.05em 0 var(--shade); }
+.pc .rule { background: repeating-linear-gradient(#000 0 10px, transparent 10px 18px); width: 4px; }
+.pc .np { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.03em; color: #111; }
+
+/* BUT WAIT… THERE'S LESS!: the announcer's line, a black caption bubble over the NOW price */
+.pc .wait { display: flex; align-items: center; justify-content: center; white-space: nowrap; background: #111; color: var(--yellow); border: 4px solid #000;
+            font: 400 1px/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; box-shadow: 6px 6px 0 rgba(4, 6, 60, 0.55); transform: rotate(-2deg); }
+.pc .wait em { font-style: normal; color: #fff; margin-right: 0.3em; }
+.pc .wait::after { content: ''; position: absolute; left: 14%; top: 100%; border: 0.42em solid transparent; border-top: 0.5em solid #111; border-bottom: 0; }
+/* the globe's product inset, framed like a picture-in-picture */
+.inset { background: radial-gradient(circle at 50% 42%, #58c4ff 0%, #2a8cff 18%, #1348ee 40%, #0a1aa8 66%, #060c6a 100%); border: 5px solid #fff; outline: 4px solid #000;
+         box-shadow: 14px 14px 0 rgba(4, 6, 60, 0.9); }
+.inset small { position: absolute; left: 0; top: 0; background: var(--yellow); color: #111; font: 600 1em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.1em; padding: 0.25em 0.5em; }
+
+/* BLACK FRIDAY ONLY!, as a red tag stuck on the card */
+.tag { position: absolute; white-space: nowrap; background: var(--red); color: var(--yellow); border: 0.07em solid #000;
+       font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; padding: 0.2em 0.42em 0.24em;
+       box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.9); text-shadow: 0.05em 0.05em 0 #7a0006; }
+
+.oval { width: 7.6em; height: 3.31em; border-radius: 50%; display: grid !important; place-items: center; text-align: center;
+        font: italic 700 1em/0.98 "Tinos", "Times New Roman", serif; background: radial-gradient(ellipse at 40% 30%, #fffc9a, #efe01c 72%); color: #151515;
+        transform: rotate(-7deg); box-shadow: 0.143em 0.167em 0 rgba(6, 8, 70, 0.9), inset 0 0 0 0.095em rgba(170, 158, 0, 0.5); }
+.cards { display: flex !important; flex-wrap: wrap; gap: 12px; width: 436px; transform-origin: left top; font: italic 700 21px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
+.cards i { flex: none; position: relative; display: block; width: 100px; height: 62px; border-radius: 7px; overflow: hidden; box-shadow: 3px 3px 0 rgba(6, 8, 70, 0.55); }
+.cards b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; }
+.cards .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; outline: 2px solid #c9cbd1; outline-offset: -2px; }
+.cards .c2 { background: radial-gradient(circle at 50% 40%, #ffb300 0 30%, transparent 31%), #fff; color: #111; outline: 2px solid #c9cbd1; outline-offset: -2px; }
+.cards .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
+.cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
+.cards .c4 b { font-size: 16px; }
+
+/* the starburst sticker */
+.burst { display: grid !important; place-items: center; }
+.burst svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.burst span { position: relative; text-align: center; font: italic 700 1em/0.95 "Tinos", "Times New Roman", serif; color: #b00008; }
+
+/* THE ORDER BAR (the lower third): item number, the store link, the credits */
+.item { background: var(--shade); border: 0.08em solid var(--yellow); display: flex !important; flex-direction: column; align-items: center; justify-content: center;
+        color: #fff; font: 300 1em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.12em; box-shadow: 0.2em 0.2em 0 rgba(4, 6, 60, 0.85); }
+.item b { font: 400 2.3em/1 "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.02em; margin-top: 0.12em; }
+.order { display: flex !important; align-items: center; justify-content: center; gap: 0.5em; white-space: nowrap; text-decoration: none; cursor: pointer;
+         background: linear-gradient(#fffb86, #f0e11c 70%, #e4d40c); color: #111; border: 0.06em solid #000; font: italic 700 1em "Arimo", Arial, sans-serif; }
+.order .go { display: inline-flex; align-items: center; gap: 0.35em; padding: 0.14em 0.55em 0.2em; background: #111; color: var(--yellow); font-style: normal;
+             font-family: "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; }
+.order .go i { font: 900 1em/1 Arial, Helvetica, sans-serif; display: inline-block; }
+.order:hover, .order:focus-visible { outline: none; background: linear-gradient(#fffdb8, #fff035); }
+.order:hover .go, .order:focus-visible .go { background: var(--red); color: #fff; }
+.order:hover .go i, .order:focus-visible .go i { transform: translateX(0.18em); }
+.order:focus-visible .go { outline: 0.08em solid #fff; outline-offset: 0.08em; }
+.act { display: flex !important; align-items: center; gap: 0.5em; white-space: nowrap; background: var(--red); color: #fff; border: 0.08em solid #000; border-bottom: 0;
+       font: 600 1em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.1em; padding: 0 0.6em; }
+.act .dot { width: 0.5em; height: 0.5em; border-radius: 50%; background: var(--yellow); }
+.act.off { background: #b3000a; }
+.act.off .dot { background: #5a0004; }
+.by { background: var(--shade); border: 0.08em solid #3348ff; display: flex !important; align-items: center; gap: 0.7em; color: #fff; white-space: nowrap;
+      font: italic 700 1em/1.25 "Arimo", Arial, sans-serif; letter-spacing: 0.06em; text-transform: uppercase; box-shadow: 0.2em 0.2em 0 rgba(4, 6, 60, 0.85); }
+.by img { display: block; flex: none; }
+.by .sep { margin: 0 0.6em; color: var(--yellow); }
+.by a { color: #fff; text-decoration: none; border-bottom: 0.12em solid var(--yellow); padding-bottom: 0.03em; }
+.by a:hover, .by a:focus-visible { color: var(--yellow); outline: none; }
+.by.row { justify-content: center; }
+</style>
+</head>
+<body>
+<main id="p" aria-label="30% Off EVERYTHING: 30% off every website. Black Friday only."></main>
+<div class="lines" aria-hidden="true"></div>
+<script>
+(async () => {
+  const STORE = '{{link:store}}', GARRETT = '{{link:garrett}}', AUFBAU = '{{link:aufbau}}';
+  const query = new URLSearchParams(location.search);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IMG = { globe: still ? '{{img:globe_still}}' : '{{img:globe_anim}}', tile: '{{img:tile}}', logo: '{{img:logo}}' };
+  const TICKER = '<b>30% off the entire internet.</b> ✦ No purchase necessary! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
+  const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
+  const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
+  const TAN9 = Math.tan((9 * Math.PI) / 180);
+  const FPS = 25;
+
+  // ---- the tape look: the live banner's filter, distances set in build(), the noise moved on by the clock ----
+  const LUMA = '0.299 0.587 0.114 0 0';
+  const tint = (i, q) => `${i * 0.22} ${q * 0.2} 0 0 ${0.5 - 0.5 * (i * 0.22 + q * 0.2)}`;
+  const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
+  const GRAIN = `${'0.7 0 0 0 -0.399  '.repeat(3)} 0 0 0 0 1`;
+  const add = (extra = '') => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`;
+  document.body.insertAdjacentHTML('beforeend', `
+    <svg class="defs" aria-hidden="true"><filter id="tape" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feFlood flood-color="#0a22d6"/><feMerge result="picture"><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      <feGaussianBlur class="soft" in="picture"/><feColorMatrix type="matrix" values="${LUMA} ${LUMA} ${LUMA} 0 0 0 1 0" result="luma"/>
+      <feGaussianBlur class="halo"/><feComposite in="luma" operator="arithmetic" k2="1.42" k3="-0.42" result="sharp"/>
+      <feGaussianBlur class="smear" in="picture"/><feOffset class="late"/>
+      <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
+      <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
+      <feTurbulence class="blotch" type="fractalNoise" numOctaves="1" seed="3"/>
+      <feColorMatrix type="matrix" values="${MOTTLE}"/><feComposite in2="clean" ${add('result="mottled"')}/>
+      <feTurbulence class="static" type="fractalNoise" numOctaves="2" seed="2"/>
+      <feColorMatrix type="matrix" values="${GRAIN}"/><feComposite in2="mottled" operator="arithmetic" k2="1" k3="1" result="taped"/>
+      <feComponentTransfer><feFuncR type="linear" intercept="-0.55"/><feFuncG type="linear" intercept="-0.55"/><feFuncB type="linear" intercept="-0.55"/></feComponentTransfer>
+      <feGaussianBlur class="bloom"/><feComposite in2="taped" operator="arithmetic" k2="0.149" k3="0.93" k4="0.037"/>
+    </filter></svg>`);
+  const $ = (sel) => document.querySelector(sel);
+  const BLOTCH = [3, 11, 7, 19, 5, 13], STATIC = [2, 17, 9, 23, 4, 29];
+
+  await Promise.all(['100px "Archivo Black"', 'italic 700 100px "Arimo"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Tinos"'].map((f) => document.fonts.load(f)));
+  const p = document.getElementById('p');
+  const put = (html, parent = p) => { parent.insertAdjacentHTML('beforeend', html); return parent.lastElementChild; };
+  const place = (el, x, y, w, h) => { Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); return el; };
+  const at = (el, x, y) => Object.assign(el.style, { left: x + 'px', top: y + 'px' });
+
+  // Lettering is measured, not guessed: the ink's edges and the cap height of a string, per 1px of type.
+  const mc = document.createElement('canvas').getContext('2d');
+  function ink(text, font, ls) {
+    mc.font = font.replace('SIZE', '200px'); mc.letterSpacing = ls * 200 + 'px';
+    const m = mc.measureText(text), k = 1 / 200;
+    return { l: -m.actualBoundingBoxLeft * k, r: m.actualBoundingBoxRight * k - ls, cap: mc.measureText('H').actualBoundingBoxAscent * k,
+             asc: m.fontBoundingBoxAscent * k, desc: m.fontBoundingBoxDescent * k };
+  }
+  // Set a line of type with its ink's left edge at x and its baseline at y (in `parent`'s pixels). skew: a slant.
+  function set(cls, text, font, ls, size, x, y, skew, tag = 'div', parent = p, html = text) {
+    const i = ink(text, font, ls), el = put(`<${tag} class="t ${cls}">${html}</${tag}>`, parent);
+    const base = (1 - (i.asc + i.desc)) / 2 + i.asc;
+    Object.assign(el.style, { fontSize: size + 'px', left: x - i.l * size + 'px', top: y - base * size + 'px' });
+    if (skew) Object.assign(el.style, { transformOrigin: `0 ${base * size}px`, transform: `skewX(${-skew}deg)` });
+    return el;
+  }
+  const HEAD = 'SIZE "Archivo Black"', SUB = 'italic 700 SIZE "Arimo"', TIN = 'italic 700 SIZE "Tinos"', ANT = '600 SIZE "Antonio"', ANTL = '300 SIZE "Antonio"';
+  const width = (text, font, ls) => { const i = ink(text, font, ls); return i.r - i.l; };
+  const headW = (t, slant = 9) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * Math.tan((slant * Math.PI) / 180);
+  const subW = (t) => width(t, SUB, -0.04);
+  const HCAP = ink('H', HEAD, -0.05).cap, SCAP = ink('H', SUB, -0.04).cap;
+  const run = (text, font, size, ls) => { mc.font = font.replace('SIZE', size + 'px'); mc.letterSpacing = ls * size + 'px'; return mc.measureText(text).width; };
+
+  // ---- what moves, and how, at time t (seconds) ----
+  let movers = [];
+  const ease = (q) => q * q * (3 - 2 * q);
+  const lerp = (a, b, q) => a + (b - a) * q;
+  const twinkle = (path, delay) => movers.push((t) => {
+    const ph = ((t + delay) / 2.4) % 1, q = ease(ph < 0.5 ? ph * 2 : 2 - ph * 2);
+    path.style.transform = `scale(${lerp(0.55, 1, q)}) rotate(${lerp(-10, 12, q)}deg)`; path.style.opacity = lerp(0.75, 1, q);
+  });
+  const JOLT = [[0, 1, 0], [0.12, 1.14, -4], [0.26, 0.97, 2.5], [0.4, 1.06, -1.5], [0.55, 1, 0], [1, 1, 0]]; // when, scale, turn
+  const jolt = (el, period, pre = '') => movers.push((t) => {
+    const ph = (t / period) % 1, i = JOLT.findIndex(([w], n) => ph < JOLT[n + 1]?.[0]), [w0, s0, r0] = JOLT[i], [w1, s1, r1] = JOLT[i + 1];
+    const q = ease((ph - w0) / (w1 - w0));
+    el.style.transform = `${pre} scale(${lerp(s0, s1, q)}) rotate(${lerp(r0, r1, q)}deg)`;
+  });
+  const blink = (el, period, duty = 0.5) => movers.push((t) => el.classList.toggle('off', (t / period) % 1 >= duty));
+
+  const glint = (cls, cx, cy, r) => {
+    const el = place(put(`<div class="glint ${cls}" aria-hidden="true"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
+    twinkle(el.querySelector('path'), cls === 'b' ? 1.2 : 0);
+    return el;
+  };
+  const oval = (size, words = 'As Seen On<br>Every Website') => {
+    const el = put(`<div class="oval"><span>${words}</span></div>`); el.style.fontSize = size + 'px'; return el;
+  };
+  // the four cards, in a row (cols 4, 436 x 62) or two by two (cols 2, 212 x 136), scaled to width w
+  const cards = (parent, x, top, w, cols = 4) => {
+    const el = put('<div class="cards" aria-label="FREE, Gratis, $0.00, NO CHARGE"><i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i></div>', parent);
+    const nw = cols === 2 ? 212 : 436, nh = cols === 2 ? 136 : 62;
+    Object.assign(el.style, { left: x + 'px', top: top + 'px', width: nw + 'px', transform: `scale(${w / nw})` });
+    return (nh * w) / nw;
+  };
+  // a starburst sticker, n points, its words in Tinos; it rocks a little on the clock
+  const burst = (cx, cy, d, words, turn = -8) => {
+    const n = 22, pts = [];
+    for (let i = 0; i < n * 2; i++) { const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 0.8 : 1; pts.push(`${(Math.cos(a) * r).toFixed(3)},${(Math.sin(a) * r).toFixed(3)}`); }
+    const el = put(`<div class="burst"><svg viewBox="-1.1 -1.1 2.2 2.2" aria-hidden="true">
+      <polygon points="${pts.join(' ')}" transform="translate(0.07 0.08)" fill="rgba(6,8,70,0.9)"/>
+      <polygon points="${pts.join(' ')}" fill="#fff035" stroke="#000" stroke-width="0.035" stroke-linejoin="round"/>
+      <circle r="0.66" fill="none" stroke="#e4d40c" stroke-width="0.03"/></svg><span>${words}</span></div>`);
+    place(el, cx - d / 2, cy - d / 2, d, d); el.querySelector('span').style.fontSize = d * 0.15 + 'px';
+    movers.push((t) => { el.style.transform = `rotate(${turn + Math.sin(t * 2.2) * 4}deg) scale(${1 + Math.sin(t * 4.4) * 0.025})`; });
+    return el;
+  };
+  let globeFrames = null;
+  const globe = (cx, cy, d) => {
+    const k = d / 374, box = 480 * k, x = cx - 240 * k, y = cy - (47 + 187) * k;
+    if (globeFrames) {
+      const c = put('<canvas class="globe" aria-hidden="true"></canvas>'), dpr = Math.min(2, devicePixelRatio || 1);
+      c.width = Math.round(box * dpr); c.height = Math.round(box * dpr); place(c, x, y, box, box);
+      const g = c.getContext('2d'); let shown = -1;
+      movers.push((t) => { const i = Math.floor(t * 15) % 60; if (i !== shown) { shown = i; g.clearRect(0, 0, c.width, c.height); g.drawImage(globeFrames[i], 0, 0, c.width, c.height); } });
+    } else {
+      place(put(`<img class="globe" alt="" src="${IMG.globe}">`), x, y, box, box);
+    }
+  };
+  const glow = (cx, cy, d) => place(put('<div class="glow" aria-hidden="true"></div>'), cx - d * 1.3, cy - d * 1.45, d * 2.6, d * 2.9);
+
+  // ---- THE PRICE CARD, in its own pixels: `tall` stacks it for a phone. Returns the element and its size. ----
+  function priceCard(tall) {
+    const W0 = tall ? 640 : 1100, IW = W0 - 12, pad = tall ? 34 : 34;
+    const c = put('<div class="pc" role="img" aria-label="30% off everything on the internet. The Internet (All Of It): was 100%, now 70%."></div>');
+    c.style.width = W0 + 'px';
+    const strip = put('<div class="strip"></div>', c);
+    let y;
+    // the yellow header strip: 30% OFF EVERYTHING ON THE INTERNET.
+    if (tall) {
+      const a = (IW - 2 * pad) / headW('30% OFF', 8), b = (IW - 2 * pad) / subW('EVERYTHING ON THE INTERNET.');
+      y = 26 + HCAP * a; set('st', '30% OFF', HEAD, -0.05, a, pad, y, 8, 'h1', c);
+      y += 18 + SCAP * b; set('sb', 'EVERYTHING ON THE INTERNET.', SUB, -0.04, b, pad, y, 0, 'h2', c);
+      y += 26;
+    } else {
+      // 30% OFF large on the left; EVERYTHING ON / THE INTERNET. stacked beside it, the pair as tall as it
+      const gap = 26, wA = headW('30% OFF', 8), wB = subW('EVERYTHING ON');
+      const capA = 1, capB = (capA - 0.2) / 2;                       // per 1px of 30% OFF's cap: each stacked line, with a gap
+      const a = 1 / HCAP, b = capB / SCAP;                           // sizes per 1px of cap
+      const cap = (IW - 2 * pad - gap) / (wA * a + wB * b);
+      const A = a * cap, B = b * cap;
+      y = 24 + cap; set('st', '30% OFF', HEAD, -0.05, A, pad, y, 8, 'h1', c);
+      const x2 = pad + wA * A + gap;
+      set('sb', 'EVERYTHING ON', SUB, -0.04, B, x2, y - cap * (capB + 0.2), 0, 'h2', c);
+      set('sb', 'THE INTERNET.', SUB, -0.04, B, x2, y, 0, 'div', c);
+      y += 24;
+    }
+    strip.style.height = y + 6 + 'px'; y += 6;
+    // the red band: The Internet (All Of It)
+    const bandH = tall ? 66 : 62, band = put(`<div class="band"><span>The Internet (All Of It)</span><small>LIMITED TIME</small></div>`, c);
+    Object.assign(band.style, { top: y + 'px', height: bandH + 'px', fontSize: (bandH - 6) * 0.72 + 'px', padding: `0 ${pad * 0.7}px` });
+    y += bandH;
+    // WAS: 100% (slashed)  /  BUT WAIT… THERE'S LESS! over NOW: 70% (huge, jolting). Side by side on every screen.
+    const lab = tall ? 36 : 42, labCap = SCAP * lab;
+    const slash = (x, base, w, cap) => {
+      const el = put('<div class="slash" aria-hidden="true"></div>', c), h = cap * 0.2, len = w * 1.16;
+      place(el, x + w / 2 - len / 2, base - cap / 2 - h / 2, len, h); el.style.transform = 'rotate(-17deg)';
+    };
+    const wait = (x, top, w) => {
+      const txt = 'BUT WAIT… THERE’S LESS!', fs = (w - 36) / (run(txt, 'SIZE "Archivo Black"', 100, -0.02) / 100 + 0.3), h = fs * 1.55;
+      const el = put('<div class="wait"><em>BUT WAIT…</em>THERE’S LESS!</div>', c);
+      place(el, x, top, w, h); el.style.fontSize = fs + 'px';
+      return h;
+    };
+    const top = y, leftW = tall ? 178 : 330, divX = pad + leftW + (tall ? 18 : 30), rightX = divX + (tall ? 22 : 34), rightW = IW - pad - rightX;
+    let ry = top + (tall ? 22 : 26);
+    if (tall) ry += wait(pad - 6, ry, IW - 2 * pad + 12) + 30;      // the bubble across the card on a phone
+    else ry += wait(rightX - 14, ry, rightW + 14) + 26;               // over the NOW column on a wide screen
+    const labY = ry + labCap;
+    set('lab', 'NOW:', SUB, -0.02, lab, rightX, labY, 0, 'div', c);
+    const bigSize = rightW / headW('70%', 8), bigCap = HCAP * bigSize;
+    ry = labY + (tall ? 16 : 20) + bigCap;
+    const big = set('big', '70%', HEAD, -0.05, bigSize, rightX, ry, 0, 'div', c);
+    big.style.transformOrigin = '50% 60%'; jolt(big, 1.1, 'skewX(-8deg)');
+    const foot = ry;
+    // the left column: WAS: (level with NOW:), the slashed 100%, and on a wide screen the cards two by two at the 70%'s foot
+    const wTop = tall ? labY : top + 26 + labCap;
+    set('lab', 'WAS:', SUB, -0.02, lab, pad, wTop, 0, 'div', c);
+    if (tall) {
+      const wasCap = Math.min(HCAP * leftW / headW('100%', 0), bigCap * 0.62), wasSize = wasCap / HCAP;
+      const wy = foot - (bigCap - wasCap) * 0.35;
+      set('was', '100%', HEAD, -0.05, wasSize, pad, wy, 0, 'div', c);
+      slash(pad, wy, headW('100%', 0) * wasSize, wasCap);
+      const rule = put('<div class="rule" aria-hidden="true"></div>', c); place(rule, divX, labY - labCap - 4, 4, foot - labY + labCap + 8);
+      y = foot + 34;
+      const npS = (IW - 2 * pad) / subW('No purchase necessary!') * 0.78;
+      y += SCAP * npS; set('np', 'No purchase necessary!', SUB, -0.03, npS, pad, y, 0, 'div', c);
+      y += 18; y += cards(c, pad, y, IW - 2 * pad); y += 36;
+    } else {
+      const wasCap0 = HCAP * leftW / headW('100%', 0), room = foot - (wTop + 24);
+      const wasCap = Math.min(wasCap0, room * 0.4), wasSize = wasCap / HCAP, wy = wTop + 24 + wasCap;
+      set('was', '100%', HEAD, -0.05, wasSize, pad, wy, 0, 'div', c);
+      slash(pad, wy, headW('100%', 0) * wasSize, wasCap);
+      const cTop = wy + 40, cw = Math.min(leftW, ((foot - cTop) * 212) / 136);
+      cards(c, pad, foot - (136 * cw) / 212, cw, 2);
+      const rule = put('<div class="rule" aria-hidden="true"></div>', c); place(rule, divX, top + 26, 4, foot - top - 26);
+      y = foot + 40;
+    }
+    const H0 = y + 12;
+    c.style.height = H0 + 'px';
+    // BLACK FRIDAY ONLY!, stuck across the bottom right corner
+    const tg = put('<div class="tag">BLACK FRIDAY ONLY!</div>', c);
+    tg.style.fontSize = (tall ? 44 : 48) + 'px';
+    return { c, W0, H0, tag: tg };
+  }
+
+  // ---- one layout pass, for the window as it is ----
+  function build() {
+    p.textContent = ''; movers = [];
+    const W = p.clientWidth, H = p.clientHeight, tall = W / H < 1;
+    const s = tall ? Math.min(W / 430, H / 900) : Math.min(W / 1280, H / 800);
+    const fs = tall ? s * 0.7 : s;   // the tape's blur on a phone: lighter, as its type is smaller
+    $('.soft').setAttribute('stdDeviation', `${1.25 * fs} ${0.5 * fs}`);
+    $('.halo').setAttribute('stdDeviation', `${5 * fs} ${0.6 * fs}`);
+    $('.smear').setAttribute('stdDeviation', `${10 * fs} ${1.6 * fs}`);
+    $('.late').setAttribute('dx', 7 * fs); $('.late').setAttribute('dy', 1.7 * fs);
+    $('.bloom').setAttribute('stdDeviation', 14 * fs);
+    $('.blotch').setAttribute('baseFrequency', `${0.042 / s} ${0.167 / s}`);
+    $('.static').setAttribute('baseFrequency', `${0.19 / s} ${0.71 / s}`);
+
+    const tiles = put('<div class="tiles" aria-hidden="true"></div>');
+    place(tiles, -W * 0.3, -H * 0.3, W * 1.6, H * 1.6);
+    const ts = tall ? s * 0.5 : s;
+    Object.assign(tiles.style, { backgroundImage: `url(${IMG.tile})`, backgroundSize: `${260 * ts}px ${224 * ts}px` });
+
+    const tick = Math.max(22, (tall ? 30 : 40) * s), crawlH = Math.max(24, (tall ? 36 : 52) * s), m = Math.max(14, (tall ? 16 : 40) * s);
+
+    // ---- the order bar: [ITEM #] [ACT NOW tab over ADD TO CHROME →] [credits]; on a phone, stacked ----
+    let stageBot;
+    const orderBar = () => {
+      const credits = (cls) => put(`<div class="by ${cls}"><img alt="Gary Mustard Enterprises" src="${IMG.logo}"><div class="txt"><div class="gme">Brought to you by Gary Mustard Enterprises</div><div class="names"><a href="${GARRETT}">Garrett Musar</a><span class="sep" aria-hidden="true">✦</span><a href="${AUFBAU}">Aufbau</a></div></div></div>`);
+      const order = (h) => {
+        const el = put(`<a class="order" href="${STORE}"><span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
+        return el;
+      };
+      if (tall) {
+        const byH = Math.max(46, 50 * s), obH = Math.max(52, 64 * s), actH = Math.max(18, 22 * s);
+        const byTop = H - crawlH - 10 * s - byH, obTop = byTop - 10 * s - obH;
+        const by = credits('row'); place(by, m, byTop, W - 2 * m, byH);
+        const lg = by.querySelector('img'); lg.style.height = byH * 0.62 + 'px';
+        const lw = byH * 0.62 * 2.2;
+        const bf = Math.min(byH * 0.24, (W - 2 * m - lw - 40) / (run('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES', 'italic 700 SIZE "Arimo"', 100, 0.06) / 100));
+        Object.assign(by.style, { fontSize: bf + 'px', padding: `0 ${10}px`, justifyContent: 'flex-start' });
+        const o = order(); place(o, m, obTop, W - 2 * m, obH);
+        o.style.fontSize = Math.min(obH * 0.42, (W - 2 * m) * 0.86 / (run('ADD TO CHROME →', 'SIZE "Archivo Black"', 100, -0.01) / 100 + 1.4)) + 'px';
+        o.style.boxShadow = `${6 * s}px ${6 * s}px 0 rgba(6,8,70,0.9)`;
+        const act = put('<div class="act" aria-hidden="true"><span class="dot"></span>ACT NOW · OPERATORS STANDING BY</div>');
+        Object.assign(act.style, { left: m + 14 + 'px', top: obTop - actH + 'px', height: actH + 'px', fontSize: actH * 0.62 + 'px' });
+        blink(act, 0.8);
+        stageBot = obTop - actH - 6 * s;
+      } else {
+        const obH = Math.max(54, 92 * s), obTop = H - crawlH - 14 * s - obH, actH = Math.max(19, 27 * s);
+        const itemW = obH * 1.35;
+        const it = put('<div class="item" aria-hidden="true">ITEM #<b>030</b></div>'); place(it, m, obTop, itemW, obH); it.style.fontSize = obH * 0.17 + 'px';
+        const byW = Math.min(W * 0.33, 470 * s), byX = W - m - byW;
+        const by = credits(''); place(by, byX, obTop, byW, obH);
+        const lgH = obH * 0.5, lg = by.querySelector('img'); lg.style.height = lgH + 'px';
+        const lw = lgH * (lg.naturalWidth && lg.naturalHeight ? lg.naturalWidth / lg.naturalHeight : 2.2);
+        const textW = byW - lw - obH * 0.5;
+        const bf = Math.min(obH * 0.17, textW / (run('BROUGHT TO YOU BY GARY MUSTARD', 'italic 700 SIZE "Arimo"', 100, 0.06) / 100));
+        Object.assign(by.style, { fontSize: bf + 'px', padding: `0 ${obH * 0.18}px` });
+        by.querySelector('.gme').innerHTML = 'Brought to you by<br>Gary Mustard Enterprises';
+        const ox = m + itemW + 18 * s, ow = byX - 18 * s - ox;
+        const o = order(); place(o, ox, obTop, ow, obH);
+        o.style.fontSize = Math.min(obH * 0.44, ow * 0.86 / (run('ADD TO CHROME →', 'SIZE "Archivo Black"', 100, -0.01) / 100 + 1.4)) + 'px';
+        o.style.boxShadow = `${8 * s}px ${8 * s}px 0 rgba(6,8,70,0.9)`;
+        const act = put('<div class="act" aria-hidden="true"><span class="dot"></span>ACT NOW · OPERATORS STANDING BY</div>');
+        Object.assign(act.style, { left: ox + 18 * s + 'px', top: obTop - actH + 'px', height: actH + 'px', fontSize: actH * 0.6 + 'px' });
+        blink(act, 0.8);
+        stageBot = obTop - actH - 10 * s;
+      }
+    };
+
+    // the globe's framed product inset: a picture-in-picture box, the globe breaking out of its top
+    const inset = (x, y, w, h, turn) => {
+      const el = place(put('<div class="inset" aria-hidden="true"><small>LIVE</small></div>'), x, y, w, h);
+      el.style.transform = `rotate(${turn}deg)`; el.querySelector('small').style.fontSize = Math.max(10, w * 0.06) + 'px';
+      el.style.borderWidth = Math.max(3, w * 0.018) + 'px';
+      return el;
+    };
+    // the stage: between the ticker and the order bar. The card the hero; the globe framed beside it
+    const stage = () => {
+      const top = tick + (tall ? 26 : 34) * s, room = stageBot - top;
+      if (tall) {
+        const pc = priceCard(true), hang = 56;   // the tag hangs 56 card px under the card
+        const kH = (room - 40 * s) / (pc.H0 + hang);
+        if (pc.W0 * kH < (W - 2 * m) * 0.85) {
+          // a squarer screen (a tablet): the card fills the height, the globe's column beside it
+          const k = Math.min(kH, (W - 2 * m) / (pc.W0 * 1.34)), cw = pc.W0 * k, ch = pc.H0 * k, side = Math.min(W - 2 * m - cw - 16 * s, cw * 0.75);
+          const left = (W - cw - side - 16 * s) / 2, ccx = left + side + 16 * s + cw / 2, ccy = top + (room - ch - hang * k) / 2 + ch / 2, cTop = ccy - ch / 2, cBot = ccy + ch / 2;
+          const ih = Math.min(side * 1.1, ch * 0.5), d = Math.min(side * 0.86, ih * 0.84), gx = left + side * 0.5, gy = cTop + ih * 0.52;
+          inset(left, cTop, side, ih, 1.2); globe(gx, gy, d);
+          const o = oval(Math.min(d * 0.15, side / 7.9)); at(o, gx - o.offsetWidth / 2, cTop + ih - o.offsetHeight * 0.4);
+          const oBot = cTop + ih + o.offsetHeight * 0.6, bd = Math.min(side * 0.95, cBot - oBot - 16 * s);
+          if (bd > 60 * s) burst(gx, oBot + (cBot - oBot) * 0.45, bd, 'Works<br>like<br>magic!');
+          p.appendChild(pc.c);
+          place(pc.c, ccx - pc.W0 / 2, ccy - pc.H0 / 2, pc.W0, pc.H0);
+          pc.c.style.transform = `scale(${k}) rotate(-1.2deg)`;
+          Object.assign(pc.tag.style, { right: '-18px', bottom: '-56px', transform: 'rotate(-4deg)' });
+          glint('', left + side * 0.08, cTop + ih * 0.12, d * 0.07);
+          return;
+        }
+        // a phone: the card as wide as the screen at the foot of the stage; the framed globe and its badge over it
+        const k = Math.min((W - 2 * m - 6 * s) / pc.W0, (room - 80 * s) / (pc.H0 + hang));
+        const cw = pc.W0 * k, ch = pc.H0 * k, ccx = W / 2, ccy = stageBot - hang * k - ch / 2, cTop = ccy - ch / 2;
+        const spare = cTop - top - 4 * s, ih = Math.max(60 * s, spare), iw = Math.min(ih * 1.25, cw * 0.5);
+        const ix = ccx - cw / 2, iy = cTop - ih - 2 * s, d = Math.min(iw * 0.78, ih * 0.84), gx = ix + iw / 2, gy = iy + ih * 0.54;
+        inset(ix, iy, iw, ih, -1.5); globe(gx, gy, d);
+        const ow = W - m - (ix + iw) - 4 * s, o = oval(Math.max(12, Math.min(ih * 0.17, ow / 7.6)));
+        const ox = ix + iw + (ow - o.offsetWidth) / 2 + 4 * s, oy = iy + ih * 0.3 - o.offsetHeight / 2; at(o, ox, oy);
+        const bd = Math.min(ow * 0.62, iy + ih - (oy + o.offsetHeight) - 2 * s);
+        if (bd > 54 * s) burst(ix + iw + ow * 0.55, oy + o.offsetHeight + bd / 2 - 2 * s, bd, 'Works<br>like<br>magic!', 8);
+        p.appendChild(pc.c);
+        place(pc.c, ccx - pc.W0 / 2, ccy - pc.H0 / 2, pc.W0, pc.H0);
+        pc.c.style.transform = `scale(${k}) rotate(-1.2deg)`;
+        Object.assign(pc.tag.style, { right: '-14px', bottom: '-56px', transform: 'rotate(-4deg)' });
+        glint('', W - m - ow * 0.12, iy + ih * 0.12, 14 * s);
+        glint('b', ix + iw * 0.06, iy + ih * 0.9, 10 * s);
+      } else {
+        const pc = priceCard(false);
+        // the card most of the window; the globe's framed inset on its left, its badge and the starburst under it
+        const k = Math.min((W - 2 * m) * (W / H < 1.45 ? 0.76 : 0.73) / pc.W0, (room - 40 * s) / (pc.H0 + 40));
+        const cw = pc.W0 * k, ch = pc.H0 * k;
+        const side = Math.min(W - 2 * m - cw - 24 * s, cw * 0.36), gapX = Math.min(28 * s, W - 2 * m - cw - side);
+        const left = (W - cw - side - gapX) / 2, ccx = left + side + gapX + cw / 2, ccy = top + (room - ch - 40 * k) * 0.5 + ch / 2;
+        const cTop = ccy - ch / 2, cBot = ccy + ch / 2;
+        const ih = Math.min(side * 1.08, ch * 0.62), d = Math.min(side * 0.9, ih * 0.86), gx = left + side / 2, gy = cTop + ih * 0.53;
+        inset(left, cTop, side, ih, 1.4); globe(gx, gy, d);
+        const o = oval(Math.max(12, Math.min(side * 0.14, side / 7.4)));
+        at(o, gx - o.offsetWidth / 2, cTop + ih - o.offsetHeight * 0.38);
+        const oBot = cTop + ih + o.offsetHeight * 0.62, bd = Math.min(side * 0.78, cBot - oBot + 30 * s);
+        if (bd > 60 * s) burst(left + side * 0.62, oBot + bd / 2 - 4 * s, bd, 'Works<br>like<br>magic!');
+        p.appendChild(pc.c);
+        place(pc.c, ccx - pc.W0 / 2, ccy - pc.H0 / 2, pc.W0, pc.H0);
+        pc.c.style.transform = `scale(${k}) rotate(-1.4deg)`;
+        Object.assign(pc.tag.style, { right: '-26px', bottom: '-62px', transform: 'rotate(-4deg)' });
+        glint('', left + side * 0.08, cTop + ih * 0.1, d * 0.07);
+        glint('b', ccx + cw * 0.49, cTop + ch * 0.02, 22 * s);
+      }
+    };
+
+    orderBar();
+    stage();
+
+    // ---- the voice-over ticker along the top, the crawl along the bottom ----
+    const tk = put(`<div class="ticker" aria-label="30% off the entire internet."><div class="run" aria-hidden="true">${TICKER.repeat(8)}</div><div class="air" aria-hidden="true"><span class="dot"></span>ON AIR</div></div>`);
+    Object.assign(tk.style, { height: tick + 'px', fontSize: tick * 0.62 + 'px', lineHeight: tick + 'px' });
+    blink(tk.querySelector('.dot'), 1.2, 0.6);
+    const cr = put(`<div class="crawl" aria-hidden="true"><span>${CRAWL.repeat(20)}</span></div>`);
+    Object.assign(cr.style, { height: crawlH + 'px', fontSize: crawlH * 0.66 + 'px', lineHeight: crawlH + 'px' });
+    const tks = tk.querySelector('.run'), crs = cr.firstElementChild, tkRep = tks.offsetWidth / 8, crRep = crs.offsetWidth / 20;
+    const airW = tk.querySelector('.air').offsetWidth;
+    const tkV = tick * 1.6, crV = crawlH * 2.4;
+    movers.push((t) => {
+      tks.style.transform = `translateX(${airW + tick * 0.4 - ((t * tkV) % tkRep)}px)`;
+      crs.style.transform = `translateX(${-(((t + 3) * crV) % crRep)}px) skewX(-9deg)`;
+    });
+    render(clock());
+  }
+
+  // ---- the clock ----
+  const t0 = performance.now(), clock = () => (still ? 0 : Math.floor(((performance.now() - t0) / 1000) * FPS) / FPS);
+  const blotch = $('.blotch'), grain = $('.static');
+  function render(t) {
+    for (const move of movers) move(t);
+    const f = Math.round(t * FPS); blotch.setAttribute('seed', BLOTCH[Math.floor(f / 4) % 6]); grain.setAttribute('seed', STATIC[Math.floor(f / 2) % 6]);
+  }
+
+  build();
+  let pending = 0;
+  addEventListener('resize', () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(build); });
+  if (!still) {
+    let last = -1;
+    const frame = () => { const t = clock(); if (t !== last) { last = t; render(t); } requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+    if ('ImageDecoder' in window) (async () => {
+      try {
+        const dec = new ImageDecoder({ data: await (await fetch(IMG.globe)).arrayBuffer(), type: 'image/webp' });
+        await dec.tracks.ready;
+        const n = dec.tracks.selectedTrack.frameCount, frames = [];
+        for (let i = 0; i < n; i++) { const { image } = await dec.decode({ frameIndex: i }); frames.push(await createImageBitmap(image)); image.close(); }
+        dec.close();
+        if (n === 60) { globeFrames = frames; build(); }
+      } catch {}
+    })();
+  }
+
+  // The tape look costs little on a graphics card and a great deal without one: once the page is up,
+  // see how fast it draws; if slowly, take the look off, and if that made no difference, put it back.
+  const frameRate = () => new Promise((resolve) => {
+    let frames = 0, drawing = 0, last = 0;
+    const tick = (now) => { const gap = now - last; if (last && gap < 1000) { frames++; drawing += gap; } last = now; if (drawing < 2000) requestAnimationFrame(tick); else resolve((frames * 1000) / drawing); };
+    requestAnimationFrame(tick);
+  });
+  if (!still && !query.has('keep')) {
+    await new Promise((r) => setTimeout(r, 1200));
+    const withLook = await frameRate();
+    if (withLook < 24) {
+      p.style.filter = 'none';
+      if ((await frameRate()) < withLook * 1.5) p.style.removeProperty('filter');
+    }
+  }
+})();
+</script>
+</body>
+</html>

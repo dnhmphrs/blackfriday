@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>30% Off EVERYTHING: posters</title>
+<!-- The banner's pieces laid out as standalone pictures: the square and portrait posts, and the
+     store's screenshot and promo tiles. ?f=square|portrait|shot|marquee|tile. Rendered by
+     store/posters.mjs, which steps window.setT(t) through a 12 s loop. -->
+<style>
+  @font-face { font-family: "TOE Antonio"; font-weight: 300; src: url(../../src/fonts/antonio-light.woff2) format("woff2"); }
+  @font-face { font-family: "TOE Antonio"; font-weight: 600; src: url(../../src/fonts/antonio-semibold.woff2) format("woff2"); }
+  @font-face { font-family: "TOE Black"; src: url(../../src/fonts/archivo-black.woff2) format("woff2"); }
+  @font-face { font-family: "TOE Arimo"; font-style: italic; font-weight: 700; src: url(../../src/fonts/arimo-bold-italic.woff2) format("woff2"); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #070f9c; }
+  #p { position: relative; overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; }
+  #p > * { position: absolute; display: block; max-width: none; }
+  #p > .strip { display: flex; }
+  .glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+  .glints svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
+  .glints path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); }
+  .glints.right svg { transform: scaleX(-1); }
+  .tw { transform-box: fill-box; transform-origin: center; animation: twinkle 2.4s ease-in-out infinite; }
+  .tw.b { animation-delay: -1.2s; }
+  .ticker, .crawl { left: 0; right: 0; overflow: hidden; white-space: nowrap; }
+  .ticker { top: 0; font-family: "TOE Antonio", "Arial Narrow", Arial, sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em;
+            color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); }
+  .ticker span { display: inline-block; animation: slide 24s linear infinite; }  /* one pass of the lines per 12 s loop */
+  .crawl { bottom: 0; font-family: "TOE Black", "Arial Black", Arial, sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
+  .crawl span { display: inline-block; animation: crawl 36s linear infinite;      /* two passes per loop */
+                text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade); }
+  .strip { display: flex; align-items: center; justify-content: center; white-space: nowrap; font: italic 700 1em "TOE Arimo", Arial, sans-serif; }
+  .tape { background: linear-gradient(#fffb86, #f0e11c); color: #111; }
+  .sub { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
+  .card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000; box-shadow: 8px 8px 0 rgba(4, 6, 60, 0.92);
+          transform-origin: left top; font: italic 700 50px/1 "TOE Arimo", Arial, sans-serif; }
+  .card .head { background: var(--red); color: #fff46a; font: 600 41px/57px "TOE Antonio", "Arial Narrow", Arial, sans-serif; padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
+  .card .line { padding: 13px 17px 0; }
+  .card s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 9px; }
+  .card s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 8px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+  .card .big { position: absolute; right: 9px; bottom: -54px; font: 400 165px/0.9 "TOE Black", "Arial Black", Arial, sans-serif; color: var(--red); letter-spacing: -0.05em;
+               -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 70% 80%; animation: jolt 1.2s ease-in-out infinite; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+  @keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
+  @keyframes twinkle { 0%, 100% { transform: scale(0.55) rotate(-10deg); opacity: 0.75; } 50% { transform: scale(1) rotate(12deg); opacity: 1; } }
+  @keyframes jolt { 0%, 100% { transform: skewX(-8deg) scale(1) rotate(0deg); } 12% { transform: skewX(-8deg) scale(1.18) rotate(-5deg); }
+                    26% { transform: skewX(-8deg) scale(0.96) rotate(3deg); } 40% { transform: skewX(-8deg) scale(1.08) rotate(-2deg); } 55% { transform: skewX(-8deg) scale(1) rotate(0deg); } }
+</style>
+</head>
+<body>
+<div id="p"></div>
+<script>
+  const PARTS = '../out/channel-page/parts/', IMAGES = '../assets/banner-2.1/';
+  const TICKER = 'But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
+  const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
+  const BRAND = 'Brought to you by Gary Mustard Enterprises';
+  const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
+
+  // Each format: its size, then the pieces. type/type2: the lettering's top left and scale (the
+  // lettering is 706 x 522 and 895 x 349 at scale 1); globe: its box (x, y, size); card: top left and
+  // scale; strips: the tape's centre height at the middle and a scale; tick/crawl: heights.
+  const F = {
+    square:   { w: 1080, h: 1080, tick: 60, crawl: 96, type: [321, 78, 0.62], glints: true, type2: [40, 420, 0.5], globe: [592, 392, 390], card: [58, 604, 0.6], strips: [848, 0.62] },
+    portrait: { w: 1080, h: 1350, tick: 64, crawl: 104, type: [292, 96, 0.7], glints: true, type2: [36, 500, 0.52], globe: [590, 520, 400], card: [58, 726, 0.62], strips: [1090, 0.66] },
+    shot:     { w: 1280, h: 800, tick: 52, crawl: 84, type: [60, 70, 0.58], glints: false, type2: [470, 112, 0.42], globe: [860, 70, 360], card: [520, 330, 0.56], strips: [618, 0.56] },
+    marquee:  { w: 1400, h: 560, tick: 44, crawl: 78, type: [54, 56, 0.52], glints: false, type2: [470, 92, 0.4], globe: [1000, 44, 330], card: [520, 280, 0.5] },
+    tile:     { w: 880, h: 560, tick: 0, crawl: 76, type: [40, 70, 0.58], glints: false, globe: [500, 40, 340] },
+  };
+  const f = F[new URLSearchParams(location.search).get('f')] || F.square;
+  const p = document.getElementById('p');
+  Object.assign(p.style, { width: f.w + 'px', height: f.h + 'px' });
+  const add = (html) => { p.insertAdjacentHTML('beforeend', html); return p.lastElementChild; };
+  const place = (el, x, y, w, h) => Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+
+  // the globe on its column (the pieces of tools/channel-parts.mjs: globe 480 box; column 400 wide,
+  // cap 136 high at 410 below the globe's top, base 144 high), standing on the bottom edge
+  const [gx, gy, gd] = f.globe, k = gd / 480;
+  place(add('<div class="glow"></div>'), gx + gd / 2 - gd * 1.35, gy + gd / 2 - gd * 1.5, gd * 2.7, gd * 3);
+  const colX = gx + 40 * k, colW = 400 * k, capTop = gy + 410 * k, baseTop = Math.max(capTop + 136 * k + 4, f.h - 144 * k);
+  place(add(`<img src="${IMAGES}shaft.webp">`), colX, capTop + 136 * k - 2, colW, baseTop - capTop - 136 * k + 4);
+  place(add(`<img src="${IMAGES}cap.webp">`), colX, capTop, colW, 136 * k);
+  place(add(`<img src="${IMAGES}base.webp">`), colX, baseTop, colW, 144 * k);
+  const globe = add(`<img src="${PARTS}globe-00.png">`);
+  place(globe, gx, gy, gd, gd);
+
+  // the lettering, and the glints either side of 30% OFF
+  const [tx, ty, ts] = f.type;
+  place(add(`<img src="${IMAGES}type-top.webp">`), tx, ty, 706 * ts, 522 * ts);
+  if (f.glints) {
+    const svg = `<svg viewBox="0 0 100 200"><g transform="translate(22 62) scale(38)"><path class="tw" d="${GLINT}"/></g><g transform="translate(66 132) scale(22)"><path class="tw b" d="${GLINT}"/></g></svg>`;
+    place(add(`<div class="glints left">${svg}</div>`), tx - 178 * ts, ty + 123 * ts, 130 * ts, 260 * ts);
+    place(add(`<div class="glints right">${svg}</div>`), tx + 738 * ts, ty + 123 * ts, 130 * ts, 260 * ts);
+  }
+  if (f.type2) { const [x, y, s] = f.type2; place(add(`<img src="${IMAGES}type-mid.webp">`), x, y, 895 * s, 349 * s); }
+
+  // the price card
+  if (f.card) {
+    const [x, y, s] = f.card, c = add('<div class="card"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>');
+    Object.assign(c.style, { left: x + 'px', top: y + 'px', transform: `scale(${s}) rotate(-1.4deg)` });
+  }
+
+  // the yellow tape and the navy one under it
+  if (f.strips) {
+    const [cy, s] = f.strips, length = Math.hypot(f.w, f.h) * 1.4;
+    for (const [cls, text, dy, h, cap, dx] of [['sub', BRAND, 102, 68, 25, 0], ['tape', 'EVERY SITE 30% OFF!', 0, 126, 54, 12]]) {
+      const el = add(`<div class="strip ${cls}"><span>${text}</span></div>`);
+      place(el, f.w / 2 - length / 2, cy + dy * s - (h * s) / 2, length, h * s);
+      Object.assign(el.style, { fontSize: (cap / 0.72) * s + 'px', paddingLeft: dx * 2 * s + 'px', transform: 'rotate(-6deg)' });
+      if (cls === 'tape') el.style.boxShadow = `inset 0 ${4 * s}px 0 rgba(170,158,0,0.6), inset 0 ${-4 * s}px 0 rgba(170,158,0,0.6), ${11 * s}px ${11 * s}px 0 rgba(6,8,70,0.9)`;
+    }
+  }
+
+  // the tickers
+  if (f.tick) Object.assign(add(`<div class="ticker"><span>${TICKER.repeat(4)}</span></div>`).style, { height: f.tick + 'px', fontSize: f.tick * 0.667 + 'px', lineHeight: f.tick + 'px' });
+  if (f.crawl) Object.assign(add(`<div class="crawl"><span>${CRAWL.repeat(12)}</span></div>`).style, { height: f.crawl + 'px', fontSize: f.crawl * 0.747 + 'px', lineHeight: f.crawl + 'px' });
+
+  // Time: every animation is paused and set to t; the globe steps through its 60 frames (one turn in 4 s).
+  const frames = Array.from({ length: 60 }, (_, i) => `${PARTS}globe-${String(i).padStart(2, '0')}.png`);
+  window.ready = Promise.all([document.fonts.ready, ...frames.map((src) => { const i = new Image(); i.src = src; return i.decode(); }),
+                              ...[...p.querySelectorAll('img')].map((i) => i.decode().catch(() => {}))]);
+  window.setT = async (t) => {
+    for (const a of document.getAnimations()) { a.pause(); a.currentTime = t * 1000; }
+    globe.src = frames[Math.floor(t * 15 + 1e-6) % 60];
+    await globe.decode();
+  };
+</script>
+</body>
+</html>

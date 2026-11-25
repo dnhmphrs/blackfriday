@@ -1,0 +1,416 @@
+#!/usr/bin/env python3
+"""Build out/channel-page/channel.html: the Channel banner over a web page, one self-contained file.
+
+The banner is laid out the way the extension will lay it out, from separate pieces so it can fill
+any window shape: the lettering, the spinning globe and the column (cap, shaft, base: the shaft
+stretches to whatever height there is) are the 2.1 extension's own pictures (src/images and
+assets/banner-2.1, made by tools/channel-parts.mjs and tools/channel-assets.py); the tickers, the price card and the strips are HTML. The page under it
+loads first; the banner slides in once its pieces are ready.
+    python3 tools/channel-page.py      (run from marketing/)"""
+import base64, html, os, re
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+OUT_DIR = os.path.join(ROOT, 'out', 'channel-page')
+ASSETS = os.path.join(ROOT, '..', 'src', 'images')  # the extension's own pictures (tools/channel-assets.py)
+OLD = os.path.join(ROOT, 'assets', 'banner-2.1')     # and those 2.2 no longer uses
+FONTS = os.path.join(ROOT, 'variants', 'v17', 'fonts')
+
+
+def b64(path, mime):
+    with open(path, 'rb') as f:
+        return f'data:{mime};base64,' + base64.b64encode(f.read()).decode()
+
+
+IMG = {k: b64(os.path.join(ASSETS if f == 'globe.webp' else OLD, f), 'image/webp') for k, f in {
+    'globe': 'globe.webp', 'cap': 'cap.webp', 'shaft': 'shaft.webp', 'base': 'base.webp',
+    'typeTop': 'type-top.webp', 'typeMid': 'type-mid.webp', 'typePhone': 'type-phone.webp'}.items()}
+FONT = {k: b64(os.path.join(FONTS, f'{k}.woff2'), 'font/woff2')
+        for k in ('antonio-light', 'antonio-semibold', 'archivo-black', 'arimo-bold-italic')}
+PAGES = {k: open(os.path.join(ROOT, 'store', 'mock', f'{k}.html'), encoding='utf-8').read() for k in ('shop', 'news')}
+
+TICKER = ' ✦ '.join(['But wait… there’s less!', 'No purchase necessary!', 'Black Friday only!',
+                      'Every website, 30% off!', 'Works like magic!']) + ' ✦ '
+CRAWL = 'BLACK FRIDAY ONLY! ✦ '
+# the sign-off on the navy strip (desktop); Garrett may rewrite it
+BRAND = 'Brought to you by Gary Mustard Enterprises'
+
+PAGE = r'''<title>30% Off Channel Banner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  @font-face { font-family: "TOE Antonio"; font-weight: 300; src: url(__F_ANTONIO_LIGHT__) format("woff2"); }
+  @font-face { font-family: "TOE Antonio"; font-weight: 600; src: url(__F_ANTONIO_SEMIBOLD__) format("woff2"); }
+  @font-face { font-family: "TOE Black"; src: url(__F_ARCHIVO_BLACK__) format("woff2"); }
+  @font-face { font-family: "TOE Arimo"; font-style: italic; font-weight: 700; src: url(__F_ARIMO__) format("woff2"); }
+
+  /* One look on purpose: the web page is the colour; the surround is only seen around the phone. */
+  :root {
+    --surround: #101218; --panel: rgba(16, 18, 30, 0.92); --ink: #f1f3fb; --muted: #9ea4c0; --accent: #2f55ff;
+    --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; --hard: rgba(6, 8, 70, 0.9); color-scheme: light;
+  }
+  html, body { height: 100%; }
+  body { margin: 0; background: #fff; color: var(--ink); font: 13px/1.4 "Helvetica Neue", Arial, sans-serif; overflow: hidden; }
+  body.phone { background: var(--surround); }
+
+  /* the viewport: the whole window on desktop, a 390 x 844 phone screen otherwise */
+  #view { position: absolute; inset: 0; overflow: hidden; background: #fff; }
+  body.phone #view { inset: auto; left: 50%; top: 50%; width: 390px; height: 844px; border-radius: 28px; box-shadow: 0 0 0 12px #000, 0 20px 60px rgba(0, 0, 0, 0.6); }
+  #site { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+
+  /* ---------------- the banner ----------------
+     #frame is the black keyline, .trim the gold coupon trim, .face the banner itself; each is cut
+     with the same teeth along the page-facing edge (the left on desktop, the bottom on a phone),
+     a little further in each time. Hidden until it is ready, then it slides in. */
+  #frame { position: absolute; z-index: 2; top: 0; right: 0; width: 30%; height: 100%; background: #000; pointer-events: auto;
+           user-select: none; cursor: default; opacity: 0; transform: translateX(104%); visibility: hidden; }
+  body.phone #frame { left: 0; right: auto; width: 100%; height: 33%; transform: translateY(-104%); }
+  #frame.in, body.phone #frame.in { visibility: visible; opacity: 1; transform: none;
+             transition: transform 0.55s cubic-bezier(0.2, 0.85, 0.25, 1), opacity 0.25s linear; }
+  .trim, .face { position: absolute; inset: 0; }
+  .trim { background: linear-gradient(90deg, #fffb86, #f0e11c 45%, #c9b400); }
+  body.phone .trim { background: linear-gradient(#c9b400, #f0e11c 55%, #fffb86); }
+  .face { overflow: hidden; }
+  #glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+
+__TUBE_CSS__
+
+  /* the motif either side of 30% OFF: drawn in SVG, so it is sharp at any size */
+  .motif svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  #mR svg { transform: scaleX(-1); }
+  body.phone .motif { display: none; }
+  .tw { transform-box: fill-box; transform-origin: center; animation: twinkle 2.4s ease-in-out infinite; }
+  .tw.b { animation-delay: -1.2s; }
+  .bob { animation: bob 1.6s ease-in-out infinite; }
+  .fan { transform-box: fill-box; transform-origin: 100% 50%; animation: fan 1.1s ease-in-out infinite; }
+  .wob { transform-box: fill-box; transform-origin: center; animation: wob 2s ease-in-out infinite alternate; }
+  @keyframes twinkle { 0%, 100% { transform: scale(0.55) rotate(-10deg); opacity: 0.75; } 50% { transform: scale(1) rotate(12deg); opacity: 1; } }
+  @keyframes bob { 0%, 100% { transform: translateY(-4%); } 50% { transform: translateY(4%); } }
+  @keyframes fan { 0%, 100% { transform: scale(0.9); } 50% { transform: scale(1.08); } }
+  @keyframes wob { from { transform: rotate(-8deg) scale(0.96); } to { transform: rotate(8deg) scale(1.04); } }
+
+  /* the tickers: Garrett's lines along the top, BLACK FRIDAY ONLY! along the bottom */
+  .ticker, .crawl { left: 0; right: 0; overflow: hidden; white-space: nowrap; }
+  .ticker { top: 0; font-family: "TOE Antonio", "Arial Narrow", Arial, sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em;
+            color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); }
+  .ticker span { display: inline-block; animation: slide 44s linear infinite; }
+  .crawl { bottom: 0; font-family: "TOE Black", "Arial Black", Arial, sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
+  .crawl span { display: inline-block; text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade);
+                animation: crawl 24s linear infinite; }
+
+  /* the strips across the lower part (desktop): the yellow tape and the navy one tucked under it */
+  .strip { display: flex; align-items: center; justify-content: center; white-space: nowrap; transform-origin: 50% 50%;
+           font-family: "TOE Arimo", Arial, sans-serif; font-style: italic; font-weight: 700; }
+  #strip { background: linear-gradient(#fffb86, #f0e11c); color: #111; box-shadow: inset 0 0.06em 0 rgba(170, 158, 0, 0.6), inset 0 -0.06em 0 rgba(170, 158, 0, 0.6); }
+  #sub { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
+  body.phone #strip, body.phone #sub { display: none; }
+
+  /* the price card, from v1.7; only its 70% moves */
+  #card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000; box-sizing: border-box;
+          box-shadow: 8px 8px 0 rgba(4, 6, 60, 0.92); transform-origin: left top; font: italic 700 50px/1 "TOE Arimo", Arial, sans-serif; }
+  #card .head { background: var(--red); color: #fff46a; font: 600 41px/57px "TOE Antonio", "Arial Narrow", Arial, sans-serif;
+                padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
+  #card .line { padding: 13px 17px 0; }
+  #card s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 9px; }
+  #card s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 8px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+  #card .big { position: absolute; right: 9px; bottom: -54px; font: 400 165px/0.9 "TOE Black", "Arial Black", Arial, sans-serif;
+               color: var(--red); letter-spacing: -0.05em; -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform-origin: 70% 80%;
+               animation: jolt 1.1s ease-in-out infinite; }
+
+  @keyframes slide { to { transform: translateX(-50%); } }
+  @keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
+  @keyframes jolt {
+    0%, 100% { transform: skewX(-8deg) scale(1) rotate(0deg); }
+    12% { transform: skewX(-8deg) scale(1.18) rotate(-5deg); }
+    26% { transform: skewX(-8deg) scale(0.96) rotate(3deg); }
+    40% { transform: skewX(-8deg) scale(1.08) rotate(-2deg); }
+    55% { transform: skewX(-8deg) scale(1) rotate(0deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker span, .crawl span, #card .big, .tw, .bob, .fan, .wob { animation: none; }
+    #frame.in, body.phone #frame.in { transition: opacity 0.3s linear; }
+  }
+
+  /* the controls: a small panel bottom left; H hides it */
+  #panel { position: fixed; z-index: 10; left: max(12px, env(safe-area-inset-left, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px));
+           display: flex; flex-wrap: wrap; gap: 8px; align-items: center; max-width: calc(100vw - 24px);
+           padding: 8px; border-radius: 12px; background: var(--panel); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4); }
+  #panel.hidden > :not(#toggle) { display: none; }
+  .seg { display: inline-flex; gap: 2px; padding: 2px; border-radius: 8px; background: rgba(255, 255, 255, 0.07); }
+  #panel button, #panel input { font: inherit; color: var(--ink); }
+  .seg button, #go, #toggle, #replay { border: 0; border-radius: 6px; padding: 6px 10px; background: transparent; cursor: pointer; white-space: nowrap; }
+  .seg button[aria-pressed="true"], #go { background: var(--accent); }
+  #toggle { color: var(--muted); }
+  #url-form { display: inline-flex; gap: 4px; margin: 0; }
+  #url { width: 190px; max-width: 46vw; border: 0; border-radius: 6px; padding: 6px 8px; background: rgba(255, 255, 255, 0.1); }
+  #panel button:focus-visible, #panel input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+</style>
+
+<div id="view">
+  <iframe id="site" title="The web page under the banner" srcdoc="__SHOP_SRCDOC__"></iframe>
+  <div id="frame" role="img" aria-label="30% off everything on the internet. Black Friday only!">
+    <div class="trim"></div>
+    <div class="face">
+      <div class="tube">
+      <div id="glow"></div>
+      <img id="type" alt=""><img id="type2" alt="">
+      <div class="motif" id="mL"></div><div class="motif" id="mR"></div>
+      <img id="shaft" alt="" src="__I_SHAFT__">
+      <img id="cap" alt="" src="__I_CAP__">
+      <img id="base" alt="" src="__I_BASE__">
+      <img id="globe" alt="" src="__I_GLOBE__">
+      <div id="card"><div class="head">The Internet (All Of It)</div><div class="line">WAS: <s>100%</s></div><div class="line">NOW:</div><div class="big">70%</div></div>
+      <div class="strip" id="sub"><span>__BRAND__</span></div>
+      <div class="strip" id="strip"><span>EVERY SITE 30% OFF!</span></div>
+      <div class="ticker"><span>__TICKER__</span></div>
+      <div class="crawl"><span>__CRAWL__</span></div>
+      </div>
+      <div class="lines"></div>
+    </div>
+  </div>
+</div>
+
+<div id="panel">
+  <div class="seg" id="screen-seg" role="group" aria-label="Screen">
+    <button type="button" id="s-desktop" data-screen="desktop">Desktop</button>
+    <button type="button" id="s-phone" data-screen="phone">Phone</button>
+  </div>
+  <div class="seg" id="page-seg" role="group" aria-label="Page">
+    <button type="button" id="p-shop" data-page="shop">Shop</button>
+    <button type="button" id="p-news" data-page="news">News</button>
+  </div>
+  <form id="url-form"><input id="url" type="url" placeholder="or any https:// page" aria-label="Web page address"><button id="go" type="submit">Go</button></form>
+  <button type="button" id="replay">Replay</button>
+  <button type="button" id="toggle" title="Hide or show these controls (H)">Hide</button>
+</div>
+
+<script>
+  // Positions in banner pixels (the artwork's own): u is CSS px per banner px. "top" pieces hang
+  // from the top ticker, "bottom" pieces stand on the crawl; the column's shaft stretches between
+  // its cap and its base, so the banner fills a window of any height. Extra width spreads the
+  // pieces apart (the lettering left or centred, the monument right) instead of leaving margins.
+  const L = {
+    desktop: {
+      w: 1080, tick: 84, tickFont: 56, crawl: 150, crawlFont: 112, minArt: 1800,
+      // the lettering in two parts, so a tall window can open up the space between them
+      type: { x: 198, y: 38, w: 706, h: 522, src: 'typeTop', spread: 0.5 },
+      type2: { x: 97, y: 615, w: 895, h: 349, src: 'typeMid', spread: 0.5 },
+      mon: { x: 516, y: 972, k: 1 },   // the globe picture's top left; k scales the whole monument
+      card: { x: 80, y: 1052, s: 1.0, r: -1.4, spread: 0 },
+      strips: [{ id: 'sub', fromCrawl: -130, h: 68, cap: 25, dx: 0 }, { id: 'strip', fromCrawl: -232, h: 126, cap: 54, dx: 12 }],
+      glow: { rx: 648, ry: 729 },
+    },
+    phone: {
+      w: 1170, tick: 70, tickFont: 46, crawl: 90, crawlFont: 66, minArt: 560,
+      type: { x: 39, y: 27, w: 594, h: 577, src: 'typePhone', spread: 0 },
+      mon: { x: 780, y: -15, k: 320 / 384 },
+      card: { x: 584, y: 384, s: 0.56, r: -1.4, spread: 0.5 },
+      glow: { rx: 538, ry: 517 },
+    },
+  };
+  // The motif, drawn for the left side in a 100 x 200 box (the right side is its mirror image).
+  // Pick one with the page address: #glints, #lines, #arrows or #stars.
+  const STAR4 = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
+  const STAR5 = (r) => Array.from({ length: 10 }, (_, i) => { const a = (i * Math.PI) / 5 - Math.PI / 2, q = i % 2 ? r * 0.45 : r; return `${(q * Math.cos(a)).toFixed(1)},${(q * Math.sin(a)).toFixed(1)}`; }).join(' ');
+  const NAVY = '#0a0f66';
+  const MOTIFS = {
+    glints: `<g transform="translate(22 62) scale(38)"><path class="tw" d="${STAR4}" fill="#fff" style="filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.2px #9fd4ff)"/></g>
+             <g transform="translate(66 132) scale(22)"><path class="tw b" d="${STAR4}" fill="#fff" style="filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.25px #9fd4ff)"/></g>`,
+    lines: `<g class="fan">${[[28, 62], [0, 100], [-28, 138]].map(([a, y]) =>
+             `<g transform="translate(92 ${y}) rotate(${a})"><line x1="0" y1="0" x2="-62" y2="0" stroke="${NAVY}" stroke-width="13" stroke-linecap="round" transform="translate(5 5)"/>
+              <line x1="0" y1="0" x2="-62" y2="0" stroke="#fff035" stroke-width="13" stroke-linecap="round"/></g>`).join('')}</g>`,
+    arrows: `<g class="bob"><g transform="translate(6 6)"><path d="M35,30 h30 v70 h22 l-37,48 l-37,-48 h22z" fill="${NAVY}"/></g>
+             <path d="M35,30 h30 v70 h22 l-37,48 l-37,-48 h22z" fill="#ff1616" stroke="#000" stroke-width="5" stroke-linejoin="round"/>
+             <path d="M41,36 h9 v66 h-9z" fill="#ff8a6e" opacity="0.7"/></g>`,
+    stars: `<g class="wob"><g transform="translate(56 78)"><polygon points="${STAR5(42)}" fill="${NAVY}" transform="translate(6 6)"/><polygon points="${STAR5(42)}" fill="#fff035" stroke="#000" stroke-width="4" stroke-linejoin="round"/></g></g>
+            <g class="wob" style="animation-delay:-1s"><g transform="translate(26 150)"><polygon points="${STAR5(22)}" fill="${NAVY}" transform="translate(4 4)"/><polygon points="${STAR5(22)}" fill="#fff035" stroke="#000" stroke-width="3" stroke-linejoin="round"/></g></g>`,
+  };
+  const motifName = () => (MOTIFS[location.hash.slice(1)] ? location.hash.slice(1) : 'glints');
+  function drawMotif() {
+    const svg = `<svg viewBox="0 0 100 200" aria-hidden="true">${MOTIFS[motifName()]}</svg>`;
+    $('mL').innerHTML = svg; $('mR').innerHTML = svg;
+  }
+  addEventListener('hashchange', drawMotif);
+
+  const MON = { globe: 480, capX: 40, capY: 410, colW: 400, capH: 136, baseH: 144 }; // the monument's pieces, unscaled
+  const IMG = { typeTop: '__I_TYPE_TOP__', typeMid: '__I_TYPE_MID__', typePhone: '__I_TYPE_PHONE__' };
+  const PAGES = { shop: '__SHOP_JSON__', news: '__NEWS_JSON__' };
+  const TOOTH = { period: 16, depth: 7 }, KEY = 2, TRIM = 6; // CSS px: the teeth, the black keyline, the gold trim
+  const RESERVE = TOOTH.depth + KEY + TRIM + 2; // kept clear of the teeth on the page-facing edge
+
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+__TAPE_JS__
+  const $ = (id) => document.getElementById(id);
+  const state = { screen: 'desktop', page: 'shop', url: '' };
+  const frame = $('frame'), face = frame.querySelector('.face'), trim = frame.querySelector('.trim');
+  frame.insertAdjacentHTML('beforeend', TAPE);
+
+  // A zigzag along the page-facing edge, `s` px further in than the tips.
+  function teeth(w, h, phone, s) {
+    const { period: p, depth: d } = TOOTH, pts = [];
+    if (phone) {
+      pts.push('0 0', `${w}px 0`);
+      for (let x = w; x > -p; x -= p) pts.push(`${x}px ${h - s}px`, `${x - p / 2}px ${h - s - d}px`);
+    } else {
+      pts.push(`${w}px 0`, `${w}px ${h}px`);
+      for (let y = h; y > -p; y -= p) pts.push(`${s}px ${y}px`, `${s + d}px ${y - p / 2}px`);
+    }
+    return `polygon(${pts.join(', ')})`;
+  }
+  const place = (el, x, y, w, h) => Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+
+  function layout() {
+    const phone = state.screen === 'phone', g = L[state.screen];
+    const W = frame.clientWidth, H = frame.clientHeight;
+    if (!W || !H) return;
+    frame.style.clipPath = teeth(W, H, phone, 0);
+    trim.style.clipPath = teeth(W, H, phone, KEY);
+    face.style.clipPath = teeth(W, H, phone, KEY + TRIM);
+    // the room inside the teeth, and the scale: as big as fits across, or down at the least height
+    const x0 = phone ? 0 : RESERVE, aw = W - x0, ah = (phone ? H - RESERVE : H);
+    const u = Math.min(aw / g.w, ah / (g.tick + g.minArt + g.crawl));
+    const extra = aw - g.w * u;                         // spare width, shared out between the pieces
+    const X = (x, spread = 0) => x0 + x * u + extra * spread;
+    const top = g.tick * u;                              // where the artwork hangs from
+    const crawlTop = ah - g.crawl * u;                   // where it stands
+    const tape = (sel, name, value) => frame.querySelector(sel).setAttribute(name, value); // the filter's distances, as in the extension
+    tape('.soft', 'stdDeviation', `${1.25 * u} ${0.5 * u}`); tape('.halo', 'stdDeviation', `${5 * u} ${0.6 * u}`);
+    tape('.smear', 'stdDeviation', `${10 * u} ${1.6 * u}`); tape('.late', 'dx', 7 * u); tape('.late', 'dy', 1.7 * u); tape('.bloom', 'stdDeviation', 14 * u);
+    const Y = (y) => top + y * u;
+
+    const tk = face.querySelector('.ticker'), cr = face.querySelector('.crawl');
+    Object.assign(tk.style, { left: x0 + 'px', height: g.tick * u + 'px', fontSize: g.tickFont * u + 'px', lineHeight: g.tick * u + 'px' });
+    Object.assign(cr.style, { left: x0 + 'px', bottom: (H - ah) + 'px', height: g.crawl * u + 'px', fontSize: g.crawlFont * u + 'px', lineHeight: g.crawl * u + 'px' });
+
+    // A tall window (the scale set by the width) has height to spare. If that leaves the globe in the
+    // top half, it and the card come down to halfway (no further), and the lettering above spreads
+    // out after them: the gaps above, between and below the headline open up in step. The rest of
+    // the spare height lengthens the column.
+    const m = g.mon, k = m.k * u;
+    const spare = phone ? 0 : Math.max(0, ah - (g.tick + g.minArt + g.crawl) * u);
+    const drop = Math.min(spare, Math.max(0, ah / 2 - (Y(m.y) + (MON.globe / 2) * k)));
+    const t = g.type, type = $('type');
+    type.src = IMG[t.src];
+    place(type, X(t.x, t.spread), Y(t.y) + drop * 0.25, t.w * u, t.h * u);
+    const t2 = g.type2, type2 = $('type2');
+    type2.style.display = t2 ? '' : 'none';
+    if (t2) { type2.src = IMG[t2.src]; place(type2, X(t2.x, t2.spread), Y(t2.y) + drop * 0.55, t2.w * u, t2.h * u); }
+    if (!phone) {
+      const mw = 130, mh = 260, my0 = 291 - mh / 2;  // centred on the 30% OFF block, in the margins beside it
+      place($('mL'), X(198 - 48 - mw, t.spread), Y(my0) + drop * 0.25, mw * u, mh * u);
+      place($('mR'), X(888 + 48, t.spread), Y(my0) + drop * 0.25, mw * u, mh * u);
+    }
+
+    // the monument: globe, then the column under it, its shaft stretched down to the crawl
+    const mx = X(m.x, 1), my = Y(m.y) + drop;
+    place($('globe'), mx, my, MON.globe * k, MON.globe * k);
+    const capTop = my + MON.capY * k, capL = mx + MON.capX * k, colW = MON.colW * k;
+    place($('cap'), capL, capTop, colW, MON.capH * k);
+    const baseTop = Math.max(capTop + MON.capH * k + 4, H - MON.baseH * k); // down to the very edge, teeth and all; the crawl runs over it
+    place($('base'), capL, baseTop, colW, MON.baseH * k);
+    place($('shaft'), capL, capTop + MON.capH * k - 2, colW, baseTop - (capTop + MON.capH * k) + 4);
+    const gl = g.glow, gcx = mx + (MON.globe / 2) * k, gcy = my + (MON.globe / 2) * k;
+    place($('glow'), gcx - gl.rx * u, gcy - gl.ry * u, gl.rx * 2 * u, gl.ry * 2 * u);
+
+    const c = g.card, card = $('card');
+    Object.assign(card.style, { left: X(c.x, c.spread) + 'px', top: Y(c.y) + drop + 'px', transform: `scale(${c.s * u}) rotate(${c.r}deg)` });
+
+    if (!phone) {
+      // the strips stand on the crawl, at a slant
+      const cx = x0 + aw / 2, span = Math.hypot(W, H) * 1.4, SLANT = Math.tan((6 * Math.PI) / 180);
+      for (const st of g.strips) {
+        const el = $(st.id), h = st.h * u;
+        place(el, cx - span / 2, crawlTop + st.fromCrawl * u - h / 2, span, h);
+        Object.assign(el.style, { fontSize: (st.cap / 0.72) * u + 'px', paddingLeft: st.dx * 2 * u + 'px', transform: 'rotate(-6deg)' });
+        if (st.id === 'strip') el.style.boxShadow = `inset 0 ${4 * u}px 0 rgba(170,158,0,0.6), inset 0 ${-4 * u}px 0 rgba(170,158,0,0.6), ${11 * u}px ${11 * u}px 0 var(--hard)`;
+      }
+    }
+  }
+
+  function fitPhone() {
+    const s = Math.min(1, (innerHeight - 90) / 844, (innerWidth - 40) / 390);
+    $('view').style.transform = state.screen === 'phone' ? `translate(-50%, -50%) scale(${s})` : '';
+  }
+
+  // Show the banner only when its pieces and type are ready, after the page underneath has had
+  // its turn, then slide it in.
+  let showing = 0;
+  async function show() {
+    const ticket = ++showing;
+    frame.classList.remove('in');
+    layout();
+    const pics = [...face.querySelectorAll('img')].map((i) => i.decode().catch(() => {}));
+    const type = ['300 56px "TOE Antonio"', '600 41px "TOE Antonio"', '112px "TOE Black"', 'italic 700 50px "TOE Arimo"'].map((f) => document.fonts.load(f).catch(() => {}));
+    const settled = new Promise((r) => {
+      const f = $('site');
+      let done = false; const go = () => { if (!done) { done = true; r(); } };
+      if (f.contentDocument && f.contentDocument.readyState === 'complete') go(); else f.addEventListener('load', go, { once: true });
+      setTimeout(go, 1500); // a slow page does not keep the banner waiting for ever
+    });
+    await Promise.all([...pics, ...type, settled]);
+    await new Promise((r) => (window.requestIdleCallback ? requestIdleCallback(r, { timeout: 400 }) : setTimeout(r, 50)));
+    if (ticket !== showing) return;
+    layout();
+    void frame.offsetWidth; // start the slide from the hidden position
+    frame.classList.add('in');
+  }
+
+  function render() {
+    document.body.classList.toggle('phone', state.screen === 'phone');
+    for (const el of document.querySelectorAll('[data-screen]')) el.setAttribute('aria-pressed', String(el.dataset.screen === state.screen));
+    for (const el of document.querySelectorAll('[data-page]')) el.setAttribute('aria-pressed', String(!state.url && el.dataset.page === state.page));
+    fitPhone();
+  }
+  function loadPage() {
+    const f = $('site');
+    if (state.url) { f.removeAttribute('srcdoc'); f.src = state.url; }
+    else { f.removeAttribute('src'); f.srcdoc = PAGES[state.page]; }
+  }
+
+  $('screen-seg').addEventListener('click', (e) => { const t = e.target.closest('[data-screen]'); if (t && t.dataset.screen !== state.screen) { state.screen = t.dataset.screen; render(); loadPage(); show(); } });
+  $('page-seg').addEventListener('click', (e) => { const t = e.target.closest('[data-page]'); if (t) { state.page = t.dataset.page; state.url = ''; $('url').value = ''; render(); loadPage(); show(); } });
+  $('url-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    let u = $('url').value.trim(); if (!u) return;
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    state.url = u; render(); loadPage(); show();
+  });
+  $('replay').addEventListener('click', () => show());
+  const toggle = () => { const p = $('panel'); p.classList.toggle('hidden'); $('toggle').textContent = p.classList.contains('hidden') ? 'Show' : 'Hide'; };
+  $('toggle').addEventListener('click', toggle);
+  addEventListener('keydown', (e) => { if ((e.key === 'h' || e.key === 'H') && e.target.tagName !== 'INPUT') toggle(); });
+  addEventListener('resize', () => { fitPhone(); layout(); });
+
+  drawMotif();
+  render();
+  show();
+</script>
+'''
+
+js = lambda s: s.replace('\\', '\\\\').replace("'", "\\'").replace('\n', '\\n').replace('</', '<\\/')
+# The tape look is the extension's own: its filter (from content.js) and its styles (from banner.css).
+SRC = os.path.join(ROOT, '..', 'src')
+content_js = open(os.path.join(SRC, 'content.js'), encoding='utf-8').read()
+banner_css = open(os.path.join(SRC, 'banner.css'), encoding='utf-8').read()
+cut = lambda text, start, end: text[text.index(start):text.index(end)]
+TAPE_JS = (re.search(r'^  const GRAIN_GAIN = .*$', content_js, re.M).group(0) + '\n'
+           + cut(content_js, '  // The look of a worn tape on a tube', '  // The frame is hidden by its own style attribute'))
+TUBE_CSS = cut(banner_css, '/* the tube:', '/* the ground:')
+page = PAGE.replace('__TAPE_JS__', TAPE_JS.rstrip()).replace('__TUBE_CSS__', TUBE_CSS.rstrip())
+for k, v in {'__F_ANTONIO_LIGHT__': FONT['antonio-light'], '__F_ANTONIO_SEMIBOLD__': FONT['antonio-semibold'],
+             '__F_ARCHIVO_BLACK__': FONT['archivo-black'], '__F_ARIMO__': FONT['arimo-bold-italic'],
+             '__I_SHAFT__': IMG['shaft'], '__I_CAP__': IMG['cap'], '__I_BASE__': IMG['base'], '__I_GLOBE__': IMG['globe'],
+             '__I_TYPE_TOP__': IMG['typeTop'], '__I_TYPE_MID__': IMG['typeMid'], '__I_TYPE_PHONE__': IMG['typePhone'],
+             '__SHOP_SRCDOC__': html.escape(PAGES['shop'], quote=True),
+             '__TICKER__': html.escape(TICKER * 4), '__BRAND__': html.escape(BRAND), '__CRAWL__': html.escape(CRAWL * 12),
+             '__SHOP_JSON__': js(PAGES['shop']), '__NEWS_JSON__': js(PAGES['news'])}.items():
+    page = page.replace(k, v)
+
+# channel.html is the file to download and open; channel-artifact.html is the same page without
+# the document skeleton, which the artifact host adds itself.
+with open(os.path.join(OUT_DIR, 'channel.html'), 'w', encoding='utf-8') as f:
+    f.write('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
+            '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+            + page.replace('<div id="view">', '</head>\n<body>\n<div id="view">', 1) + '</body>\n</html>\n')
+with open(os.path.join(OUT_DIR, 'channel-artifact.html'), 'w', encoding='utf-8') as f:
+    f.write(page)
+print(os.path.join(OUT_DIR, 'channel.html'), round(os.path.getsize(os.path.join(OUT_DIR, 'channel.html')) / 1e6, 2), 'MB')

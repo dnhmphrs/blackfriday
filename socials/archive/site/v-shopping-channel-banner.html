@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>30% Off EVERYTHING</title>
+<link rel="icon" href="{{img:favicon}}">
+<!-- Variant "shopping-channel-banner": "Home Shopping Channel" (v-shopping-channel) redrawn as the
+     extension's sale banner itself. It is a picture, not a page: no links, no buttons, no credits.
+     One frame of the channel: the product (the globe on its white column) in the studio with the
+     ON AIR bug and the clock; the lower third with the offer, 30% OFF / EVERYTHING ON THE INTERNET.
+     and the red BLACK FRIDAY ONLY! strap, the presenter's caption (LIVE But wait… THERE'S LESS!)
+     riding on its top edge; the order panel (TODAY ONLY, ITEM #, The Internet (All Of It),
+     WAS 100% / NOW 70%, OPERATORS STANDING BY where there is room). Read in order:
+       1. 30% OFF / EVERYTHING ON THE INTERNET.   (the lower third)
+       2. NOW 70%                                  (the order panel)
+       3. the product
+     then the caption, the strap, the furniture. It lays itself out for the banner's two shapes:
+       a tall column (the side banner on a desktop window): the studio and the product on top, the
+         lower third across the middle, the order panel across under it; where the column is short,
+         the product and the panel side by side over the lower third. The live banner's slanted
+         yellow tape EVERY SITE 30% OFF! and the navy tape under it, above the crawl.
+       a short wide strip (the banner across the top of a phone or narrow window): the product at
+         the left; at the right the lower third, the order panel under it, or (in a long strip) the
+         lower third in the middle and the order panel down the right.
+     The live banner's ticker runs along the top, its yellow BLACK FRIDAY ONLY! crawl along the
+     bottom, at its measures, dressed as the channel's bars.
+     ?edge=left|bottom&clear=N keeps N px of the face clear along the coupon edge (the harness that
+     shows it in place passes them); ?keep keeps the tape look on however slow the machine.
+     Everything that moves runs off one clock at 25 frames a second; nothing is animated in CSS. -->
+<style>
+{{fonts}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #070f9c; }
+body { -webkit-font-smoothing: antialiased; }
+#p { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); filter: url(#tape);
+     --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; --navy: #0a0f66; user-select: none; pointer-events: none; }
+#p > * { position: absolute; display: block; max-width: none; }
+.defs { position: absolute; width: 0; height: 0; }
+.lines { position: fixed; inset: 0; pointer-events: none; z-index: 2;
+         background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.05) 1.5px, rgba(0, 0, 16, 0) 3px),
+                     radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
+
+.glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+.tiles { background-repeat: repeat; opacity: 0.08; transform: rotate(-6deg); }
+/* the studio: a beam of light from above onto the product, a floor where it stands */
+.beam { clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); background: linear-gradient(rgba(190, 225, 255, 0.34), rgba(150, 200, 255, 0.05) 85%, transparent); }
+.floor { border-radius: 50%; background: radial-gradient(closest-side, rgba(170, 215, 255, 0.55), rgba(80, 150, 255, 0.2) 60%, transparent); }
+
+/* lettering, placed by baseline and ink edge (see set()) */
+.t { white-space: nowrap; line-height: 1; }
+.head { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.05em;
+        text-shadow: 0.009em 0.009em 0 var(--shade), 0.018em 0.018em 0 var(--shade), 0.027em 0.027em 0 var(--shade),
+                     0.036em 0.036em 0 var(--shade), 0.045em 0.045em 0 var(--shade), 0.054em 0.054em 0 var(--shade); }
+.sub { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.04em;
+       background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+       filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
+
+.glint svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
+.glint path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); transform-box: fill-box; transform-origin: center; }
+
+/* ---- channel furniture ---- */
+/* the ON AIR bug, with the clock */
+.bug { display: flex !important; align-items: stretch; font: 600 1em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.08em; white-space: nowrap;
+       box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.85); }
+.bug b { display: flex; align-items: center; gap: 0.35em; background: var(--red); color: #fff; padding: 0.28em 0.5em 0.3em 0.45em; font-weight: 600; border: 0.07em solid #fff; }
+.bug b i { width: 0.55em; height: 0.55em; border-radius: 50%; background: #fff; display: block; }
+.bug b i.off { background: #7a0006; }
+.bug span { display: flex; align-items: center; background: rgba(6, 10, 80, 0.85); color: #fff; padding: 0.28em 0.55em 0.3em; font-weight: 300; border: 0.07em solid #fff; border-left: 0; }
+/* the live banner's ticker along the top, as the channel's bar; its crawl along the bottom, on the channel's navy */
+.ticker, .crawl { overflow: hidden; white-space: nowrap; }
+.ticker { font-family: "Antonio", "Arial Narrow", sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em; color: #e9f0ff;
+          background: linear-gradient(#141b86, #0a0f66 70%, #060a4a); border-bottom: solid var(--yellow); z-index: 1; }
+.ticker span { display: inline-block; }
+.crawl { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em;
+         background: linear-gradient(#0a0f66, #050843); border-top: solid #3a6bff; z-index: 1; }
+.crawl span { display: inline-block; text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 #000; }
+/* the tapes, at the live banner's slant: the yellow one, and the navy one under it (column only) */
+.strip { display: flex !important; align-items: center; justify-content: center; white-space: nowrap; font: italic 700 1em "Arimo", Arial, sans-serif; }
+.tape { background: linear-gradient(#fffb86, #f0e11c); color: #111; }
+.by { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* ---- the lower third ---- */
+.lt { background: linear-gradient(#2a46ff 0, #1630d8 9%, #0b1690 40%, #060b5c 100%); border-top: 0.5em solid var(--yellow); border-bottom: 0.25em solid #3a6bff;
+      box-shadow: 0 -0.2em 0 rgba(6, 8, 70, 0.5), inset 0 0.18em 0 rgba(255, 255, 255, 0.25), 0 0.5em 0 rgba(4, 6, 60, 0.6); }
+/* BLACK FRIDAY ONLY!: the red strap along the bottom of the lower third, the offer's last line */
+.strap { display: flex !important; align-items: center; background: linear-gradient(#ff2a2a, #e00000 60%, #a80000); border-top: 0.1em solid #000;
+         color: var(--yellow); font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden;
+         text-shadow: 0.06em 0.06em 0 #6a0004; box-shadow: inset 0 0.08em 0 rgba(255, 255, 255, 0.3); }
+.strap i { font-style: normal; color: #fff; margin: 0 0.5em; }
+/* BUT WAIT… THERE'S LESS!: the presenter's caption, flashing between two states by the clock */
+.cap { display: flex !important; align-items: center; gap: 0.45em; white-space: nowrap; padding: 0.26em 0.6em 0.3em 0.5em;
+       background: #fff; color: #0a0f66; border: 0.06em solid #000; box-shadow: 0.1em 0.1em 0 rgba(6, 8, 70, 0.85);
+       font: italic 700 1em/1 "Tinos", "Times New Roman", serif; letter-spacing: -0.01em; }
+.cap i { font: 600 0.62em/1 "Antonio", "Arial Narrow", sans-serif; font-style: normal; letter-spacing: 0.1em; background: var(--red); color: #fff; padding: 0.22em 0.4em; }
+.cap.flash { background: var(--yellow); color: #c40000; }
+.cap.flash i { background: #0a0f66; }
+
+/* ---- the order panel: laid out at its natural size, then scaled to its place ---- */
+.panel { width: 420px; transform-origin: left top; display: flex !important; flex-direction: column; background: #f3f4f6; color: #0c0c0c;
+         border: 5px solid #000; box-shadow: 10px 10px 0 rgba(4, 6, 60, 0.92); font: italic 700 20px/1 "Arimo", Arial, sans-serif; }
+.panel .ph { display: flex; justify-content: space-between; align-items: center; background: var(--red); color: #fff46a; border-bottom: 5px solid #000;
+             font: 600 30px/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.05em; padding: 9px 14px 10px; white-space: nowrap; }
+.panel .ph small { font: 300 21px/1 "Antonio", "Arial Narrow", sans-serif; color: #fff; letter-spacing: 0.08em; }
+.panel .pn { background: linear-gradient(#1b3cf0, #0816a8); color: #fff; padding: 12px 14px 14px; border-bottom: 5px solid #000; white-space: nowrap;
+             font: italic 700 36px/1.02 "Arimo", Arial, sans-serif; letter-spacing: -0.03em; text-shadow: 2px 2px 0 rgba(6, 8, 70, 0.95); }
+.panel .pn small { display: block; font: 600 17px/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.14em; color: #b9c9ff; font-style: normal; margin-bottom: 7px; text-shadow: none; }
+.panel .price { position: relative; padding: 4px 16px 6px; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+.panel .row { display: flex; align-items: baseline; gap: 12px; white-space: nowrap; }
+.panel .lb { font: 600 30px/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.06em; color: #333; font-style: normal; width: 74px; flex: none; }
+.panel .was { font: italic 700 46px/1 "Arimo", Arial, sans-serif; margin-top: 10px; }
+.panel s { position: relative; text-decoration: none; color: #6b6f78; }
+.panel s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 7px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+.panel .now { margin-top: 14px; }
+.panel .big { display: inline-block; font: 400 90px/0.98 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em;
+              -webkit-text-stroke: 9px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 30% 80%; }
+.panel .sb { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 9px 0 11px; font: 600 17px/1 "Antonio", "Arial Narrow", sans-serif;
+             letter-spacing: 0.16em; color: #333; font-style: normal; white-space: nowrap; border-top: 3px solid #d4d7de; }
+.panel .sb i { width: 9px; height: 9px; border-radius: 50%; background: #1bb01b; display: block; }
+.panel .sb i.off { background: #bcd8bc; }
+/* flush: across a column edge to edge, like the channel's side panel */
+.panel.flush { border-left: 0; border-right: 0; box-shadow: 0 10px 0 rgba(4, 6, 60, 0.92); }
+.panel.flush .price { align-items: center; }
+.panel.flush .price .row { width: 330px; }
+/* compact: tighter */
+.panel.compact .pn { font-size: 30px; padding: 9px 14px 10px; }
+.panel.compact .pn small { display: none; }
+.panel.compact .price { padding: 2px 16px 4px; }
+.panel.compact .was { margin-top: 6px; font-size: 40px; }
+.panel.compact .now { margin-top: 10px; }
+.panel.compact .big { font-size: 76px; -webkit-text-stroke: 7px #000; }
+.panel.flush.compact .big { font-size: 68px; -webkit-text-stroke: 6.5px #000; }
+/* side: WAS and NOW side by side */
+.panel.side { width: max-content; }
+.panel.side .price { flex-direction: row; align-items: baseline; justify-content: center; gap: 26px; padding: 12px 30px 14px 18px; }
+.panel.side .price .row { width: auto; margin-top: 0; }
+.panel.side .lb { width: auto; }
+.panel.side .was { font-size: 38px; }
+.panel.side .big { font-size: 66px; -webkit-text-stroke: 6.5px #000; }
+/* row: a short wide panel, the header and the item side by side over the price (the strip) */
+.panel.rowp { width: max-content; }
+.panel.rowp .hdr { display: flex; border-bottom: 5px solid #000; }
+.panel.rowp .hdr .ph { border-bottom: 0; border-right: 5px solid #000; flex-direction: column; justify-content: center; align-items: flex-start; gap: 6px; font-size: 34px; padding: 9px 16px 10px; }
+.panel.rowp .hdr .pn { border-bottom: 0; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; font-size: 32px; padding: 9px 16px 10px; }
+</style>
+</head>
+<body>
+<main id="p" role="img" aria-label="30% off everything on the internet. Black Friday only!"></main>
+<div class="lines" aria-hidden="true"></div>
+<script>
+(async () => {
+  const query = new URLSearchParams(location.search);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IMG = { globe: still ? '{{img:globe_still}}' : '{{img:globe_anim}}', cap: '{{img:cap}}', shaft: '{{img:shaft}}', base: '{{img:base}}', tile: '{{img:tile}}' };
+  // the live banner's wording: the ticker along the top, the crawl along the bottom, the tapes
+  const TICKER = 'But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
+  const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
+  const BRAND = 'Brought to you by Gary Mustard Enterprises';
+  const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
+  const TAN9 = Math.tan((9 * Math.PI) / 180), SLANT = -6, TAN6 = Math.tan((6 * Math.PI) / 180);
+  const FPS = 25; // the clock everything moves by: a PAL picture's rate
+  // the coupon edge: which side faces the page, and how many px along it to keep clear of the teeth
+  const EDGE = query.get('edge') || '', CLEAR = EDGE ? Number(query.get('clear') || 17) : 0;
+
+  // ---- the tape look: the live banner's filter (src/content.js), distances set in build(), the noise moved on by the clock ----
+  const LUMA = '0.299 0.587 0.114 0 0';
+  const tint = (i, q) => `${i * 0.22} ${q * 0.2} 0 0 ${0.5 - 0.5 * (i * 0.22 + q * 0.2)}`;
+  const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
+  const GRAIN = `${'0.7 0 0 0 -0.399  '.repeat(3)} 0 0 0 0 1`;
+  const add = (extra = '') => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`;
+  document.body.insertAdjacentHTML('beforeend', `
+    <svg class="defs" aria-hidden="true"><filter id="tape" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feFlood flood-color="#0a22d6"/><feMerge result="picture"><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      <feGaussianBlur class="soft" in="picture"/><feColorMatrix type="matrix" values="${LUMA} ${LUMA} ${LUMA} 0 0 0 1 0" result="luma"/>
+      <feGaussianBlur class="halo"/><feComposite in="luma" operator="arithmetic" k2="1.42" k3="-0.42" result="sharp"/>
+      <feGaussianBlur class="smear" in="picture"/><feOffset class="late"/>
+      <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
+      <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
+      <feTurbulence class="blotch" type="fractalNoise" numOctaves="1" seed="3"/>
+      <feColorMatrix type="matrix" values="${MOTTLE}"/><feComposite in2="clean" ${add('result="mottled"')}/>
+      <feTurbulence class="static" type="fractalNoise" numOctaves="2" seed="2"/>
+      <feColorMatrix type="matrix" values="${GRAIN}"/><feComposite in2="mottled" operator="arithmetic" k2="1" k3="1" result="taped"/>
+      <feComponentTransfer><feFuncR type="linear" intercept="-0.55"/><feFuncG type="linear" intercept="-0.55"/><feFuncB type="linear" intercept="-0.55"/></feComponentTransfer>
+      <feGaussianBlur class="bloom"/><feComposite in2="taped" operator="arithmetic" k2="0.149" k3="0.93" k4="0.037"/>
+    </filter></svg>`);
+  const $ = (sel) => document.querySelector(sel);
+  // the noise: the colour blotches change 6 times a second, the static 12 (every fourth and every other frame)
+  const BLOTCH = [3, 11, 7, 19, 5, 13], STATIC = [2, 17, 9, 23, 4, 29];
+
+  await Promise.all(['100px "Archivo Black"', 'italic 700 100px "Arimo"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Tinos"'].map((f) => document.fonts.load(f)));
+  const p = document.getElementById('p');
+  const put = (html) => { p.insertAdjacentHTML('beforeend', html); return p.lastElementChild; };
+  const place = (el, x, y, w, h) => { Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); return el; };
+  const at = (el, x, y) => { Object.assign(el.style, { left: x + 'px', top: y + 'px' }); return el; };
+
+  // Lettering is measured, not guessed: the ink's edges and the cap height of a string, per 1px of type.
+  const mc = document.createElement('canvas').getContext('2d');
+  function ink(text, font, ls) {
+    mc.font = font.replace('SIZE', '200px'); mc.letterSpacing = ls * 200 + 'px';
+    const m = mc.measureText(text), k = 1 / 200;
+    return { l: -m.actualBoundingBoxLeft * k, r: m.actualBoundingBoxRight * k - ls, cap: mc.measureText('H').actualBoundingBoxAscent * k,
+             asc: m.fontBoundingBoxAscent * k, desc: m.fontBoundingBoxDescent * k };
+  }
+  // Set a line of type with its ink's left edge at x and its baseline at y. skew: the headline's slant.
+  function set(cls, text, font, ls, size, x, y, skew) {
+    const i = ink(text, font, ls), el = put(`<div class="t ${cls}">${text}</div>`);
+    const base = (1 - (i.asc + i.desc)) / 2 + i.asc;
+    Object.assign(el.style, { fontSize: size + 'px', left: x - i.l * size + 'px', top: y - base * size + 'px' });
+    if (skew) Object.assign(el.style, { transformOrigin: `0 ${base * size}px`, transform: 'skewX(-9deg)' });
+    return el;
+  }
+  const HEAD = 'SIZE "Archivo Black"', SUB = 'italic 700 SIZE "Arimo"';
+  const width = (text, font, ls) => { const i = ink(text, font, ls); return i.r - i.l; };
+  const headW = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9; // per 1px of type, slant included
+  const subW = (t) => width(t, SUB, -0.04);
+  const HCAP = ink('H', HEAD, -0.05).cap, SCAP = ink('H', SUB, -0.04).cap;
+  const across = (text, font, size, ls) => { mc.font = `${font} ${size}px ${font.includes('700') ? '"Arimo"' : font.includes('600') || font.includes('300') ? '"Antonio"' : '"Archivo Black"'}`; mc.letterSpacing = ls * size + 'px'; return mc.measureText(text).width; };
+
+  // ---- what moves, and how, at time t (seconds) ----
+  let movers = [];
+  const ease = (q) => q * q * (3 - 2 * q);
+  const lerp = (a, b, q) => a + (b - a) * q;
+  const twinkle = (path, delay) => movers.push((t) => {
+    const ph = ((t + delay) / 2.4) % 1, q = ease(ph < 0.5 ? ph * 2 : 2 - ph * 2); // there and back, easing each way
+    path.style.transform = `scale(${lerp(0.55, 1, q)}) rotate(${lerp(-10, 12, q)}deg)`; path.style.opacity = lerp(0.75, 1, q);
+  });
+  const JOLT = [[0, 1, 0], [0.12, 1.18, -5], [0.26, 0.96, 3], [0.4, 1.08, -2], [0.55, 1, 0], [1, 1, 0]]; // when, scale, turn
+  const jolt = (el, period) => movers.push((t) => {
+    const ph = (t / period) % 1, i = JOLT.findIndex(([w], n) => ph < JOLT[n + 1]?.[0]), [w0, s0, r0] = JOLT[i], [w1, s1, r1] = JOLT[i + 1];
+    const q = ease((ph - w0) / (w1 - w0));
+    el.style.transform = `skewX(-8deg) scale(${lerp(s0, s1, q)}) rotate(${lerp(r0, r1, q)}deg)`;
+  });
+  // on and off by the clock: a class that comes and goes, n times a second
+  const blink = (el, cls, rate, duty = 0.5, offset = 0) => movers.push((t) => el.classList.toggle(cls, ((t * rate + offset) % 1) < duty));
+
+  const glint = (cls, cx, cy, r) => {
+    const el = place(put(`<div class="glint ${cls}" aria-hidden="true"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
+    twinkle(el.querySelector('path'), cls === 'b' ? 1.2 : 0);
+    return el;
+  };
+  // The globe: its 60 frames drawn onto a canvas by the clock (decoded once from the moving picture),
+  // so it changes in step with everything else; until they are ready, a picture.
+  let globeFrames = null;
+  const globe = (cx, cy, d) => {
+    const k = d / 374, box = 480 * k, x = cx - 240 * k, y = cy - (47 + 187) * k;
+    if (globeFrames) {
+      const c = put('<canvas class="globe" aria-hidden="true"></canvas>'), dpr = Math.min(2, devicePixelRatio || 1);
+      c.width = Math.round(box * dpr); c.height = Math.round(box * dpr); place(c, x, y, box, box);
+      const g = c.getContext('2d'); let shown = -1;
+      movers.push((t) => { const i = Math.floor(t * 15) % 60; if (i !== shown) { shown = i; g.clearRect(0, 0, c.width, c.height); g.drawImage(globeFrames[i], 0, 0, c.width, c.height); } });
+    } else place(put(`<img class="globe" alt="" src="${IMG.globe}">`), x, y, box, box);
+  };
+  const glow = (cx, cy, d) => place(put('<div class="glow" aria-hidden="true"></div>'), cx - d * 1.3, cy - d * 1.45, d * 2.6, d * 2.9);
+
+  // The product's height over its floor, per 1px of the globe's diameter: from the globe's top
+  // to the foot of the column's cap (the base may stand behind what is in front of it).
+  const PRODUCT = 0.5 + (176 + 136) / 374 + 0.06;
+  // The studio: a beam of light onto the product, the globe (diameter d, its centre at cx, cy) on its
+  // white column standing down to `floor`, from the top of the studio at `top`.
+  function studio(cx, cy, d, floor, top) {
+    const k = d / 374, gx = cx - 240 * k, gy = cy - 234 * k;
+    place(put('<div class="beam" aria-hidden="true"></div>'), cx - d * 1.1, top, d * 2.2, floor - top);
+    glow(cx, cy, d * 1.25);
+    const colX = gx + 40 * k, colW = 400 * k, capTop = gy + 410 * k, baseTop = Math.max(capTop + 136 * k + 4, floor - 144 * k);
+    place(put('<div class="floor" aria-hidden="true"></div>'), cx - d * 1.1, floor - d * 0.16, d * 2.2, d * 0.32);
+    place(put(`<img alt="" src="${IMG.shaft}">`), colX, capTop + 136 * k - 2, colW, baseTop - capTop - 136 * k + 4);
+    place(put(`<img alt="" src="${IMG.cap}">`), colX, capTop, colW, 136 * k);
+    place(put(`<img alt="" src="${IMG.base}">`), colX, baseTop, colW, 144 * k);
+    globe(cx, cy, d);
+    const r = d / 2;
+    glint('', cx - r * 0.78, cy - r * 0.74, d * 0.085);
+    glint('b', cx + r * 0.98, cy + r * 0.5, d * 0.05);
+  }
+  // the ON AIR bug with the clock; returns its element (not yet placed)
+  const clocks = [];
+  function bug(f) {
+    const el = put('<div class="bug" aria-hidden="true"><b><i></i>ON AIR</b><span class="clock">0:00 PM</span></div>');
+    el.style.fontSize = f + 'px';
+    blink(el.querySelector('b i'), 'off', 1, 0.45);
+    clocks.push(el.querySelector('.clock'));
+    return el;
+  }
+
+  // ---- the order panel ----
+  // kinds: 'col' (420 across: header, the item, WAS over NOW, operators), with any of flush, compact, side, nosb;
+  //        'row' (a short wide one: TODAY ONLY and the item side by side over WAS and NOW side by side).
+  function panelHTML(kind, opts) {
+    const sb = opts.includes('nosb') ? '' : '<div class="sb"><i></i><i></i><i></i>OPERATORS STANDING BY<i></i><i></i><i></i></div>';
+    const price = '<div class="price"><div class="row was"><span class="lb">WAS:</span><s>100%</s></div><div class="row now"><span class="lb">NOW:</span><b class="big">70%</b></div></div>';
+    if (kind === 'row') return `<div class="panel rowp side compact ${opts.join(' ')}" aria-hidden="true">
+      <div class="hdr"><div class="ph"><span>TODAY ONLY</span><small>ITEM # 030-070</small></div><div class="pn">The Internet (All Of It)</div></div>${price}${sb}</div>`;
+    return `<div class="panel ${opts.join(' ')}" aria-hidden="true">
+      <div class="ph"><span>TODAY ONLY</span><small>ITEM # 030-070</small></div>
+      <div class="pn"><small>NOW SHOWING</small>The Internet (All Of It)</div>${price}${sb}</div>`;
+  }
+  // its natural size (unscaled), measured
+  function measure(kind, opts) {
+    const el = put(panelHTML(kind, opts)); el.style.left = '-9999px';
+    const r = { w: el.offsetWidth, h: el.offsetHeight }; el.remove(); return r;
+  }
+  // put it in, scale k, at x, y; height (unscaled) h if given
+  function panel(kind, opts, x, y, k, h, w) {
+    const el = put(panelHTML(kind, opts));
+    Object.assign(el.style, { left: x + 'px', top: y + 'px', transform: `scale(${k})` });
+    if (h) el.style.height = h + 'px';
+    if (w) el.style.width = w + 'px';
+    jolt(el.querySelector('.big'), 1.1);
+    el.querySelectorAll('.sb i').forEach((d, n) => blink(d, 'off', 1.25, 0.5, (n % 3) / 3));
+    return el;
+  }
+
+  // The lower third, x0 to x1, at most maxH high: the offer, read in order. 30% OFF, then
+  // EVERYTHING ON THE INTERNET. under it, then the red strap BLACK FRIDAY ONLY! along its foot.
+  // The presenter's caption (LIVE But wait… THERE'S LESS!) rides on its top edge: the second voice.
+  // wide: the two lines left-aligned and the same width; else centred, each across. Returns its
+  // height h, the caption's rise above it, and a draw(y).
+  function lower(x0, x1, wide, maxH, scale = 1) {
+    const padX = Math.max(10, (x1 - x0) * (wide ? 0.06 : 0.055)), w = x1 - x0 - 2 * padX;
+    const SUBT = 'EVERYTHING ON THE INTERNET.';
+    let hs = (w * (wide ? 0.97 : 0.98) * scale) / headW('30% OFF');
+    let l = wide ? (headW('30% OFF') * hs) / subW(SUBT) : (w * 0.99 * scale) / subW(SUBT);
+    let gap = HCAP * hs * 0.2, padT = HCAP * hs * 0.36, padB = HCAP * hs * 0.32, st = HCAP * hs * (wide ? 0.5 : 0.5);
+    let h = padT + HCAP * hs + gap + SCAP * l + padB + st;
+    const k = Math.min(1, maxH / h); hs *= k; l *= k; gap *= k; padT *= k; padB *= k; st *= k; h *= k;
+    const hw = headW('30% OFF') * hs, sw = subW(SUBT) * l;
+    // the caption: as large as sits on the bar's top edge
+    const CAPW = across('LIVE', '600', 0.62, 0.1) + 1.25 + across('But wait… THERE’S LESS!', 'italic 700', 1, -0.01) * 1.02 + 0.45 + 0.17;
+    const cf = Math.max(9, Math.min(HCAP * hs * 0.46, ((x1 - x0) - padX * 1.4) / CAPW));
+    const o = { h, rise: cf * 1.6 * 0.8 };
+    o.draw = (y) => {
+      const bar = put('<div class="lt" aria-hidden="true"></div>');
+      place(bar, x0, y, x1 - x0, h - st); bar.style.fontSize = Math.max(5, HCAP * hs * 0.08) + 'px';
+      const X = wide ? x0 + padX : x0 + padX + (w - Math.max(hw, sw)) / 2;
+      const body = h - st, text = HCAP * hs + gap + SCAP * l;
+      let base = y + (body - text) * (padT / (padT + padB)) + HCAP * hs;
+      set('head', '30% OFF', HEAD, -0.05, hs, wide ? X : x0 + padX + (w - hw) / 2, base, true);
+      base += gap + SCAP * l;
+      set('sub', SUBT, SUB, -0.04, l, wide ? X : x0 + padX + (w - sw) / 2, base, false);
+      // BLACK FRIDAY ONLY!: the red strap, as many whole repeats as fit across (wide), one centred
+      const sf = st * 0.6, one = across('BLACK FRIDAY ONLY!', '400', sf, -0.01), step = one + sf * 1.6;
+      const reps = wide ? Math.max(1, Math.floor((x1 - X - padX * 0.5 + sf * 1.6) / step)) : 1;
+      const sp = put(`<div class="strap" aria-hidden="true"><span>BLACK FRIDAY ONLY!</span>${'<i>✦</i><span>BLACK FRIDAY ONLY!</span>'.repeat(reps - 1)}</div>`);
+      place(sp, x0, y + h - st, x1 - x0, st); Object.assign(sp.style, { fontSize: sf + 'px', paddingLeft: X - x0 + 'px' });
+      if (!wide || reps === 1) { sp.style.paddingLeft = '0'; sp.style.justifyContent = 'center'; }
+      // the caption, on the top edge at the left, flashing
+      const cp = put('<div class="cap" aria-hidden="true"><i>LIVE</i><span>But wait… THERE’S LESS!</span></div>'); cp.style.fontSize = cf + 'px';
+      at(cp, x0 + padX * (wide ? 0.6 : 0.5), y - cp.offsetHeight * 0.8);
+      blink(cp, 'flash', 1.6);
+      return cp;
+    };
+    return o;
+  }
+
+  // the bands: the ticker along the top of (x, w) at y0, the crawl with its foot at y1
+  function bands(x, w, y0, tick, tickFont, crawlH, crawlFont, y1) {
+    const tk = put(`<div class="ticker" aria-hidden="true"><span>${TICKER.repeat(6)}</span></div>`);
+    const rule = Math.max(1.5, tick * 0.05);
+    Object.assign(tk.style, { left: x + 'px', top: y0 + 'px', width: w + 'px', height: tick + 'px', fontSize: tickFont + 'px', lineHeight: tick - rule + 'px', borderBottomWidth: rule + 'px' });
+    const cr = put(`<div class="crawl" aria-hidden="true"><span>${CRAWL.repeat(16)}</span></div>`);
+    const line = Math.max(1, crawlH * 0.03);
+    Object.assign(cr.style, { left: x + 'px', width: w + 'px', top: y1 - crawlH + 'px', height: crawlH + 'px', fontSize: crawlFont + 'px', lineHeight: crawlH - line + 'px', borderTopWidth: line + 'px' });
+    const tks = tk.firstElementChild, crs = cr.firstElementChild, tkRep = tks.offsetWidth / 6, crRep = crs.offsetWidth / 16;
+    const tkV = tick * 1.5, crV = crawlH * 2.6;
+    movers.push((t) => {
+      tks.style.transform = `translateX(${-(((t + 3) * tkV) % tkRep)}px)`;
+      crs.style.transform = `translateX(${-(((t + 3) * crV) % crRep)}px) skewX(-9deg)`;
+    });
+  }
+  function look(s) {
+    $('.soft').setAttribute('stdDeviation', `${1.25 * s} ${0.5 * s}`);
+    $('.halo').setAttribute('stdDeviation', `${5 * s} ${0.6 * s}`);
+    $('.smear').setAttribute('stdDeviation', `${10 * s} ${1.6 * s}`);
+    $('.late').setAttribute('dx', 7 * s); $('.late').setAttribute('dy', 1.7 * s);
+    $('.bloom').setAttribute('stdDeviation', 14 * s);
+    // the noise at the live banner's grain: in px, not scaled with the art
+    $('.blotch').setAttribute('baseFrequency', '0.042 0.167');
+    $('.static').setAttribute('baseFrequency', '0.19 0.71');
+  }
+
+  // ---- one layout pass, for the box as it is ----
+  function build() {
+    p.textContent = ''; movers = []; clocks.length = 0;
+    const W = p.clientWidth, H = p.clientHeight;
+    if (!W || !H) return;
+    // the face: all of the box but the strip kept clear along the coupon edge
+    const X0 = EDGE === 'left' ? CLEAR : 0, X1 = EDGE === 'right' ? W - CLEAR : W;
+    const Y0 = EDGE === 'top' ? CLEAR : 0, Y1 = EDGE === 'bottom' ? H - CLEAR : H;
+    const FW = X1 - X0, FH = Y1 - Y0;
+    const column = FW / FH < 1;
+    const tiles = put('<div class="tiles" aria-hidden="true"></div>');
+    place(tiles, -W * 0.3, -H * 0.3, W * 1.6, H * 1.6);
+
+    if (column) {
+      // ---- the column: the live banner's measures (1080 banner px across) ----
+      const u = Math.min(FW / 1080, FH / 1900);
+      look(u * 1.1);
+      Object.assign(tiles.style, { backgroundImage: `url(${IMG.tile})`, backgroundSize: `${260 * u * 1.4}px ${224 * u * 1.4}px` });
+      const tick = 84 * u, crawlH = 150 * u, crawlTop = Y1 - crawlH;
+      const tapeH = 126 * u, byH = 68 * u, tapeC = crawlTop - 232 * u, byC = crawlTop - 130 * u;
+      const m = Math.max(8, 34 * u);
+      const cx = X0 + FW / 2;
+      const top = Y0 + tick, bottom = tapeC - tapeH / 2 - (FW / 2) * TAN6 - m * 0.9; // the panel's foot clears the tape's high end
+      const bugF = Math.max(10, 34 * u), bugH = bugF * 1.72, bugW = bugF * 6.6;
+      const Z = bottom - top;
+      // Stacked (studio, lower third, panel): the first that leaves the product a fair size, the lower
+      // third as large as goes, then the richest panel. Otherwise the studio and the panel side by side.
+      const VARIANTS = [['flush'], ['flush', 'compact'], ['flush', 'compact', 'nosb'], ['flush', 'compact', 'side', 'nosb']];
+      const dMin = FW * 0.4;
+      let plan = null;
+      const nats = VARIANTS.map((v) => measure('col', v));
+      search: for (const sc of [1, 0.92, 0.85]) {
+        const lt = lower(X0, X1, false, Infinity, sc);
+        for (const pf of [1, 0.9, 0.8, 0.72]) {           // the panel across the column, or a little smaller (still flush)
+          for (const [n, v] of VARIANTS.entries()) {
+            const nat = nats[n], pk = (FW / nat.w) * pf, ph = nat.h * pk;
+            const room = Z - m * 0.6 - lt.rise - m * 0.3 - lt.h - m * 1.1 - ph;   // the studio, over the lower third
+            const d = Math.min(room / PRODUCT, FW * 0.6);
+            if (d >= dMin) { plan = { lt, v, pk, ph, d, room }; break search; }
+          }
+        }
+      }
+      if (plan) {
+        const { lt, v, pk, ph, d, room } = plan;
+        // what is spare goes to the gaps: a little over the panel, the rest round the product
+        const spare = Math.max(0, room - d * PRODUCT);
+        const panY = bottom - ph, ltY = panY - m * 1.1 - spare * 0.25 - lt.h;
+        const floor = ltY + Math.min(d * 0.1, 30 * u);
+        const studioTop = top;
+        let cy = ltY - lt.rise - m * 0.3 - spare * 0.35 - (PRODUCT - 0.5) * d;
+        studio(cx, cy, d, floor, studioTop);
+        const b = bug(bugF); at(b, X0 + m * 0.8, top + m * 0.7);
+        lt.draw(ltY);
+        panel('col', v, X0, panY, pk, 0, FW / pk);
+      } else {
+        // short: the product at the left and the panel at the right over the lower third
+        const lt = lower(X0, X1, false, Z * 0.36);
+        const ltY = bottom - lt.h, studioBot = ltY - lt.rise - m * 0.5;
+        // the panel as large as goes in the right of the studio: WAS over NOW, or side by side
+        const pw = FW * 0.6;
+        let v, nat, pk = 0;
+        for (const c of [['compact'], ['compact', 'nosb'], ['compact', 'side', 'nosb']]) {
+          const n = measure('col', c), k = Math.min((pw - m * 0.6) / n.w, (studioBot - top - m * 1.6) / n.h);
+          if (k > pk * 1.04) { v = c; nat = n; pk = k; }
+        }
+        const px = X1 - m * 0.6 - nat.w * pk, py = top + m + (studioBot - top - m * 1.6 - nat.h * pk) / 2;
+        const sw = px - X0 - m * 0.4, d = Math.min(sw * 0.86, (ltY - top - bugH - m) / PRODUCT);
+        const pcx = X0 + sw / 2, cy = ltY + Math.min(d * 0.1, 30 * u) - (PRODUCT - 0.5) * d - Math.min(d * 0.1, 30 * u);
+        studio(pcx, cy, d, ltY + Math.min(d * 0.1, 30 * u), top);
+        const b = bug(bugF); at(b, X0 + m * 0.8, top + m * 0.7);
+        lt.draw(ltY);
+        panel('col', v, px, py, pk);
+      }
+
+      // the yellow tape and the navy one under it, the live banner's slant and wording
+      const length = Math.hypot(W, H) * 1.4;
+      const by = put(`<div class="strip by" aria-hidden="true"><span>${BRAND}</span></div>`);
+      let byFont = (25 / 0.72) * u;
+      const byNeed = across(BRAND.toUpperCase(), 'italic 700', byFont, 0.08);
+      if (byNeed > (FW - m) / Math.cos(0.105)) byFont *= (FW - m) / byNeed;
+      place(by, cx - length / 2, byC - byH / 2, length, byH);
+      Object.assign(by.style, { fontSize: byFont + 'px', transform: `rotate(${SLANT}deg)` });
+      const tape = put('<div class="strip tape" aria-hidden="true"><span>EVERY SITE 30% OFF!</span></div>');
+      place(tape, cx - length / 2, tapeC - tapeH / 2, length, tapeH);
+      Object.assign(tape.style, { fontSize: (54 / 0.72) * u + 'px', paddingLeft: 24 * u + 'px', transform: `rotate(${SLANT}deg)`,
+        boxShadow: `inset 0 ${4 * u}px 0 rgba(170, 158, 0, 0.6), inset 0 ${-4 * u}px 0 rgba(170, 158, 0, 0.6), ${11 * u}px ${11 * u}px 0 rgba(6, 8, 70, 0.9)` });
+      bands(X0, FW, Y0, tick, 56 * u, crawlH, 112 * u, Y1);
+    } else {
+      // ---- the strip: the live banner's measures (1170 banner px across) ----
+      const u = Math.min(FW / 1170, FH / 720);
+      look(u * 1.1);
+      Object.assign(tiles.style, { backgroundImage: `url(${IMG.tile})`, backgroundSize: `${260 * u * 1.4}px ${224 * u * 1.4}px` });
+      const tick = 70 * u, crawlH = 90 * u;
+      const top = Y0 + tick, bot = Y1 - crawlH, mid = bot - top;
+      const m = Math.max(6, 30 * u);
+      const bugF = Math.max(9, 30 * u), bugH = bugF * 1.72;
+      const long = FW / mid > 2.5;
+      // the product's column at the left: the globe as large as stands under the bug
+      const d = Math.min((mid - bugH - m * 1.2) / (PRODUCT + 0.04), FW * (long ? 0.19 : 0.27));
+      const sw = d * 1.22 + m;                                   // the studio's width
+      // its base stands behind the crawl, its foot above the crawl's foot
+      const pcx = X0 + m * 0.3 + sw / 2, floor = bot + crawlH * 0.7;
+      const cy = floor - (144 + 4 + 176 + 136) / 374 * d;
+      studio(pcx, cy, d, floor, top);
+      const b = bug(bugF); at(b, X0 + m * 0.6, top + m * 0.5);
+      const L = X0 + sw + m * 0.5;                               // the lower third from here
+      if (long) {
+        // the lower third in the middle, the panel down the right
+        const v0 = ['compact', 'nosb'], v1 = ['compact'];
+        const pw = FW * 0.26;
+        let v = v1, nat = measure('col', v), pk = Math.min(pw / nat.w, (mid - m * 1.4) / nat.h);
+        if (pk < (pw / nat.w) * 0.85) { v = v0; nat = measure('col', v); pk = Math.min(pw / nat.w, (mid - m * 1.4) / nat.h); }
+        const px = X1 - m * 0.7 - nat.w * pk, py = top + (mid - nat.h * pk) / 2 - m * 0.1;
+        const lt = lower(L, px - m * 0.9, true, mid - m * 1.6);
+        const ltY = top + (mid - lt.h - lt.rise) / 2 + lt.rise + m * 0.1;
+        lt.draw(ltY);
+        panel('col', v, px, py, pk);
+      } else {
+        // the lower third over the panel, at the right
+        const rw = X1 - L, nat = measure('row', ['nosb']);
+        const pk = Math.min((rw - m * 1.2) / nat.w, (mid * 0.38) / nat.h), ph = nat.h * pk;
+        const lt = lower(L, X1, true, mid - ph - m * 1.4);
+        const used = lt.rise + lt.h + m * 0.7 + ph, sp = Math.max(0, mid - used);
+        const ltY = top + sp * 0.4 + lt.rise;
+        lt.draw(ltY);
+        panel('row', ['nosb'], L + (rw - nat.w * pk) / 2, ltY + lt.h + m * 0.7 + sp * 0.2, pk);
+      }
+      bands(X0, FW, Y0, tick, 46 * u, crawlH, 66 * u, Y1);
+    }
+
+    // the clock: the time of day
+    let shownTime = '';
+    movers.push(() => {
+      const now = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      if (now !== shownTime) { shownTime = now; for (const c of clocks) c.textContent = now; }
+    });
+    render(clock());
+  }
+
+  // ---- the clock ----
+  const t0 = performance.now(), clock = () => (still ? 0 : Math.floor(((performance.now() - t0) / 1000) * FPS) / FPS);
+  const blotch = $('.blotch'), grain = $('.static');
+  function render(t) {
+    for (const move of movers) move(t);
+    const f = Math.round(t * FPS); blotch.setAttribute('seed', BLOTCH[Math.floor(f / 4) % 6]); grain.setAttribute('seed', STATIC[Math.floor(f / 2) % 6]);
+  }
+
+  build();
+  let pending = 0;
+  addEventListener('resize', () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(build); });
+  if (!still) {
+    let last = -1;
+    const frame = () => { const t = clock(); if (t !== last) { last = t; render(t); } requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+    // the globe's frames, decoded once (on the side), then drawn by the clock in step with everything else
+    if ('ImageDecoder' in window) (async () => {
+      try {
+        const dec = new ImageDecoder({ data: await (await fetch(IMG.globe)).arrayBuffer(), type: 'image/webp' });
+        await dec.tracks.ready;
+        const n = dec.tracks.selectedTrack.frameCount, frames = [];
+        for (let i = 0; i < n; i++) { const { image } = await dec.decode({ frameIndex: i }); frames.push(await createImageBitmap(image)); image.close(); }
+        dec.close();
+        if (n === 60) { globeFrames = frames; build(); }
+      } catch {}
+    })();
+  }
+
+  // the slow-machine fallback: if the look makes drawing slow, take it off (and put it back if that did not help)
+  const frameRate = () => new Promise((resolve) => {
+    let frames = 0, drawing = 0, last = 0;
+    const tick = (now) => { const gap = now - last; if (last && gap < 1000) { frames++; drawing += gap; } last = now; if (drawing < 2000) requestAnimationFrame(tick); else resolve((frames * 1000) / drawing); };
+    requestAnimationFrame(tick);
+  });
+  if (!still && !query.has('keep')) {
+    await new Promise((r) => setTimeout(r, 1200));
+    const withLook = await frameRate();
+    if (withLook < 24) {
+      p.style.filter = 'none';
+      if ((await frameRate()) < withLook * 1.5) p.style.removeProperty('filter');
+    }
+  }
+})();
+</script>
+</body>
+</html>

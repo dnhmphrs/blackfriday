@@ -1,4 +1,8 @@
 node_modules/
-test/shots/
-test/run.log
-black-friday.zip
+out/
+dist/
+frames/
+**/test/shots/
+__pycache__/
+*.zip
+*.log

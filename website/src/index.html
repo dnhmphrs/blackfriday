@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en" class="loading">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>30% Off EVERYTHING</title>
+<meta name="description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
+<meta name="theme-color" content="#0a1cc4">
+<meta name="color-scheme" content="only light">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="30% Off EVERYTHING">
+<meta property="og:title" content="30% Off EVERYTHING">
+<meta property="og:description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
+<meta property="og:url" content="%SITE%">
+<meta property="og:image" content="%SITE%og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BLACK FRIDAY ONLY! 30% OFF EVERYTHING ON THE INTERNET.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="30% Off EVERYTHING">
+<meta name="twitter:description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
+<meta name="twitter:image" content="%SITE%og.png">
+<link rel="preload" href="fonts/archivo-black.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="images/globe-still.webp" as="image">
+<style>/*STYLE*/</style>
+<noscript><style>.loading .fit { visibility: visible; }</style></noscript>
+</head>
+<body>
+<!-- The page is one screen. #p holds the picture (the WebGL background and the page itself) and carries
+     the tape filter; #fx is the WebGL noise, scanline and vignette layer over everything. -->
+<div id="tv">
+  <div id="p">
+    <canvas id="bg" aria-hidden="true"></canvas>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="onair"><i></i>ON AIR</div>
+      <div class="run"><span>But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ </span></div>
+    </div>
+
+    <div class="band">
+      <div class="bulbs top" aria-hidden="true"></div>
+      <div class="bulbs bot" aria-hidden="true"></div>
+      <div class="fit"><p class="head bf"><span>BLACK FRIDAY</span> <span>ONLY!</span></p></div>
+    </div>
+
+    <main class="mid">
+      <div class="globe-box" aria-hidden="true">
+        <div class="glow"></div>
+        <img class="globe" src="images/globe-still.webp" alt="" width="340" height="340" decoding="async" draggable="false">
+        <svg class="glint g1" viewBox="-1 -1 2 2"><path d="M0,-1C.06,-.22 .22,-.06 1,0C.22,.06 .06,.22 0,1C-.06,.22 -.22,.06 -1,0C-.22,-.06 -.06,-.22 0,-1Z"/></svg>
+        <svg class="glint g2" viewBox="-1 -1 2 2"><path d="M0,-1C.06,-.22 .22,-.06 1,0C.22,.06 .06,.22 0,1C-.06,.22 -.22,.06 -1,0C-.22,-.06 -.06,-.22 0,-1Z"/></svg>
+        <svg class="glint g3" viewBox="-1 -1 2 2"><path d="M0,-1C.06,-.22 .22,-.06 1,0C.22,.06 .06,.22 0,1C-.06,.22 -.22,.06 -1,0C-.22,-.06 -.06,-.22 0,-1Z"/></svg>
+      </div>
+      <div class="right">
+        <div class="clock-box">
+          <div class="fit clock" role="timer" aria-live="off" aria-label="Black Friday starts in">
+            <div class="ch"><span class="dot"></span><span class="lbl">STARTS IN</span><span class="dot"></span></div>
+            <div class="row"></div>
+            <div class="burst" aria-hidden="true">
+              <svg viewBox="-1.1 -1.1 2.2 2.2"><polygon class="sh"/><polygon class="st"/><circle r=".66"/></svg>
+              <span class="b1">ACT<br>NOW!</span><span class="b2">TODAY<br>ONLY!</span>
+            </div>
+          </div>
+        </div>
+        <div class="offer-box">
+          <div class="fit offer">
+            <h1 class="head">30% OFF</h1>
+            <h2 class="sub"><span>EVERYTHING ON</span> <span>THE INTERNET.</span></h2>
+            <p class="tag">A Black Friday treat for your browser.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <a class="order" href="https://chromewebstore.google.com/detail/henmcmipcaepmamandofeafnkijmeddn" target="_blank" rel="noopener" aria-label="ADD TO CHROME: 30% off the entire internet.">
+      <span class="fit">
+        <span class="side lead"><span class="op">LIMITED TIME</span><span class="np">No purchase necessary!</span></span>
+        <span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span>
+        <span class="side item"><span class="op">ACT NOW</span><span class="np">Works like magic!</span></span>
+      </span>
+    </a>
+
+    <footer class="by"><span class="fit">Brought to you by Gary Mustard Enterprises</span></footer>
+
+    <div class="crawl" aria-hidden="true"><div class="run"><span>BLACK FRIDAY ONLY! <b>✦</b> </span></div></div>
+
+    <div class="takeover" aria-hidden="true">
+      <div class="tape"><div class="run"><span>IT’S HAPPENING! <b>✦</b> TODAY ONLY! <b>✦</b> </span></div></div>
+    </div>
+    <p class="sr">30% off the entire internet.</p>
+  </div>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="lines" aria-hidden="true"></div>
+</div>
+<svg class="defs" aria-hidden="true" width="0" height="0">
+  <filter id="tape" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feGaussianBlur class="soft" in="SourceGraphic" stdDeviation="1.2 0.5"/>
+    <feComponentTransfer result="picture"><feFuncA type="table" tableValues="1 1"/></feComponentTransfer>
+    <feColorMatrix type="matrix" values="0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0" result="luma"/>
+    <feGaussianBlur class="halo" stdDeviation="5 0.6"/>
+    <feComposite in="luma" operator="arithmetic" k2="1.42" k3="-0.42" result="sharp"/>
+    <feGaussianBlur class="smear" in="picture" stdDeviation="10 1.6"/>
+    <feOffset class="late" dx="7" dy="1.7"/>
+    <feComponentTransfer><feFuncA type="table" tableValues="1 1"/></feComponentTransfer>
+    <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
+    <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
+    <feComponentTransfer><feFuncR type="linear" intercept="-0.55"/><feFuncG type="linear" intercept="-0.55"/><feFuncB type="linear" intercept="-0.55"/></feComponentTransfer>
+    <feGaussianBlur class="bloom" stdDeviation="14"/>
+    <feComposite in2="clean" operator="arithmetic" k2="0.12" k3="0.94" k4="0.03"/>
+  </filter>
+</svg>
+<!--SCRIPT-->
+</body>
+</html>

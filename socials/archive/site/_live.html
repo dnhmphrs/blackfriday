@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>30% Off EVERYTHING</title>
+<meta name="description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
+<link rel="icon" href="{{img:favicon}}">
+<!-- The promo site: the store screenshot's composition is the page itself, live, filling the window
+     exactly with nothing to scroll. Wide windows get the screenshot's arrangement; tall ones (phones)
+     a stacked one. The yellow tape is the link to the store; the navy tape under it carries the
+     credits. Everything goes through the same tape filter as the live banner.
+     Layout "{{layout}}": site = the page: the globe large, BUT WAIT… THERE'S LESS! on its badge; beside
+                                 it 30% OFF EVERYTHING ON THE INTERNET. and BLACK FRIDAY ONLY!;
+                          one, two = screenshots 1 and 2, kept for the vertical posts.
+     Everything that moves (tickers, glints, the 70%, the globe, the noise) runs off one clock at 25
+     frames a second, so the filter is worked out 25 times a second rather than at the screen's rate.
+     ?post: the same picture for a post rather than a page: no links (the tapes read as on the store
+     images), no filter (tools/tv-frames.py adds the look afterwards), and the clock stopped, so
+     tools/site-post.mjs can step it through a 12 s loop with window.setT(t). -->
+<style>
+{{fonts}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #070f9c; }
+body { -webkit-font-smoothing: antialiased; }
+#p { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); filter: url(#tape);
+     --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; user-select: none; }
+#p > * { position: absolute; display: block; max-width: none; }
+#p img { -webkit-user-drag: none; }
+.defs { position: absolute; width: 0; height: 0; }
+/* faint scanlines and dark corners over everything, as on the banner */
+.lines { position: fixed; inset: 0; pointer-events: none; z-index: 2;
+         background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.05) 1.5px, rgba(0, 0, 16, 0) 3px),
+                     radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
+
+.glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+.tiles { background-repeat: repeat; opacity: 0.095; transform: rotate(-6deg); }
+
+/* lettering, placed by baseline and ink edge (see set()) */
+.t { white-space: nowrap; line-height: 1; }
+.head { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.05em;
+        text-shadow: 0.009em 0.009em 0 var(--shade), 0.018em 0.018em 0 var(--shade), 0.027em 0.027em 0 var(--shade),
+                     0.036em 0.036em 0 var(--shade), 0.045em 0.045em 0 var(--shade), 0.054em 0.054em 0 var(--shade); }
+.sub { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.04em;
+       background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+       filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
+
+.glint svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
+.glint path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); transform-box: fill-box; transform-origin: center; }
+
+.ticker, .crawl { left: 0; right: 0; overflow: hidden; white-space: nowrap; pointer-events: none; }
+.ticker { top: 0; font-family: "Antonio", "Arial Narrow", sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em;
+          color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); }
+.ticker span { display: inline-block; }
+.crawl { bottom: 0; font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
+.crawl span { display: inline-block; text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade); }
+
+/* the tapes: the yellow one is the link to the store, the navy one carries the credits */
+.strip { display: flex !important; align-items: center; justify-content: center; white-space: nowrap; font: italic 700 1em "Arimo", Arial, sans-serif; transform-origin: center; }
+.tape { background: linear-gradient(#fffb86, #f0e11c); color: #111; text-decoration: none; cursor: pointer; }
+.tape .say { margin-right: 0.7em; }
+.tape .go { display: inline-flex; align-items: center; gap: 0.4em; padding: 0.16em 0.62em 0.2em; background: #111; color: var(--yellow); font-style: normal;
+            font-family: "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; }
+.tape .go i { font: 900 1em/1 Arial, Helvetica, sans-serif; display: inline-block; }
+/* hover: at once, no easing in (every change has to go through the filter, so it should be one change) */
+.tape:hover, .tape:focus-visible { outline: none; background: linear-gradient(#fffdb8, #fff035); }
+.tape:hover .go, .tape:focus-visible .go { background: var(--red); color: #fff; }
+.tape:hover .go i, .tape:focus-visible .go i { transform: translateX(0.18em); }
+.tape:focus-visible .go { outline: 0.08em solid #fff; outline-offset: 0.08em; }
+.by { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
+.by .sep { margin: 0 0.9em; color: var(--yellow); }
+.by.two { flex-direction: column; gap: 0.3em; line-height: 1; }  /* a narrow screen: the credits under the sign-off */
+.by.two .sep.first { display: none; }
+.by a { color: #fff; text-decoration: none; border-bottom: 0.12em solid var(--yellow); padding-bottom: 0.05em; }
+.by a:hover, .by a:focus-visible { color: var(--yellow); outline: none; }
+
+/* the price card; only its 70% moves */
+.card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000; box-shadow: 8px 8px 0 rgba(4, 6, 60, 0.92);
+        transform-origin: left top; font: italic 700 50px/1 "Arimo", Arial, sans-serif; }
+.card .hd { background: var(--red); color: #fff46a; font: 600 41px/57px "Antonio", "Arial Narrow", sans-serif; padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
+.card .ln { padding: 13px 17px 0; }
+.card s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 9px; }
+.card s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 8px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+.card .big { position: absolute; right: 9px; bottom: -54px; font: 400 165px/0.9 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em;
+             -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 70% 80%; }
+
+/* BLACK FRIDAY ONLY!, as a red tag */
+.tag { display: inline-block !important; white-space: nowrap; background: var(--red); color: var(--yellow); border: 0.07em solid #000;
+       font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; padding: 0.2em 0.42em 0.24em;
+       box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.9); transform: rotate(-2deg); transform-origin: left center; text-shadow: 0.05em 0.05em 0 #7a0006; }
+
+/* the As Seen On badge (its size from its type) and the four cards (laid out 436 x 62, then scaled) */
+.oval { width: 7.6em; height: 3.31em; border-radius: 50%; display: grid !important; place-items: center; text-align: center;
+        font: italic 700 1em/0.98 "Tinos", "Times New Roman", serif; background: radial-gradient(ellipse at 40% 30%, #fffc9a, #efe01c 72%); color: #151515;
+        transform: rotate(-7deg); box-shadow: 0.143em 0.167em 0 rgba(6, 8, 70, 0.9), inset 0 0 0 0.095em rgba(170, 158, 0, 0.5); }
+.cards { display: flex !important; gap: 12px; width: 436px; transform-origin: left top; font: italic 700 19px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
+.cards i { flex: none; position: relative; display: block; width: 100px; height: 62px; border-radius: 7px; overflow: hidden; box-shadow: 3px 3px 0 rgba(6, 8, 70, 0.85); }
+.cards b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; }
+.cards .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; }
+.cards .c2 { background: radial-gradient(circle at 50% 40%, #ffb300 0 30%, transparent 31%), #f6f6f6; color: #111; }
+.cards .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
+.cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
+.cards .c4 b { font-size: 14.5px; }
+
+</style>
+</head>
+<body>
+<main id="p" aria-label="30% Off EVERYTHING: 30% off every website. Black Friday only."></main>
+<div class="lines" aria-hidden="true"></div>
+<script>
+(async () => {
+  const LAYOUT = '{{layout}}';
+  const STORE = '{{link:store}}', GARRETT = '{{link:garrett}}', AUFBAU = '{{link:aufbau}}';
+  const query = new URLSearchParams(location.search), POST = query.has('post');
+  const still = !POST && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (POST) { document.getElementById('p').style.filter = 'none'; document.querySelector('.lines').remove(); }
+  const IMG = { globe: still ? '{{img:globe_still}}' : '{{img:globe_anim}}', cap: '{{img:cap}}', shaft: '{{img:shaft}}', base: '{{img:base}}',
+                typeTop: '{{img:type_top}}', typeMid: '{{img:type_mid}}', tile: '{{img:tile}}' };
+  const TICKER = 'But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
+  const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
+  const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
+  const TAN6 = Math.tan((6 * Math.PI) / 180), COS6 = Math.cos((6 * Math.PI) / 180), TAN9 = Math.tan((9 * Math.PI) / 180);
+  const FPS = 25; // the clock everything moves by: a PAL picture's rate
+
+  // ---- the tape look: the live banner's filter (src/content.js), distances set in build(), the noise moved on by the clock ----
+  const LUMA = '0.299 0.587 0.114 0 0';
+  const tint = (i, q) => `${i * 0.22} ${q * 0.2} 0 0 ${0.5 - 0.5 * (i * 0.22 + q * 0.2)}`;
+  const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
+  const GRAIN = `${'0.7 0 0 0 -0.399  '.repeat(3)} 0 0 0 0 1`;
+  const add = (extra = '') => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`;
+  document.body.insertAdjacentHTML('beforeend', `
+    <svg class="defs" aria-hidden="true"><filter id="tape" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feFlood flood-color="#0a22d6"/><feMerge result="picture"><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      <feGaussianBlur class="soft" in="picture"/><feColorMatrix type="matrix" values="${LUMA} ${LUMA} ${LUMA} 0 0 0 1 0" result="luma"/>
+      <feGaussianBlur class="halo"/><feComposite in="luma" operator="arithmetic" k2="1.42" k3="-0.42" result="sharp"/>
+      <feGaussianBlur class="smear" in="picture"/><feOffset class="late"/>
+      <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
+      <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
+      <feTurbulence class="blotch" type="fractalNoise" numOctaves="1" seed="3"/>
+      <feColorMatrix type="matrix" values="${MOTTLE}"/><feComposite in2="clean" ${add('result="mottled"')}/>
+      <feTurbulence class="static" type="fractalNoise" numOctaves="2" seed="2"/>
+      <feColorMatrix type="matrix" values="${GRAIN}"/><feComposite in2="mottled" operator="arithmetic" k2="1" k3="1" result="taped"/>
+      <feComponentTransfer><feFuncR type="linear" intercept="-0.55"/><feFuncG type="linear" intercept="-0.55"/><feFuncB type="linear" intercept="-0.55"/></feComponentTransfer>
+      <feGaussianBlur class="bloom"/><feComposite in2="taped" operator="arithmetic" k2="0.149" k3="0.93" k4="0.037"/>
+    </filter></svg>`);
+  const $ = (sel) => document.querySelector(sel);
+  // the noise: the colour blotches change 6 times a second, the static 12 (every fourth and every other frame)
+  const BLOTCH = [3, 11, 7, 19, 5, 13], STATIC = [2, 17, 9, 23, 4, 29];
+
+  await Promise.all(['100px "Archivo Black"', 'italic 700 100px "Arimo"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Tinos"'].map((f) => document.fonts.load(f)));
+  const p = document.getElementById('p');
+  const put = (html) => { p.insertAdjacentHTML('beforeend', html); return p.lastElementChild; };
+  const place = (el, x, y, w, h) => Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+  const at = (el, x, y) => Object.assign(el.style, { left: x + 'px', top: y + 'px' });
+
+  // Lettering is measured, not guessed: the ink's edges and the cap height of a string, per 1px of type.
+  const mc = document.createElement('canvas').getContext('2d');
+  function ink(text, font, ls) {
+    mc.font = font.replace('SIZE', '200px'); mc.letterSpacing = ls * 200 + 'px';
+    const m = mc.measureText(text), k = 1 / 200;
+    return { l: -m.actualBoundingBoxLeft * k, r: m.actualBoundingBoxRight * k - ls, cap: mc.measureText('H').actualBoundingBoxAscent * k,
+             asc: m.fontBoundingBoxAscent * k, desc: m.fontBoundingBoxDescent * k };
+  }
+  // Set a line of type with its ink's left edge at x and its baseline at y. skew: the headline's slant.
+  function set(cls, text, font, ls, size, x, y, skew, tag = 'div') {
+    const i = ink(text, font, ls), el = put(`<${tag} class="t ${cls}">${text}</${tag}>`);
+    const base = (1 - (i.asc + i.desc)) / 2 + i.asc;
+    Object.assign(el.style, { fontSize: size + 'px', left: x - i.l * size + 'px', top: y - base * size + 'px' });
+    if (skew) Object.assign(el.style, { transformOrigin: `0 ${base * size}px`, transform: 'skewX(-9deg)' });
+    return el;
+  }
+  const HEAD = 'SIZE "Archivo Black"', SUB = 'italic 700 SIZE "Arimo"';
+  const width = (text, font, ls) => { const i = ink(text, font, ls); return i.r - i.l; };
+  const headW = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9; // per 1px of type, slant included
+  const subW = (t) => width(t, SUB, -0.04);
+  const HCAP = ink('H', HEAD, -0.05).cap, SCAP = ink('H', SUB, -0.04).cap;
+  const across = (text, font, size, ls) => { mc.font = `${font} ${size}px ${font.includes('700') ? '"Arimo"' : '"Archivo Black"'}`; mc.letterSpacing = ls * size + 'px'; return mc.measureText(text).width; };
+
+  // ---- what moves, and how, at time t (seconds) ----
+  let movers = [];
+  const ease = (q) => q * q * (3 - 2 * q);
+  const lerp = (a, b, q) => a + (b - a) * q;
+  const twinkle = (path, delay) => movers.push((t) => {
+    const ph = ((t + delay) / 2.4) % 1, q = ease(ph < 0.5 ? ph * 2 : 2 - ph * 2); // there and back, easing each way
+    path.style.transform = `scale(${lerp(0.55, 1, q)}) rotate(${lerp(-10, 12, q)}deg)`; path.style.opacity = lerp(0.75, 1, q);
+  });
+  const JOLT = [[0, 1, 0], [0.12, 1.18, -5], [0.26, 0.96, 3], [0.4, 1.08, -2], [0.55, 1, 0], [1, 1, 0]]; // when, scale, turn
+  const jolt = (el, period) => movers.push((t) => {
+    const ph = (t / period) % 1, i = JOLT.findIndex(([w], n) => ph < JOLT[n + 1]?.[0]), [w0, s0, r0] = JOLT[i], [w1, s1, r1] = JOLT[i + 1];
+    const q = ease((ph - w0) / (w1 - w0));
+    el.style.transform = `skewX(-8deg) scale(${lerp(s0, s1, q)}) rotate(${lerp(r0, r1, q)}deg)`;
+  });
+
+  const glint = (cls, cx, cy, r) => {
+    const el = place(put(`<div class="glint ${cls}" aria-hidden="true"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
+    twinkle(p.lastElementChild.querySelector('path'), cls === 'b' ? 1.2 : 0);
+    return el;
+  };
+  // the oval badge: As Seen On Every Website on the screenshots; on the site, Garrett's punchline
+  const oval = (size, words = LAYOUT === 'site' ? 'But Wait…<br>There’s Less!' : 'As Seen On<br>Every Website') => {
+    const el = put(`<div class="oval"${LAYOUT === 'site' ? '' : ' aria-hidden="true"'}><span>${words}</span></div>`); el.style.fontSize = size + 'px'; return el;
+  };
+  const cards = (x, top, w) => {
+    const el = put('<div class="cards" aria-hidden="true"><i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i></div>');
+    Object.assign(el.style, { left: x + 'px', top: top + 'px', transform: `scale(${w / 436})` });
+    return (62 * w) / 436;
+  };
+  const card = (x, top, scale) => {
+    const el = put('<div class="card" role="img" aria-label="The Internet (All Of It). Was 100%, now 70%."><div class="hd">The Internet (All Of It)</div><div class="ln">WAS: <s>100%</s></div><div class="ln">NOW:</div><div class="big">70%</div></div>');
+    Object.assign(el.style, { left: x + 'px', top: top + 'px', transform: `scale(${scale}) rotate(-1.4deg)` });
+    jolt(el.querySelector('.big'), POST ? 1.2 : 1.1);
+    return top + (306 + 54) * scale;
+  };
+  // The globe: on the page, its 60 frames drawn onto a canvas by the clock (decoded once from the
+  // moving picture), so it changes in step with everything else; until they are ready, and in a
+  // post (stepped from the frame files), a picture.
+  let globeFrames = null;
+  const globe = (cx, cy, d) => {
+    const k = d / 374, box = 480 * k, x = cx - 240 * k, y = cy - (47 + 187) * k;
+    if (globeFrames && !POST) {
+      const c = put('<canvas class="globe" aria-hidden="true"></canvas>'), dpr = Math.min(2, devicePixelRatio || 1);
+      c.width = Math.round(box * dpr); c.height = Math.round(box * dpr); place(c, x, y, box, box);
+      const g = c.getContext('2d'); let shown = -1;
+      movers.push((t) => { const i = Math.floor(t * 15) % 60; if (i !== shown) { shown = i; g.clearRect(0, 0, c.width, c.height); g.drawImage(globeFrames[i], 0, 0, c.width, c.height); } });
+    } else {
+      place(put(`<img class="globe" alt="" src="${IMG.globe}">`), x, y, box, box);
+    }
+    return { x, y, k };
+  };
+  const glow = (cx, cy, d) => place(put('<div class="glow" aria-hidden="true"></div>'), cx - d * 1.3, cy - d * 1.45, d * 2.6, d * 2.9);
+
+  // ---- one layout pass, for the window as it is ----
+  function build() {
+    p.textContent = ''; movers = [];
+    const W = p.clientWidth, H = p.clientHeight, tall = W / H < 1;
+    const REF = tall ? [1080, 1920] : [1280, 800];
+    const s = Math.min(W / REF[0], H / REF[1]);           // the composition's scale
+    const ox = (W - REF[0] * s) / 2;                        // its left edge: centred across
+    const tick = (tall ? 72 : 44) * s, crawlH = (tall ? 129 : 76) * s, crawlTop = H - crawlH, m = (tall ? 60 : 56) * s;
+
+    // the tape filter's distances, in step with the composition's size
+    $('.soft').setAttribute('stdDeviation', `${1.25 * s} ${0.5 * s}`);
+    $('.halo').setAttribute('stdDeviation', `${5 * s} ${0.6 * s}`);
+    $('.smear').setAttribute('stdDeviation', `${10 * s} ${1.6 * s}`);
+    $('.late').setAttribute('dx', 7 * s); $('.late').setAttribute('dy', 1.7 * s);
+    $('.bloom').setAttribute('stdDeviation', 14 * s);
+    $('.blotch').setAttribute('baseFrequency', `${0.042 / s} ${0.167 / s}`);
+    $('.static').setAttribute('baseFrequency', `${0.19 / s} ${0.71 / s}`);
+
+    // the ground of marks
+    const tiles = put('<div class="tiles" aria-hidden="true"></div>');
+    place(tiles, -W * 0.3, -H * 0.3, W * 1.6, H * 1.6);
+    Object.assign(tiles.style, { backgroundImage: `url(${IMG.tile})`, backgroundSize: `${260 * s}px ${224 * s}px` });
+
+    // the tapes' place: the navy one's lower left corner meets the crawl at the composition's left edge
+    const strips = tall ? Math.max(0.86 * s, Math.min(0.5, W / 900)) : 0.6 * s;
+    const tapeFont = (54 * strips) / 0.72, byFont = (25 * strips) / 0.72;
+    // will the sign-off and the credits go on one line across the screen? if not, the navy tape takes two
+    const byTwo = !POST && across('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES ✦ GARRETT MUSAR ✦ AUFBAU', 'italic 700', byFont, 0.08) + 3.6 * byFont > W * 0.9;
+    const tapeH = 126 * strips, byH = 68 * strips * (byTwo ? 1.8 : 1);
+    const byC = crawlTop - ((REF[0] * s) / 2) * TAN6 - byH / 2 / COS6 + (tall ? 0 : 6 * s), tapeC = byC - ((tapeH + byH) / 2 + 4 * strips) / COS6;
+    const tapeTop = (x) => tapeC - tapeH / 2 / COS6 - (x - W / 2) * TAN6; // the yellow tape's top edge at x
+    // the yellow tape's words: NO PURCHASE NECESSARY! beside the button on the site, the store images'
+    // line on a post. Where they will not go across they get a little smaller, and where that is not
+    // enough the button goes alone
+    const say = LAYOUT === 'site' ? 'NO PURCHASE NECESSARY!' : 'EVERY SITE 30% OFF!';
+    const goW = across('ADD TO CHROME →', '400', 100, -0.01) / 100 + 1.24 + 0.4, need = across(say, 'italic 700', 100, 0) / 100 + 0.7 + goW;
+    const fit = Math.min(1, (W * 0.92) / (need * tapeFont)), sayFits = POST || fit >= 0.72;
+
+    ({ site: tall ? siteTall : siteWide, one: tall ? oneTall : oneWide, two: tall ? twoTall : twoWide })[LAYOUT]();
+
+    // The offer: 30% OFF / EVERYTHING ON / THE INTERNET. / BLACK FRIDAY ONLY! / the four cards (if
+    // withCards). At x (the left edge, or the centre if `centred`) in a column w wide, from y; k shrinks
+    // the lot. Returns where it ends. (BUT WAIT… THERE'S LESS! is on the badge on the globe.)
+    function offer(x, y, w, k, centred, withCards, dry = false) {
+      const left = (wide) => (centred ? x - wide / 2 : x);
+      const line = (cls, text, font, ls, size, measure, skew, tag) => { if (!dry) set(cls, text, font, ls, size, left(measure(text) * size), y, skew, tag); };
+      // 30% OFF EVERYTHING ON THE INTERNET.
+      const hs = (w / headW('30% OFF')) * k, l = ((w * 0.98) / subW('EVERYTHING ON')) * k;
+      y += HCAP * hs; line('head', '30% OFF', HEAD, -0.05, hs, headW, true, 'h1');
+      y += 26 * s * k + SCAP * l; line('sub', 'EVERYTHING ON', SUB, -0.04, l, subW, false, 'h2');
+      y += 12 * s * k + SCAP * l; line('sub', 'THE INTERNET.', SUB, -0.04, l, subW, false);
+      // the tag, as wide as seven tenths of the column
+      const tw = w * 0.72 * k, tf = tw / (across('BLACK FRIDAY ONLY!', '400', 100, -0.01) / 100 + 0.84 + 0.14);
+      y += 28 * s * k;
+      if (!dry) { const tg = put('<div class="tag">BLACK FRIDAY ONLY!</div>'); tg.style.fontSize = tf + 'px'; at(tg, left(tw), y); }
+      y += tf * 1.58;
+      if (withCards) { const cw = w * 0.74 * k; y += 40 * s * k; if (!dry) cards(left(cw), y, cw); y += (62 * cw) / 436; }
+      return y;
+    }
+    // the offer's height in a column w wide, at k, with or without the cards
+    function offerH(w, k, withCards) { return offer(0, 0, w, k, false, withCards, true); }
+
+    // ---- the site, wide: the globe large on the left; the offer and the punchline down a column on the right ----
+    function siteWide() {
+      const L = ox + m, R = ox + REF[0] * s - m, x0 = ox + 690 * s, cw = R - x0;
+      const lo = tick + 28 * s, hi = tapeTop(R) - 22 * s, room = hi - lo;     // under the ticker, over the tape at its highest
+      const d = Math.min(570 * s, (crawlTop - tick) * 0.86, (x0 - L - 30 * s) * 0.98), cx = Math.max(L + d / 2 + 6 * s, ox + 341 * s), cy = (tick + crawlTop) / 2;
+      glow(cx, cy, d * 1.28);
+      const withCards = offerH(cw, 1, true) <= room * 1.1;                    // the cards where there is (nearly) the room
+      const k = Math.min(1, room / offerH(cw, 1, withCards));
+      offer(x0, lo + (room - offerH(cw, k, withCards)) / 2, cw, k, false, withCards);
+      globe(cx, cy, d);
+      const r = d / 2, o = oval(46 * s * Math.min(1, d / (570 * s)) ** 0.5);
+      at(o, cx + r * 0.4 - o.offsetWidth / 2, cy - r * 0.84 - o.offsetHeight / 2);
+      glint('', cx - r * 0.74, cy - r * 0.78, d * 0.075);
+      glint('b', cx + r * 0.93, cy + r * 0.62, d * 0.045);
+    }
+
+    // ---- the site, tall: the globe large on top; the offer and the punchline centred under it ----
+    function siteTall() {
+      const cw = (REF[0] - 2 * 90) * s, lo = tick + 36 * s, hi = tapeTop(ox + REF[0] * s - m) - 30 * s, room = hi - lo;
+      const d0 = 520 * s, gap = 40 * s;
+      const withCards = d0 + gap + offerH(cw, 1, true) <= room * 1.1;
+      const natural = d0 + gap + offerH(cw, 1, withCards), k = Math.min(1, room / natural);
+      // spare height goes first to the globe, up to the column's width, then either side
+      let spare = room - natural * k, d = d0 * k;
+      const grow = Math.max(0, Math.min(spare * 0.6, cw * 1.02 - d)); d += grow; spare -= grow;
+      const y = lo + spare * 0.4, cx = W / 2, cy = y + d / 2;
+      glow(cx, cy, d * 1.28);
+      globe(cx, cy, d);
+      const r = d / 2, o = oval(48 * s * Math.max(k, d / (520 * s)) ** 0.5);
+      at(o, Math.min(cx + r * 0.42 - o.offsetWidth / 2, W - m - o.offsetWidth), cy - r * 0.84 - o.offsetHeight / 2);
+      glint('', cx - r * 0.78, cy - r * 0.7, d * 0.075);
+      glint('b', cx + r * 0.95, cy + r * 0.55, d * 0.045);
+      offer(W / 2, y + d + gap * k + spare * 0.2, cw, k, true, withCards);
+    }
+
+    // ---- layout one, wide: screenshot 1. The message flush left down a column; the globe on its
+    //      column in the space to the right, its top level with the headline's cap line ----
+    function oneWide() {
+      const oy = Math.max(0, H - REF[1] * s) * 0.4;  // spare height: a little above, the rest below
+      const L = ox + m, col = 700 * s, colR = L + col, R = ox + REF[0] * s - m, gutter = 48 * s, monX = (colR + gutter + R) / 2;
+      const headTop = oy + 86 * s, bd = 300 * s;
+      const gk = bd / 374, gd = 480 * gk, gx = monX - gd / 2, gy = headTop - 6 * s - 47 * gk;
+      glow(monX, gy + gd * 0.487, gd);
+      const colX = gx + 40 * gk, colW = 400 * gk, capTop = gy + 410 * gk, baseTop = Math.max(capTop + 136 * gk + 4, H - 144 * gk);
+      place(put(`<img alt="" src="${IMG.shaft}">`), colX, capTop + 136 * gk - 2, colW, baseTop - capTop - 136 * gk + 4);
+      place(put(`<img alt="" src="${IMG.cap}">`), colX, capTop, colW, 136 * gk);
+      place(put(`<img alt="" src="${IMG.base}">`), colX, baseTop, colW, 144 * gk);
+      globe(monX, gy + (47 + 187) * gk, bd);
+      const hs = col / headW('30% OFF'); let y = headTop + HCAP * hs;
+      set('head', '30% OFF', HEAD, -0.05, hs, L, y, true, 'h1');
+      const ss = col / subW('EVERYTHING ON THE INTERNET.'); y += 34 * s + SCAP * ss;
+      set('sub', 'EVERYTHING ON THE INTERNET.', SUB, -0.04, ss, L, y, false, 'h2');
+      const cs = 0.7 * s, top = y + 30 * s;
+      card(L, top, cs);
+      const x0 = L + 400 * cs + 34 * s, o = oval(37 * s), ch = (62 * (colR - x0)) / 436;
+      at(o, (x0 + colR - o.offsetWidth) / 2, top);
+      cards(x0, top + 306 * cs - ch, colR - x0);
+      const ballL = gx + 53 * gk, ballT = gy + 47 * gk;
+      glint('', ballL + bd * 0.1, ballT + bd * 0.1, bd * 0.105);
+      glint('b', ballL + bd * 0.97, ballT + bd * 0.86, bd * 0.06);
+    }
+
+    // ---- layout one, tall: the banner's own stacked arrangement ----
+    function oneTall() {
+      const u = 0.86, row = 1.1;
+      const T1 = { w: 706 * u * s, h: 522 * u * s }, T2 = { w: 895 * u * s, h: 349 * u * s };
+      const rowH = 480 * row * s;
+      const used = 124 * s + T1.h + 34 * s + T2.h + 40 * s + rowH;
+      const room = tapeTop(ox + REF[0] * s - m) - tick;
+      const spare = Math.max(0, room - used);
+      const t1y = tick + 52 * s + spare * 0.35, t2y = t1y + T1.h + 34 * s, rowY = t2y + T2.h + 40 * s + spare * 0.2;
+      const t1x = (W - T1.w) / 2;
+      const gd = 480 * row * s, gk = gd / 480, gcx = ox + 790 * s, gy = rowY - 47 * gk;
+      glow(gcx, gy + gd * 0.487, gd);
+      const colX = gcx - gd / 2 + 40 * gk, colW = 400 * gk, capTop = gy + 410 * gk, baseTop = Math.max(capTop + 136 * gk + 4, H - 144 * gk);
+      place(put(`<img alt="" src="${IMG.shaft}">`), colX, capTop + 136 * gk - 2, colW, baseTop - capTop - 136 * gk + 4);
+      place(put(`<img alt="" src="${IMG.cap}">`), colX, capTop, colW, 136 * gk);
+      place(put(`<img alt="" src="${IMG.base}">`), colX, baseTop, colW, 144 * gk);
+      globe(gcx, gy + (47 + 187) * gk, 374 * gk);
+      place(put(`<img alt="30% OFF" src="${IMG.typeTop}">`), t1x, t1y, T1.w, T1.h);
+      place(put(`<img alt="Everything on the internet." src="${IMG.typeMid}">`), (W - T2.w) / 2, t2y, T2.w, T2.h);
+      for (const side of [-1, 1]) {
+        const edge = side < 0 ? t1x : t1x + T1.w, out = (d) => edge + side * d * u * s;
+        glint('', out(149), t1y + 204 * u * s, 49 * u * s);
+        glint('b', out(92), t1y + 295 * u * s, 29 * u * s);
+      }
+      const cx = ox + 60 * s, cTop = rowY + 103 * s, cs = row * s, foot = card(cx, cTop, cs);
+      const r = 187 * gk, o = oval(34 * s);
+      at(o, gcx + r * 0.42 - o.offsetWidth / 2, rowY + (47 + 187) * gk - r * 0.92 - o.offsetHeight / 2);
+      const cw = 400 * cs, chH = (62 * cw) / 436, gap = tapeTop(cx + cw) - foot;
+      if (gap > chH + 30 * s) cards(cx, foot + (gap - chH) / 2, cw);
+    }
+
+    // ---- layout two, wide: screenshot 2. The globe large on the left; the lines down a column on
+    //      the right, set to its width, the four cards under them ----
+    function twoWide() {
+      const L = ox + m, R = ox + REF[0] * s - m, x0 = ox + 690 * s, cw = R - x0;
+      const lo = tick + 26 * s, hi = tapeTop(R) - 26 * s;
+      const d = Math.min(570 * s, (crawlTop - tick) * 0.86, (x0 - L - 30 * s) * 0.98), cx = Math.max(L + d / 2 + 6 * s, ox + 341 * s), cy = (tick + crawlTop) / 2;
+      glow(cx, cy, d * 1.28);
+      const lines = ['THERE’S', 'LESS!'].map((t) => ({ t, size: cw / headW(t) }));
+      const ss0 = cw / subW('NO PURCHASE NECESSARY!');
+      const natural = 46 * s + 34 * s + lines.reduce((a, l, n) => a + HCAP * l.size + (n ? 30 * s : 0), 0) + 38 * s + SCAP * ss0 + 34 * s + (62 * cw) / 436;
+      const k = Math.min(1, (hi - lo) / natural), w = cw * k;
+      let y = lo + (hi - lo - natural * k) / 2 + 46 * s * k;
+      set('sub', 'BUT WAIT…', SUB, -0.04, (46 * s * k) / SCAP, x0, y);
+      y += 34 * s * k;
+      lines.forEach((l, n) => { y += HCAP * l.size * k + (n ? 30 * s * k : 0); set('head', l.t, HEAD, -0.05, l.size * k, x0, y, true, n ? 'div' : 'h1'); });
+      y += 38 * s * k + SCAP * ss0 * k; set('sub', 'NO PURCHASE NECESSARY!', SUB, -0.04, ss0 * k, x0, y, false, 'h2');
+      cards(x0, y + 34 * s * k, w);
+      globe(cx, cy, d);
+      const r = d / 2, o = oval(40 * s * Math.min(1, d / (570 * s)) ** 0.5);
+      at(o, cx + r * 0.4 - o.offsetWidth / 2, cy - r * 0.86 - o.offsetHeight / 2);
+      glint('', cx - r * 0.74, cy - r * 0.78, d * 0.075);
+      glint('b', cx + r * 0.93, cy + r * 0.62, d * 0.045);
+    }
+
+    // ---- layout two, tall: the globe large on top; the lines centred under it; the cards ----
+    function twoTall() {
+      const cw = (REF[0] - 2 * 90) * s, lo = tick + 40 * s, hi = tapeTop(ox + REF[0] * s - m) - 34 * s;
+      const lines = ['THERE’S', 'LESS!'].map((t) => ({ t, size: (cw * 0.92) / headW(t) }));
+      const ss0 = cw / subW('NO PURCHASE NECESSARY!'), cardsW = cw * 0.92;
+      const text = 46 * s + 30 * s + lines.reduce((a, l, n) => a + HCAP * l.size + (n ? 26 * s : 0), 0) + 34 * s + SCAP * ss0 + 34 * s + (62 * cardsW) / 436;
+      const d0 = 640 * s, gap = 56 * s, natural = d0 + gap + text;
+      const k = Math.min(1, (hi - lo) / natural);
+      let y = lo + (hi - lo - natural * k) * 0.45;
+      const d = d0 * k, cx = W / 2, cy = y + d / 2;
+      glow(cx, cy, d * 1.28);
+      globe(cx, cy, d);
+      const r = d / 2, o = oval(40 * s * k);
+      at(o, cx + r * 0.42 - o.offsetWidth / 2, cy - r * 0.86 - o.offsetHeight / 2);
+      glint('', cx - r * 0.78, cy - r * 0.7, d * 0.075);
+      glint('b', cx + r * 0.95, cy + r * 0.55, d * 0.045);
+      y += d + gap * k;
+      const mid = (text, font, ls, size) => (W - width(text, font, ls) * size) / 2 - (font === HEAD ? ink(text, font, ls).cap * size * TAN9 * 0.5 : 0);
+      const ledeSize = (46 * s * k) / SCAP;
+      y += 46 * s * k; set('sub', 'BUT WAIT…', SUB, -0.04, ledeSize, mid('BUT WAIT…', SUB, -0.04, ledeSize), y);
+      y += 30 * s * k;
+      lines.forEach((l, n) => { y += HCAP * l.size * k + (n ? 26 * s * k : 0); set('head', l.t, HEAD, -0.05, l.size * k, mid(l.t, HEAD, -0.05, l.size * k) + ink(l.t, HEAD, -0.05).cap * l.size * k * TAN9 * 0.5, y, true, n ? 'div' : 'h1'); });
+      y += 34 * s * k + SCAP * ss0 * k; set('sub', 'NO PURCHASE NECESSARY!', SUB, -0.04, ss0 * k, mid('NO PURCHASE NECESSARY!', SUB, -0.04, ss0 * k), y, false, 'h2');
+      cards((W - cardsW * k) / 2, y + 34 * s * k, cardsW * k);
+    }
+
+    // ---- the tapes, over everything but the tickers ----
+    const len = Math.hypot(W, H) * 1.4;
+    const by = put(POST ? '<div class="strip by"><span class="gme">Brought to you by Gary Mustard Enterprises</span></div>'
+                        : `<div class="strip by${byTwo ? ' two' : ''}"><span class="gme">Brought to you by Gary Mustard Enterprises</span><span class="sep first" aria-hidden="true">✦</span><span class="names"><a href="${GARRETT}">Garrett Musar</a><span class="sep" aria-hidden="true">✦</span><a href="${AUFBAU}">Aufbau</a></span></div>`);
+    place(by, W / 2 - len / 2, byC - byH / 2, len, byH);
+    Object.assign(by.style, { fontSize: byFont + 'px', transform: 'rotate(-6deg)' });
+    if (byTwo && across('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES', 'italic 700', byFont, 0.08) > W * 0.9) by.querySelector('.gme').textContent = 'Gary Mustard Enterprises';
+    const tape = put(POST ? `<div class="strip tape"><span>${say}</span></div>`
+                          : `<a class="strip tape" href="${STORE}"><span class="say">${say}</span><span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
+    place(tape, W / 2 - len / 2, tapeC - tapeH / 2, len, tapeH);
+    Object.assign(tape.style, { fontSize: tapeFont + 'px', transform: 'rotate(-6deg)',
+                                boxShadow: `inset 0 ${4 * strips}px 0 rgba(170,158,0,0.6), inset 0 ${-4 * strips}px 0 rgba(170,158,0,0.6), ${11 * strips}px ${11 * strips}px 0 rgba(6,8,70,0.9)` });
+    // on a narrow screen the words go before the button does, and the button keeps some yellow either side
+    if (!POST && sayFits) tape.style.fontSize = tapeFont * fit + 'px';
+    if (!POST && !sayFits) { tape.querySelector('.say').remove(); tape.querySelector('.go').style.fontSize = Math.min(tapeFont, (W * 0.66) / goW) + 'px'; }
+
+    // ---- the tickers: Garrett's lines along the top, BLACK FRIDAY ONLY! along the bottom ----
+    const tk = put(`<div class="ticker" aria-hidden="true"><span>${TICKER.repeat(6)}</span></div>`);
+    Object.assign(tk.style, { height: tick + 'px', fontSize: tick * 0.66 + 'px', lineHeight: tick + 'px' });
+    const cr = put(`<div class="crawl" aria-hidden="true"><span>${CRAWL.repeat(16)}</span></div>`);
+    Object.assign(cr.style, { height: crawlH + 'px', fontSize: crawlH * 0.75 + 'px', lineHeight: crawlH + 'px' });
+    // the same speed whatever the size: so many of their own letters a second (for a post, whatever
+    // speed makes them come round exactly in 12 s: once for the lines, twice for the crawl)
+    const tks = tk.firstElementChild, crs = cr.firstElementChild, tkRep = tks.offsetWidth / 6, crRep = crs.offsetWidth / 16;
+    const tkV = POST ? tkRep / 12 : tick * 1.5, crV = POST ? (2 * crRep) / 12 : crawlH * 2.6;
+    movers.push((t) => {
+      tks.style.transform = `translateX(${-(((t + 3) * tkV) % tkRep)}px)`;
+      crs.style.transform = `translateX(${-(((t + 3) * crV) % crRep)}px) skewX(-9deg)`;
+    });
+    render(clock());
+  }
+
+  // ---- the clock ----
+  const t0 = performance.now(), clock = () => (still ? 0 : Math.floor(((performance.now() - t0) / 1000) * FPS) / FPS);
+  const blotch = $('.blotch'), grain = $('.static');
+  function render(t) {
+    for (const move of movers) move(t);
+    if (!POST) { const f = Math.round(t * FPS); blotch.setAttribute('seed', BLOTCH[Math.floor(f / 4) % 6]); grain.setAttribute('seed', STATIC[Math.floor(f / 2) % 6]); }
+  }
+
+  build();
+  if (POST) {
+    // time stands still until setT moves it; the globe steps through its 60 frames, one turn in 4 s
+    const frames = Array.from({ length: 60 }, (_, i) => `../channel-page/parts/globe-${String(i).padStart(2, '0')}.png`);
+    await Promise.all(frames.map((src) => { const i = new Image(); i.src = src; return i.decode().catch(() => {}); }));
+    window.setT = async (t) => {
+      render(t);
+      for (const g of p.querySelectorAll('.globe')) { g.src = frames[Math.floor(t * 15 + 1e-6) % 60]; await g.decode(); }
+    };
+    window.ready = true;
+    return;
+  }
+  let pending = 0;
+  addEventListener('resize', () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(build); });
+  if (!still) {
+    let last = -1;
+    const frame = () => { const t = clock(); if (t !== last) { last = t; render(t); } requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+    // the globe's frames, decoded once (on the side), then drawn by the clock in step with everything else
+    if ('ImageDecoder' in window) (async () => {
+      try {
+        const dec = new ImageDecoder({ data: await (await fetch(IMG.globe)).arrayBuffer(), type: 'image/webp' });
+        await dec.tracks.ready;
+        const n = dec.tracks.selectedTrack.frameCount, frames = [];
+        for (let i = 0; i < n; i++) { const { image } = await dec.decode({ frameIndex: i }); frames.push(await createImageBitmap(image)); image.close(); }
+        dec.close();
+        if (n === 60) { globeFrames = frames; build(); }
+      } catch {}
+    })();
+  }
+
+  // The tape look costs little on a graphics card and a great deal without one. As on the banner:
+  // once the page is up, see how fast it draws; if slowly, take the look off, and if that made no
+  // difference, put it back.
+  const frameRate = () => new Promise((resolve) => {
+    let frames = 0, drawing = 0, last = 0;
+    const tick = (now) => { const gap = now - last; if (last && gap < 1000) { frames++; drawing += gap; } last = now; if (drawing < 2000) requestAnimationFrame(tick); else resolve((frames * 1000) / drawing); };
+    requestAnimationFrame(tick);
+  });
+  if (!still && !query.has('keep')) {
+    await new Promise((r) => setTimeout(r, 1200));
+    const withLook = await frameRate();
+    if (withLook < 24) {
+      p.style.filter = 'none';
+      if ((await frameRate()) < withLook * 1.5) p.style.removeProperty('filter');
+    }
+  }
+})();
+</script>
+</body>
+</html>

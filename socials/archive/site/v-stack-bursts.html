@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>30% Off EVERYTHING</title>
+<meta name="description" content="A Black Friday treat for your browser: 30% off every website you visit. Black Friday only.">
+<link rel="icon" href="{{img:favicon}}">
+<!-- Variant "stack-bursts": MAXIMUM CLUTTER, STRICT RANKS. A Black Friday spot's busiest frame, read in
+     a fixed order:
+       1. 30% OFF                 the one giant burst (yellow rim, red heart), turning, in front of the globe
+       2. BLACK FRIDAY ONLY!      the black slab slung across the burst's foot, jolting
+       3. ADD TO CHROME →         the flashing button in the lower third
+       4. the stickers            BUT WAIT… THERE'S LESS! (the biggest of them, on the globe), Works like
+                                  magic!, As Seen On Every Website, Every site 30% OFF!, the price card,
+                                  the four cards: all small, all one size class, wobbling
+     The two key phrases no longer fight: the offer and its deadline are ranks 1 and 2; the punchline
+     is demoted to a sticker, the gag you find on the third look.
+     Everything that moves runs off one clock at 25 frames a second (no CSS animation). -->
+<style>
+{{fonts}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #070f9c; }
+body { -webkit-font-smoothing: antialiased; }
+#p { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(#0a1cc4, #0a22d6 45%, #070f9c); filter: url(#tape);
+     --yellow: #fff035; --shade: #0a0f66; --red: #ff1616; user-select: none; }
+#p > * { position: absolute; display: block; max-width: none; }
+#p img { -webkit-user-drag: none; }
+.defs { position: absolute; width: 0; height: 0; }
+.lines { position: fixed; inset: 0; pointer-events: none; z-index: 2;
+         background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.05) 1.5px, rgba(0, 0, 16, 0) 3px),
+                     radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
+
+.glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+.tiles { background-repeat: repeat; opacity: 0.095; transform: rotate(-6deg); }
+/* the rays behind everything: a sale spot's sunburst */
+.rays { border-radius: 50%; background: repeating-conic-gradient(rgba(120, 190, 255, 0.16) 0 6deg, rgba(120, 190, 255, 0) 6deg 15deg);
+        -webkit-mask: radial-gradient(closest-side, #000 30%, transparent 100%); mask: radial-gradient(closest-side, #000 30%, transparent 100%); }
+
+.t { white-space: nowrap; line-height: 1; }
+.head { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.05em;
+        text-shadow: 0.009em 0.009em 0 var(--shade), 0.018em 0.018em 0 var(--shade), 0.027em 0.027em 0 var(--shade),
+                     0.036em 0.036em 0 var(--shade), 0.045em 0.045em 0 var(--shade), 0.054em 0.054em 0 var(--shade); }
+.sub { font: italic 700 1em "Arimo", Arial, sans-serif; letter-spacing: -0.04em;
+       background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+       filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
+.burstsvg { overflow: visible; pointer-events: none; }
+.burstsvg svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+.glint svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
+.glint path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); transform-box: fill-box; transform-origin: center; }
+
+.ticker, .crawl { left: 0; right: 0; overflow: hidden; white-space: nowrap; pointer-events: none; }
+.ticker { top: 0; font-family: "Antonio", "Arial Narrow", sans-serif; font-weight: 300; letter-spacing: 0.035em; word-spacing: 0.3em;
+          color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); background: rgba(4, 8, 90, 0.55); }
+.ticker span { display: inline-block; }
+.crawl { bottom: 0; font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; background: #000; }
+.crawl span { display: inline-block; text-shadow: 0.027em 0.027em 0 #b00008, 0.054em 0.054em 0 #b00008; }
+
+/* the slab: BLACK FRIDAY ONLY!, rank 2 */
+.slab { background: #050505; border: 0.05em solid var(--red); box-shadow: 0.1em 0.1em 0 rgba(6, 8, 70, 0.95), inset 0 0 0 0.03em #3a3a3a;
+        display: flex !important; align-items: center; justify-content: center; white-space: nowrap; }
+.slab .head { position: static; --shade: #b00008; }
+
+/* the stickers, rank 4: one size class */
+.stk { display: grid !important; place-items: center; text-align: center; pointer-events: none; }
+.stk > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.stk > span { position: relative; line-height: 0.98; }
+.oval { width: 7.6em; height: 3.31em; border-radius: 50%; display: grid !important; place-items: center; text-align: center;
+        font: italic 700 1em/0.98 "Tinos", "Times New Roman", serif; background: radial-gradient(ellipse at 40% 30%, #fffc9a, #efe01c 72%); color: #151515;
+        box-shadow: 0.143em 0.167em 0 rgba(6, 8, 70, 0.9), inset 0 0 0 0.095em rgba(170, 158, 0, 0.5); }
+.oval.w { background: radial-gradient(ellipse at 40% 30%, #fff, #d9e2f7 72%); color: #0a1aa8; box-shadow: 0.143em 0.167em 0 rgba(6, 8, 70, 0.9), inset 0 0 0 0.095em rgba(10, 26, 168, 0.35); }
+
+/* the price card; only its 70% moves */
+.card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000; box-shadow: 8px 8px 0 rgba(4, 6, 60, 0.92);
+        transform-origin: left top; font: italic 700 50px/1 "Arimo", Arial, sans-serif; }
+.card .hd { background: var(--red); color: #fff46a; font: 600 41px/57px "Antonio", "Arial Narrow", sans-serif; padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
+.card .ln { padding: 13px 17px 0; }
+.card s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 9px; }
+.card s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 8px; background: var(--red); transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
+.card .big { position: absolute; right: 9px; bottom: -54px; font: 400 165px/0.9 "Archivo Black", "Arial Black", sans-serif; color: var(--red); letter-spacing: -0.05em;
+             -webkit-text-stroke: 11px #000; paint-order: stroke fill; transform: skewX(-8deg); transform-origin: 70% 80%; }
+.cards { display: flex !important; gap: 12px; width: 436px; transform-origin: left top; font: italic 700 19px/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
+.cards i { flex: none; position: relative; display: block; width: 100px; height: 62px; border-radius: 7px; overflow: hidden; box-shadow: 3px 3px 0 rgba(6, 8, 70, 0.85); }
+.cards b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; }
+.cards .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; }
+.cards .c2 { background: radial-gradient(circle at 50% 40%, #ffb300 0 30%, transparent 31%), #f6f6f6; color: #111; }
+.cards .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
+.cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
+.cards .c4 b { font-size: 14.5px; }
+
+/* the lower third: the furniture round the button */
+.l3 { background: linear-gradient(#0d1a8a, #060c55); border-top: 0.12em solid var(--yellow); box-shadow: 0 -0.2em 0 rgba(0, 0, 30, 0.5); }
+.box { display: flex !important; flex-direction: column; justify-content: center; white-space: nowrap; line-height: 1; }
+.item { font: 600 1em/1 "Antonio", "Arial Narrow", sans-serif; color: #fff; letter-spacing: 0.06em; text-transform: uppercase; }
+.item b { color: var(--yellow); font-weight: 600; }
+.item small { display: block; font: 300 0.62em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.12em; color: #c9d6ff; margin-top: 0.22em; }
+.onair { background: var(--red); color: #fff; font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: 0.04em; padding: 0.22em 0.5em 0.26em;
+         border: 0.08em solid #000; display: inline-flex !important; align-items: center; gap: 0.35em; }
+.onair i { display: inline-block; width: 0.55em; height: 0.55em; border-radius: 50%; background: #fff; }
+.onair.off i { background: #7a0006; }
+.clock { font: 600 1em/1 "Antonio", "Arial Narrow", sans-serif; color: var(--yellow); letter-spacing: 0.04em; }
+/* THE link: a flashing ORDER-panel style button. Flash by the clock (class .on); hover wins at once */
+.buy { display: flex !important; align-items: center; justify-content: center; gap: 0.45em; text-decoration: none; cursor: pointer; white-space: nowrap;
+       background: linear-gradient(#fffb86, #f0e11c); color: #111; border: 0.07em solid #000;
+       box-shadow: 0.14em 0.14em 0 rgba(0, 0, 0, 0.85), inset 0 0.06em 0 rgba(255, 255, 255, 0.7), inset 0 -0.08em 0 rgba(170, 158, 0, 0.7);
+       font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; }
+.buy .say { font: italic 700 0.5em/1 "Arimo", Arial, sans-serif; letter-spacing: -0.01em; }
+.buy .go { display: inline-flex; align-items: center; gap: 0.32em; padding: 0.14em 0.5em 0.18em; background: #111; color: var(--yellow); }
+.buy .go i { font: 900 1em/1 Arial, Helvetica, sans-serif; font-style: normal; display: inline-block; }
+.buy.on .go { background: var(--red); color: #fff; }
+.buy:hover, .buy:focus-visible { outline: none; background: #fff; }
+.buy:hover .go, .buy:focus-visible .go { background: #0a22d6; color: #fff; }
+.buy:hover .go i, .buy:focus-visible .go i { transform: translateX(0.18em); }
+.buy:focus-visible { outline: 0.08em solid #fff; outline-offset: 0.08em; }
+.by { display: flex !important; align-items: center; justify-content: center; white-space: nowrap; background: #000; color: #fff; letter-spacing: 0.08em;
+      text-transform: uppercase; font: italic 700 1em/1 "Arimo", Arial, sans-serif; }
+.by .sep { margin: 0 0.9em; color: var(--yellow); }
+.by.two { flex-direction: column; gap: 0.35em; }
+.by.two .sep.first { display: none; }
+.by a { color: #fff; text-decoration: none; border-bottom: 0.12em solid var(--yellow); padding-bottom: 0.05em; }
+.by a:hover, .by a:focus-visible { color: var(--yellow); outline: none; }
+.logo { opacity: 0.95; }
+</style>
+</head>
+<body>
+<main id="p" aria-label="30% Off EVERYTHING: 30% off every website. Black Friday only."></main>
+<div class="lines" aria-hidden="true"></div>
+<script>
+(async () => {
+  const STORE = '{{link:store}}', GARRETT = '{{link:garrett}}', AUFBAU = '{{link:aufbau}}';
+  const query = new URLSearchParams(location.search);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IMG = { globe: still ? '{{img:globe_still}}' : '{{img:globe_anim}}', tile: '{{img:tile}}', logo: '{{img:logo}}' };
+  const TICKER = 'But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
+  const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
+  const GLINT = 'M0,-1 C0.06,-0.22 0.22,-0.06 1,0 C0.22,0.06 0.06,0.22 0,1 C-0.06,0.22 -0.22,0.06 -1,0 C-0.22,-0.06 -0.06,-0.22 0,-1Z';
+  const TAN9 = Math.tan((9 * Math.PI) / 180);
+  const FPS = 25;
+
+  // ---- the tape look (as on the live page) ----
+  const LUMA = '0.299 0.587 0.114 0 0';
+  const tint = (i, q) => `${i * 0.22} ${q * 0.2} 0 0 ${0.5 - 0.5 * (i * 0.22 + q * 0.2)}`;
+  const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
+  const GRAIN = `${'0.7 0 0 0 -0.399  '.repeat(3)} 0 0 0 0 1`;
+  const add = (extra = '') => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`;
+  document.body.insertAdjacentHTML('beforeend', `
+    <svg class="defs" aria-hidden="true"><filter id="tape" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feFlood flood-color="#0a22d6"/><feMerge result="picture"><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      <feGaussianBlur class="soft" in="picture"/><feColorMatrix type="matrix" values="${LUMA} ${LUMA} ${LUMA} 0 0 0 1 0" result="luma"/>
+      <feGaussianBlur class="halo"/><feComposite in="luma" operator="arithmetic" k2="1.42" k3="-0.42" result="sharp"/>
+      <feGaussianBlur class="smear" in="picture"/><feOffset class="late"/>
+      <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
+      <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
+      <feTurbulence class="blotch" type="fractalNoise" numOctaves="1" seed="3"/>
+      <feColorMatrix type="matrix" values="${MOTTLE}"/><feComposite in2="clean" ${add('result="mottled"')}/>
+      <feTurbulence class="static" type="fractalNoise" numOctaves="2" seed="2"/>
+      <feColorMatrix type="matrix" values="${GRAIN}"/><feComposite in2="mottled" operator="arithmetic" k2="1" k3="1" result="taped"/>
+      <feComponentTransfer><feFuncR type="linear" intercept="-0.55"/><feFuncG type="linear" intercept="-0.55"/><feFuncB type="linear" intercept="-0.55"/></feComponentTransfer>
+      <feGaussianBlur class="bloom"/><feComposite in2="taped" operator="arithmetic" k2="0.149" k3="0.93" k4="0.037"/>
+    </filter></svg>`);
+  const $ = (sel) => document.querySelector(sel);
+  const BLOTCH = [3, 11, 7, 19, 5, 13], STATIC = [2, 17, 9, 23, 4, 29];
+
+  await Promise.all(['100px "Archivo Black"', 'italic 700 100px "Arimo"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Tinos"'].map((f) => document.fonts.load(f)));
+  const p = document.getElementById('p');
+  const put = (html) => { p.insertAdjacentHTML('beforeend', html); return p.lastElementChild; };
+  const place = (el, x, y, w, h) => { Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); return el; };
+  const at = (el, x, y) => Object.assign(el.style, { left: x + 'px', top: y + 'px' });
+
+  // measured type (as on the live page)
+  const mc = document.createElement('canvas').getContext('2d');
+  function ink(text, font, ls) {
+    mc.font = font.replace('SIZE', '200px'); mc.letterSpacing = ls * 200 + 'px';
+    const m = mc.measureText(text), k = 1 / 200;
+    return { l: -m.actualBoundingBoxLeft * k, r: m.actualBoundingBoxRight * k - ls, cap: mc.measureText('H').actualBoundingBoxAscent * k,
+             asc: m.fontBoundingBoxAscent * k, desc: m.fontBoundingBoxDescent * k };
+  }
+  function set(cls, text, font, ls, size, x, y, skew, tag = 'div') {
+    const i = ink(text, font, ls), el = put(`<${tag} class="t ${cls}">${text}</${tag}>`);
+    const base = (1 - (i.asc + i.desc)) / 2 + i.asc;
+    Object.assign(el.style, { fontSize: size + 'px', left: x - i.l * size + 'px', top: y - base * size + 'px' });
+    if (skew) Object.assign(el.style, { transformOrigin: `0 ${base * size}px`, transform: 'skewX(-9deg)' });
+    return el;
+  }
+  const HEAD = 'SIZE "Archivo Black"', SUB = 'italic 700 SIZE "Arimo"';
+  const width = (text, font, ls) => { const i = ink(text, font, ls); return i.r - i.l; };
+  const headW = (t) => width(t, HEAD, -0.05) + ink(t, HEAD, -0.05).cap * TAN9;
+  const subW = (t) => width(t, SUB, -0.04);
+  const HCAP = ink('H', HEAD, -0.05).cap, SCAP = ink('H', SUB, -0.04).cap;
+  const across = (text, font, size, ls) => { mc.font = font.replace('SIZE', size + 'px'); mc.letterSpacing = ls * size + 'px'; return mc.measureText(text).width; };
+  // centred on cx, baseline at y
+  const setHeadC = (text, size, cx, y, tag) => set('head', text, HEAD, -0.05, size, cx - (headW(text) * size) / 2, y, true, tag);
+  const setSubC = (text, size, cx, y, tag) => set('sub', text, SUB, -0.04, size, cx - (subW(text) * size) / 2, y, false, tag);
+
+  // ---- what moves ----
+  let movers = [];
+  const ease = (q) => q * q * (3 - 2 * q);
+  const lerp = (a, b, q) => a + (b - a) * q;
+  const twinkle = (path, delay) => movers.push((t) => {
+    const ph = ((t + delay) / 2.4) % 1, q = ease(ph < 0.5 ? ph * 2 : 2 - ph * 2);
+    path.style.transform = `scale(${lerp(0.55, 1, q)}) rotate(${lerp(-10, 12, q)}deg)`; path.style.opacity = lerp(0.75, 1, q);
+  });
+  const JOLT = [[0, 1, 0], [0.12, 1.18, -5], [0.26, 0.96, 3], [0.4, 1.08, -2], [0.55, 1, 0], [1, 1, 0]];
+  const joltAt = (ph) => {
+    const i = JOLT.findIndex(([w], n) => ph < JOLT[n + 1]?.[0]), [w0, s0, r0] = JOLT[i], [w1, s1, r1] = JOLT[i + 1];
+    const q = ease((ph - w0) / (w1 - w0)); return [lerp(s0, s1, q), lerp(r0, r1, q)];
+  };
+  // el's transform: `pre` then the jolt, every `period` s from `delay`; `amp` scales how hard
+  const jolt = (el, period, pre = '', amp = 1, delay = 0) => movers.push((t) => {
+    const [sc, r] = joltAt((((t + delay) / period) % 1 + 1) % 1);
+    el.style.transform = `${pre} scale(${1 + (sc - 1) * amp}) rotate(${r * amp}deg)`;
+  });
+  const wobble = (el, base, amp, period, delay) => movers.push((t) => { el.style.transform = `rotate(${base + amp * Math.sin(((t + delay) / period) * 2 * Math.PI)}deg)`; });
+
+  const glint = (cx, cy, r, delay = 0) => {
+    const el = place(put(`<div class="glint" aria-hidden="true"><svg viewBox="-1 -1 2 2"><path d="${GLINT}"/></svg></div>`), cx - r, cy - r, r * 2, r * 2);
+    twinkle(el.querySelector('path'), delay); return el;
+  };
+  // a starburst's points: n spikes between radius 1 and `inner`
+  const spikes = (n, inner) => Array.from({ length: n * 2 }, (_, i) => { const a = (i / (n * 2)) * 2 * Math.PI - Math.PI / 2, r = i % 2 ? inner : 1; return `${(r * Math.cos(a)).toFixed(4)},${(r * Math.sin(a)).toFixed(4)}`; }).join(' ');
+  // a burst of layers [{n, inner, scale, fill, stroke}], centred, radius r, with a navy shadow under the first
+  const burst = (cx, cy, r, layers, sh = 0.05) => {
+    const L0 = layers[0];
+    const svg = layers.map((l, i) => `${i ? '' : `<polygon points="${spikes(l.n, l.inner)}" transform="translate(${sh} ${sh})" fill="rgba(6,8,70,0.92)"/>`}<polygon points="${spikes(l.n, l.inner)}" transform="scale(${l.scale || 1}) rotate(${l.turn || 0})" fill="${l.fill}" stroke="${l.stroke || '#000'}" stroke-width="${(l.sw ?? 0.025) / (l.scale || 1)}" stroke-linejoin="miter"/>`).join('');
+    const el = place(put(`<div class="burstsvg" aria-hidden="true"><svg viewBox="-1 -1 2 2">${svg}</svg></div>`), cx - r, cy - r, r * 2, r * 2);
+    return el;
+  };
+  // a sticker: a small burst (or disc) with words in it
+  const sticker = (cx, cy, r, html, o) => {
+    const shape = o.disc ? `<circle r="1" cx="0.06" cy="0.06" fill="rgba(6,8,70,0.92)"/><circle r="1" fill="${o.fill}" stroke="#000" stroke-width="0.05"/><circle r="0.86" fill="none" stroke="${o.ring || '#000'}" stroke-width="0.03" stroke-dasharray="0.06 0.05"/>`
+                         : `<polygon points="${spikes(o.n || 16, o.inner || 0.8)}" transform="translate(0.07 0.07)" fill="rgba(6,8,70,0.92)"/><polygon points="${spikes(o.n || 16, o.inner || 0.8)}" fill="${o.fill}" stroke="#000" stroke-width="0.045"/>`;
+    const el = place(put(`<div class="stk"${o.label ? ` role="img" aria-label="${o.label}"` : ' aria-hidden="true"'}><svg viewBox="-1 -1 2 2">${shape}</svg><span>${html}</span></div>`), cx - r, cy - r, r * 2, r * 2);
+    Object.assign(el.querySelector('span').style, { font: o.font, fontSize: o.size + 'px', color: o.color, letterSpacing: o.ls || '-0.02em' });
+    wobble(el, o.rot || 0, o.amp ?? 3, o.period || 3, o.delay || 0);
+    return el;
+  };
+  const oval = (cx, cy, size, words, cls = '', rot = -7, label) => {
+    const el = put(`<div class="oval ${cls}"${label ? ` role="img" aria-label="${label}"` : ''}><span>${words}</span></div>`); el.style.fontSize = size + 'px';
+    at(el, cx - el.offsetWidth / 2, cy - el.offsetHeight / 2); wobble(el, rot, 2.5, 2.6, cx * 0.01); return el;
+  };
+  // the four cards, in a row (436 x 62) or, with grid, two by two (212 x 136); w: the width they take
+  const cards = (x, top, w, rot = 0, grid = false) => {
+    const el = put('<div class="cards" aria-hidden="true"><i class="c1"><b>FREE</b></i><i class="c2"><b>Gratis</b></i><i class="c3"><b>$0.00</b></i><i class="c4"><b>NO CHARGE</b></i></div>');
+    const nat = grid ? 212 : 436;
+    Object.assign(el.style, { left: x + 'px', top: top + 'px', transform: `rotate(${rot}deg) scale(${w / nat})` });
+    if (grid) Object.assign(el.style, { width: '212px', flexWrap: 'wrap' });
+    const sc = w / nat; movers.push((t) => { el.style.transform = `rotate(${rot + 1.5 * Math.sin(((t + 0.4) / 3.6) * 2 * Math.PI)}deg) scale(${sc})`; });
+    return ((grid ? 136 : 62) * w) / nat;
+  };
+  const card = (x, top, scale, rot = 3) => {
+    const el = put('<div class="card" role="img" aria-label="The Internet (All Of It). Was 100%, now 70%."><div class="hd">The Internet (All Of It)</div><div class="ln">WAS: <s>100%</s></div><div class="ln">NOW:</div><div class="big">70%</div></div>');
+    Object.assign(el.style, { left: x + 'px', top: top + 'px', transform: `scale(${scale}) rotate(${rot}deg)` });
+    jolt(el.querySelector('.big'), 1.1, 'skewX(-8deg)');
+    return el;
+  };
+  let globeFrames = null;
+  const globe = (cx, cy, d) => {
+    const k = d / 374, box = 480 * k, x = cx - 240 * k, y = cy - (47 + 187) * k;
+    if (globeFrames) {
+      const c = put('<canvas class="globe" aria-hidden="true"></canvas>'), dpr = Math.min(2, devicePixelRatio || 1);
+      c.width = Math.round(box * dpr); c.height = Math.round(box * dpr); place(c, x, y, box, box);
+      const g = c.getContext('2d'); let shown = -1;
+      movers.push((t) => { const i = Math.floor(t * 15) % 60; if (i !== shown) { shown = i; g.clearRect(0, 0, c.width, c.height); g.drawImage(globeFrames[i], 0, 0, c.width, c.height); } });
+    } else place(put(`<img class="globe" alt="" src="${IMG.globe}">`), x, y, box, box);
+  };
+  const glow = (cx, cy, d) => place(put('<div class="glow" aria-hidden="true"></div>'), cx - d * 1.3, cy - d * 1.45, d * 2.6, d * 2.9);
+
+  // RANK 1: the giant burst, 30% OFF / EVERYTHING ON THE INTERNET. Its rim turns slowly.
+  function primary(cx, cy, R, wide) {
+    const rim = burst(cx, cy, R, [{ n: 28, inner: 0.84, fill: '#fff035', sw: 0.022 }, { n: 28, inner: 0.84, scale: 0.885, turn: 6.43, fill: '#ff1616', sw: 0.02 }], 0.04);
+    movers.push((t) => { rim.style.transform = `rotate(${(t * 4) % 360}deg)`; });
+    // an inner ring of light, to sit the type on
+    const hs = (R * (wide ? 1.74 : 1.74)) / headW('30% OFF');
+    const l1 = 'EVERYTHING ON', l2 = 'THE INTERNET.', ss = (R * 1.18) / subW(l1);
+    const blockH = HCAP * hs + R * 0.1 + SCAP * ss + R * 0.06 + SCAP * ss;
+    let y = cy - blockH / 2 + HCAP * hs - R * 0.02;
+    const h = setHeadC('30% OFF', hs, cx, y, 'h1');
+    y += R * 0.12 + SCAP * ss; setSubC(l1, ss, cx, y, 'h2');
+    y += R * 0.07 + SCAP * ss; setSubC(l2, ss, cx, y);
+    return h;
+  }
+  // RANK 2: the slab, BLACK FRIDAY ONLY!, slung across the burst's foot, jolting
+  function secondary(cx, cy, w, rot) {
+    const text = 'BLACK FRIDAY ONLY!', size = (w * 0.86) / headW(text), h = HCAP * size * 1.9;
+    const el = put(`<div class="slab"><div class="t head" style="transform:skewX(-9deg)">${text}</div></div>`);
+    place(el, cx - w / 2, cy - h / 2, w, h);
+    Object.assign(el.style, { fontSize: size + 'px', transformOrigin: 'center' });
+    jolt(el, 2.4, `rotate(${rot}deg)`, 0.45, 0.8);
+    return h;
+  }
+
+  // ---- one layout pass ----
+  function build() {
+    p.textContent = ''; movers = [];
+    const W = p.clientWidth, H = p.clientHeight, tall = W / H < 0.95;
+    const s = tall ? Math.min(W / 1080, H / 1920) : Math.min(W / 1440, H / 900);
+    const f = (px, min) => Math.max(min, px);
+
+    $('.soft').setAttribute('stdDeviation', `${1.25 * s} ${0.5 * s}`);
+    $('.halo').setAttribute('stdDeviation', `${5 * s} ${0.6 * s}`);
+    $('.smear').setAttribute('stdDeviation', `${10 * s} ${1.6 * s}`);
+    $('.late').setAttribute('dx', 7 * s); $('.late').setAttribute('dy', 1.7 * s);
+    $('.bloom').setAttribute('stdDeviation', 14 * s);
+    $('.blotch').setAttribute('baseFrequency', `${0.042 / s} ${0.167 / s}`);
+    $('.static').setAttribute('baseFrequency', `${0.19 / s} ${0.71 / s}`);
+
+    const tiles = put('<div class="tiles" aria-hidden="true"></div>');
+    place(tiles, -W * 0.3, -H * 0.3, W * 1.6, H * 1.6);
+    Object.assign(tiles.style, { backgroundImage: `url(${IMG.tile})`, backgroundSize: `${260 * s}px ${224 * s}px` });
+
+    // the bands: ticker on top; at the foot, the lower third, the credits and the crawl
+    const tick = f((tall ? 64 : 38) * s, 18);
+    const crawlH = f((tall ? 96 : 50) * s, 24);
+    const byFont = f((tall ? 26 : 15) * s, 10.5);
+    const byTwo = across('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES ✦ GARRETT MUSAR ✦ AUFBAU', 'italic 700 SIZE "Arimo"', byFont, 0.08) + 3 * byFont > W * 0.94;
+    const byH = byFont * (byTwo ? 3.4 : 2.1);
+    const l3H = tall ? f(230 * s, 96) : f(112 * s, 62);
+    const crawlTop = H - crawlH, byTop = crawlTop - byH, l3Top = byTop - l3H;
+    const top = tick, bot = l3Top, SH = bot - top;   // the stage
+
+    // ---- the stage ----
+    if (tall) stageTall(top, SH); else stageWide(top, SH);
+
+    function stageWide(top, SH) {
+      const k = Math.min(W / 1440, SH / 660), cx0 = W / 2, cy0 = top + SH / 2;
+      const spareX = W - 1440 * k, spareY = SH - 660 * k;
+      const X = (dx, side = 0) => cx0 + dx * k + side * spareX * 0.32, Y = (dy, side = 0) => cy0 + dy * k + side * spareY * 0.3;
+      const rays = put('<div class="rays" aria-hidden="true"></div>'), rr = Math.max(W, H) * 0.9;
+      place(rays, X(150) - rr, Y(-10) - rr, rr * 2, rr * 2);
+      movers.push((t) => { rays.style.transform = `rotate(${(-t * 2) % 360}deg)`; });
+      // the anchor: the globe, left, behind the burst
+      const gx = X(-370, -1), gy = Y(30), gd = 520 * k;
+      glow(gx, gy, gd * 1.2);
+      globe(gx, gy, gd);
+      glint(gx - gd * 0.4, gy - gd * 0.36, gd * 0.07);
+      glint(gx + gd * 0.47, gy + gd * 0.36, gd * 0.04, 1.2);
+      // tertiaries on the left: As Seen On, under the globe; Every site 30% OFF!, its shoulder
+      oval(X(-560, -1), Y(255, 1), 25 * k, 'As Seen On<br>Every Website', 'w', 6, 'As Seen On Every Website');
+      sticker(X(-600, -1), Y(-200, -1), 82 * k, 'Every site<br>30% OFF!', { fill: '#29b6ff', n: 18, inner: 0.82, font: '400 1em "Archivo Black"', size: 19 * k, color: '#fff', rot: -12, period: 3.4, label: 'Every site 30% OFF!' });
+      // the punchline: the biggest sticker, on the globe's top edge
+      oval(X(-250, -1), Y(-215), 32 * k, 'But Wait…<br>There’s Less!', '', -8, 'But wait… there’s less!');
+      // tertiaries on the right: the price card, Works like magic!, the four cards
+      const cs = 0.47 * k, cw = 400 * cs;
+      card(X(720 - 30, 1) - cw - 4 * k, Y(-312, -1), cs, 4);
+      sticker(X(612, 1), Y(-25), 88 * k, 'Works<br>like<br>magic!', { fill: '#fff', n: 20, inner: 0.84, font: 'italic 700 1em "Arimo"', size: 23 * k, color: '#e00010', rot: 10, period: 2.8, delay: 0.7, label: 'Works like magic!' });
+      cards(X(540, 1), Y(85, 0.5), 160 * k, 5, true);
+      glint(X(470), Y(-280), 26 * k, 0.6);
+      // rank 1 and 2, over everything on the stage
+      const R = 330 * k, bx = X(150), by = Y(-28);
+      primary(bx, by, R, true);
+      // the slab sits on the burst's foot, but never down into the lower third, even at the top of its jolt
+      const slabH = HCAP * ((800 * k * 0.86) / headW('BLACK FRIDAY ONLY!')) * 1.9;
+      secondary(X(150), Math.min(Y(286, 0.5), top + SH - slabH * 0.78 - 6 * k), 800 * k, -3.5);
+    }
+
+    function stageTall(top, SH) {
+      const k = Math.min(W / 1080, SH / 1500), cx0 = W / 2, cy0 = top + SH / 2;
+      const spareY = SH - 1500 * k;
+      const X = (dx) => cx0 + dx * k, Y = (dy, side = 0) => cy0 + dy * k + side * spareY * 0.36;
+      const rays = put('<div class="rays" aria-hidden="true"></div>'), rr = Math.max(W, H) * 0.9;
+      place(rays, X(0) - rr, Y(-260, -1) - rr, rr * 2, rr * 2);
+      movers.push((t) => { rays.style.transform = `rotate(${(-t * 2) % 360}deg)`; });
+      const gx = X(-150), gy = Y(330, 1), gd = 600 * k;
+      glow(gx, gy, gd * 1.15);
+      globe(gx, gy, gd);
+      glint(gx - gd * 0.42, gy - gd * 0.3, gd * 0.07);
+      oval(X(-40), Y(610, 1), 36 * k, 'But Wait…<br>There’s Less!', '', -8, 'But wait… there’s less!');
+      sticker(X(330), Y(360, 1), 130 * k, 'Works<br>like<br>magic!', { fill: '#fff', n: 20, inner: 0.84, font: 'italic 700 1em "Arimo"', size: 34 * k, color: '#e00010', rot: 10, period: 2.8, delay: 0.7, label: 'Works like magic!' });
+      const cs = 0.58 * k; card(X(500) - 400 * cs, Y(520, 1), cs, 4);
+      sticker(X(-410), Y(-640, -1), 110 * k, 'Every site<br>30% OFF!', { fill: '#29b6ff', n: 18, inner: 0.82, font: '400 1em "Archivo Black"', size: 26 * k, color: '#fff', rot: -12, period: 3.4, label: 'Every site 30% OFF!' });
+      oval(X(380), Y(-660, -1), 30 * k, 'As Seen On<br>Every Website', 'w', 6, 'As Seen On Every Website');
+      cards(X(-505), Y(545, 1), 190 * k, -5, true);
+      glint(X(440), Y(-470, -1), 36 * k, 0.6);
+      primary(X(0), Y(-260, -0.4), 470 * k, false);
+      secondary(X(0), Y(140), 1010 * k, -3.5);
+    }
+
+    // ---- the lower third: furniture, the button, the clock ----
+    const l3 = put('<div class="l3" aria-hidden="true"></div>'); place(l3, 0, l3Top, W, l3H);
+    const pad = Math.max(12, (tall ? 40 : 30) * s);
+    let clockEl;
+    if (!tall) {
+      const lf = f(l3H * 0.26, 11);
+      // left: the item number and the logo
+      const logoH = l3H * 0.5, logoW = logoH * 2.3;
+      const lg = place(put(`<img class="logo" alt="Gary Mustard Enterprises" src="${IMG.logo}">`), pad, l3Top + (l3H - logoH) / 2, logoW, logoH); lg.style.objectFit = 'contain';
+      const item = put('<div class="box item"><div><b>ITEM #</b> 30-OFF</div><small>LIMITED TIME</small></div>');
+      item.style.fontSize = lf + 'px'; at(item, pad + logoW + pad * 0.8, l3Top + (l3H - lf * 1.9) / 2);
+      // right: ON AIR and the clock, operators standing by
+      const rgt = put(`<div class="box" style="align-items:flex-end;gap:${lf * 0.3}px"><div class="onair" style="font-size:${lf * 0.85}px"><i></i>ON AIR</div><div class="item" style="font-size:${lf * 0.8}px">OPERATORS STANDING BY</div></div>`);
+      clockEl = rgt;
+      at(rgt, W - pad - rgt.offsetWidth, l3Top + (l3H - rgt.offsetHeight) / 2);
+      // the button, in the middle, as big as the room between
+      const roomL = pad + logoW + pad * 0.8 + item.offsetWidth + pad, roomR = W - pad * 2 - rgt.offsetWidth, room = roomR - roomL;
+      const bh = l3H * 0.78, fs0 = bh * 0.5;
+      const withSay = across('ADD TO CHROME →', '400 SIZE "Archivo Black"', fs0, -0.01) + fs0 * 1.9 + across('No purchase necessary!', 'italic 700 SIZE "Arimo"', fs0 * 0.5, 0) + fs0 * 0.6 < room;
+      const btn = put(`<a class="buy" href="${STORE}" aria-label="Add to Chrome">${withSay ? '<span class="say">No purchase necessary!</span>' : ''}<span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
+      btn.style.fontSize = fs0 + 'px';
+      const bw = Math.min(room, btn.scrollWidth + fs0 * 1.2);
+      place(btn, roomL + (room - bw) / 2, l3Top + (l3H - bh) / 2 + l3H * 0.04, bw, bh);
+      flash(btn);
+    } else {
+      const lf = f(l3H * 0.13, 11);
+      const bh = l3H * 0.56, bw = W - pad * 2, fs0 = Math.min(bh * 0.46, (bw * 0.86) / (across('ADD TO CHROME →', '400 100px "Archivo Black"', 100, -0.01) / 100 + 1.3));
+      const btn = put(`<a class="buy" href="${STORE}" aria-label="Add to Chrome"><span class="go">ADD TO CHROME <i aria-hidden="true">→</i></span></a>`);
+      btn.style.fontSize = fs0 + 'px'; place(btn, pad, l3Top + l3H * 0.09, bw, bh);
+      flash(btn);
+      const rowY = l3Top + l3H * 0.09 + bh + (l3H * 0.91 - bh - lf * 1.6) / 2;
+      const item = put('<div class="box item"><div><b>ITEM #</b> 30-OFF ✦ NO PURCHASE NECESSARY!</div></div>');
+      item.style.fontSize = lf + 'px'; at(item, pad, rowY);
+      const rgt = put(`<div class="onair" style="font-size:${lf}px"><i></i>ON AIR</div>`); clockEl = rgt;
+      at(rgt, W - pad - rgt.offsetWidth, rowY - lf * 0.15);
+      if (item.offsetWidth > W - pad * 3 - rgt.offsetWidth) item.firstElementChild.innerHTML = '<b>ITEM #</b> 30-OFF';
+    }
+    const dot = clockEl.querySelector('.onair') || clockEl;
+    movers.push((t) => { dot.classList.toggle('off', Math.floor(t * 1.25) % 2 === 1); });
+
+    // the credits and the crawl
+    const by = put(`<div class="by${byTwo ? ' two' : ''}"><span class="gme">Brought to you by Gary Mustard Enterprises</span><span class="sep first" aria-hidden="true">✦</span><span class="names"><a href="${GARRETT}">Garrett Musar</a><span class="sep" aria-hidden="true">✦</span><a href="${AUFBAU}">Aufbau</a></span></div>`);
+    place(by, 0, byTop, W, byH); by.style.fontSize = byFont + 'px';
+    if (byTwo && across('BROUGHT TO YOU BY GARY MUSTARD ENTERPRISES', 'italic 700 SIZE "Arimo"', byFont, 0.08) > W * 0.92) by.querySelector('.gme').textContent = 'Gary Mustard Enterprises';
+
+    const tk = put(`<div class="ticker" aria-hidden="true"><span>${TICKER.repeat(6)}</span></div>`);
+    Object.assign(tk.style, { height: tick + 'px', fontSize: tick * 0.66 + 'px', lineHeight: tick + 'px' });
+    const cr = put(`<div class="crawl" aria-hidden="true"><span>${CRAWL.repeat(16)}</span></div>`);
+    Object.assign(cr.style, { height: crawlH + 'px', fontSize: crawlH * 0.66 + 'px', lineHeight: crawlH + 'px' });
+    const tks = tk.firstElementChild, crs = cr.firstElementChild, tkRep = tks.offsetWidth / 6, crRep = crs.offsetWidth / 16;
+    const tkV = tick * 1.5, crV = crawlH * 2.6;
+    movers.push((t) => {
+      tks.style.transform = `translateX(${-(((t + 3) * tkV) % tkRep)}px)`;
+      crs.style.transform = `translateX(${-(((t + 3) * crV) % crRep)}px) skewX(-9deg)`;
+    });
+    render(clock());
+  }
+  // the button flashes like an order panel: twice a second, by the clock
+  function flash(btn) { movers.push((t) => { btn.classList.toggle('on', Math.floor(t * 2.5) % 2 === 1); }); }
+
+  // ---- the clock ----
+  const t0 = performance.now(), clock = () => (still ? 0 : Math.floor(((performance.now() - t0) / 1000) * FPS) / FPS);
+  const blotch = $('.blotch'), grain = $('.static');
+  function render(t) {
+    for (const move of movers) move(t);
+    const fr = Math.round(t * FPS); blotch.setAttribute('seed', BLOTCH[Math.floor(fr / 4) % 6]); grain.setAttribute('seed', STATIC[Math.floor(fr / 2) % 6]);
+  }
+
+  build();
+  let pending = 0;
+  addEventListener('resize', () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(build); });
+  if (!still) {
+    let last = -1;
+    const frame = () => { const t = clock(); if (t !== last) { last = t; render(t); } requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+    if ('ImageDecoder' in window) (async () => {
+      try {
+        const dec = new ImageDecoder({ data: await (await fetch(IMG.globe)).arrayBuffer(), type: 'image/webp' });
+        await dec.tracks.ready;
+        const n = dec.tracks.selectedTrack.frameCount, frames = [];
+        for (let i = 0; i < n; i++) { const { image } = await dec.decode({ frameIndex: i }); frames.push(await createImageBitmap(image)); image.close(); }
+        dec.close();
+        if (n === 60) { globeFrames = frames; build(); }
+      } catch {}
+    })();
+  }
+
+  // slow machine: take the tape look off if it costs the frame rate, and put it back if that made no difference
+  const frameRate = () => new Promise((resolve) => {
+    let frames = 0, drawing = 0, last = 0;
+    const tick = (now) => { const gap = now - last; if (last && gap < 1000) { frames++; drawing += gap; } last = now; if (drawing < 2000) requestAnimationFrame(tick); else resolve((frames * 1000) / drawing); };
+    requestAnimationFrame(tick);
+  });
+  if (!still && !query.has('keep')) {
+    await new Promise((r) => setTimeout(r, 1200));
+    const withLook = await frameRate();
+    if (withLook < 24) {
+      p.style.filter = 'none';
+      if ((await frameRate()) < withLook * 1.5) p.style.removeProperty('filter');
+    }
+  }
+})();
+</script>
+</body>
+</html>
