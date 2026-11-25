@@ -1,5 +1,6 @@
 // Opens dist/ in Chromium at several window sizes, in each mode, and checks: no scrolling, no console
-// or page errors, WebGL on, and the clock's digits right for ?now=. Saves screenshots to screenshots/.
+// or page errors, WebGL on, and the clock's digits right for ?now=. Saves screenshots to screenshots/: each size
+// before the day, on it (two frames, either side of the beat) and with reduced motion.
 //   npm run build && npm run check
 //   npm run check -- --quick                  (two sizes only)
 process.env.TZ = 'America/New_York'; // the browser runs in the same zone (timezoneId below)
@@ -26,7 +27,7 @@ const DATES = {
 const RUNS = [
   ...SIZES.flatMap(([w, h, d]) => ['before', 'today'].map((m) => ({ w, h, d, m }))),
   ...SIZES.filter(([w]) => w === 1440 || w === 390).map(([w, h, d]) => ({ w, h, d, m: 'after' })),
-  ...SIZES.filter(([w]) => w === 1440 || w === 390 || w === 844).flatMap(([w, h, d]) => ['before', 'today'].map((m) => ({ w, h, d, m, still: true }))),
+  ...SIZES.flatMap(([w, h, d]) => ['before', 'today'].map((m) => ({ w, h, d, m, still: true }))),
 ];
 
 const server = await serve('dist', 0, { quiet: true });
@@ -34,7 +35,7 @@ const browser = await chromium.launch();
 let failures = 0;
 const fail = (what) => { failures++; console.log(`  FAIL ${what}`); };
 
-async function open({ w, h, d, still = false }, url) {
+async function open({ w, h, d, still = false, held = false }, url) {
   const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: d, timezoneId: 'America/New_York',
                                          reducedMotion: still ? 'reduce' : 'no-preference', isMobile: w < 900 && d > 1, hasTouch: w < 900 && d > 1 });
   const page = await ctx.newPage(), errors = [];
@@ -43,6 +44,7 @@ async function open({ w, h, d, still = false }, url) {
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
   page.on('requestfailed', (r) => errors.push(`requestfailed: ${r.url()}`));
   page.on('request', (r) => { if (!r.url().startsWith(server.url) && !r.url().startsWith('data:') && !r.url().startsWith('file:')) errors.push(`external request: ${r.url()}`); });
+  if (held) await page.clock.install(); // time runs as usual, but can be held still for a screenshot (see below)
   await page.goto(url);
   await page.waitForFunction(() => window.__bf && window.__bf.ready, null, { timeout: 15000 });
   return { ctx, page, errors };
@@ -71,14 +73,26 @@ function verify(r, spec, forced, name) {
 for (const run of RUNS) {
   const spec = DATES[run.m], name = `${run.w}x${run.h}-${run.m}${run.still ? '-still' : ''}`;
   const forced = new Date(spec.now).getTime();
-  const { ctx, page, errors } = await open(run, `${server.url}?now=${spec.now}&keep`);
+  // On the day the beat changes faster than a screenshot of the filtered page is taken here, so the
+  // page's time is held still for each frame, and stepped on to the other side of the beat for the second
+  const held = run.m === 'today' && !run.still;
+  const { ctx, page, errors } = await open({ ...run, held }, `${server.url}?now=${spec.now}&keep`);
   await page.waitForTimeout(run.still ? 600 : 1800);
+  if (held) {
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000)); // a margin: a slow machine takes a while to get there
+    await page.clock.runFor(20);
+  }
   const r = await read(page);
   const clock = verify(r, spec, forced, name);
-  await page.screenshot({ path: `${OUT}/${name}.jpg`, type: 'jpeg', quality: 60 });
-  if (run.m === 'today' && !run.still && run.w === 1440) { // a second frame, off the beat
-    await page.waitForTimeout(130);
+  if (held) {
+    const beat = () => page.evaluate(() => document.documentElement.classList.contains('beat'));
+    await page.screenshot({ path: `${OUT}/${name}.jpg`, type: 'jpeg', quality: 60 });
+    const was = await beat();
+    for (let i = 0; i < 20 && (await beat()) === was; i++) await page.clock.runFor(40);
+    if ((await beat()) === was) fail(`${name}: the beat never changed`);
     await page.screenshot({ path: `${OUT}/${name}-b.jpg`, type: 'jpeg', quality: 60 });
+  } else {
+    await page.screenshot({ path: `${OUT}/${name}.jpg`, type: 'jpeg', quality: 60 });
   }
   errors.forEach((e) => fail(`${name}: ${e}`));
   console.log(`${errors.length ? 'FAIL' : 'ok  '} ${name.padEnd(26)} ${clock}  tape:${r.tape}`);
