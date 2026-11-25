@@ -137,16 +137,9 @@ function settle(tall, s) {
   cards.style.marginTop = '';
   for (const f of fits) Object.assign(f.style, { top: '', bottom: '' });
   const box = (el) => el.getBoundingClientRect();
-  if (tall) {
-    for (let i = 0; i < 3; i++) {
-      const above = box(cards).top - box($('.tag')).bottom, below = box($('.order')).top - box(cards).bottom;
-      const zoom = box(cards).height / cards.offsetHeight || 1; // the fitted block is scaled
-      const shift = (below - above) / 2 / zoom;
-      if (Math.abs(shift) < 0.5) break;
-      cards.style.marginTop = `${parseFloat(getComputedStyle(cards).marginTop) + shift}px`;
-    }
-  } else {
-    // stack them with one even gap, the pair centred on the badge
+  if (tall) return;
+  // wide: stack them with one even gap, the pair centred on the badge
+  {
     const [clockFit, wordsFit] = fits, gap = s * 34;
     const hClock = box(clockFit).height, hWords = box(wordsFit).height, badge = box($('.burst'));
     const top = (badge.top + badge.bottom) / 2 - (hClock + gap + hWords) / 2;
@@ -163,8 +156,11 @@ function layout() {
   const s = tall ? Math.min(W / 430, H / 900) : Math.min(W / 1280, H / 800);
   root.style.setProperty('--s', `${s}px`);
 
+  // in a tall window the cards have their own row under the clock; in a wide one they follow the words
+  (tall ? $('.cards-box .fit') : $('.words')).append($('.cards'));
   fit($('.timer'), tall ? { w: 0.9, h: 0.94 } : { w: 0.94, h: 0.96 });
   fit($('.words'), tall ? { w: 0.94, h: 0.96 } : { w: 0.96, h: 0.96 });
+  if (tall) fit($('.cards-box .fit'), { w: 0.86, h: 0.8 });
   fit($('.order .fit'), tall ? { w: 0.9, h: 0.72 } : { w: 0.9, h: 0.46 });
   fit($('.by .fit'), { w: 0.92, h: 0.42 });
   settle(tall, s);
