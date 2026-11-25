@@ -74,12 +74,11 @@
 .ticker, .crawl { right: 0; overflow: hidden; white-space: nowrap; }
 .ticker { top: 0; font: 300 1em "TOE Antonio", "Arial Narrow", Arial, sans-serif; letter-spacing: 0.035em; word-spacing: 0.3em;
           color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); background: rgba(4, 8, 90, 0.35); }
-.ticker span { display: inline-block; animation: slide 44s linear infinite; }
-/* a faint rule on each ticker's inner edge */
-.ticker { border-bottom: max(1px, 0.04em) solid rgba(255, 240, 53, 0.38); }
-.crawl { border-top: max(1px, 0.025em) solid rgba(255, 240, 53, 0.38); }
+/* both run at a set speed for their size (layout() sets --dur). The hair of rotation keeps the
+   browser from snapping the sliding text to whole pixels, which makes slow motion stick */
+.ticker span { display: inline-block; animation: slide var(--dur, 44s) linear infinite; will-change: transform; }
 .crawl { font-family: "TOE Black", "Arial Black", Arial, sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; background: rgba(4, 8, 90, 0.25); }
-.crawl span { display: inline-block; animation: crawl 24s linear infinite;
+.crawl span { display: inline-block; animation: crawl var(--dur, 24s) linear infinite; will-change: transform;
               text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade); }
 
 /* the yellow tape and the navy one under it, at a slant over the crawl */
@@ -111,7 +110,7 @@
              color: var(--red); letter-spacing: -0.05em; -webkit-text-stroke: 11px #000; paint-order: stroke fill;
              transform: skewX(-8deg); transform-origin: 70% 80%; animation: jolt 1.1s ease-in-out infinite; }
 
-@keyframes slide { to { transform: translateX(-50%); } }
+@keyframes slide { from { transform: translateX(0) rotate(0.01deg); } to { transform: translateX(-50%) rotate(0.01deg); } }
 @keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
 @keyframes turn { to { transform: rotate(360deg); } }
 @keyframes twinkle { 0%, 100% { transform: scale(0.55) rotate(-10deg); opacity: 0.75; } 50% { transform: scale(1) rotate(12deg); opacity: 1; } }
