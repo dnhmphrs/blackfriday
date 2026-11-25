@@ -5,13 +5,11 @@
 import { status, units, parseNow } from './clock.js';
 import { layer } from './gl/gl.js';
 import BG from './gl/bg.glsl';
-import FX from './gl/fx.glsl';
 import TILE from './images/tile.png?inline';
 
 const BEAT = 0.25;   // s. On the day the big flips (background, marquee, bulbs) happen only on this beat, in step:
                      // at most 4 changes a second, 2 flashes, under the 3 a second of WCAG 2.3.1
 const CHASE = 0.2;   // s. The bulbs' chase and the ON AIR light, before the day
-const FPS = 25;      // the tape's frame rate: the noise moves on 25 times a second
 
 const TICKER = 'But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
 const CRAWL = 'BLACK FRIDAY ONLY! <b>✦</b> ';
@@ -37,13 +35,12 @@ const now = () => (FREEZE ? wall0 + offset : Date.now() + offset);
 const seconds = () => (FREEZE ? 2.2 : (performance.now() - perf0) / 1000);
 
 // ---- WebGL: the background under the page and the tape over it ----
-let bg = null, fx = null, tile = null;
+let bg = null, tile = null;
 try {
   bg = layer($('#bg'), BG);
-  fx = bg && layer($('#fx'), FX, { alpha: false });
-} catch { bg = fx = null; }
-if (!bg || !fx) { bg = fx = null; set('nogl', true); }
-for (const c of ['#bg', '#fx']) $(c).addEventListener('webglcontextlost', (e) => { e.preventDefault(); bg = fx = null; set('nogl', true); });
+} catch { bg = null; }
+if (!bg) set('nogl', true);
+$('#bg').addEventListener('webglcontextlost', (e) => { e.preventDefault(); bg = null; set('nogl', true); });
 if (bg) {
   const img = new Image();
   img.onload = () => { if (bg) { tile = bg.texture(img, 0); draw(seconds(), true); } };
@@ -62,7 +59,6 @@ let mode = '', shape = '', cells = [];
 const cell = (c) => `<em><b class="up"><b>${c}</b></b><b class="dn"><b>${c}</b></b><b class="fa"><b>${c}</b></b><b class="fb"><b>${c}</b></b></em>`;
 const FLAP_A = [{ transform: 'rotateX(0)' }, { transform: 'rotateX(-90deg)', filter: 'brightness(0.6)' }];
 const FLAP_B = [{ transform: 'rotateX(90deg)', filter: 'brightness(1.6)' }, { transform: 'rotateX(0)' }];
-let ticked = -1e9; // when the seconds last changed (for the tick's glow)
 
 function build(st, us) {
   row.innerHTML = us.map(([name, val], i) =>
@@ -94,7 +90,7 @@ function tick(animate) {
     if (st.mode !== mode) enter(st.mode);
     layout();
   } else {
-    us.forEach(([, v], i) => [...v].forEach((c, j) => { if (setDigit(cells[i][j], c, animate) && i === us.length - 1 && j === 1) ticked = performance.now(); }));
+    us.forEach(([, v], i) => [...v].forEach((c, j) => { setDigit(cells[i][j], c, animate); }));
   }
   const minute = us.slice(0, -1).map((u) => u[1]).join();
   if (minute !== lastMinute) { lastMinute = minute; describe(st, us); }
@@ -166,14 +162,14 @@ function layout() {
           clock: [c.left, H - c.bottom, c.width, c.height] };
   if (bg) {
     const px = Math.min(1, devicePixelRatio || 1);
-    bg.size(W, H, px); fx.size(W, H, 1);
+    bg.size(W, H, px);
     geo.px = px;
   }
   draw(seconds(), true);
 }
 
-// ---- drawing: classes on the beat, and the two WebGL layers ----
-let ang = 0, lastT = 0, lastFrame = -1;
+// ---- drawing: classes on the beat, and the WebGL background ----
+let ang = 0, lastT = 0;
 function draw(t, force = false) {
   const bf = mode === 'today';
   const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t;
@@ -193,14 +189,6 @@ function draw(t, force = false) {
     uBF: bf ? 1 : 0, uFlip: onBeat ? 1 : 0, uPulse: pulse, uTime: t % 3600, uK: geo.s * (geo.W / geo.H < 0.85 ? 0.7 : 1),
     uTile: { tex: 0 },
   });
-  const frame = MOVING ? Math.floor(t * FPS) : 0;
-  if (frame === lastFrame && !force && !bf) return;
-  lastFrame = frame;
-  const since = (performance.now() - ticked) / 1000;
-  fx.draw({
-    uRes: [fx.gl.drawingBufferWidth, fx.gl.drawingBufferHeight], uPx: 1, uFrame: frame % 1000, uTime: t % 3600,
-    uMotion: MOVING ? 1 : 0, uGrain: MOVING && !FREEZE ? 1 : 0.3, uBF: bf && MOVING ? 1 : 0, uFlash: pulse, uClock: geo.clock, uTick: MOVING ? Math.exp(-since * 6) : 0,
-  });
 }
 
 // ---- start ----
@@ -209,6 +197,7 @@ async function start() {
   const faces = ['400 50px "Archivo Black"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Arimo"'];
   await Promise.race([Promise.all(faces.map((f) => document.fonts.load(f))), new Promise((r) => setTimeout(r, 3000))]);
   set('moving', MOVING); set('freeze', FREEZE);
+  if (!MOVING || FREEZE) $('svg.defs').pauseAnimations(); // the tape's noise holds still too
   tick(false);
   layout();
   set('loading', false);
