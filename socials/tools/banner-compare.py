@@ -5,13 +5,16 @@
 The current banner is the real extension: ../extension/src/content.js run on the mock page, with
 chrome.runtime stood in for (its files handed over as data: URLs) and the date set to Black Friday.
 A design is any templates/*-banner.html, built (tools/build-templates.py) and shown in the frame the
-extension uses, given the same Black Friday date."""
-import base64, json, os, re, subprocess
+extension uses, given the same Black Friday date. A Noise switch shows the banner with or without its
+VHS tape look.
+    python3 tools/banner-compare.py --current   -> out/banner-noise.html: the extension's banner only"""
+import base64, json, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(os.path.dirname(ROOT), 'extension', 'src')
 # button label -> template name: v-starburst-banner -> "Starburst"
-DESIGNS = [(n[2:-7].replace('-', ' ').title(), n) for n in sorted(f[:-5] for f in os.listdir(os.path.join(ROOT, 'templates')) if f.endswith('-banner.html'))]
+CURRENT_ONLY = '--current' in sys.argv
+DESIGNS = [] if CURRENT_ONLY else [(n[2:-7].replace('-', ' ').title(), n) for n in sorted(f[:-5] for f in os.listdir(os.path.join(ROOT, 'templates')) if f.endswith('-banner.html'))]
 subprocess.run(['python3', os.path.join(ROOT, 'tools', 'build-templates.py'), *[n for _, n in DESIGNS]], check=True, stdout=subprocess.DEVNULL)
 
 def data(path, mime):
@@ -47,6 +50,7 @@ page = r'''<!doctype html>
   .group { display: flex; background: var(--panel); border-radius: 999px; padding: 3px; }
   .group button { border: 0; background: none; color: var(--text); font: 600 14px/1 system-ui, sans-serif; padding: 9px 16px; border-radius: 999px; cursor: pointer; }
   .group button[aria-pressed="true"] { background: var(--on); color: var(--on-text); }
+  .group[hidden] { display: none; }
   .note { color: var(--muted); font-size: 12px; }
   #stage { position: absolute; left: 0; right: 0; bottom: 0; display: grid; place-items: center; }
   #screen { position: absolute; border: 0; background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.5); transform-origin: 0 0; border-radius: 6px; }
@@ -57,17 +61,21 @@ page = r'''<!doctype html>
   <div class="group" role="group" aria-label="Banner">
     <button data-banner="current" aria-pressed="true">Current (__VERSION__)</button>
   </div>
+  <div class="group" role="group" aria-label="Noise">
+    <button data-noise="on" aria-pressed="true">With noise</button>
+    <button data-noise="off" aria-pressed="false">Without noise</button>
+  </div>
   <div class="group" role="group" aria-label="Screen">
     <button data-screen="desktop" aria-pressed="true">Desktop</button>
     <button data-screen="phone" aria-pressed="false">Phone</button>
   </div>
-  <span class="note">Shown as on Black Friday, 2pm. Keys: 1–9 switch banner, D / P switch screen.</span>
+  <span class="note">Shown as on Black Friday, 2pm. Keys: 1–9 banner, N noise, D / P screen.</span>
 </header>
 <div id="stage"><iframe id="screen" title="A web page on Black Friday"></iframe></div>
 <script>
 const B = __PAYLOAD__;
 const SCREENS = { desktop: [1440, 900], phone: [390, 844] };
-const state = { banner: 'current', screen: 'desktop' };
+const state = { banner: 'current', screen: 'desktop', noise: 'on' };
 const screen = document.getElementById('screen'), stage = document.getElementById('stage');
 
 // the mock page, with something added to the end of its <body>
@@ -81,11 +89,19 @@ const DATE = `<script>(() => { const R = Date, t0 = new R(2026, 10, 27, 14).getT
 const group = document.querySelector('[aria-label="Banner"]');
 B.designs.forEach((d, i) => group.insertAdjacentHTML('beforeend', `<button data-banner="${i}" aria-pressed="false">${d.label}</button>`));
 
+// The tape look, set inside the banner's shadow root: on (kept on even where a slow machine would take
+// it off, so the two can be compared) or off (no filter, no scanlines)
+const look = (css) => `<script>(() => { const t = setInterval(() => {
+    const s = document.querySelector('thirty-off-everything')?.shadowRoot; if (!s) return;
+    const st = document.createElement('style'); st.textContent = '${css}';
+    s.append(st); clearInterval(t); }, 20); })();<\/script>`;
+const NOISE = { on: look('.tube { filter: url(#tape) !important; }'), off: look('.tube { filter: none !important; } .lines { display: none !important; }') };
+
 // The current banner: the extension's own script, given what it asks Chrome for.
 function current(mock) {
   const shim = `<script>
     window.chrome = { runtime: { id: 'demo', getURL: (p) => (${esc(JSON.stringify(B.files))})[p] || p } };
-  <\/script>${DATE}<script>${esc(B.content)}<\/script>`;
+  <\/script>${DATE}<script>${esc(B.content)}<\/script>${NOISE[state.noise]}`;
   return withExtra(mock, shim);
 }
 // A design: the built banner page in the extension's frame, its options set in place of the query
@@ -131,6 +147,8 @@ function fit() {
 function show() {
   for (const b of document.querySelectorAll('[data-banner]')) b.setAttribute('aria-pressed', b.dataset.banner === String(state.banner));
   for (const b of document.querySelectorAll('[data-screen]')) b.setAttribute('aria-pressed', b.dataset.screen === state.screen);
+  for (const b of document.querySelectorAll('[data-noise]')) b.setAttribute('aria-pressed', b.dataset.noise === state.noise);
+  document.querySelector('[aria-label="Noise"]').hidden = state.banner !== 'current';
   fit();
   const narrow = state.screen === 'phone', mock = B.mock[narrow ? 'news' : 'shop'];
   if (state.banner !== 'current' && !B.designs[state.banner]) state.banner = 'current';
@@ -145,11 +163,12 @@ document.addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.banner) state.banner = b.dataset.banner;
   if (b.dataset.screen) state.screen = b.dataset.screen;
+  if (b.dataset.noise) state.noise = b.dataset.noise;
   show();
 });
 addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase(), n = Number(k) - 2;
-  const m = k === '1' ? ['banner', 'current'] : n >= 0 && n < B.designs.length ? ['banner', String(n)] : { d: ['screen', 'desktop'], p: ['screen', 'phone'] }[k];
+  const m = k === '1' ? ['banner', 'current'] : n >= 0 && n < B.designs.length ? ['banner', String(n)] : { d: ['screen', 'desktop'], p: ['screen', 'phone'], n: ['noise', state.noise === 'on' ? 'off' : 'on'] }[k];
   if (m && state[m[0]] !== m[1]) { state[m[0]] = m[1]; show(); }
 });
 addEventListener('resize', fit);
@@ -158,7 +177,7 @@ show();
 </body>
 </html>
 '''
-out = os.path.join(ROOT, 'out/banner-compare.html')
+out = os.path.join(ROOT, 'out', 'banner-noise.html' if CURRENT_ONLY else 'banner-compare.html')
 version = json.load(open(f'{SRC}/manifest.json'))['version']
 open(out, 'w', encoding='utf-8').write(page.replace('__VERSION__', version).replace('__PAYLOAD__', payload))
 print(out, f'{os.path.getsize(out) / 1e6:.2f} MB')
