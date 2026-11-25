@@ -79,7 +79,7 @@ for (const run of RUNS) {
   const { ctx, page, errors } = await open({ ...run, held }, `${server.url}?now=${spec.now}&keep`);
   await page.waitForTimeout(run.still ? 600 : 1800);
   if (held) {
-    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 50));
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000)); // a margin: a slow machine takes a while to get there
     await page.clock.runFor(20);
   }
   const r = await read(page);

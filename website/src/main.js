@@ -9,7 +9,6 @@ import TILE from './images/tile.png?inline';
 
 const BEAT = 0.25;   // s. On the day the big flips (sash, tag, clock, rays, the red rim) happen only on every other
                      // beat, all in step: 2 flashes a second, under the 3 a second of WCAG 2.3.1
-const BLINK = 0.5;   // s. The ON AIR light, before the day (on the day it blinks on the beat)
 
 const TICKER = 'But wait… there’s less! ✦ No purchase necessary! ✦ Black Friday only! ✦ Every website, 30% off! ✦ Works like magic! ✦ ';
 const CRAWL = 'BLACK FRIDAY ONLY! ✦ ';
@@ -129,6 +128,20 @@ function run(r, bandH) {
   r.el.style.setProperty('--dur', `${unitW / (bandH * r.speed)}s`);
 }
 
+// the cards sit halfway between the BLACK FRIDAY ONLY! tag and the yellow tape
+function balanceCards() {
+  const cards = $('.cards'), tag = $('.tag'), order = $('.order');
+  cards.style.marginTop = '';
+  for (let i = 0; i < 3; i++) {
+    const above = cards.getBoundingClientRect().top - tag.getBoundingClientRect().bottom;
+    const below = order.getBoundingClientRect().top - cards.getBoundingClientRect().bottom;
+    const zoom = cards.getBoundingClientRect().height / cards.offsetHeight || 1; // the fitted block may be scaled
+    const shift = (below - above) / 2 / zoom;
+    if (Math.abs(shift) < 0.5) break;
+    cards.style.marginTop = `${parseFloat(getComputedStyle(cards).marginTop) + shift}px`;
+  }
+}
+
 let geo = { W: 1, H: 1, s: 1, tall: false, cx: 0, cy: 0, r: 100 };
 function layout() {
   const W = tv.clientWidth, H = tv.clientHeight, tall = W / H < 0.85;
@@ -140,6 +153,7 @@ function layout() {
   fit($('.words'), tall ? { w: 0.94, h: 0.96 } : { w: 0.9, h: 0.88 });
   fit($('.order .fit'), tall ? { w: 0.9, h: 0.72 } : { w: 0.9, h: 0.46 });
   fit($('.by .fit'), { w: 0.92, h: 0.42 });
+  balanceCards();
 
   const tk = Math.min(H * 0.2, W * (tall ? 0.2 : 0.11));
   $('.takeover').style.setProperty('--tk', `${tk}px`);
@@ -175,7 +189,6 @@ function draw(t) {
   const beatN = Math.floor(t / BEAT), onBeat = bf && MOVING && beatN % 2 === 1;
   if (MOVING) {
     set('beat', onBeat);
-    set('blink', bf ? onBeat : Math.floor(t / BLINK) % 2 === 1);
     ang += dt * (bf ? 0.6 : (2 * Math.PI) / 180); // the banner's rays go round in 3 minutes
   }
   if (!bg) return;

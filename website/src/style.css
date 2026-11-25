@@ -54,12 +54,6 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 .crawl .run > span { text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade); }
 
 /* the deck's on-screen display, top left */
-.osd { position: absolute; left: calc(34 * var(--s)); top: calc(14 * var(--s)); z-index: 2; white-space: nowrap;
-       font: 600 calc(20 * var(--s))/1 "Antonio", "Arial Narrow", sans-serif; color: #fff; letter-spacing: 0.06em;
-       text-shadow: 0.06em 0.06em 0 rgba(4, 8, 60, 0.9), -0.03em -0.03em 0 rgba(4, 8, 60, 0.6); }
-.osd b { color: var(--yellow); font-weight: 600; }
-.blink .osd b { visibility: hidden; }
-.tall .osd { left: calc(14 * var(--s)); top: calc(8 * var(--s)); font-size: calc(14 * var(--s)); }
 
 /* ---- the stage: the badge, the clock, the words ---- */
 .stage { flex: 1 1 0 !important; min-height: 0; width: 100%; max-width: calc(1440 * var(--s)); margin: 0 auto; display: grid;
@@ -113,13 +107,8 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 .stamp .b { font: 400 1em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.02em; }
 .moving .stamp { animation: thud 6s -4.6s ease-in-out infinite; }
 
-/* ---- the clock: split-flap digits in a dark case under a red header, the LIMITED TIME label over it ---- */
+/* ---- the clock: split-flap digits in a dark case under a red header ---- */
 .timer { display: flex; flex-direction: column; align-items: flex-start; }
-.label { font: 600 0.3em/1 "Antonio", "Arial Narrow", sans-serif; letter-spacing: 0.08em; color: var(--yellow); background: var(--shade);
-         padding: 0.18em 0.45em 0.2em; border: 0.06em solid var(--yellow); box-shadow: 0.1em 0.1em 0 rgba(4, 6, 50, 0.8);
-         margin: 0 0 0.55em 0.5em; transform: rotate(-2deg); }
-.label .to, .bf .label .lt { display: none; }
-.bf .label .to { display: inline; }
 .clock { display: flex; flex-direction: column; align-items: stretch; color: var(--yellow); background: linear-gradient(#141a52, #070a2e);
          border: 0.05em solid #000; box-shadow: inset 0 0 0 0.03em #2a3290, 0.12em 0.14em 0 var(--navy); }
 .clock .ch { display: flex; align-items: center; justify-content: center; background: linear-gradient(#ff3a2a, #e00a0a 60%, #c80000);
@@ -202,9 +191,7 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 .bf .crawl { background: rgba(70, 0, 12, 0.34); }
 .bf .sub { filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)) drop-shadow(0 0 0.12em rgba(90, 0, 10, 0.45)); }
 .bf .tag { background: var(--yellow); color: var(--red); text-shadow: 0.05em 0.05em 0 #7a6a00; }
-.bf .label { box-shadow: 0.1em 0.1em 0 var(--navy); }
 .bf .order { box-shadow: inset 0 calc(5 * var(--s)) 0 rgba(170, 158, 0, 0.6), inset 0 calc(-5 * var(--s)) 0 rgba(170, 158, 0, 0.6), 0 calc(-7 * var(--s)) 0 rgba(6, 8, 70, 0.85); }
-.bf .osd { text-shadow: 0.06em 0.06em 0 rgba(6, 8, 70, 0.95), 0 0 0.3em rgba(70, 0, 12, 0.6); }
 .bf.moving .burst.red { animation-duration: 9s; }
 .bf.moving .burst.yellow { animation-duration: 3.6s; }
 .bf.moving .sticker { animation: pump 0.5s ease-out infinite; }
