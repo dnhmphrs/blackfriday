@@ -33,7 +33,7 @@ body { -webkit-font-smoothing: antialiased; }
                      radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
 
 .glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
-.tiles { background-repeat: repeat; opacity: 0.07; transform: rotate(-6deg); }
+.tiles { background-repeat: repeat; opacity: 0.095; transform: rotate(-6deg); }
 
 .t { white-space: nowrap; line-height: 1; }
 .head { font-family: "Archivo Black", "Arial Black", sans-serif; color: var(--yellow); letter-spacing: -0.05em;
@@ -149,8 +149,11 @@ body { -webkit-font-smoothing: antialiased; }
       <feGaussianBlur class="bloom"/><feComposite in2="taped" operator="arithmetic" k2="0.149" k3="0.93" k4="0.037"/>
     </filter></svg>`);
   const $ = (sel) => document.querySelector(sel);
-  // the noise: the blotches change every 4 frames through 5 seeds (20 frames), the grain every 2 through 6 (12): both divide 300
-  const BLOTCH = [3, 11, 7, 19, 5], STATIC = [2, 17, 9, 23, 4, 29];
+  // the noise: each seed held for an uneven number of frames, so it never settles into a rhythm. The
+  // blotch cycle is 25 frames, the grain's 30: both divide the 300-frame loop
+  const cycle = (seeds, holds) => holds.flatMap((h, i) => Array(h).fill(seeds[i]));
+  const BLOTCH = cycle([3, 41, 11, 7, 29, 19, 53, 5], [3, 4, 2, 4, 3, 2, 4, 3]);
+  const STATIC = cycle([2, 31, 17, 47, 9, 23, 59, 4, 43, 29, 11, 61, 37, 19, 53, 7, 41, 13], [2, 1, 2, 2, 1, 3, 1, 2, 1, 1, 2, 2, 1, 3, 1, 2, 2, 1]);
 
   await Promise.all(['100px "Archivo Black"', 'italic 700 100px "Arimo"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Tinos"'].map((f) => document.fonts.load(f)));
   const p = document.getElementById('p');
@@ -335,7 +338,7 @@ body { -webkit-font-smoothing: antialiased; }
     el.textContent = unit.repeat(8); const rep = (el.getBoundingClientRect().width - w4) / 4;
     const reps = Math.ceil((W + rep) / rep) + 1; el.textContent = unit.repeat(reps + 1);
     const v = (Math.max(1, Math.round((v0 * LOOP) / rep)) * rep) / LOOP;
-    movers.push((t) => { el.style.transform = `translateX(${-(((t + 3) * v) % rep)}px)${extra}`; });
+    movers.push((t) => { el.style.transform = `translateX(${-(((t + 3) * v) % rep)}px) rotate(0.01deg)${extra}`; }); // the rotation stops whole-pixel snapping
   }
   function front(fr) {
     if (fr.osdF) {
@@ -590,7 +593,7 @@ body { -webkit-font-smoothing: antialiased; }
   const blotch = $('.blotch'), grain = $('.static');
   function render(t) {
     for (const move of movers) move(t);
-    const f = Math.round(t * FPS); blotch.setAttribute('seed', BLOTCH[Math.floor(f / 4) % 5]); grain.setAttribute('seed', STATIC[Math.floor(f / 2) % 6]);
+    const f = Math.round(t * FPS); blotch.setAttribute('seed', BLOTCH[f % BLOTCH.length]); grain.setAttribute('seed', STATIC[f % STATIC.length]);
   }
 
   build();

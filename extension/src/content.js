@@ -75,7 +75,14 @@
   const MOTTLE = `${tint(0.956, 0.621)}  ${tint(-0.272, -0.647)}  ${tint(-1.106, 1.703)}  0 0 0 0 1`;
   // ... and static: only the brightest part of a fast channel shows, so the specks are white and scattered, as static is
   const GRAIN = `${`${GRAIN_GAIN} 0 0 0 ${-0.57 * GRAIN_GAIN}  `.repeat(3)} 0 0 0 0 1`;
-  const crawl = (seeds, dur) => (still ? "" : `<animate attributeName="seed" values="${seeds}" dur="${dur}s" calcMode="discrete" repeatCount="indefinite"/>`);
+  // each seed is held for an uneven share of the cycle, and the two cycles differ in length, so the
+  // noise never settles into a visible rhythm
+  const crawl = (seeds, holds, dur) => {
+    if (still) return "";
+    const total = holds.reduce((a, b) => a + b, 0);
+    const times = holds.map((_, i) => (holds.slice(0, i).reduce((a, b) => a + b, 0) / total).toFixed(4));
+    return `<animate attributeName="seed" values="${seeds.join(";")}" keyTimes="${times.join(";")}" dur="${dur}s" calcMode="discrete" repeatCount="indefinite"/>`;
+  };
   const add = (extra = "") => `operator="arithmetic" k2="1" k3="1" k4="-0.5" ${extra}`; // a + (b - mid grey)
   const TAPE = `
     <svg class="defs" width="0" height="0" aria-hidden="true">
@@ -93,10 +100,10 @@
         <feColorMatrix type="matrix" values="0.393 -0.329 -0.064 0 0.5  -0.167 0.231 -0.064 0 0.5  -0.167 -0.329 0.496 0 0.5  0 0 0 1 0"/>
         <feComposite in2="sharp" operator="arithmetic" k2="2" k3="1" k4="-1" result="clean"/>
 
-        <feTurbulence type="fractalNoise" baseFrequency="0.042 0.167" numOctaves="1" seed="3">${crawl("3;11;7;19;5;13", 2)}</feTurbulence>
+        <feTurbulence type="fractalNoise" baseFrequency="0.042 0.167" numOctaves="1" seed="3">${crawl([3, 41, 11, 7, 29, 19, 53, 5, 37, 13], [3, 2, 4, 2, 3, 1, 3, 2, 4, 2], 2.2)}</feTurbulence>
         <feColorMatrix type="matrix" values="${MOTTLE}"/>
         <feComposite in2="clean" ${add('result="mottled"')}/>
-        <feTurbulence type="fractalNoise" baseFrequency="0.19 0.71" numOctaves="2" seed="2">${crawl("2;17;9;23;4;29", 1)}</feTurbulence>
+        <feTurbulence type="fractalNoise" baseFrequency="0.19 0.71" numOctaves="2" seed="2">${crawl([2, 31, 17, 47, 9, 23, 59, 4, 43, 29, 11, 61, 37, 19], [2, 1, 3, 1, 2, 2, 1, 3, 1, 2, 1, 2, 1, 2], 1.6)}</feTurbulence>
         <feColorMatrix type="matrix" values="${GRAIN}"/>
         <feComposite in2="mottled" operator="arithmetic" k2="1" k3="1" result="taped"/>
 
@@ -213,6 +220,10 @@
     $(".tiles").style.backgroundSize = `${364 * u}px ${313.6 * u}px`;
     Object.assign($(".ticker").style, { left: px(X0), height: px(tick), fontSize: px(0.66 * tick), lineHeight: px(tick) });
     Object.assign($(".crawl").style, { left: px(X0), top: px(Y1 - crawlH), height: px(crawlH), fontSize: px(0.75 * crawlH), lineHeight: px(crawlH) });
+    // the words go by at so many times the band's height a second, whatever the size
+    const pace = (sel, speed, h) => { const span = $(sel); span.style.setProperty("--dur", `${span.offsetWidth / 2 / (speed * h)}s`); };
+    pace(".ticker span", 1.35, tick);
+    pace(".crawl span", 2.6, crawlH);
 
     // the badge, radius R round (cx, cy): the burst, the globe on its plate, the glow behind and
     // the rays turning round it across the whole face

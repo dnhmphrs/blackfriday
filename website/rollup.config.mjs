@@ -7,7 +7,9 @@ import { join, relative } from 'node:path';
 import { serve } from './scripts/serve.mjs';
 
 const WATCH = !!process.env.ROLLUP_WATCH;
-const SITE = process.env.SITE_URL ? process.env.SITE_URL.replace(/\/?$/, '/') : '';
+// on Vercel, the project's production domain unless SITE_URL says otherwise
+const host = process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
+const SITE = host ? host.replace(/\/?$/, '/') : '';
 const DIST = 'dist';
 
 // .glsl files import as strings, comments and indentation stripped (line breaks kept for the preprocessor)
