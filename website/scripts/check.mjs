@@ -35,7 +35,7 @@ const browser = await chromium.launch();
 let failures = 0;
 const fail = (what) => { failures++; console.log(`  FAIL ${what}`); };
 
-async function open({ w, h, d, still = false }, url) {
+async function open({ w, h, d, still = false, held = false }, url) {
   const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: d, timezoneId: 'America/New_York',
                                          reducedMotion: still ? 'reduce' : 'no-preference', isMobile: w < 900 && d > 1, hasTouch: w < 900 && d > 1 });
   const page = await ctx.newPage(), errors = [];
@@ -44,7 +44,7 @@ async function open({ w, h, d, still = false }, url) {
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
   page.on('requestfailed', (r) => errors.push(`requestfailed: ${r.url()}`));
   page.on('request', (r) => { if (!r.url().startsWith(server.url) && !r.url().startsWith('data:') && !r.url().startsWith('file:')) errors.push(`external request: ${r.url()}`); });
-  await page.clock.install(); // time runs as usual, but can be held still for a screenshot (see below)
+  if (held) await page.clock.install(); // time runs as usual, but can be held still for a screenshot (see below)
   await page.goto(url);
   await page.waitForFunction(() => window.__bf && window.__bf.ready, null, { timeout: 15000 });
   return { ctx, page, errors };
@@ -73,7 +73,7 @@ function verify(r, spec, forced, name) {
 for (const run of RUNS) {
   const spec = DATES[run.m], name = `${run.w}x${run.h}-${run.m}${run.still ? '-still' : ''}`;
   const forced = new Date(spec.now).getTime();
-  const { ctx, page, errors } = await open(run, `${server.url}?now=${spec.now}&keep`);
+  const { ctx, page, errors } = await open({ ...run, held: run.m === 'today' && !run.still }, `${server.url}?now=${spec.now}&keep`);
   await page.waitForTimeout(run.still ? 600 : 1800);
   const r = await read(page);
   const clock = verify(r, spec, forced, name);

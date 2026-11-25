@@ -39,7 +39,7 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
        background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
        filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
 
-/* ---- the bands: Garrett's ticker along the top, the crawl along the bottom ---- */
+/* ---- the bands: the ticker along the top, the crawl along the bottom ---- */
 .run { white-space: nowrap; overflow: hidden; flex: 1; min-width: 0; }
 .run > span { display: inline-block; will-change: transform; }
 .moving .run > span { animation: run var(--dur, 20s) linear infinite; }

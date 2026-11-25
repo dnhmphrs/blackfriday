@@ -34,8 +34,8 @@ const offset = FORCED == null ? 0 : FORCED - wall0;
 const now = () => (FREEZE ? wall0 + offset : Date.now() + offset);
 const seconds = () => (FREEZE ? 2.2 : (performance.now() - perf0) / 1000);
 
-// ---- WebGL: the background under the page and the tape over it ----
-let bg = null, tile = null;
+// ---- WebGL: the background under the page (the tape look over it is the SVG filter in index.html) ----
+let bg = null;
 try {
   bg = layer($('#bg'), BG);
 } catch { bg = null; }
@@ -43,7 +43,7 @@ if (!bg) set('nogl', true);
 $('#bg').addEventListener('webglcontextlost', (e) => { e.preventDefault(); bg = null; set('nogl', true); });
 if (bg) {
   const img = new Image();
-  img.onload = () => { if (bg) { tile = bg.texture(img, 0); draw(seconds(), true); } };
+  img.onload = () => { if (bg) { bg.texture(img, 0); draw(seconds()); } };
   img.src = TILE;
 }
 
@@ -164,12 +164,12 @@ function layout() {
     bg.size(W, H, px);
     geo.px = px;
   }
-  draw(seconds(), true);
+  draw(seconds());
 }
 
 // ---- drawing: classes on the beat, and the WebGL background ----
 let ang = 0, lastT = 0;
-function draw(t, force = false) {
+function draw(t) {
   const bf = mode === 'today';
   const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t;
   const beatN = Math.floor(t / BEAT), onBeat = bf && MOVING && beatN % 2 === 1;
