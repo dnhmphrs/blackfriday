@@ -128,17 +128,29 @@ function run(r, bandH) {
   r.el.style.setProperty('--dur', `${unitW / (bandH * r.speed)}s`);
 }
 
-// the cards sit halfway between the BLACK FRIDAY ONLY! tag and the yellow tape
-function balanceCards() {
-  const cards = $('.cards'), tag = $('.tag'), order = $('.order');
+// Phones: the cards sit halfway between the BLACK FRIDAY ONLY! tag and the yellow tape.
+// Wide windows: the clock and the words, as one column, are centred on the badge.
+function settle(tall, s) {
+  const cards = $('.cards'), fits = [$('.clock-box .fit'), $('.words-box .fit')];
   cards.style.marginTop = '';
-  for (let i = 0; i < 3; i++) {
-    const above = cards.getBoundingClientRect().top - tag.getBoundingClientRect().bottom;
-    const below = order.getBoundingClientRect().top - cards.getBoundingClientRect().bottom;
-    const zoom = cards.getBoundingClientRect().height / cards.offsetHeight || 1; // the fitted block may be scaled
-    const shift = (below - above) / 2 / zoom;
-    if (Math.abs(shift) < 0.5) break;
-    cards.style.marginTop = `${parseFloat(getComputedStyle(cards).marginTop) + shift}px`;
+  for (const f of fits) Object.assign(f.style, { top: '', bottom: '' });
+  const box = (el) => el.getBoundingClientRect();
+  if (tall) {
+    for (let i = 0; i < 3; i++) {
+      const above = box(cards).top - box($('.tag')).bottom, below = box($('.order')).top - box(cards).bottom;
+      const zoom = box(cards).height / cards.offsetHeight || 1; // the fitted block is scaled
+      const shift = (below - above) / 2 / zoom;
+      if (Math.abs(shift) < 0.5) break;
+      cards.style.marginTop = `${parseFloat(getComputedStyle(cards).marginTop) + shift}px`;
+    }
+  } else {
+    // stack them with one even gap, the pair centred on the badge
+    const [clockFit, wordsFit] = fits, gap = s * 34;
+    const hClock = box(clockFit).height, hWords = box(wordsFit).height, badge = box($('.burst'));
+    const top = (badge.top + badge.bottom) / 2 - (hClock + gap + hWords) / 2;
+    const place = (f, y) => { const parent = box(f.parentElement); Object.assign(f.style, { top: `${y - parent.top}px`, bottom: 'auto' }); };
+    place(clockFit, top);
+    place(wordsFit, top + hClock + gap);
   }
 }
 
@@ -149,11 +161,11 @@ function layout() {
   const s = tall ? Math.min(W / 430, H / 900) : Math.min(W / 1280, H / 800);
   root.style.setProperty('--s', `${s}px`);
 
-  fit($('.timer'), tall ? { w: 0.9, h: 0.94 } : { w: 0.9, h: 0.96 });
-  fit($('.words'), tall ? { w: 0.94, h: 0.96 } : { w: 0.9, h: 0.88 });
+  fit($('.timer'), tall ? { w: 0.9, h: 0.94 } : { w: 0.94, h: 0.96 });
+  fit($('.words'), tall ? { w: 0.94, h: 0.96 } : { w: 0.96, h: 0.96 });
   fit($('.order .fit'), tall ? { w: 0.9, h: 0.72 } : { w: 0.9, h: 0.46 });
   fit($('.by .fit'), { w: 0.92, h: 0.42 });
-  balanceCards();
+  settle(tall, s);
 
   const tk = Math.min(H * 0.2, W * (tall ? 0.2 : 0.11));
   $('.takeover').style.setProperty('--tk', `${tk}px`);
