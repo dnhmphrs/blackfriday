@@ -75,6 +75,9 @@
 .ticker { top: 0; font: 300 1em "TOE Antonio", "Arial Narrow", Arial, sans-serif; letter-spacing: 0.035em; word-spacing: 0.3em;
           color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); background: rgba(4, 8, 90, 0.35); }
 .ticker span { display: inline-block; animation: slide 44s linear infinite; }
+/* a faint rule on each ticker's inner edge */
+.ticker { border-bottom: max(1px, 0.04em) solid rgba(255, 240, 53, 0.38); }
+.crawl { border-top: max(1px, 0.025em) solid rgba(255, 240, 53, 0.38); }
 .crawl { font-family: "TOE Black", "Arial Black", Arial, sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; background: rgba(4, 8, 90, 0.25); }
 .crawl span { display: inline-block; animation: crawl 24s linear infinite;
               text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade); }
