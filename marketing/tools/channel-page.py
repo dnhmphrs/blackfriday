@@ -3,8 +3,8 @@
 
 The banner is laid out the way the extension will lay it out, from separate pieces so it can fill
 any window shape: the lettering, the spinning globe and the column (cap, shaft, base: the shaft
-stretches to whatever height there is) are the extension's own pictures (src/images, made by
-tools/channel-parts.mjs and tools/channel-assets.py); the tickers, the price card and the strips are HTML. The page under it
+stretches to whatever height there is) are the 2.1 extension's own pictures (src/images and
+assets/banner-2.1, made by tools/channel-parts.mjs and tools/channel-assets.py); the tickers, the price card and the strips are HTML. The page under it
 loads first; the banner slides in once its pieces are ready.
     python3 tools/channel-page.py      (run from marketing/)"""
 import base64, html, os, re
@@ -13,6 +13,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OUT_DIR = os.path.join(ROOT, 'out', 'channel-page')
 ASSETS = os.path.join(ROOT, '..', 'src', 'images')  # the extension's own pictures (tools/channel-assets.py)
+OLD = os.path.join(ROOT, 'assets', 'banner-2.1')     # and those 2.2 no longer uses
 FONTS = os.path.join(ROOT, 'variants', 'v17', 'fonts')
 
 
@@ -21,7 +22,7 @@ def b64(path, mime):
         return f'data:{mime};base64,' + base64.b64encode(f.read()).decode()
 
 
-IMG = {k: b64(os.path.join(ASSETS, f), 'image/webp') for k, f in {
+IMG = {k: b64(os.path.join(ASSETS if f == 'globe.webp' else OLD, f), 'image/webp') for k, f in {
     'globe': 'globe.webp', 'cap': 'cap.webp', 'shaft': 'shaft.webp', 'base': 'base.webp',
     'typeTop': 'type-top.webp', 'typeMid': 'type-mid.webp', 'typePhone': 'type-phone.webp'}.items()}
 FONT = {k: b64(os.path.join(FONTS, f'{k}.woff2'), 'font/woff2')
@@ -393,7 +394,7 @@ banner_css = open(os.path.join(SRC, 'banner.css'), encoding='utf-8').read()
 cut = lambda text, start, end: text[text.index(start):text.index(end)]
 TAPE_JS = (re.search(r'^  const GRAIN_GAIN = .*$', content_js, re.M).group(0) + '\n'
            + cut(content_js, '  // The look of a worn tape on a tube', '  // The frame is hidden by its own style attribute'))
-TUBE_CSS = cut(banner_css, '/* the tube:', '/* the glints either side')
+TUBE_CSS = cut(banner_css, '/* the tube:', '/* the ground:')
 page = PAGE.replace('__TAPE_JS__', TAPE_JS.rstrip()).replace('__TUBE_CSS__', TUBE_CSS.rstrip())
 for k, v in {'__F_ANTONIO_LIGHT__': FONT['antonio-light'], '__F_ANTONIO_SEMIBOLD__': FONT['antonio-semibold'],
              '__F_ARCHIVO_BLACK__': FONT['archivo-black'], '__F_ARIMO__': FONT['arimo-bold-italic'],

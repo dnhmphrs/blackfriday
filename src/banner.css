@@ -14,7 +14,6 @@
 .trim, .face { position: absolute; inset: 0; }
 .trim { background: linear-gradient(90deg, #fffb86, #f0e11c 45%, #c9b400); }
 .face { overflow: hidden; }
-.glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
 
 /* the tube: the whole face goes through the tape filter (see content.js); over it lie faint
    scanlines and the dark corners */
@@ -26,34 +25,82 @@
          background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.05) 1.5px, rgba(0, 0, 16, 0) 3px),
                      radial-gradient(farthest-corner at 50% 50%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.08) 71%, rgba(0, 0, 0, 0.13) 85%, rgba(0, 0, 0, 0.21) 100%); }
 
-/* the glints either side of 30% OFF */
-.glints svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
-.glints path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); }
-.glints.right svg { transform: scaleX(-1); }
-.tw { transform-box: fill-box; transform-origin: center; animation: twinkle 2.4s ease-in-out infinite; }
-.tw.b { animation-delay: -1.2s; }
+/* the ground: the maker's mark, faint and tiled; rays turning round the badge; a glow behind it */
+.tiles { background: url(images/tile.webp) repeat; opacity: 0.07; transform: rotate(-6deg); }
+.rays { background: repeating-conic-gradient(rgba(120, 200, 255, 0.11) 0deg 6deg, rgba(120, 200, 255, 0) 6deg 15deg); animation: turn 180s linear infinite; }
+.glow { border-radius: 50%; background: radial-gradient(closest-side, #58c4ff 0%, #2a8cff 22%, #1348ee 44%, transparent 72%); }
+
+/* the badge: the two bursts turn opposite ways, slowly, each over its shadow, offset by a part of
+   the badge's radius (its font-size) */
+.burst { overflow: visible; }
+.burst text { font-family: "TOE Black", "Arial Black", Arial, sans-serif; fill: var(--shade); letter-spacing: 0.01em; }
+.burst.red { animation: turn 120s linear infinite reverse; }
+.burst.yellow { animation: turn 48s linear infinite; }
+.red.shadow { translate: 0.05em 0.06em; }
+.yellow.shadow { translate: 0.03em 0.035em; }
+
+/* the glints by the badge */
+.glint svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #fff; }
+.glint path { filter: drop-shadow(0 0 0.08px #fff) drop-shadow(0 0 0.22px #9fd4ff); transform-box: fill-box; transform-origin: center;
+              animation: twinkle 2.4s ease-in-out infinite; }
+.glint.two path { animation-delay: -1.2s; }
+
+/* 30% OFF on a red sticker with a yellow keyline, across the globe; it pops every so often */
+.sticker { background: linear-gradient(#ff3a2a, #e00a0a 60%, #c80000); border: 0.05em solid #000; border-radius: 0.08em;
+           box-shadow: inset 0 0 0 0.035em #e00a0a, inset 0 0 0 0.065em var(--yellow), 0.1em 0.1em 0 rgba(6, 8, 70, 0.92);
+           transform: rotate(-6deg); animation: pop 3.2s -0.6s ease-in-out infinite; }
+.sticker .head { position: absolute; white-space: nowrap; line-height: 1; font-family: "TOE Black", "Arial Black", Arial, sans-serif;
+                 color: var(--yellow); letter-spacing: -0.05em; transform: skewX(-9deg); transform-origin: 0 0.835em;
+                 text-shadow: 0.009em 0.009em 0 var(--shade), 0.018em 0.018em 0 var(--shade), 0.027em 0.027em 0 var(--shade),
+                              0.036em 0.036em 0 var(--shade), 0.045em 0.045em 0 var(--shade), 0.054em 0.054em 0 var(--shade); }
+
+/* BUT WAIT… THERE'S LESS!, a rubber stamp on a white card, stamped on every six seconds */
+.stamp { text-align: center; white-space: nowrap; background: #fbfbf4; color: var(--red); padding: 0.32em 0.6em 0.36em;
+         border: 0.13em solid var(--red); border-radius: 0.18em;
+         box-shadow: inset 0 0 0 0.09em #fbfbf4, inset 0 0 0 0.15em var(--red), 0.14em 0.16em 0 rgba(6, 8, 70, 0.9);
+         transform: rotate(var(--turn)); animation: thud 6s -4.6s ease-in-out infinite; }
+.stamp .a { display: block; font: italic 700 0.62em/1 "TOE Tinos", "Times New Roman", serif; color: #111; letter-spacing: 0.01em; margin-bottom: 0.14em; }
+.stamp .b { display: block; font: 400 1em/1 "TOE Black", "Arial Black", Arial, sans-serif; letter-spacing: -0.02em; }
+
+/* EVERYTHING ON THE INTERNET. and the red BLACK FRIDAY ONLY! tag */
+.caption { white-space: nowrap; line-height: 1; font: italic 700 1em/1 "TOE Arimo", Arial, sans-serif; letter-spacing: -0.04em;
+           background: linear-gradient(#fff 35%, #c5d4fb 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+           filter: drop-shadow(0.045em 0.045em 0 rgba(6, 8, 70, 0.95)); padding: 0 0.1em 0.06em 0; }
+.tag { white-space: nowrap; background: var(--red); color: var(--yellow); border: 0.07em solid #000;
+       font: 400 1em/1 "TOE Black", "Arial Black", Arial, sans-serif; letter-spacing: -0.01em; padding: 0.2em 0.42em 0.24em;
+       box-shadow: 0.12em 0.12em 0 rgba(6, 8, 70, 0.9); transform: rotate(-2deg); text-shadow: 0.05em 0.05em 0 #7a0006; }
 
 /* the tickers: the lines along the top, BLACK FRIDAY ONLY! along the bottom */
 .ticker, .crawl { right: 0; overflow: hidden; white-space: nowrap; }
 .ticker { top: 0; font: 300 1em "TOE Antonio", "Arial Narrow", Arial, sans-serif; letter-spacing: 0.035em; word-spacing: 0.3em;
-          color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); }
+          color: #e9f0ff; text-shadow: 0.06em 0.06em 0 rgba(4, 8, 80, 0.85); background: rgba(4, 8, 90, 0.35); }
 .ticker span { display: inline-block; animation: slide 44s linear infinite; }
-.crawl { font-family: "TOE Black", "Arial Black", Arial, sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; }
+.crawl { font-family: "TOE Black", "Arial Black", Arial, sans-serif; color: var(--yellow); letter-spacing: -0.02em; word-spacing: 0.08em; background: rgba(4, 8, 90, 0.25); }
 .crawl span { display: inline-block; animation: crawl 24s linear infinite;
               text-shadow: 0.027em 0.027em 0 var(--shade), 0.054em 0.054em 0 var(--shade), 0.08em 0.08em 0 var(--shade); }
 
-/* the yellow tape and the navy one under it */
-.strip { display: flex; align-items: center; justify-content: center; white-space: nowrap;
+/* the yellow tape and the navy one under it, at a slant over the crawl */
+.strip { display: flex; align-items: center; justify-content: center; white-space: nowrap; transform: rotate(-6deg);
          font: italic 700 1em "TOE Arimo", Arial, sans-serif; }
 .tape { background: linear-gradient(#fffb86, #f0e11c); color: #111; }
 .sub { background: var(--shade); color: #fff; letter-spacing: 0.08em; text-transform: uppercase; }
 
-/* the price card; only its 70% moves */
+/* the four cards, in a row 436 x 62 (scaled to fit) */
+.cards { display: flex; flex-wrap: wrap; gap: 12px; width: 436px; transform-origin: left top; font: italic 700 19px/1 "TOE Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
+.cards i { flex: none; position: relative; display: block; width: 100px; height: 62px; border-radius: 7px; overflow: hidden; box-shadow: 3px 3px 0 rgba(6, 8, 70, 0.85); }
+.cards b { position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; }
+.cards .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; }
+.cards .c2 { background: radial-gradient(circle at 50% 40%, #ffb300 0 30%, transparent 31%), #f6f6f6; color: #111; }
+.cards .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
+.cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
+.cards .c4 b { font-size: 14.5px; }
+
+/* the price card, in a long strip; only its 70% moves */
 .card { width: 400px; height: 306px; background: #f3f4f6; color: #0c0c0c; border: 5px solid #000;
         box-shadow: 8px 8px 0 rgba(4, 6, 60, 0.92); transform-origin: left top; font: italic 700 50px/1 "TOE Arimo", Arial, sans-serif; }
-.card .head { background: var(--red); color: #fff46a; font: 600 41px/57px "TOE Antonio", "Arial Narrow", Arial, sans-serif;
-              padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
-.card .line { padding: 13px 17px 0; }
+.card .hd { background: var(--red); color: #fff46a; font: 600 41px/57px "TOE Antonio", "Arial Narrow", Arial, sans-serif;
+            padding: 0 15px; border-bottom: 5px solid #000; white-space: nowrap; overflow: hidden; }
+.card .ln { padding: 13px 17px 0; }
 .card s { position: relative; text-decoration: none; color: #6b6f78; margin-left: 9px; }
 .card s::after { content: ""; position: absolute; left: -8%; right: -8%; top: 46%; height: 8px; background: var(--red);
                  transform: rotate(-11deg); box-shadow: 0 0 0 2px #000; }
@@ -63,7 +110,20 @@
 
 @keyframes slide { to { transform: translateX(-50%); } }
 @keyframes crawl { from { transform: skewX(-9deg); } to { transform: translateX(-50%) skewX(-9deg); } }
+@keyframes turn { to { transform: rotate(360deg); } }
 @keyframes twinkle { 0%, 100% { transform: scale(0.55) rotate(-10deg); opacity: 0.75; } 50% { transform: scale(1) rotate(12deg); opacity: 1; } }
+@keyframes pop {
+  0%, 20%, 100% { transform: rotate(-6deg) scale(1); }
+  5% { transform: rotate(-6deg) scale(1.07); }
+  10% { transform: rotate(-6deg) scale(0.98); }
+  15% { transform: rotate(-6deg) scale(1.02); }
+}
+@keyframes thud {
+  0% { transform: rotate(var(--turn)) scale(1.9); opacity: 0; }
+  4% { transform: rotate(var(--turn)) scale(0.94); opacity: 1; }
+  6.5% { transform: rotate(var(--turn)) scale(1.03); }
+  9%, 100% { transform: rotate(var(--turn)) scale(1); }
+}
 @keyframes jolt {
   0%, 100% { transform: skewX(-8deg) scale(1) rotate(0deg); }
   12% { transform: skewX(-8deg) scale(1.18) rotate(-5deg); }
@@ -76,10 +136,9 @@
 @media (max-width: 768px) {
   .frame { width: 100%; height: 33%; transform: translateY(-104%); }
   .trim { background: linear-gradient(#c9b400, #f0e11c 55%, #fffb86); }
-  .glints, .strip { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ticker span, .crawl span, .card .big, .tw { animation: none; }
+  .tube * { animation: none !important; }
   .frame.in { transition: opacity 0.3s linear; }
 }

@@ -6,7 +6,7 @@ The current banner is the real extension: src/content.js run on the mock page, w
 stood in for (its files handed over as data: URLs) and the date set to Black Friday. The Globe Badge
 designs are built site/v-*-banner.html pages in the frame the extension uses (tools/banner-in-place.html),
 each told the same Black Friday date. Builds them first (tools/site-build.py); a design not yet made is left out."""
-import base64, json, os, subprocess
+import base64, json, os, re, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(os.path.dirname(ROOT), 'src')
@@ -17,10 +17,13 @@ subprocess.run(['python3', os.path.join(ROOT, 'tools/site-build.py'), *[n for _,
 
 def data(path, mime):
     return f'data:{mime};base64,' + base64.b64encode(open(path, 'rb').read()).decode()
-files = {'banner.css': data(f'{SRC}/banner.css', 'text/css')}
+files = {}
 for sub, mime in (('images', 'image/webp'), ('fonts', 'font/woff2')):
     for f in sorted(os.listdir(f'{SRC}/{sub}')):
         if f.endswith(('.webp', '.woff2')): files[f'{sub}/{f}'] = data(f'{SRC}/{sub}/{f}', mime)
+# the stylesheet, with the pictures it names (relative to itself) put inside it
+css = re.sub(r'url\((images/[\w-]+\.webp)\)', lambda m: f'url({files[m.group(1)]})', open(f'{SRC}/banner.css', encoding='utf-8').read())
+files['banner.css'] = 'data:text/css;base64,' + base64.b64encode(css.encode()).decode()
 read = lambda p: open(p, encoding='utf-8').read()
 bundle = {
     'files': files,
@@ -53,7 +56,7 @@ page = r'''<!doctype html>
 <body>
 <header>
   <div class="group" role="group" aria-label="Banner">
-    <button data-banner="current" aria-pressed="true">Current (2.1)</button>
+    <button data-banner="current" aria-pressed="true">Current (__VERSION__)</button>
   </div>
   <div class="group" role="group" aria-label="Screen">
     <button data-screen="desktop" aria-pressed="true">Desktop</button>
@@ -157,5 +160,6 @@ show();
 </html>
 '''
 out = os.path.join(ROOT, 'out/banner-compare.html')
-open(out, 'w', encoding='utf-8').write(page.replace('__PAYLOAD__', payload))
+version = json.load(open(f'{SRC}/manifest.json'))['version']
+open(out, 'w', encoding='utf-8').write(page.replace('__VERSION__', version).replace('__PAYLOAD__', payload))
 print(out, f'{os.path.getsize(out) / 1e6:.2f} MB')

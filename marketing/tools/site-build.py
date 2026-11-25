@@ -24,11 +24,11 @@ IMAGES = {
     'icon': (f'{KIT}/extension-store/store-icon-128.png', None, 'PNG', None),
     'favicon': (f'{SRC}/icons/icon32.png', None, 'PNG', None),
     'logo': (f'{ROOT}/assets/gme/gme-primary.png', 600, 'WEBP', 90),   # white on clear
-    'cap': (f'{SRC}/images/cap.webp', None, 'WEBP', 90),
-    'shaft': (f'{SRC}/images/shaft.webp', None, 'WEBP', 90),
-    'base': (f'{SRC}/images/base.webp', None, 'WEBP', 90),
-    'type_top': (f'{SRC}/images/type-top.webp', None, 'WEBP', 90),
-    'type_mid': (f'{SRC}/images/type-mid.webp', None, 'WEBP', 90),
+    'cap': (f'{ROOT}/assets/banner-2.1/cap.webp', None, 'WEBP', 90),
+    'shaft': (f'{ROOT}/assets/banner-2.1/shaft.webp', None, 'WEBP', 90),
+    'base': (f'{ROOT}/assets/banner-2.1/base.webp', None, 'WEBP', 90),
+    'type_top': (f'{ROOT}/assets/banner-2.1/type-top.webp', None, 'WEBP', 90),
+    'type_mid': (f'{ROOT}/assets/banner-2.1/type-mid.webp', None, 'WEBP', 90),
     'globe_still': (f'{ROOT}/out/channel-page/parts/globe-00.png', None, 'WEBP', 85),
 }
 PARTS = f'{ROOT}/out/channel-page/parts'

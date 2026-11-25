@@ -71,6 +71,8 @@ const probe = () => {
   if (!host) return { present: false, count: 0 };
   const s = host.shadowRoot;
   const rect = (el) => { const r = el?.getBoundingClientRect(); return r && [r.x, r.y, r.width, r.height].map(Math.round); };
+  const union = (els) => { const r = [...els].map((e) => e.getBoundingClientRect()), x = Math.min(...r.map((b) => b.left)), y = Math.min(...r.map((b) => b.top));
+    return r.length ? [x, y, Math.max(...r.map((b) => b.right)) - x, Math.max(...r.map((b) => b.bottom)) - y].map(Math.round) : null; };
   let topLayer = null;
   try { topLayer = host.matches(':popover-open'); } catch {}
   const frame = s.querySelector('.frame');
@@ -82,7 +84,7 @@ const probe = () => {
     styled: !!frame && getComputedStyle(frame).backgroundColor === 'rgb(0, 0, 0)' && getComputedStyle(s.querySelector('.face')).overflow === 'hidden',
     revealed: !!frame && frame.classList.contains('in') && getComputedStyle(frame).visibility === 'visible',
     frame: rect(frame),
-    art: rect(s.querySelector('.type')),
+    art: union(s.querySelectorAll('.caption:not([hidden]), .tag')), // the lettering: EVERYTHING ON THE INTERNET. and its tag
     globe: rect(s.querySelector('.globe')),
     ticker: rect(s.querySelector('.crawl')),
     // how much of each ticker's width has its lettering over it (1: all of it), and which way the banner reads
@@ -238,7 +240,7 @@ console.log('\n# 4. The banner (Black Friday)');
   check('never shows unstyled or half-loaded: hidden until ready, then slides in', base.revealed && (await page.evaluate(() => window.__flash.length)) === 0, `flashes at ${await page.evaluate(() => window.__flash.slice(0, 5).join(','))} ms`);
   check('right-hand 30%, full height', Math.abs(base.frame[2] - vw * 0.3) <= 2 && base.frame[1] === 0 && base.frame[3] === vh && Math.abs(base.frame[0] + base.frame[2] - vw) <= 1, `${JSON.stringify(base.frame)} of ${vw}`); // to a pixel: a browser that draws a scrollbar gives halves
   check('under <html>, in the top layer', base.parent === 'HTML' && base.topLayer === true);
-  check('stylesheet, pictures and crawl loaded', base.styled && base.images.length === 6 && base.images.every((w) => w > 0), JSON.stringify(base.images));
+  check('stylesheet, pictures and crawl loaded', base.styled && base.images.length === 1 && base.images.every((w) => w > 0), JSON.stringify(base.images));
   check('both tickers run across the banner, left to right', base.tickers.every((c) => c > 0.9) && base.direction === 'ltr', `${base.tickers} ${base.direction}`);
   check('the crawl sits on the bottom edge', base.ticker && Math.abs(base.ticker[1] + base.ticker[3] - (base.frame[1] + base.frame[3])) <= 1, JSON.stringify(base.ticker));
   check('blocks the right side, left side still clickable', base.hitRight === 'THIRTY-OFF-EVERYTHING' && base.hitLeft !== 'THIRTY-OFF-EVERYTHING', `${base.hitRight} / ${base.hitLeft}`);

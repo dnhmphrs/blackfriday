@@ -1,2 +1,2 @@
-Antonio, Archivo Black and Arimo are licensed under the SIL Open Font License 1.1
+Antonio, Archivo Black, Arimo and Tinos are licensed under the SIL Open Font License 1.1
 (https://openfontlicense.org). Copies taken from the @fontsource npm packages.

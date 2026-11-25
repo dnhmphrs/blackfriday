@@ -99,7 +99,7 @@ try {
   check('Black Friday: banner up and revealed', p.present && p.revealed, JSON.stringify({ revealed: p.revealed }));
   if (p.present) {
     check('covers the right 30%, full height', Math.abs(p.frame.w - p.vw * 0.3) <= 2 && p.frame.t === 0 && Math.abs(p.frame.h - p.vh) <= 1 && Math.abs(p.frame.r - p.vw) <= 1, JSON.stringify(p.frame));
-    check('pictures and typefaces loaded', p.images.length === 6 && p.images.every((w) => w > 0) && p.faces === 4, `${JSON.stringify(p.images)} faces ${p.faces}`);
+    check('pictures and typefaces loaded', p.images.length === 1 && p.images.every((w) => w > 0) && p.faces === 5, `${JSON.stringify(p.images)} faces ${p.faces}`);
     check('tickers show across the banner', p.ticker > 0.9 && p.crawl > 0.9, `ticker ${p.ticker.toFixed(2)} crawl ${p.crawl.toFixed(2)}`);
     check('in the top layer (or, before Chrome 114, fixed above the page)', p.topLayer === true || p.topLayer === 'no popover', String(p.topLayer));
     check('blocks its part of the page', p.hit === 'THIRTY-OFF-EVERYTHING', p.hit);
