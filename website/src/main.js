@@ -137,7 +137,7 @@ function layout() {
   root.style.setProperty('--s', `${s}px`);
 
   fit($('.timer'), tall ? { w: 0.9, h: 0.94 } : { w: 0.9, h: 0.96 });
-  fit($('.words'), tall ? { w: 0.94, h: 0.94 } : { w: 0.9, h: 0.8 });
+  fit($('.words'), tall ? { w: 0.94, h: 0.96 } : { w: 0.9, h: 0.88 });
   fit($('.order .fit'), tall ? { w: 0.9, h: 0.72 } : { w: 0.9, h: 0.46 });
   fit($('.by .fit'), { w: 0.92, h: 0.42 });
 

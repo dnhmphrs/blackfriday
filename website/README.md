@@ -4,8 +4,8 @@ A one-screen Black Friday countdown for the Chrome extension **30% Off EVERYTHIN
 Gary Mustard Enterprises), in the same look as the extension's banner and the store images and posts
 ("Globe Badge", see `socials/templates/v-starburst-post.html` and `extension/src/content.js`). The
 badge (the red and yellow starbursts, the globe, 30% OFF on its sash, BUT WAIT… THERE'S LESS! stamped on
-its shoulder) beside a split-flap clock; EVERYTHING ON THE INTERNET. and the red BLACK FRIDAY ONLY! tag;
-the yellow tape; the navy credit; the ticker along the top and the crawl along the bottom; all on the
+its shoulder) beside a split-flap clock; EVERYTHING ON THE INTERNET., the red BLACK FRIDAY ONLY! tag and
+the four cards (FREE, Gratis, $0.00, NO CHARGE); the yellow tape; the navy credit; the ticker along the top and the crawl along the bottom; all on the
 royal-blue tube with its rays and faint marks, through the banner's VHS tape filter. One link: the
 yellow tape, ADD TO CHROME, to the Chrome Web Store.
 
@@ -61,18 +61,21 @@ browser's dev tools.
   plate, globe, sash, stamp, glints) is placed in em, with the banner's own proportions.
 - `src/gl/bg.glsl` draws the background under the page with WebGL: the royal-blue tube gradient, the
   maker's mark tiled at 9.5% (`src/images/tile.png`, as the banner's), 24 pale rays turning round the
-  badge, and the glow behind it.
+  badge, and the glow behind it. On Black Friday, all day, it draws the same in warm sun tones instead
+  (orange to red, sun-yellow rays, a hot glow); before and after the day it is the blue look.
 - The tape look is the banner's own SVG filter (`#tape`, in `index.html`) on the whole picture, plus
   CSS scanlines and dark corners (`.lines`). If the page then draws under 24 frames a second, the filter
   is taken off (and put back if that made no difference).
-- Without WebGL the page still works: a CSS gradient and a CSS glow behind the badge.
-- Black Friday mode, in the same colours: the bursts and rays spin fast, 30% OFF pumps, the stamp thuds
-  every 2 s, the tag jolts, the clock glows, the crawl adds TODAY ONLY!, and a yellow TODAY ONLY! tape
-  slams across the screen every 9 seconds. On every other 0.25 s beat, all in step, the sash and the
-  tag flip red/yellow, the clock's header and glow flare, the rays flash yellow and the screen's rim
-  red: 2 flashes a second, under WCAG 2.3.1's limit of 3.
-- With `prefers-reduced-motion` nothing moves: a still globe, still bursts and rays, still tape noise,
-  no flashing and no takeover. The clock still counts.
+- Without WebGL the page still works: a CSS gradient and a CSS glow behind the badge (warm on the day).
+- Black Friday mode: the warm ground, and the bands and tag recoloured to read on it; the bursts and
+  rays spin fast, 30% OFF pumps, the stamp thuds every 2 s, the tag jolts, the clock glows, the crawl
+  adds TODAY ONLY!, and a yellow TODAY ONLY! tape slams across the screen every 9 seconds. On every
+  other 0.25 s beat, all in step, the sash and the tag flip red/yellow, the clock's header and glow
+  flare, and the rays and the screen's rim flash yellow: 2 flashes a second, under WCAG 2.3.1's limit
+  of 3.
+- With `prefers-reduced-motion` nothing moves: a still globe (a blue-facing frame), still bursts and
+  rays, still tape noise, no flashing and no takeover; on the day, the warm palette, still. The clock
+  still counts.
 
 ## Checking
 

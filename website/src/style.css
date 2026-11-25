@@ -63,14 +63,14 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 
 /* ---- the stage: the badge, the clock, the words ---- */
 .stage { flex: 1 1 0 !important; min-height: 0; width: 100%; max-width: calc(1440 * var(--s)); margin: 0 auto; display: grid;
-         grid-template: "badge clock" 47fr "badge words" 53fr / 50fr 50fr; padding: calc(16 * var(--s)) calc(40 * var(--s)) calc(20 * var(--s)); }
-.tall .stage { grid-template: "badge" 430fr "clock" 140fr "words" 160fr / 100%; padding: calc(10 * var(--s)) calc(14 * var(--s)) calc(14 * var(--s)); }
+         grid-template: "badge clock" 41fr "badge words" 59fr / 50fr 50fr; padding: calc(16 * var(--s)) calc(40 * var(--s)) calc(20 * var(--s)); }
+.tall .stage { grid-template: "badge" 380fr "clock" 128fr "words" 220fr / 100%; padding: calc(10 * var(--s)) calc(14 * var(--s)) calc(14 * var(--s)); }
 .badge-box { grid-area: badge; position: relative; min-height: 0; container-type: size; }
 .clock-box { grid-area: clock; position: relative; min-width: 0; min-height: 0; z-index: 2; }
 .words-box { grid-area: words; position: relative; min-width: 0; min-height: 0; z-index: 1; }
 /* in a wide window the clock and the words sit together as one column beside the badge */
 .wide .clock-box .fit { top: auto; bottom: 0; transform: translate(-50%, 0); }
-.wide .words-box .fit { top: calc(30 * var(--s)); transform: translate(-50%, 0); }
+.wide .words-box .fit { top: calc(22 * var(--s)); transform: translate(-50%, 0); }
 
 /* ---- the badge: a red 16-point burst behind a yellow 30-point one, each over a navy shadow, turning
    opposite ways; the words round the yellow one's rim; the globe on its blue plate; 30% OFF on the red
@@ -149,6 +149,17 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 .tag { font: 400 0.4em/1 "Archivo Black", "Arial Black", sans-serif; letter-spacing: -0.01em; color: var(--yellow); background: var(--red);
        border: 0.07em solid #000; padding: 0.2em 0.42em 0.24em; margin-top: 0.55em; box-shadow: 0.12em 0.12em 0 var(--navy);
        transform: rotate(-2deg); text-shadow: 0.05em 0.05em 0 #7a0006; }
+
+/* the four cards, as on the banner: a row 436 x 62 there, here in em of their 19 px labels */
+.cards { display: flex; gap: 0.632em; margin-top: 0.75em; font: italic 700 0.29em/1 "Arimo", Arial, sans-serif; letter-spacing: 0.02em; }
+.cards i { flex: none; position: relative; display: block; width: 5.263em; height: 3.263em; border-radius: 0.368em; overflow: hidden;
+           box-shadow: 0.158em 0.158em 0 rgba(6, 8, 70, 0.85); }
+.cards b { position: absolute; left: 0; right: 0; bottom: 0.263em; text-align: center; }
+.cards .c1 { background: linear-gradient(#f4f4f4 0 34%, #1c3fd1 34% 62%, #f1b400 62%); color: #111; }
+.cards .c2 { background: radial-gradient(circle at 50% 40%, #ffb300 0 30%, transparent 31%), #f6f6f6; color: #111; }
+.cards .c3 { background: linear-gradient(135deg, #7fd4ff, #2a79d8); color: #fff; }
+.cards .c4 { background: linear-gradient(#151515, #3a2a00); color: #ffcf2e; }
+.cards .c4 b { font-size: 0.763em; }
 
 /* ---- the yellow tape: the one link, to the store ---- */
 .order { display: block; height: calc(var(--tape) * var(--s)); text-decoration: none; cursor: pointer; color: #111; z-index: 4 !important;

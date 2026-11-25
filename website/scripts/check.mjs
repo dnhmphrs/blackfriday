@@ -73,16 +73,19 @@ function verify(r, spec, forced, name) {
 for (const run of RUNS) {
   const spec = DATES[run.m], name = `${run.w}x${run.h}-${run.m}${run.still ? '-still' : ''}`;
   const forced = new Date(spec.now).getTime();
-  const { ctx, page, errors } = await open({ ...run, held: run.m === 'today' && !run.still }, `${server.url}?now=${spec.now}&keep`);
+  // On the day the beat changes faster than a screenshot of the filtered page is taken here, so the
+  // page's time is held still for each frame, and stepped on to the other side of the beat for the second
+  const held = run.m === 'today' && !run.still;
+  const { ctx, page, errors } = await open({ ...run, held }, `${server.url}?now=${spec.now}&keep`);
   await page.waitForTimeout(run.still ? 600 : 1800);
-  const r = await read(page);
-  const clock = verify(r, spec, forced, name);
-  if (run.m === 'today' && !run.still) {
-    // The beat changes faster than a screenshot of the filtered page is taken here, so hold the page's
-    // time still for each frame, and step it on to the other side of the beat for the second one
-    const beat = () => page.evaluate(() => document.documentElement.classList.contains('beat'));
+  if (held) {
     await page.clock.pauseAt(await page.evaluate(() => Date.now() + 50));
     await page.clock.runFor(20);
+  }
+  const r = await read(page);
+  const clock = verify(r, spec, forced, name);
+  if (held) {
+    const beat = () => page.evaluate(() => document.documentElement.classList.contains('beat'));
     await page.screenshot({ path: `${OUT}/${name}.jpg`, type: 'jpeg', quality: 60 });
     const was = await beat();
     for (let i = 0; i < 20 && (await beat()) === was; i++) await page.clock.runFor(40);
