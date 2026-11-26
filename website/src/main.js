@@ -42,11 +42,14 @@ try {
 } catch { bg = null; }
 if (!bg) set('nogl', true);
 $('#bg').addEventListener('webglcontextlost', (e) => { e.preventDefault(); bg = null; set('nogl', true); });
-if (bg) {
+// the maker's-mark tile, ready before the page shows (drawing before the first layout stretched one mark across the screen)
+const tileReady = new Promise((ok) => {
+  if (!bg) return ok();
   const img = new Image();
-  img.onload = () => { if (bg) { bg.texture(img, 0); draw(seconds()); } };
+  img.onload = () => { if (bg) bg.texture(img, 0); ok(); };
+  img.onerror = () => ok();
   img.src = TILE;
-}
+});
 
 // ---- the badge's bursts, as on the banner (a radius of 100 in a box 224 across): red 16 points, yellow 30 ----
 {
@@ -213,7 +216,8 @@ function draw(t) {
 window.__bf = { gl: !!bg, mode: '', tape: false, now };
 async function start() {
   const faces = ['400 50px "Archivo Black"', '300 50px "Antonio"', '600 50px "Antonio"', 'italic 700 50px "Arimo"', 'italic 700 50px "Tinos"'];
-  await Promise.race([Promise.all(faces.map((f) => document.fonts.load(f))), new Promise((r) => setTimeout(r, 3000))]);
+  // the page shows once, whole: typefaces, the background's tile and the first layout all ready
+  await Promise.race([Promise.all([...faces.map((f) => document.fonts.load(f)), tileReady]), new Promise((r) => setTimeout(r, 3000))]);
   set('moving', MOVING); set('freeze', FREEZE);
   if (!MOVING || FREEZE) $('svg.defs').pauseAnimations(); // the tape's noise holds still too
   tick(false);
