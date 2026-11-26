@@ -22,7 +22,9 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 #bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
 .nogl #bg { display: none; }
 #p > :not(#bg) { position: relative; z-index: 1; flex: none; }
-.loading #p > :not(#bg) { visibility: hidden; }
+/* until everything is ready only the plain blue shows; then the whole picture fades in at once */
+#tv { transition: opacity 0.35s ease-out; }
+.loading #tv { opacity: 0; }
 /* faint scanlines and dark corners, as on the banner */
 .lines { display: none; position: absolute; inset: 0; z-index: 10; pointer-events: none;
          background: repeating-linear-gradient(rgba(0, 0, 16, 0) 0, rgba(0, 0, 16, 0.05) 1.5px, rgba(0, 0, 16, 0) 3px),
@@ -75,8 +77,8 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 /* ---- the badge: a red 16-point burst behind a yellow 30-point one, each over a navy shadow, turning
    opposite ways; the words round the yellow one's rim; the globe on its blue plate; 30% OFF on the red
    sash across it; BUT WAIT... THERE'S LESS! stamped on its shoulder. Room is left for the stamp at the right. ---- */
-.badge { position: absolute; left: 50%; top: 50%; width: 0; height: 0; font-size: min(calc(100cqw / 2.62), calc(100cqh / 2.27)); }
-.tall .badge { font-size: min(calc(100cqw / 2.36), calc(100cqh / 2.27)); }
+.badge { position: absolute; left: 50%; top: 50%; width: 0; height: 0; font-size: min(calc(100cqw / 2.4), calc(100cqh / 2.06)); }
+.tall .badge { font-size: min(calc(100cqw / 2.16), calc(100cqh / 2.06)); }
 .badge > * { position: absolute; display: block; max-width: none; }
 .burst { left: -1.12em; top: -1.12em; width: 2.24em; height: 2.24em; overflow: visible; }
 .burst text { font-family: "Archivo Black", "Arial Black", sans-serif; fill: var(--shade); letter-spacing: 0.01em; }

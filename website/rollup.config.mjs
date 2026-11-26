@@ -53,10 +53,16 @@ const page = () => ({
       .replace('/*STYLE*/', () => minCss(readFileSync('src/style.css', 'utf8')))
       .replace('<!--SCRIPT-->', `<script defer src="${entry.fileName}"></script>`)
       .replace(/%SITE%/g, SITE)
-      .replace(/\n\s*<meta property="og:url" content="">/, '') // no site URL given: leave og:url out
+      .replace(/\n\s*<meta property="og:url" content="">/, '') // no site URL given: leave og:url and the canonical link out
+      .replace(/\n\s*<link rel="canonical" href="">/, '')
+      .replace(/"url": "", /, '')
       .replace(/<!--[\s\S]*?-->\n?/g, '');
     this.emitFile({ type: 'asset', fileName: 'index.html', source: html });
     for (const f of walk('public')) this.emitFile({ type: 'asset', fileName: relative('public', f), source: readFileSync(f) });
+    // for search engines: one page, the sitemap only when the site's address is known
+    this.emitFile({ type: 'asset', fileName: 'robots.txt', source: `User-agent: *\nAllow: /\n${SITE ? `Sitemap: ${SITE}sitemap.xml\n` : ''}` });
+    if (SITE) this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source:
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${SITE}</loc></url></urlset>\n` });
   },
 });
 
